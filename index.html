@@ -1,10 +1,29 @@
 <!DOCTYPE html>
-<html>
+<html ng-app="pocketcivApp">
 <head>
+<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"/>
+
 <script src="//code.jquery.com/jquery-2.1.1.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js"></script>
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+<script src="//code.angularjs.org/1.2.9/angular.min.js"></script>
 </head>    
-<body>
-    <div id="deck">DECK</div>
+<body ng-controller="MainGame">
+    <div>{{ deck.cardsLeft }}
+        <button ng-click="drawCard()">draw</button>
+    </div>
+    <div>{{ card.id }}</div>
+    <textarea rows="5" cols="100">
+    {{ map }}
+    </textarea>
+    
+    <div id="mover">
+        <ul ng-repeat="(id, area) in movement">
+            <li>{{ id }}: <input type="number" value="{{ area.tribes }}" ng-model="movement[id]"/></li>
+        </ul>
+        <button ng-click="moveTribes()">Move</button>
+    </div>
+    
     <script type="text/javascript" src="bundle.js"></script>
 </body>
 </html>

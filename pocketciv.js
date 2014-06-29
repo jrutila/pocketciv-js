@@ -81,9 +81,11 @@ function Map() {
 }
 
 Map.prototype = {
-    moveTribes: function(from, to, amount) {
-        this.areas[from].tribes -= amount;
-        this.areas[to].tribes += amount;
+    moveTribes: function(situation) {
+        for (var key in situation)
+        {
+            this.areas[key].tribes = situation[key];
+        }
     },
     addTribe: function(area, amount) {
         amount = typeof amount !== 'undefined' ? amount : 1;

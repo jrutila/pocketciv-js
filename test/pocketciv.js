@@ -64,9 +64,10 @@ describe('Map', function() {
                 };
             });
             it('should move tribes from area to another', function() {
-                pocketciv.Map.moveTribes(1,2,1);
+                pocketciv.Map.moveTribes({ 1: 1, 2: 3, 3: 2 });
                 pocketciv.Map.areas[1].tribes.should.equal(1);
                 pocketciv.Map.areas[2].tribes.should.equal(3);
+                pocketciv.Map.areas[3].tribes.should.equal(2);
             });
         });
         describe('changes', function() {
