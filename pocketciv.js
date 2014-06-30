@@ -1,43 +1,4 @@
-var events = {
-    1: {
-        'circle': 1,
-        'square': 7,
-        'hexagon': 6,
-        'ab': 'A',
-        'friendly': true,
-        'gold': 0
-    },
-    2: {
-    },
-    3: {
-    },
-    4: {
-    },
-    5: {
-    },
-    6: {
-    },
-    7: {
-    },
-    8: {
-    },
-    9: {
-    },
-    10: {
-    },
-    11: {
-    },
-    12: {
-    },
-    13: {
-    },
-    14: {
-    },
-    15: {
-    },
-    16: {
-    },
-};
+var eventDeck = require('./eventdeck').EventDeck;
 
 var Set = function() {}
 Set.prototype.add = function(o) { this[o] = true; }
@@ -67,9 +28,9 @@ EventDeck.prototype = {
         if (this.cardsLeft == 0)
             throw new NoMoreCardsError("No more cards");
         var that = this;
-        var left = Object.keys(events).filter(function (x) { return that.usedCards.indexOf(parseInt(x)) < 0 });
+        var left = Object.keys(eventDeck).filter(function (x) { return that.usedCards.indexOf(parseInt(x)) < 0 });
         var n = left[Math.floor((Math.random() * left.length))]
-        var card = events[n];
+        var card = eventDeck[n];
         card.id = parseInt(n);
         this.usedCards.push(parseInt(n));
         return card;
@@ -179,13 +140,76 @@ TribeMover.prototype = {
     }
 }
 
+function Engine(map, deck) {
+    this.mover = function() { throw "Not implemented"; }
+    this.map = map;
+    this.deck = deck;
+    this.phases = ["populate", "move", "event", "advance"];
+    this.phase = "populate";
+    this.era = 1;
+}
+
+Engine.prototype = {
+    init: function(state) {
+        if ('deck' in state)
+        {
+            this.deck.usedCards = state.deck.usedCards;
+        }
+    },
+    nextPhase: function() {
+        this.phase = this.phases[this.phases.indexOf(this.phase)+1];
+        console.log("Phase is now "+this.phase);
+    },
+    populate: function() {
+        console.log("Populating areas");
+        for (var key in this.map.areas)
+        {
+            if (this.map.areas[key].tribes > 0)
+                this.map.areas[key].tribes += 1;
+        }
+        this.nextPhase();
+    },
+    move: function() {
+        console.log("Moving tribes with mover");
+        this.mover(this.map.areas, function(end) {
+            for (var key in this.map.areas)
+            {
+                this.map.areas[key].tribes = end[key];
+            }
+            this.nextPhase();
+        });
+    }
+    ,
+    event: function() {
+        console.log("Drawing event card")
+        this.drawer(this.deck, function(card) {
+            var eng = this;
+            if (eng.era in card.events)
+            {
+                var event = card.events[eng.era];
+                eng.events[event.name].run(eng, event, function() {
+                    eng.nextPhase();
+                })
+                console.log("Event: "+event);
+            } else {
+                console.log("No event!");
+                eng.nextPhase();
+            }
+        });
+    }
+}
+
+var theMap = new Map();
+var theDeck = new EventDeck();
+
 module.exports = {
     example: function(a) {
         return a + "--";
     }
     ,
     NoMoreCardsError: NoMoreCardsError,
-    EventDeck: new EventDeck(),
-    Map: new Map(),
+    EventDeck: theDeck,
+    Map: theMap,
     TribeMover: TribeMover,
+    Engine: new Engine(theMap, theDeck),
 }

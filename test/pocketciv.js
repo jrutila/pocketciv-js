@@ -183,3 +183,154 @@ describe('TribeMover', function() {
         });
     });
 });
+
+describe("Engine", function() {
+    describe('populate', function() {
+        beforeEach(function() {
+            engine = pocketciv.Engine;
+            engine.init({
+                'era': 1
+            });
+            pocketciv.Map.areas = {
+                    1: {
+                        'tribes': 2,
+                        'neighbours': [ 2, 3 ]
+                    },
+                    2: {
+                        'tribes': 1,
+                        'neighbours': [ 1, 3 ]
+                    },
+                    3: {
+                        'tribes': 0,
+                        'neighbours': [ 2, 1 ]
+                    }
+            };
+        });
+        it('should populate', function() {
+            engine.phase.should.equal("populate");
+            engine.populate();
+            pocketciv.Map.areas[1].tribes.should.equal(3);
+            pocketciv.Map.areas[2].tribes.should.equal(2);
+            pocketciv.Map.areas[3].tribes.should.equal(0);
+            engine.phase.should.equal("move");
+            //engine.move();
+            //engine.event();
+            //engine.advance();
+            //engine.upkeep();
+        });
+    });
+    describe('move', function() {
+        beforeEach(function() {
+            engine = pocketciv.Engine;
+            engine.init({
+                'era': 1
+            });
+            pocketciv.Map.areas = {
+                    1: {
+                        'tribes': 2,
+                        'neighbours': [ 2, 3 ]
+                    },
+                    2: {
+                        'tribes': 1,
+                        'neighbours': [ 1, 3 ]
+                    },
+                    3: {
+                        'tribes': 0,
+                        'neighbours': [ 2, 1 ]
+                    }
+            };
+            engine.phase = "move";
+        });
+        it('should call mover', function() {
+            engine.mover = function(situation, move) {
+                situation[1].tribes.should.equal(2);
+                situation[2].tribes.should.equal(1);
+                move.call(engine, { 1: 1, 2: 2, 3: 0});
+            }
+            engine.phase.should.equal("move");
+            engine.move(function () {
+                pocketciv.Map.areas[1].tribes.should.equal(1);
+                pocketciv.Map.areas[2].tribes.should.equal(2);
+                pocketciv.Map.areas[3].tribes.should.equal(0);
+                engine.phase.should.equal("event");
+            });
+        });
+    });
+    describe('event', function() {
+        beforeEach(function() {
+            engine = pocketciv.Engine;
+            engine.init({
+                'era': 1,
+                'deck': {
+                    'usedCards': [1, 2, 3, 4]
+                }
+            });
+            pocketciv.Map.areas = {
+                    1: {
+                        'tribes': 2,
+                        'neighbours': [ 2, 3 ]
+                    },
+                    2: {
+                        'tribes': 1,
+                        'neighbours': [ 1, 3 ]
+                    },
+                    3: {
+                        'tribes': 0,
+                        'neighbours': [ 2, 1 ]
+                    }
+            };
+            engine.phase = "event";
+            engine.events = {
+                'test': {
+                    name: "Test event",
+                    description: "Reset tribe count to one on selected area",
+                    run: function(engine, event, done) {
+                        engine.drawer(engine.deck, function(card) {
+                            var area_id = card.circle;
+                            if (engine.map.areas[area_id].tribes > 1)
+                            {
+                                engine.map.areas[area_id].tribes = 1;
+                            }
+                            done();
+                        })
+                    }
+                }
+            }
+            testdeck = [
+                {
+                    'circle': 1
+                },
+                {
+                    'events': { 1: { name: 'test' } },
+                }
+            ]
+        });
+        it('should call drawer', function() {
+            engine.drawer = function(deck, drawn) {
+                var card = deck.draw();
+                card.events = { };
+                drawn.call(engine, card);
+            }
+            engine.phase.should.equal("event");
+            engine.event(function () {
+                pocketciv.EventDeck.cardLeft.should.equal(12);
+                engine.phase.should.equal("advance");
+            });
+        });
+        it('should call the event', function() {
+            engine.drawer = function(deck, drawn) {
+                var card = deck.draw();
+                card = testdeck.pop();
+                drawn.call(engine, card);
+            }
+            engine.phase.should.equal("event");
+            engine.event(function () {
+                pocketciv.EventDeck.cardLeft.should.equal(12);
+                // because testdeck card had circle: 1
+                pocketciv.Map.areas[1].tribes.should.equal(1);
+                pocketciv.Map.areas[2].tribes.should.equal(1);
+                engine.phase.should.equal("advance");
+            });
+        });
+    });
+});

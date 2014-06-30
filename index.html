@@ -10,18 +10,27 @@
 </head>    
 <body ng-controller="MainGame">
     <div>{{ deck.cardsLeft }}
-        <button ng-click="drawCard()">draw</button>
+        <button ng-hide="hideDrawer" ng-click="drawCard()">draw</button>
     </div>
-    <div>{{ card.id }}</div>
+    <div>{{ card }}</div>
     <textarea rows="5" cols="100">
     {{ map }}
     </textarea>
     
-    <div id="mover">
+    <div id="mover" ng-hide="hideMover">
         <ul ng-repeat="(id, area) in movement">
             <li>{{ id }}: <input type="number" value="{{ area.tribes }}" ng-model="movement[id]"/></li>
         </ul>
         <button ng-click="moveTribes()">Move</button>
+    </div>
+    
+    <div id="phaser">
+    <h2>Phases</h2>
+        <ul>
+            <li><button ng-click="engine.populate()" ng-disabled="engine.phase != 'populate'">1. Population</button></li>
+            <li><button ng-click="engine.move()" ng-disabled="engine.phase != 'move'">2. Move</button></li>
+            <li><button ng-click="engine.event()" ng-disabled="engine.phase != 'event'">3. Event card</button></li>
+        </ul>
     </div>
     
     <script type="text/javascript" src="bundle.js"></script>
