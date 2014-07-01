@@ -1,4 +1,9 @@
 var eventDeck = require('./eventdeck').EventDeck;
+var events = {
+    'famine': require('./events/famine'),
+}
+
+var irrigation = {}
 
 var Set = function() {}
 Set.prototype.add = function(o) { this[o] = true; }
@@ -23,6 +28,9 @@ EventDeck.prototype = {
     },
     get cardsLeft() {
         return 16 - this.usedCards.length;
+    },
+    specific: function(n) {
+      return eventDeck[n];  
     },
     draw: function() {
         if (this.cardsLeft == 0)
@@ -143,10 +151,19 @@ TribeMover.prototype = {
 function Engine(map, deck) {
     this.mover = function() { throw "Not implemented"; }
     this.map = map;
+    for (var key in map)
+    {
+        map[key].id = key;
+    }
     this.deck = deck;
     this.phases = ["populate", "move", "event", "advance"];
     this.phase = "populate";
+    this.events = events;
     this.era = 1;
+}
+
+function draw_active_area() {
+    
 }
 
 Engine.prototype = {
@@ -180,21 +197,116 @@ Engine.prototype = {
         });
     }
     ,
-    event: function() {
+    event: function(done) {
         console.log("Drawing event card")
         this.drawer(this.deck, function(card) {
             var eng = this;
             if (eng.era in card.events)
             {
                 var event = card.events[eng.era];
-                eng.events[event.name].run(eng, event, function() {
-                    eng.nextPhase();
-                })
                 console.log("Event: "+event);
+                var ev = eng.events[event.name];
+                if (ev.hasOwnProperty('run'))
+                    ev.run(eng, event, function() {
+                        eng.nextPhase();
+                        done();
+                    });
+                else
+                {
+                    console.log('No run method. Doing steps!')
+                    var patt = /{% (.*?) %}/g;
+                    var area = undefined;
+                    var change = undefined;
+                    area_card = function(done) {
+                        console.log("Drawing area card");
+                        eng.drawer(eng.deck, function(card) {
+                            var area_id = card.circle;
+                            if (area_id in eng.map.areas)
+                            {
+                                area = eng.map.areas[area_id];
+                                done();
+                            }
+                        });
+                    };
+                    var adv = function(advance) {
+                        return false;
+                    };
+                    final = function(d) {
+                        console.log(area);
+                        console.log(change);
+                        if (area && change)
+                        {
+                            eng.areaChange(area, change, function() {
+                                eng.nextPhase();
+                                d();
+                            });
+                        }
+                        else {
+                            console.log("No area change");
+                            d();
+                        }
+                    };
+                    var steps_cmd = [];
+                    for (var key in ev.steps)
+                    {
+                        var step = ev.steps[key];
+                        var m = step.match(patt);
+                        var cmd = "";
+                        for (var s in m)
+                        {
+                            cmd += m[s].replace(patt, "$1");
+                        }
+                        steps_cmd.push(cmd);
+                    }
+                    steps_cmd.push("final");
+                    
+                    var stepper = function(steps) {
+                        if (steps.length == 0)
+                        {
+                            console.log("'I'm ready, calling done")
+                            console.log(done);
+                            return done();
+                        }
+                        console.log("Stepping " + steps.length);
+                        var cmd = steps.shift();
+                        var callback = function() { stepper(steps); }
+                        console.log(cmd);
+                        if (cmd in this)
+                        {
+                            // It is a function
+                            this[cmd].call(this, callback);
+                        } else {
+                            (function(d) {
+                                eval(cmd);
+                                d();
+                            })(callback);
+                        }
+                    };
+                    stepper(steps_cmd);
+                }
             } else {
                 console.log("No event!");
                 eng.nextPhase();
+                done();
             }
+        });
+    },
+    areaChange: function(area, change, done) {
+        this.areaChanger(area, change, function() {
+            for (var k in change)
+            {
+                if (change[k] === true || change[k] === false)
+                    area[k] = change[k];
+                else
+                {
+                    var v = change[k];
+                    if (v.indexOf('-') == 0 || v.indexOf('+') == 0)
+                        area[k] += parseInt(v);
+                    else
+                        area[k] = parseInt(v);
+                }
+            }
+            done();
         });
     }
 }

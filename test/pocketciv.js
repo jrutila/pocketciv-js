@@ -279,6 +279,9 @@ describe("Engine", function() {
                         'neighbours': [ 2, 1 ]
                     }
             };
+            engine.areaChanger = function(area, change, done) {
+                done();
+            }
             engine.phase = "event";
             engine.events = {
                 'test': {
@@ -294,6 +297,17 @@ describe("Engine", function() {
                             done();
                         })
                     }
+                },
+                'steps_event': {
+                    name: 'famine',
+                    title: 'Famine',
+                    punchline: 'Famine is upon us!',
+                    description: "",
+                    steps: {
+                    '1': "{% area_card %}",
+                    '2.1': "In {{ Active Region|area }}, Decimate Tribes and Farms. Reduce City AV by 2. {% change = { tribes: '0', farm: false, city: '-2' } %}",
+                    '2.2': "{% if (adv(irrigation)) { %}2.2. If you have {{ adv:irrigation }}, do not Decimate Farms. Reduce City AV by 1 instead 2.{% change = { tribes: '0', city: '-1' } %}{% } %}",
+                    },
                 }
             }
             testdeck = [
@@ -302,6 +316,14 @@ describe("Engine", function() {
                 },
                 {
                     'events': { 1: { name: 'test' } },
+                }
+            ]
+            stepsdeck = [
+                {
+                    'circle': 1
+                },
+                {
+                    'events': { 1: { name: 'steps_event' } },
                 }
             ]
         });
@@ -313,11 +335,11 @@ describe("Engine", function() {
             }
             engine.phase.should.equal("event");
             engine.event(function () {
-                pocketciv.EventDeck.cardLeft.should.equal(12);
+                pocketciv.EventDeck.cardsLeft.should.equal(11);
                 engine.phase.should.equal("advance");
             });
         });
-        it('should call the event', function() {
+        it('should call the event', function(done) {
             engine.drawer = function(deck, drawn) {
                 var card = deck.draw();
                 card = testdeck.pop();
@@ -325,11 +347,29 @@ describe("Engine", function() {
             }
             engine.phase.should.equal("event");
             engine.event(function () {
-                pocketciv.EventDeck.cardLeft.should.equal(12);
+                pocketciv.EventDeck.cardsLeft.should.equal(10);
                 // because testdeck card had circle: 1
                 pocketciv.Map.areas[1].tribes.should.equal(1);
                 pocketciv.Map.areas[2].tribes.should.equal(1);
                 engine.phase.should.equal("advance");
+                done();
+            });
+        });
+        it('should do the steps', function(done) {
+            engine.drawer = function(deck, drawn) {
+                var card = deck.draw();
+                card = stepsdeck.pop();
+                drawn.call(engine, card);
+            }
+            engine.phase.should.equal("event");
+            engine.event(function () {
+                pocketciv.EventDeck.cardsLeft.should.equal(10);
+                // because testdeck card had circle: 1
+                pocketciv.Map.areas[1].tribes.should.equal(0);
+                pocketciv.Map.areas[1].farm.should.equal(false);
+                pocketciv.Map.areas[2].tribes.should.equal(1);
+                engine.phase.should.equal("advance");
+                done();
             });
         });
     });

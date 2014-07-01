@@ -11,22 +11,27 @@ pocketcivApp.controller('MainGame', function ($scope) {
     pocketciv.Map.areas =
     {
     "1": {
+        "id": 1,
         "tribes": 1,
         "neighbours": [ 2 ] 
     },
     "2": {
+        "id": 2,
         "tribes": 0,
         "neighbours": [ 1, 3 ] 
     },
     "3": {
+        "id": 3,
         "tribes": 0,
         "neighbours": [ 2, 4, 5 ] 
     },
     "4": {
+        "id": 4,
         "tribes": 0,
         "neighbours": [ 3, 5 ] 
     },
     "5": {
+        "id": 5,
         "tribes": 0,
         "neighbours": [ 3, 4 ] 
     }
@@ -43,7 +48,6 @@ pocketcivApp.controller('MainGame', function ($scope) {
             console.log("OK MOVE!");
             moveFunc.call(pocketciv.Engine, $scope.movement);
             $scope.hideMover = true;
-            moveFunc = undefined;
         } else {
             console.log("FAILED MOVE")
         }
@@ -54,9 +58,9 @@ pocketcivApp.controller('MainGame', function ($scope) {
     $scope.hideDrawer = true;
     $scope.drawCard = function() {
         $scope.card = $scope.deck.draw();
+        $scope.card = pocketciv.EventDeck.specific(10);
         $scope.hideDrawer = true;
         drawnFunc.call(pocketciv.Engine, $scope.card);
-        drawnFunc = undefined;
     }
     
     pocketciv.Engine.mover = function(situation, move) {
@@ -71,6 +75,17 @@ pocketcivApp.controller('MainGame', function ($scope) {
         $scope.deck = deck;
         $scope.hideDrawer = false;
         drawnFunc = drawn;
+    }
+    
+    $scope.areaChangeOk = function() {
+        $scope.areaChange = undefined;
+        areaChangeDone();
+    }
+    
+    var areaChangeDone = undefined;
+    pocketciv.Engine.areaChanger = function(area, change, done) {
+        $scope.areaChange = { 'area_id': area.id, 'change': change };
+        areaChangeDone = done;
     }
     
     $scope.engine = pocketciv.Engine;

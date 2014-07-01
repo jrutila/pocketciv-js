@@ -13,9 +13,13 @@
         <button ng-hide="hideDrawer" ng-click="drawCard()">draw</button>
     </div>
     <div>{{ card }}</div>
-    <textarea rows="5" cols="100">
-    {{ map }}
-    </textarea>
+    
+    <div id="map">
+        <textarea rows="5" cols="100">
+        {{ map }}
+        </textarea>
+        <span>{{ areaChange }}<button ng-hide="!areaChange" ng-click="areaChangeOk()">OK</button></span>
+    </div>
     
     <div id="mover" ng-hide="hideMover">
         <ul ng-repeat="(id, area) in movement">
@@ -29,7 +33,8 @@
         <ul>
             <li><button ng-click="engine.populate()" ng-disabled="engine.phase != 'populate'">1. Population</button></li>
             <li><button ng-click="engine.move()" ng-disabled="engine.phase != 'move'">2. Move</button></li>
-            <li><button ng-click="engine.event()" ng-disabled="engine.phase != 'event'">3. Event card</button></li>
+<!--            <li><button ng-click="engine.event()" ng-disabled="engine.phase != 'event'">3. Event card</button></li>-->
+            <li><button ng-click="engine.event()">3. Event card</button></li>
         </ul>
     </div>
     
