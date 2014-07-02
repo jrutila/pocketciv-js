@@ -14,6 +14,7 @@ var actions = {
 var advances = {
     'irrigation': require('./advances/irrigation'),
     'literacy': require('./advances/literacy'),
+    'agriculture': require('./advances/agriculture'),
 }
 
 
@@ -235,7 +236,16 @@ Engine.prototype = {
     },
     advance: function(name) {
         console.log("Running advance "+name);
-        this.advances[name].run(this);
+        var context = {};
+        var eng = this;
+        for (var key in eng.acquired)
+        {
+            if (name in eng.acquired[key].actions)
+            {
+                _.extend(context, eng.acquired[key].actions[name].context(this));
+            }
+        }
+        this.actions[name].run.call(this, context);
     }
     ,
     event: function(done) {
@@ -388,7 +398,7 @@ final = function(d) {
                             area[k] = parseInt(v);
                             
                         if (area[k] < 0)
-                            area[k] == 0;
+                            area[k] = 0;
                     }
                 }
             }

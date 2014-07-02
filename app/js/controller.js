@@ -106,9 +106,10 @@ pocketcivApp.controller('MainGame', function ($scope) {
     }
     
     $scope.engine = pocketciv.Engine;
-    //$scope.engine.phase = "event";
+    $scope.engine.phase = "advance";
     $scope.engine.era = 3
     $scope.engine.acquired = {
         'literacy': pocketciv.Advances['literacy'],
+        'agriculture': pocketciv.Advances['agriculture'],
     }
 });
