@@ -12,28 +12,31 @@ pocketcivApp.controller('MainGame', function ($scope) {
     {
     "1": {
         "id": 1,
-        "tribes": 1,
-        "neighbours": [ 2 ] 
+        "tribes": 5,
+        "neighbours": [ 2, 'sea' ],
+        "forest": true
     },
     "2": {
         "id": 2,
-        "tribes": 0,
-        "neighbours": [ 1, 3 ] 
+        "tribes": 5,
+        "neighbours": [ 1, 3, 'sea', 'frontier' ] 
     },
     "3": {
         "id": 3,
-        "tribes": 0,
-        "neighbours": [ 2, 4, 5 ] 
+        "tribes": 5,
+        "neighbours": [ 2, 4, 5, 'frontier' ],
+        "farm": true,
+        "forest": true
     },
     "4": {
         "id": 4,
         "tribes": 0,
-        "neighbours": [ 3, 5 ] 
+        "neighbours": [ 3, 5, 'frontier' ] 
     },
     "5": {
         "id": 5,
         "tribes": 0,
-        "neighbours": [ 3, 4 ] 
+        "neighbours": [ 3, 4, 'frontier' ] 
     }
     };
     $scope.map = pocketciv.Map;
@@ -88,5 +91,19 @@ pocketcivApp.controller('MainGame', function ($scope) {
         areaChangeDone = done;
     }
     
+    $scope.possibleAreas = []
+    $scope.selectedArea = undefined;
+    var areaSelect = undefined;
+    $scope.selectArea = function() {
+        areaSelect.call(pocketciv.Engine, $scope.selectedArea);
+        $scope.possibleAreas = []
+    }
+    pocketciv.Engine.areaSelector = function(possibleAreas, select)
+    {
+        $scope.possibleAreas = possibleAreas;
+        areaSelect = select;
+    }
+    
     $scope.engine = pocketciv.Engine;
+    //$scope.engine.phase = "event";
 });

@@ -158,6 +158,10 @@ describe('TribeMover', function() {
             mover.ok({ 1: 0, 2: 0, 3: 1, 4: 0, 5: 1 }).should.be.true;
             mover.ok({ 1: 0, 2: 0, 3: 0, 4: 0, 5: 2 }).should.be.true;
         });
+        it('case 3', function() {
+            mover.init({ 1: 6, 2: 6, 3: 6, 4: 0, 5: 0 });
+            mover.ok({ 1: 6, 2: 6, 3: 6, 4: 3, 5: 3 }).should.be.false;
+        });
     });
     describe('big one', function() {
         beforeEach(function() {
@@ -180,6 +184,31 @@ describe('TribeMover', function() {
         it('case 1', function() {
             mover.init({ 1: 0, 2: 0, 3: 6, 4: 0, 5: 0, 6: 0, 7: 0 });
             mover.ok({ 1: 1, 2: 1, 3: 0, 4: 1, 5: 1, 6: 1, 7: 1 }).should.be.true;
+        });
+    });
+    describe('with sea and frontier', function() {
+        beforeEach(function() {
+            //       1 - 2---------
+            //      SEA / \
+            //         /   3
+            //        /   / \ FRONTIER
+            //           4 - 5
+            map = {
+                1: { 'neighbours': [2, 'sea'] },
+                2: { 'neighbours': [1, 3, 'sea', 'frontier'] },
+                3: { 'neighbours': [2, 5, 4, 'frontier'] },
+                4: { 'neighbours': [3, 5, 'frontier'] },
+                5: { 'neighbours': [3, 4, 'frontier'] },
+            }
+            mover = new pocketciv.TribeMover(map, 1);
+        });
+        it('case 1', function() {
+            mover.init({ 1: 0, 2: 0, 3: 6, 4: 0, 5: 0 });
+            mover.ok({ 1: 0, 2: 3, 3: 0, 4: 2, 5: 1 }).should.be.true;
+        });
+        it('case 2', function() {
+            mover.init({ 1: 6, 2: 6, 3: 6, 4: 0, 5: 0 });
+            mover.ok({ 1: 6, 2: 6, 3: 6, 4: 3, 5: 3 }).should.be.false;
         });
     });
 });

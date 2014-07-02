@@ -3,6 +3,11 @@ var events = {
     'famine': require('./events/famine'),
 }
 
+var advances = {
+    'farm': require('./actions/farm'),
+    'city': require('./actions/city'),
+}
+
 var irrigation = {}
 
 var Set = function() {}
@@ -73,12 +78,15 @@ function TribeMover(map, moveLimit) {
     this.neighbours2 = {};
     for (var key in this.map)
     {
-        var ngh = this.map[key]['neighbours'];
+        var ngh = this.map[key]['neighbours'].slice(0);
+        ngh = ngh.filter(function (e) { return typeof e != "string"; })
         this.neighbours[key] = ngh.slice(0);
         var ngh2 = ngh.slice(0);
+        console.log(ngh)
         for (var n in ngh2)
         {
-            var n2 = this.map[ngh[n]]['neighbours'];
+            var n2 = this.map[ngh[n]]['neighbours'].slice(0);
+            n2 = n2.filter(function (e) { return typeof e != "string"; })
             ngh2 = ngh2.concat(n2);
         }
         ngh2 = ngh2.filter(function (e, p) {
@@ -88,6 +96,17 @@ function TribeMover(map, moveLimit) {
         this.neighbours2[key] = ngh2;
     }
     this.moveLimit = moveLimit;
+}
+
+function sum(arr) {
+    var total = 0;
+
+    for (var i in arr)
+    {
+        total += arr[i];
+    }
+
+    return total;
 }
 
 TribeMover.prototype = {
@@ -100,17 +119,24 @@ TribeMover.prototype = {
         var ngh = this._nghValue(situation);
         /*
         console.log('--COMP--')
-        console.log('start')
+        console.log('this.start')
         console.log(this.start)
-        console.log('ngh')
+        console.log('this.neighbours')
         console.log(this.neighbours)
-        console.log('ngh2')
+        console.log('this.neighbours2')
         console.log(this.neighbours2)
+        console.log('this.max')
+        console.log(this.max)
+        console.log('this.ngh2')
+        console.log(this.ngh2)
         console.log('curr - situation')
         console.log(situation)
         console.log('curr - ngh')
         console.log(ngh)
+        console.log(sum(this.start) + " != " + sum(situation))
         */
+        if (sum(this.start) != sum(situation))
+            return false;
         for (var key in situation)
         {
             var curr = situation[key];
@@ -159,6 +185,7 @@ function Engine(map, deck) {
     this.phases = ["populate", "move", "event", "advance"];
     this.phase = "populate";
     this.events = events;
+    this.advances = advances;
     this.era = 1;
 }
 
@@ -195,6 +222,10 @@ Engine.prototype = {
             }
             this.nextPhase();
         });
+    },
+    advance: function(name) {
+        console.log("Running advance "+name);
+        this.advances[name].run(this);
     }
     ,
     event: function(done) {
@@ -263,11 +294,8 @@ Engine.prototype = {
                     var stepper = function(steps) {
                         if (steps.length == 0)
                         {
-                            console.log("'I'm ready, calling done")
-                            console.log(done);
-                            return done();
+                            return done && done();
                         }
-                        console.log("Stepping " + steps.length);
                         var cmd = steps.shift();
                         var callback = function() { stepper(steps); }
                         console.log(cmd);
@@ -287,7 +315,7 @@ Engine.prototype = {
             } else {
                 console.log("No event!");
                 eng.nextPhase();
-                done();
+                done && done();
             }
         });
     },
@@ -300,13 +328,16 @@ Engine.prototype = {
                 else
                 {
                     var v = change[k];
+                    if (!area[k])
+                        area[k] = 0;
+                    
                     if (v.indexOf('-') == 0 || v.indexOf('+') == 0)
                         area[k] += parseInt(v);
                     else
                         area[k] = parseInt(v);
                 }
             }
-            done();
+            done && done();
         });
     }
 }
