@@ -12,11 +12,12 @@ module.exports = {
             }
         }
         engine.areaSelector(possibleAreas, function(area) {
-            engine.areaChange(engine.map.areas[area], {
+            var changes = {};
+            changes[area] = {
                 'tribes': '-2',
                 'forest': false,
-                'farm': true
-            });
+                'farm': true };
+            engine.areaChange(changes);
         });
     }
 }

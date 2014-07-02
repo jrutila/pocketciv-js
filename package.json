@@ -5,6 +5,7 @@
         "test": "make test"
     },
     "dependencies": {
-            "browserify": "*"
+            "browserify": "*",
+            "underscore": "*"
     }
 }

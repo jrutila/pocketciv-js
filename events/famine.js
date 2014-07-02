@@ -6,7 +6,6 @@ module.exports = {
     steps: {
             '1': "{% area_card %}",
             '2.1': "In {{ Active Region|area }}, Decimate Tribes and Farms. Reduce City AV by 2. {% change = { tribes: '0', farm: false, city: '-2' } %}",
-            '2.2': "{% if (adv(irrigation)) { %}2.2. If you have {{ adv:irrigation }}, do not Decimate Farms. Reduce City AV by 1 instead 2.{% change = { tribes: '0', city: '-1' } %}{% } %}",
     }
 }
     /*

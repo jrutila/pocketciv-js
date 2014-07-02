@@ -234,6 +234,10 @@ describe("Engine", function() {
                         'neighbours': [ 2, 1 ]
                     }
             };
+            engine.areaChanger = function(changes, done)
+            {
+                done.call(engine);
+            }
         });
         it('should populate', function() {
             engine.phase.should.equal("populate");
@@ -296,20 +300,25 @@ describe("Engine", function() {
             });
             pocketciv.Map.areas = {
                     1: {
+                        'id': 1,
                         'tribes': 2,
                         'neighbours': [ 2, 3 ]
                     },
                     2: {
+                        'id': 2,
                         'tribes': 1,
                         'neighbours': [ 1, 3 ]
                     },
                     3: {
+                        'id': 3,
                         'tribes': 0,
                         'neighbours': [ 2, 1 ]
                     }
             };
-            engine.areaChanger = function(area, change, done) {
-                done();
+            engine.areaChanger = function(changes, done) {
+                console.log("test area change with")
+                console.log(changes)
+                done && done.call(engine);
             }
             engine.phase = "event";
             engine.events = {
@@ -328,14 +337,16 @@ describe("Engine", function() {
                     }
                 },
                 'steps_event': {
-                    name: 'famine',
+                    name: 'steps_event',
                     title: 'Famine',
-                    punchline: 'Famine is upon us!',
+                    punchline: 'Event is upon us!',
                     description: "",
                     steps: {
                     '1': "{% area_card %}",
-                    '2.1': "In {{ Active Region|area }}, Decimate Tribes and Farms. Reduce City AV by 2. {% change = { tribes: '0', farm: false, city: '-2' } %}",
-                    '2.2': "{% if (adv(irrigation)) { %}2.2. If you have {{ adv:irrigation }}, do not Decimate Farms. Reduce City AV by 1 instead 2.{% change = { tribes: '0', city: '-1' } %}{% } %}",
+                    '1.1': "{% cityNumber = '7' %}",
+                    '2.1': "In {{ Active Region|area }}, Decimate Tribes and Farms. Reduce City AV by 2. {% change = { tribes: '0', farm: true} %}",
+                    '-': '{% change.city = cityNumber; change.farm = farmValue %}',
+                    '1.2': "{% farmValue = false %}",
                     },
                 }
             }
@@ -396,6 +407,37 @@ describe("Engine", function() {
                 // because testdeck card had circle: 1
                 pocketciv.Map.areas[1].tribes.should.equal(0);
                 pocketciv.Map.areas[1].farm.should.equal(false);
+                pocketciv.Map.areas[2].tribes.should.equal(1);
+                engine.phase.should.equal("advance");
+                done();
+            });
+        });
+        it('should do the steps with acquired advance', function(done) {
+            engine.acquired = {
+                'test_adv': {
+                    events: {
+                        'steps_event': {
+                            steps: {
+                                '2.2': "{% change = { 'tribes': '10', farm: true } %}",
+                                '2.3': "{% cityNumber = '2' %}"
+                            }
+                        }
+                    }
+                }
+            };
+            engine.drawer = function(deck, drawn) {
+                var card = deck.draw();
+                card = stepsdeck.pop();
+                drawn.call(engine, card);
+            }
+            engine.phase.should.equal("event");
+            engine.event(function () {
+                pocketciv.EventDeck.cardsLeft.should.equal(10);
+                // because testdeck card had circle: 1
+                // AND there is test_adv acquired
+                pocketciv.Map.areas[1].tribes.should.equal(10);
+                pocketciv.Map.areas[1].farm.should.equal(false);
+                pocketciv.Map.areas[1].city.should.equal(2);
                 pocketciv.Map.areas[2].tribes.should.equal(1);
                 engine.phase.should.equal("advance");
                 done();

@@ -10,10 +10,11 @@ module.exports = {
             }
         }
         engine.areaSelector(possibleAreas, function(area) {
-            engine.areaChange(engine.map.areas[area], {
+            var changes = {};
+            changes[area] = {
                 'tribes': '-4',
-                'city': '+1'
-            });
+                'city': '1' };
+            engine.areaChange(changes);
         });
     }
 }

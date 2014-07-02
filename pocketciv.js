@@ -1,12 +1,21 @@
 var eventDeck = require('./eventdeck').EventDeck;
+var _ = require("underscore");
+
 var events = {
     'famine': require('./events/famine'),
+    'anarchy': require('./events/anarchy'),
 }
 
-var advances = {
+var actions = {
     'farm': require('./actions/farm'),
     'city': require('./actions/city'),
 }
+
+var advances = {
+    'irrigation': require('./advances/irrigation'),
+    'literacy': require('./advances/literacy'),
+}
+
 
 var irrigation = {}
 
@@ -186,12 +195,10 @@ function Engine(map, deck) {
     this.phase = "populate";
     this.events = events;
     this.advances = advances;
+    this.actions = actions;
     this.era = 1;
 }
 
-function draw_active_area() {
-    
-}
 
 Engine.prototype = {
     init: function(state) {
@@ -206,12 +213,15 @@ Engine.prototype = {
     },
     populate: function() {
         console.log("Populating areas");
+        var changes = {};
         for (var key in this.map.areas)
         {
             if (this.map.areas[key].tribes > 0)
-                this.map.areas[key].tribes += 1;
+                changes[key] = { 'tribes': '+1' };
         }
-        this.nextPhase();
+        this.areaChange(changes, function() {
+            this.nextPhase();
+        })
     },
     move: function() {
         console.log("Moving tribes with mover");
@@ -247,49 +257,87 @@ Engine.prototype = {
                     console.log('No run method. Doing steps!')
                     var patt = /{% (.*?) %}/g;
                     var area = undefined;
+                    var areas = [];
                     var change = undefined;
-                    area_card = function(done) {
-                        console.log("Drawing area card");
-                        eng.drawer(eng.deck, function(card) {
-                            var area_id = card.circle;
-                            if (area_id in eng.map.areas)
-                            {
-                                area = eng.map.areas[area_id];
-                                done();
-                            }
-                        });
-                    };
-                    var adv = function(advance) {
-                        return false;
-                    };
-                    final = function(d) {
-                        console.log(area);
-                        console.log(change);
-                        if (area && change)
-                        {
-                            eng.areaChange(area, change, function() {
-                                eng.nextPhase();
-                                d();
-                            });
-                        }
-                        else {
-                            console.log("No area change");
-                            d();
-                        }
-                    };
+                    var changes = {};
+                    
+area_card = function(done) {
+    console.log("Drawing area card");
+    eng.drawer(eng.deck, function(card) {
+        var area_id = card.circle;
+        if (area_id in eng.map.areas)
+        {
+            area = eng.map.areas[area_id];
+            done();
+        }
+    });
+};
+
+select_areas = function(expr) {
+    for (var a in eng.map.areas)
+    {
+        if (expr(eng.map.areas[a]))
+            areas.push(eng.map.areas[a]);
+    }
+};
+
+var adv = function(advance) {
+    return false;
+};
+
+final = function(d) {
+    console.log(area);
+    console.log(change);
+    console.log(areas);
+    console.log(changes);
+    if (area && change)
+    {
+        var cngs= {};
+        cngs[area.id] = change;
+        eng.areaChange(cngs, function() {
+            eng.nextPhase();
+            d();
+        });
+    } else if (areas && changes)
+    {
+        eng.areaChange(changes, function() {
+            eng.nextPhase();
+            d();
+        });
+    }
+    else {
+        console.log("No area change");
+        d();
+    }
+};
                     var steps_cmd = [];
-                    for (var key in ev.steps)
+                    var actual_steps = _.clone(ev.steps);
+                    for (var key in eng.acquired)
                     {
-                        var step = ev.steps[key];
+                        if (ev.name in eng.acquired[key].events)
+                        {
+                            _.extend(actual_steps, eng.acquired[key].events[ev.name].steps);
+                        }
+                    }
+                    
+                    var keys = _.sortBy(_.keys(actual_steps), function(s) {
+                        if (s == '-') return 99999
+                        var nums = s.split('.');
+                        return parseInt(nums[0])*100 + parseInt(nums[1]);
+                    });
+                    _.each(keys, function(key)
+                    {
+                        var step = actual_steps[key];
                         var m = step.match(patt);
                         var cmd = "";
                         for (var s in m)
                         {
-                            cmd += m[s].replace(patt, "$1");
+                            cmd += m[s].replace(patt, "$1") + "\n";
                         }
                         steps_cmd.push(cmd);
-                    }
+                    });
                     steps_cmd.push("final");
+                    console.log(steps_cmd)
                     
                     var stepper = function(steps) {
                         if (steps.length == 0)
@@ -298,11 +346,10 @@ Engine.prototype = {
                         }
                         var cmd = steps.shift();
                         var callback = function() { stepper(steps); }
-                        console.log(cmd);
-                        if (cmd in this)
+                        if (cmd.trim() in this)
                         {
                             // It is a function
-                            this[cmd].call(this, callback);
+                            this[cmd.trim()].call(eng, callback);
                         } else {
                             (function(d) {
                                 eval(cmd);
@@ -319,25 +366,33 @@ Engine.prototype = {
             }
         });
     },
-    areaChange: function(area, change, done) {
-        this.areaChanger(area, change, function() {
-            for (var k in change)
+    areaChange: function(changes, done) {
+        this.areaChanger(changes, function() {
+            for (var a in changes)
             {
-                if (change[k] === true || change[k] === false)
-                    area[k] = change[k];
-                else
+                var change = changes[a];
+                var area = this.map.areas[a];
+                for (var k in change)
                 {
-                    var v = change[k];
-                    if (!area[k])
-                        area[k] = 0;
-                    
-                    if (v.indexOf('-') == 0 || v.indexOf('+') == 0)
-                        area[k] += parseInt(v);
+                    if (change[k] === true || change[k] === false)
+                        area[k] = change[k];
                     else
-                        area[k] = parseInt(v);
+                    {
+                        var v = change[k];
+                        if (!area[k])
+                            area[k] = 0;
+                        
+                        if (v.indexOf('-') == 0 || v.indexOf('+') == 0)
+                            area[k] += parseInt(v);
+                        else
+                            area[k] = parseInt(v);
+                            
+                        if (area[k] < 0)
+                            area[k] == 0;
+                    }
                 }
             }
-            done && done();
+            done && done.call(this);
         });
     }
 }
@@ -355,4 +410,5 @@ module.exports = {
     Map: theMap,
     TribeMover: TribeMover,
     Engine: new Engine(theMap, theDeck),
+    Advances: advances,
 }

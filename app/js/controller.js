@@ -35,7 +35,8 @@ pocketcivApp.controller('MainGame', function ($scope) {
     },
     "5": {
         "id": 5,
-        "tribes": 0,
+        "tribes": 8,
+        "city": 3,
         "neighbours": [ 3, 4, 'frontier' ] 
     }
     };
@@ -61,7 +62,7 @@ pocketcivApp.controller('MainGame', function ($scope) {
     $scope.hideDrawer = true;
     $scope.drawCard = function() {
         $scope.card = $scope.deck.draw();
-        $scope.card = pocketciv.EventDeck.specific(10);
+        $scope.card = pocketciv.EventDeck.specific(7);
         $scope.hideDrawer = true;
         drawnFunc.call(pocketciv.Engine, $scope.card);
     }
@@ -82,12 +83,12 @@ pocketcivApp.controller('MainGame', function ($scope) {
     
     $scope.areaChangeOk = function() {
         $scope.areaChange = undefined;
-        areaChangeDone();
+        areaChangeDone.call($scope.engine);
     }
     
     var areaChangeDone = undefined;
-    pocketciv.Engine.areaChanger = function(area, change, done) {
-        $scope.areaChange = { 'area_id': area.id, 'change': change };
+    pocketciv.Engine.areaChanger = function(changes, done) {
+        $scope.areaChange = changes;
         areaChangeDone = done;
     }
     
@@ -106,4 +107,8 @@ pocketcivApp.controller('MainGame', function ($scope) {
     
     $scope.engine = pocketciv.Engine;
     //$scope.engine.phase = "event";
+    $scope.engine.era = 3
+    $scope.engine.acquired = {
+        'literacy': pocketciv.Advances['literacy'],
+    }
 });
