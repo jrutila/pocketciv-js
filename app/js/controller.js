@@ -105,6 +105,11 @@ pocketcivApp.controller('MainGame', function ($scope) {
         areaSelect = select;
     }
     
+    pocketciv.Engine.queryUser = function(type, message)
+    {
+        return confirm(message);
+    }
+    
     $scope.engine = pocketciv.Engine;
     $scope.engine.phase = "advance";
     $scope.engine.era = 3

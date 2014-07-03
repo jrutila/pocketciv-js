@@ -197,6 +197,7 @@ function Engine(map, deck) {
     this.events = events;
     this.advances = advances;
     this.actions = actions;
+    this.round = {} // Will be emptied after upkeep!
     this.era = 1;
 }
 
@@ -407,6 +408,24 @@ final = function(d) {
     }
 }
 
+function AdvanceAcquirer(engine) {
+    this.engine = engine;
+}
+
+AdvanceAcquirer.prototype = {
+    possibleAdvances: function() {
+        var adv = {};
+        for (var key in _.omit(this.engine.advances, _.keys(this.engine.acquired)))
+        {
+            adv[key] = { 'areas': [] };
+        }
+        _.map(_.omit(this.engine.advances, _.keys(adv)), function(a, key) {
+            return 
+        });
+        return adv;
+    }
+}
+
 var theMap = new Map();
 var theDeck = new EventDeck();
 
@@ -419,6 +438,7 @@ module.exports = {
     EventDeck: theDeck,
     Map: theMap,
     TribeMover: TribeMover,
+    AdvanceAcquirer: AdvanceAcquirer,
     Engine: new Engine(theMap, theDeck),
     Advances: advances,
 }

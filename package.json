@@ -6,6 +6,7 @@
     },
     "dependencies": {
             "browserify": "*",
-            "underscore": "*"
+            "underscore": "*",
+            "jed": "*"
     }
 }

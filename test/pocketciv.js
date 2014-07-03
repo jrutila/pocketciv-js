@@ -445,3 +445,44 @@ describe("Engine", function() {
         });
     });
 });
+
+describe.only("AdvanceAcquirer", function() {
+    beforeEach(function() {
+        engine = pocketciv.Engine;
+        engine.map.areas = {
+            1: {
+                'city': 2,
+                'tribes': 4
+            }
+        }
+        engine.acquired = { 'adv1': undefined }
+        
+        acquirer = new pocketciv.AdvanceAcquirer(engine);
+    });
+    it('should return possible advances', function() {
+        engine.advances = {
+            'adv1': { },
+            'adv2': { }
+        };
+        
+        acquirer.possibleAdvances().should.deep.equal({
+            'adv2': { 'areas': [] }
+        });
+        engine.advances['adv2'].should.deep.equal({});
+    });
+    it('should return possible advances with cities by tribes', function() {
+        engine.advances = {
+            'adv1': { }, // Already acquired
+            'adv2': {
+                cost: { 'tribes': 3 }
+            },
+            'adv3': {
+                cost: { 'tribes': 5 }
+            }
+        };
+        acquirer.possibleAdvances().should.deep.equal({
+            'adv2': { 'areas': [1] },
+            'adv3': { 'areas': [] },
+        });
+    });
+});

@@ -11,15 +11,13 @@ module.exports = {
         'farm': {
             'context': function(engine) {
                 return { 
-                    'do_not_use_forest': !engine.forest_used,
-                    'done': function() { engine.forest_used = true }
+                    'forest_free': !engine.round.agriculture_farm_used,
+                    'forest_free_used': function() {
+                        console.log("Agriculture used for farm building!")
+                        engine.round.agriculture_farm_used = true;
+                        }
                     }
             }
         },
-        'upkeep': {
-            'engine': function(engine) {
-                engine.forest_used = false;
-            }
-        }
     }
 }
