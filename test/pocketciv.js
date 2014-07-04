@@ -452,14 +452,18 @@ describe.only("AdvanceAcquirer", function() {
         engine.map.areas = {
             1: {
                 'city': 2,
-                'tribes': 4
+                'tribes': 4,
+                'mountain': true,
+                'farm': true,
+                'forest': true
             },
             2: {
                 'city': 0,
-                'tribes': 6
+                'tribes': 6,
             },
             3: {
-                'city': 1
+                'city': 1,
+                'forest': true,
             }
         }
         engine.acquired = { 'adv1': undefined }
@@ -579,5 +583,24 @@ describe.only("AdvanceAcquirer", function() {
             'adv2': { 'areas': ["1"] },
             'adv4': { 'areas': ["1","3"] },
         });
+    });
+    it('should return advances by resources', function() {
+        engine.advances = {
+            'adv1': { cost: { } }, // Already acquired
+            'adv2': {
+                cost: { 'tribes': 3 },
+                resources: [ 'wood', 'food' ]
+            },
+            'adv3': {
+                cost: { },
+                resources: [ 'stone' ]
+            }
+        };
+        acquirer = new pocketciv.AdvanceAcquirer(engine);
+        acquirer.possibleAdvances().should.deep.equal({
+            'adv2': { 'areas': ["1"] },
+            'adv3': { 'areas': ["1"] },
+        });
+        
     });
 });

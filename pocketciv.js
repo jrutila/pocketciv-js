@@ -427,6 +427,17 @@ function filterAreasWithoutCities(areas) {
     return result;
 }
 
+function getResources(area) {
+    var ret = [];
+    if (area.mountain || area.volcano)
+        ret.push('stone');
+    if (area.farm)
+        ret.push('food');
+    if (area.forest)
+        ret.push('wood');
+    return ret;
+}
+
 function AdvanceAcquirer(engine) {
     this.advances = _.omit(_.clone(engine.advances), _.keys(engine.acquired));
     this.acquired = _.clone(engine.round.acquired) || {};
@@ -460,17 +471,34 @@ AdvanceAcquirer.prototype = {
                 }
             }
             
-            // Check tribes
             adv[key] = { 'areas': [] };
+            
             for (var a in _.omit(this.areas, _.keys(this.acquired)))
             {
+                // Check tribes
+                var has_tribes = true;
+                var has_resources = true;
                 if ('tribes' in this.advances[key].cost)
                 {
-                    if (this.areas[a].tribes >= this.advances[key].cost.tribes)
-                        adv[key].areas.push(a);
-                } else {
-                    adv[key].areas.push(a);
+                    if (!(this.areas[a].tribes >= this.advances[key].cost.tribes))
+                        has_tribes = false;
                 }
+                
+                // Check resources
+                if ('resources' in this.advances[key])
+                {
+                    var area_resources = getResources(this.areas[a]);
+                    if(!_.intersection(
+                        area_resources, this.advances[key].resources).length
+                        ==
+                        this.advances[key].resources.length)
+                        {
+                            has_resources = false;
+                        }
+                }
+                
+                if (has_tribes && has_resources)
+                    adv[key].areas.push(a);
             }
         }
         return adv;

@@ -2,7 +2,8 @@
     "name": "pocketciv",
     "version": "0.0.1",
     "scripts": {
-        "test": "make test"
+        "test": "make test",
+        "watch-js": "watchify app/js/*.js advances/*.js actions/*.js events/*.js *.js -o bundle.js -dv"
     },
     "dependencies": {
             "browserify": "*",

@@ -39,7 +39,8 @@ pocketcivApp.controller('MainGame', function ($scope) {
         "id": 5,
         "tribes": 8,
         "city": 3,
-        "neighbours": [ 3, 4, 'frontier' ] 
+        "neighbours": [ 3, 4, 'frontier' ],
+        "mountain": true
     }
     };
     $scope.map = pocketciv.Map;
