@@ -18,18 +18,17 @@ module.exports = {
             {% } else { %}\
             {%  changes[area.id] = { 'city': areaCityReduce.toString() } %}\
             {% }  %}\
-            {% var ngh = neighbours(area) %}\
-            {% for (var ar in ngh) { %} \
-            {% var a = ngh[ar] %} \
+            {% areas = neighbours(area) %}\
+            {% for (var ar in areas) { %} \
+            {% var a = areas[ar] %} \
             {% if (a.city <= neighbourCityReduce) { %}\
             {%  changes[a.id] = { 'city': cityMin.toString() } %}\
             {% } else { %}\
             {%  changes[a.id] = { 'city': neighbourCityReduce.toString() } %}\
             {% }  %}\
-            {% } %} \
-            {% ngh[area.id] = area %}\
-            {% reduce_tribes(collateralDamage, ngh) %} \
-            ",
+            {% } %}\
+            {% areas[area.id] = area %}",
+            '--': "{%= reduce_tribes(collateralDamage, areas) %}",
     }
 }
     /*

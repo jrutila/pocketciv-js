@@ -28,7 +28,7 @@
         <button ng-click="moveTribes()">Move</button>
     </div>
     
-    <div id="reducer" ng-hide="tribeReducer">
+    <div id="reducer" ng-hide="hideReducer">
         <span>Decimate {{ reduceAmount - reductions.length }} tribes</span>
         <ul>
             <li ng-repeat="id in reduceAreas">{{ id }}: <input type="number" value="0" ng-model="reductions[id]"/></li>

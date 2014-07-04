@@ -275,7 +275,7 @@ Engine.prototype = {
                 else
                 {
                     console.log('No run method. Doing steps!')
-                    var patt = /{% (.*?) %}/g;
+                    var patt = /{%(=? .*?) %}/g;
                     var area = undefined;
                     var areas = [];
                     var change = undefined;
@@ -306,7 +306,7 @@ neighbours = function(area) {
     return _.pick(eng.map.areas, area.neighbours);
 };
 
-reduce_tribes = function(amount, areas) {
+reduce_tribes = function(amount, areas, done) {
     var redAreas = _.map(areas, function(a) { return a.id; });
     eng.tribeReducer(amount, redAreas,
         function(reductions) {
@@ -319,6 +319,7 @@ reduce_tribes = function(amount, areas) {
                     changes[r].tribes = tr.toString();
                 }
             }
+            done && done();
         }
     );
 };
@@ -378,7 +379,7 @@ final = function(d) {
                     }
                     
                     var keys = _.sortBy(_.keys(actual_steps), function(s) {
-                        if (s == '-') return 99999
+                        if (s.indexOf('-') > 0) return 99999
                         var nums = s.split('.');
                         return parseInt(nums[0])*100 + parseInt(nums[1]);
                     });
@@ -407,6 +408,10 @@ final = function(d) {
                         {
                             // It is a function
                             this[cmd.trim()].call(eng, callback);
+                        } else if (cmd.indexOf('=') == 0) {
+                            var par = cmd.lastIndexOf(')');
+                            cmd = cmd.substring(1, par) + ", callback)";
+                            eval(cmd);
                         } else {
                             (function(d) {
                                 eval(cmd);
