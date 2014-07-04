@@ -39,8 +39,15 @@ pocketcivApp.controller('MainGame', function ($scope) {
         "id": 5,
         "tribes": 8,
         "city": 3,
-        "neighbours": [ 3, 4, 'frontier' ],
+        "neighbours": [ 3, 4, 6, 'frontier' ],
         "mountain": true
+    },
+    "6": {
+        "id": 6,
+        "tribes": 8,
+        "city": 3,
+        "neighbours": [ 5, 'frontier' ],
+        "volcano": true
     }
     };
     $scope.map = pocketciv.Map;
@@ -65,7 +72,7 @@ pocketcivApp.controller('MainGame', function ($scope) {
     $scope.hideDrawer = true;
     $scope.drawCard = function() {
         $scope.card = $scope.deck.draw;
-        $scope.card = pocketciv.EventDeck.specific(7);
+        $scope.card = pocketciv.EventDeck.specific(6);
         $scope.hideDrawer = true;
         drawnFunc.call(pocketciv.Engine, $scope.card);
     }
@@ -75,6 +82,21 @@ pocketcivApp.controller('MainGame', function ($scope) {
         $scope.movement = getMovement(situation);
         $scope.hideMover = false;
         moveFunc = move;
+    }
+    
+    var reduceFunc = undefined;
+    pocketciv.Engine.tribeReducer = function(amount, areas, done) {
+        console.log("Show reducer")
+        $scope.hideReducer = false;
+        $scope.reduceAmount = amount;
+        $scope.reduceAreas = areas;
+        $scope.reductions = {};
+        reduceFunc = done;
+    }
+    
+    $scope.reduceTribes = function() {
+        reduceFunc.call($scope.engine, $scope.reductions);
+        $scope.hideReducer = true;
     }
     
     pocketciv.Engine.drawer = function(deck, drawn) {
@@ -135,7 +157,7 @@ pocketcivApp.controller('MainGame', function ($scope) {
     
     $scope.engine = pocketciv.Engine;
     $scope.engine.phase = "advance";
-    $scope.engine.era = 3
+    $scope.engine.era = 4
     $scope.engine.acquired = {
         'literacy': pocketciv.Advances['literacy'],
         //'agriculture': pocketciv.Advances['agriculture'],

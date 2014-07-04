@@ -4,6 +4,7 @@ var _ = require("underscore");
 var events = {
     'famine': require('./events/famine'),
     'anarchy': require('./events/anarchy'),
+    'civil_war': require('./events/civil_war'),
 }
 
 var actions = {
@@ -279,17 +280,54 @@ Engine.prototype = {
                     var areas = [];
                     var change = undefined;
                     var changes = {};
+                    var card = undefined;
                     
 area_card = function(done) {
     console.log("Drawing area card");
-    eng.drawer(eng.deck, function(card) {
-        var area_id = card.circle;
+    eng.drawer(eng.deck, function(c) {
+        var area_id = c.circle;
         if (area_id in eng.map.areas)
         {
             area = eng.map.areas[area_id];
             done();
         }
     });
+};
+
+draw_card = function(done) {
+    console.log("Drawing a card");
+    eng.drawer(eng.deck, function(c) {
+        card = c;
+        done();
+    });
+};
+
+neighbours = function(area) {
+    return _.pick(eng.map.areas, area.neighbours);
+};
+
+reduce_tribes = function(amount, areas) {
+    var redAreas = _.map(areas, function(a) { return a.id; });
+    eng.tribeReducer(amount, redAreas,
+        function(reductions) {
+            for (var r in reductions)
+            {
+                if (reductions[r])
+                {
+                    var tr = (changes[r].tribes && parseInt(changes[r].tribes)) || 0;
+                    tr -= reductions[r];
+                    changes[r].tribes = tr.toString();
+                }
+            }
+        }
+    );
+};
+
+card_value = function(expr) {
+    var h = card.hexagon;
+    var c = card.circle;
+    var s = card.square;
+    return eval(expr);
 };
 
 select_areas = function(expr) {
