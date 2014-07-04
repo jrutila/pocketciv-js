@@ -9,6 +9,7 @@ var events = {
 var actions = {
     'farm': require('./actions/farm'),
     'city': require('./actions/city'),
+    'acquire': require('./actions/acquire'),
 }
 
 var advances = {
@@ -196,6 +197,7 @@ function Engine(map, deck) {
     this.phase = "populate";
     this.events = events;
     this.advances = advances;
+    this.acquired = {};
     this.actions = actions;
     this.round = {} // Will be emptied after upkeep!
     this.era = 1;
@@ -247,6 +249,12 @@ Engine.prototype = {
             }
         }
         this.actions[name].run.call(this, context);
+    }
+    ,
+    acquire: function(name, done) {
+        this.acquired[name] = this.advances[name];
+        console.log("Acquired "+name);
+        done && done();
     }
     ,
     event: function(done) {
@@ -408,21 +416,79 @@ final = function(d) {
     }
 }
 
+function filterAreasWithoutCities(areas) {
+    var result = {};
+    
+    for (var key in areas)
+    {
+        if (areas[key].hasOwnProperty('city') && areas[key].city)
+            result[key] = areas[key];
+    }
+    return result;
+}
+
 function AdvanceAcquirer(engine) {
-    this.engine = engine;
+    this.advances = _.omit(_.clone(engine.advances), _.keys(engine.acquired));
+    this.acquired = _.clone(engine.round.acquired) || {};
+    this.acquired_names = _.keys(engine.acquired);
+    this.areas = _.clone(engine.map.areas);
+    this.areas = filterAreasWithoutCities(this.areas);
 }
 
 AdvanceAcquirer.prototype = {
     possibleAdvances: function() {
         var adv = {};
-        for (var key in _.omit(this.engine.advances, _.keys(this.engine.acquired)))
+        for (var key in _.omit(this.advances, this.acquired_names))
         {
+            // Check requirements
+            if (_.has(this.advances[key], 'requires') && this.advances[key].requires)
+            {
+                var kk = _.keys(this.advances);
+                var aq = this.acquired_names;
+                var re = _.clone(this.advances[key].requires);
+                
+                // First, check optional requirements (either one must be required)
+                // Remove them from re if they are satisfied
+                var re = _.filter(re, function(r) {
+                    if (!_.isArray(r)) return true;
+                    return _.intersection(r, aq).length < 1;
+                });
+                // Check that all requirements are acquired
+                if (!_.isEqual(_.intersection(aq, re), re))
+                {
+                    continue;
+                }
+            }
+            
+            // Check tribes
             adv[key] = { 'areas': [] };
+            for (var a in _.omit(this.areas, _.keys(this.acquired)))
+            {
+                if ('tribes' in this.advances[key].cost)
+                {
+                    if (this.areas[a].tribes >= this.advances[key].cost.tribes)
+                        adv[key].areas.push(a);
+                } else {
+                    adv[key].areas.push(a);
+                }
+            }
         }
-        _.map(_.omit(this.engine.advances, _.keys(adv)), function(a, key) {
-            return 
-        });
         return adv;
+    },
+    acquire: function(name, area) {
+        this.acquired[area] = this.advances[name];
+        this.acquired_names.push(name);
+    },
+    deacquire: function(name) {
+        for (var a in this.acquired)
+        {
+            if (this.acquired[a] == this.advances[name])
+            {
+                delete this.acquired[a];
+                break;
+            }
+        }
+        this.acquired_names.pop(name);
     }
 }
 

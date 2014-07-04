@@ -13,12 +13,14 @@ pocketcivApp.controller('MainGame', function ($scope) {
     "1": {
         "id": 1,
         "tribes": 5,
+        "city": 1,
         "neighbours": [ 2, 'sea' ],
         "forest": true
     },
     "2": {
         "id": 2,
-        "tribes": 5,
+        "tribes": 9,
+        "city": 0,
         "neighbours": [ 1, 3, 'sea', 'frontier' ] 
     },
     "3": {
@@ -61,7 +63,7 @@ pocketcivApp.controller('MainGame', function ($scope) {
     var drawnFunc = undefined;
     $scope.hideDrawer = true;
     $scope.drawCard = function() {
-        $scope.card = $scope.deck.draw();
+        $scope.card = $scope.deck.draw;
         $scope.card = pocketciv.EventDeck.specific(7);
         $scope.hideDrawer = true;
         drawnFunc.call(pocketciv.Engine, $scope.card);
@@ -110,11 +112,31 @@ pocketcivApp.controller('MainGame', function ($scope) {
         return confirm(message);
     }
     
+    var doAcquire = undefined;
+    pocketciv.Engine.advanceAcquirer = function(engine, done) {
+        $scope.acquirer = new pocketciv.AdvanceAcquirer(engine);
+        $scope.possibleAdvances = $scope.acquirer.possibleAdvances();
+        doAcquire = done;
+    }
+    
+    $scope.acquireGo = function() {
+        $scope.acquirer.acquire($scope.acquire_name, $scope.acquire_area);
+        $scope.possibleAdvances = $scope.acquirer.possibleAdvances();
+        $scope.acquired = _.map($scope.acquirer.acquired, function(v) {
+            return v.title;
+        });
+    }
+    
+    $scope.acquireOk = function() {
+        doAcquire.call($scope.engine, $scope.acquirer.acquired)
+        $scope.possibleAdvances = undefined;
+    }
+    
     $scope.engine = pocketciv.Engine;
     $scope.engine.phase = "advance";
     $scope.engine.era = 3
     $scope.engine.acquired = {
         'literacy': pocketciv.Advances['literacy'],
-        'agriculture': pocketciv.Advances['agriculture'],
+        //'agriculture': pocketciv.Advances['agriculture'],
     }
 });

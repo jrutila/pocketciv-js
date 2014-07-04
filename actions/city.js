@@ -1,5 +1,6 @@
 module.exports = {
-    run: function(engine) {
+    run: function() {
+        var engine = this;
         var possibleAreas = [];
         for (var key in engine.map.areas)
         {

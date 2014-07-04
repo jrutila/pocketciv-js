@@ -453,26 +453,31 @@ describe.only("AdvanceAcquirer", function() {
             1: {
                 'city': 2,
                 'tribes': 4
+            },
+            2: {
+                'city': 0,
+                'tribes': 6
+            },
+            3: {
+                'city': 1
             }
         }
         engine.acquired = { 'adv1': undefined }
-        
-        acquirer = new pocketciv.AdvanceAcquirer(engine);
     });
-    it('should return possible advances', function() {
+    it('should return empty advances', function() {
         engine.advances = {
-            'adv1': { },
-            'adv2': { }
+            'adv1': { cost: { 'tribes': 100 } }, //already acquired
+            'adv2': { cost: { 'tribes': 100 } }
         };
+        acquirer = new pocketciv.AdvanceAcquirer(engine);
         
         acquirer.possibleAdvances().should.deep.equal({
             'adv2': { 'areas': [] }
         });
-        engine.advances['adv2'].should.deep.equal({});
     });
     it('should return possible advances with cities by tribes', function() {
         engine.advances = {
-            'adv1': { }, // Already acquired
+            'adv1': { cost: { } }, // Already acquired
             'adv2': {
                 cost: { 'tribes': 3 }
             },
@@ -480,9 +485,99 @@ describe.only("AdvanceAcquirer", function() {
                 cost: { 'tribes': 5 }
             }
         };
+        acquirer = new pocketciv.AdvanceAcquirer(engine);
         acquirer.possibleAdvances().should.deep.equal({
-            'adv2': { 'areas': [1] },
+            'adv2': { 'areas': ["1"] },
             'adv3': { 'areas': [] },
+        });
+    });
+    it('should return advances with free cost', function() {
+        engine.advances = {
+            'adv1': { cost: { } }, // Already acquired
+            'adv2': {
+                cost: { 'tribes': 3 }
+            },
+            'adv3': {
+                cost: { }
+            }
+        };
+        acquirer = new pocketciv.AdvanceAcquirer(engine);
+        acquirer.possibleAdvances().should.deep.equal({
+            'adv2': { 'areas': ["1"] },
+            'adv3': { 'areas': ["1", "3"] },
+        });
+    });
+    it('should return advances after acquire and deacquire', function() {
+        engine.advances = {
+            'adv1': { cost: { } }, // Already acquired
+            'adv2': {
+                cost: { 'tribes': 3 }
+            },
+            'adv3': {
+                cost: { }
+            }
+        };
+        acquirer = new pocketciv.AdvanceAcquirer(engine);
+        acquirer.possibleAdvances().should.deep.equal({
+            'adv2': { 'areas': ["1"] },
+            'adv3': { 'areas': ["1", "3"] },
+        });
+        acquirer.acquire('adv2', 1);
+        acquirer.possibleAdvances().should.deep.equal({
+            'adv3': { 'areas': ["3"] },
+        });
+        acquirer.deacquire('adv2');
+        acquirer.possibleAdvances().should.deep.equal({
+            'adv2': { 'areas': ["1"] },
+            'adv3': { 'areas': ["1", "3"] },
+        });
+    });
+    it('should follow the requirement tree', function() {
+        engine.advances = {
+            'adv1': { cost: { } }, // Already acquired
+            'adv2': {
+                cost: { 'tribes': 3 },
+                requires: [ 'adv1' ]
+            },
+            'adv3': {
+                cost: { },
+                requires: [ 'adv2' ]
+            },
+            'adv4': {
+                cost: { },
+                requires: [ 'notexisting' ]
+            }
+        };
+        acquirer = new pocketciv.AdvanceAcquirer(engine);
+        acquirer.possibleAdvances().should.deep.equal({
+            'adv2': { 'areas': ["1"] },
+        });
+        acquirer.acquire('adv2', 1);
+        acquirer.possibleAdvances().should.deep.equal({
+            'adv3': { 'areas': ["3"] },
+        });
+    });
+    it('should follow the requirement tree with optional reqs', function() {
+        engine.advances = {
+            'adv1': { cost: { } }, // Already acquired
+            'adv2': {
+                cost: { 'tribes': 3 },
+                requires: [ 'adv1' ]
+            },
+            'adv3': {  // Already acquired
+                cost: { },
+                requires: [ 'adv1' ]
+            },
+            'adv4': {
+                cost: { },
+                requires: [ [ 'adv1', 'adv2'], 'adv3' ]
+            }
+        };
+        engine.acquired['adv3'] = undefined;
+        acquirer = new pocketciv.AdvanceAcquirer(engine);
+        acquirer.possibleAdvances().should.deep.equal({
+            'adv2': { 'areas': ["1"] },
+            'adv4': { 'areas': ["1","3"] },
         });
     });
 });
