@@ -28,7 +28,7 @@ module.exports = {
             {% }  %}\
             {% } %}\
             {% areas[area.id] = area %}",
-            '--': "{%= reduce_tribes(collateralDamage, areas) %}",
+            '--': "{%= reduce('tribes', collateralDamage, areas) %}",
     }
 }
     /*

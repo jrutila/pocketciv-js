@@ -5,6 +5,7 @@ var events = {
     'famine': require('./events/famine'),
     'anarchy': require('./events/anarchy'),
     'civil_war': require('./events/civil_war'),
+    'corruption': require('./events/corruption'),
 }
 
 var actions = {
@@ -260,11 +261,11 @@ Engine.prototype = {
     ,
     event: function(done) {
         console.log("Drawing event card")
-        this.drawer(this.deck, function(card) {
+        this.drawer(this.deck, function(eventcard) {
             var eng = this;
-            if (eng.era in card.events)
+            if (eng.era in eventcard.events)
             {
-                var event = card.events[eng.era];
+                var event = eventcard.events[eng.era];
                 console.log("Event: "+event);
                 var ev = eng.events[event.name];
                 if (ev.hasOwnProperty('run'))
@@ -306,9 +307,9 @@ neighbours = function(area) {
     return _.pick(eng.map.areas, area.neighbours);
 };
 
-reduce_tribes = function(amount, areas, done) {
+reduce = function(t, amount, areas, done) {
     var redAreas = _.map(areas, function(a) { return a.id; });
-    eng.tribeReducer(amount, redAreas,
+    eng.reducer(t, amount, redAreas,
         function(reductions) {
             for (var r in reductions)
             {

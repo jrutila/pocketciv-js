@@ -86,8 +86,8 @@ pocketcivApp.controller('MainGame', function ($scope) {
     
     var reduceFunc = undefined;
     $scope.hideReducer = true;
-    pocketciv.Engine.tribeReducer = function(amount, areas, done) {
-        console.log("Show reducer")
+    pocketciv.Engine.reducer = function(t, amount, areas, done) {
+        console.log("Show reducer for "+t)
         $scope.hideReducer = false;
         $scope.reduceAmount = amount;
         $scope.reduceAreas = areas;
