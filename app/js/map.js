@@ -34,6 +34,7 @@ Map = function(map) {
     this.grid = new HT.Grid(this.width, this.height)
     this.hex = {}
     this.regions = { 1:[], 2:[], 3:[], 4:[], 5:[], 6:[], 7:[], 8:[]}
+    this.symbols = {}
 
     for (var h = 0; h < this.grid.Hexes.length; h++)
     {
@@ -149,6 +150,25 @@ Map.prototype.paint = function(ctx) {
     
     for (var reg in this.regions)
     {
+        if (this.regions[reg].length > 0)
+        {
+            this.symbols[reg] = {};
+            var mp = this.regions[reg][0].MidPoint;
+            this.symbols[reg]['area'] = new HT.Point(mp.X-25, mp.Y-25)
+            this.symbols[reg]['fault'] = new HT.Point(mp.X-15, mp.Y-15)
+            mp = this.regions[reg][1].MidPoint;
+            this.symbols[reg]['tribes'] = new HT.Point(mp.X-25, mp.Y-25)
+            this.symbols[reg]['desert'] = new HT.Point(mp.X-15, mp.Y-15)
+            mp = this.regions[reg][2].MidPoint;
+            this.symbols[reg]['city'] = new HT.Point(mp.X-25, mp.Y-25)
+            this.symbols[reg]['farm'] = new HT.Point(mp.X-15, mp.Y-15)
+            mp = this.regions[reg][3].MidPoint;
+            this.symbols[reg]['forest'] = new HT.Point(mp.X-25, mp.Y-25)
+            this.symbols[reg]['mountain'] = new HT.Point(mp.X-15, mp.Y-15)
+            this.symbols[reg]['volcano'] = new HT.Point(mp.X-15, mp.Y-15)
+
+
+        }
     }
     /*
     for (var r = 1; r <= regionCount; r++)
@@ -186,81 +206,4 @@ Map.prototype.click = function(x, y) {
     var hex = this.grid.GetHexAt(p)
     console.log(hex.Id)
     console.log(this.hex[hex.Id])
-}
-
-Region = function(id) {
-    this.id = id
-    this.tribes = 0
-    this.effects = Array()
-    this.hexes = Array()
-}
-
-var Sea = {
-    toString: function() {
-        return "Sea"
-    }
-}
-
-var Land = {
-    toString: function() {
-        return "Land"
-    }
-}
-
-Region.prototype.toString = function() {
-    var ret = "Region "+this.id
-    ret += this.effects
-    if (this.tribes > 0)
-        ret += " T:"+this.tribes
-    return ret
-}
-
-var Regions = [ new Region(1),
-                new Region(2),
-                new Region(3),
-                new Region(4),
-                new Region(5),
-                new Region(6),
-                new Region(7),
-                new Region(8) ]
-
-function getRegion(spec)
-{
-    spec = spec.split(';')
-    if (spec[0] == "0")
-        return Regions[parseInt(spec[1])-1]
-    else if (spec[0] == "1")
-        return Land
-    else
-        return Sea
-}
-
-Game = function(spec) {
-    this.hex = []
-
-    var a = spec.split("\n"), i
-
-    for (i = 0; i < a.length; i++)
-    {
-        if (a[i].lastIndexOf('map.hex', 0) === 0)
-        {
-            var h = a[i].split('=')[0].split('.')
-            var r = a[i].split('=')[1]
-            var x = parseInt(h[2])
-            var y = parseInt(h[3])
-            if (!(y in this.hex))
-                this.hex[y] = []
-            var reg = getRegion(r)
-            this.hex[y][x] = reg
-        }
-        if (a[i].lastIndexOf('region.', 0) === 0)
-        {
-            var regspec = a[i].split('=')[1].split(';')
-            var regid = parseInt(a[i].split('=')[0].split('.')[1])
-
-            Regions[regid-1].tribes = parseInt(regspec[3])
-            for (var e = 0; e < regspec[4].length; e++)
-                Regions[regid-1].effects.push(regspec[4][e])
-        }
-    }
 }

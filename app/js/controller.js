@@ -12,57 +12,44 @@ pocketcivApp.controller('MainGame', function ($scope) {
     {
     "1": {
         "id": 1,
-        "tribes": 5,
-        "city": 1,
-        "neighbours": [ 2, 'sea' ],
+        "neighbours": [ 3, 4, 8, 'frontier' ],
         "forest": true
     },
     "2": {
         "id": 2,
-        "tribes": 9,
-        "city": 0,
-        "neighbours": [ 1, 3, 'sea', 'frontier' ] 
+        "desert": true,
+        "neighbours": [ 3, 5, 8, 'sea', 'frontier' ] 
     },
     "3": {
         "id": 3,
-        "tribes": 5,
-        "neighbours": [ 2, 4, 5, 'frontier' ],
-        "farm": true,
-        "forest": true
+        "desert": true,
+        "neighbours": [ 1, 2, 4, 8, 'frontier' ],
     },
     "4": {
         "id": 4,
-        "tribes": 0,
-        "neighbours": [ 3, 5, 'frontier' ] 
+        "desert": true,
+        "neighbours": [ 1, 3, 'frontier' ] 
     },
     "5": {
         "id": 5,
-        "tribes": 8,
-        "city": 3,
-        "neighbours": [ 3, 4, 6, 'frontier' ],
+        "tribes": 1,
+        "neighbours": [ 2, 7, 'sea' ],
         "mountain": true
     },
-    "6": {
-        "id": 6,
-        "tribes": 8,
-        "city": 3,
-        "neighbours": [ 5, 'frontier' ],
-        "volcano": true
+    "7": {
+        "id": 7,
+        "neighbours": [ 5, 8, 'sea' ],
+        "forest": true
+    },
+    "8": {
+        "id": 8,
+        "neighbours": [ 1, 2, 3, 7, 'sea', 'frontier' ],
+        "forest": true,
+        "mountain": true
     }
     };
     pocketciv.Map.width = 9
     pocketciv.Map.height = 9
-    pocketciv.Map.grid = [
-        [-1,-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
-        [ 0,-1, 0, 0, 0, 0, 5, 8, 8, 8, 8, 0, 0, 0 ],
-        [ 0,-1, 0, 0, 5, 5, 3, 3, 3, 3, 7, 0, 0, 0 ],
-        [ 0, 0, 0, 0, 5, 1, 1, 2, 2, 3, 7, 7, 0, 0 ],
-        [-1, 0, 0, 0, 0, 5, 1, 1, 2, 4, 7, 0, 0, 0 ],
-        [-1, 0, 0, 0, 0, 5, 4, 2, 4, 4, 7, 0, 0, 0 ],
-        [-1,-1, 0, 0,-1, 6, 6, 4, 6, 6, 6, 0,-1, 0 ],
-        [-1,-1,-1, 0,-1,-1,-1, 6,-1,-1,-1,-1,-1, 0 ],
-        [-1,-1,-1, 0,-1,-1,-1,-1,-1,-1,-1,-1, 0, 0 ]
-        ];
     pocketciv.Map.grid = [
         [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
         [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
@@ -187,15 +174,15 @@ pocketcivApp.controller('MainGame', function ($scope) {
     }
     
     $scope.engine = pocketciv.Engine;
-    $scope.engine.phase = "advance";
-    $scope.engine.era = 4
+    $scope.engine.phase = "populate";
+    $scope.engine.era = 1
     $scope.engine.acquired = {
-        'literacy': pocketciv.Advances['literacy'],
+        //'literacy': pocketciv.Advances['literacy'],
         //'agriculture': pocketciv.Advances['agriculture'],
     }
     
     var map = new Map(pocketciv.Map);
-    $scope.map = map;
+    $scope.mapArea = map
     map.getCanvas = function(i) {
         return $('#mapCanvas'+i)[0];
     }
@@ -204,5 +191,89 @@ pocketcivApp.controller('MainGame', function ($scope) {
     }
     angular.element(document).ready(function() {
         map.paint();
+        for (var reg in map.symbols)
+        {
+            $('#area'+reg).css({top: map.symbols[reg]['area'].Y, left: map.symbols[reg]['area'].X }).show()
+        }
     })
+    $scope.$watch('map', function() {
+        console.log("Hey! Map changed!")
+        for (var reg in $scope.map.areas)
+        {
+            if (!(reg in map.symbols))
+                continue
+            
+            for (var prop in $scope.map.areas[reg])
+            {
+                if (!(prop in map.symbols[reg]))
+                    continue;
+                    
+                var $elem = $('#'+prop+reg);
+                var val = $scope.map.areas[reg][prop];
+                
+                if ($elem.length == 0 && val)
+                {
+                    $elem = $('#'+prop).clone().attr('id', prop+reg).appendTo("#canvases")
+                    $elem.css({ top: map.symbols[reg][prop].Y, left: map.symbols[reg][prop].X})
+                }
+                if ($elem.length > 0 && !val)
+                    $elem.remove()
+                else
+                    $elem.html($scope.map.areas[reg][prop]).show()
+            }
+        }
+    })
+});
+
+pocketcivApp.directive('jsonText', function() {
+  return {
+    restrict: 'A', // only activate on element attribute
+    require: 'ngModel', // get a hold of NgModelController
+    link: function(scope, element, attrs, ngModelCtrl) {
+
+      var lastValid;
+
+      // push() if faster than unshift(), and avail. in IE8 and earlier (unshift isn't)
+      ngModelCtrl.$parsers.push(fromUser);
+      ngModelCtrl.$formatters.push(toUser);
+
+      // clear any invalid changes on blur
+      element.bind('blur', function () {
+        element.val(toUser(scope.$eval(attrs.ngModel)));
+      });
+
+      // $watch(attrs.ngModel) wouldn't work if this directive created a new scope;
+      // see http://stackoverflow.com/questions/14693052/watch-ngmodel-from-inside-directive-using-isolate-scope how to do it then
+      scope.$watch(attrs.ngModel, function(newValue, oldValue) {
+        lastValid = lastValid || newValue;
+
+        if (newValue != oldValue) {
+          ngModelCtrl.$setViewValue(toUser(newValue));
+
+          // TODO avoid this causing the focus of the input to be lost..
+          ngModelCtrl.$render();
+        }
+      }, true); // MUST use objectEquality (true) here, for some reason..
+
+      function fromUser(text) {
+        // Beware: trim() is not available in old browsers
+        if (!text || text.trim() === '') {
+          return {};
+        } else {
+          try {
+            lastValid = angular.fromJson(text);
+            ngModelCtrl.$setValidity('invalidJson', true);
+          } catch(e) {
+            ngModelCtrl.$setValidity('invalidJson', false);
+          }
+          return lastValid;
+        }
+      }
+
+      function toUser(object) {
+        // better than JSON.stringify(), because it formats + filters $$hashKey etc.
+        return angular.toJson(object, true);
+      }
+    }
+  };
 });

@@ -16,6 +16,27 @@
     #images {
         display: none;
     }
+    .symbol {
+        position: absolute;
+        z-index: 9000;
+        display: none;
+    }
+    .areaCode {
+        background-color: darkRed;
+        color: white;
+        border-radius: 90px;
+        width: 21px;
+        height: 21px;
+        font-weight: bolder;
+        text-align: center;
+    }
+    .tribes {
+        background-color: darksalmon;
+        width: 25px;
+        color: black;
+        font-weight: bolder;
+        text-align: center;
+    }
 </style>
 
 <script src="//code.jquery.com/jquery-2.1.1.min.js"></script>
@@ -41,21 +62,35 @@
             <img id="mapImage4" src="app/img/modern/land4.png"/>
             <img id="mapImage5" src="app/img/modern/land5.png"/>
             <img id="mapImage6" src="app/img/modern/land6.png"/>
+            <span class="symbol tribes" id="tribes"></span>
+            <img class="symbol farm" id="farm" src="app/img/modern/farm.png"></img>
+            <img class="symbol forest" id="forest" src="app/img/modern/forest.png"></img>
+            <img class="symbol fault" id="fault" src="app/img/modern/fault.png"></img>
+            <img class="symbol mountain" id="mountain" src="app/img/modern/mtn.png"></img>
+            <img class="symbol volcano" id="volcano" src="app/img/modern/vol.png"></img>
+            <img class="symbol desert" id="desert" src="app/img/modern/desert.png"></img>
         </div>
         <div id="canvases">
-        <canvas class="mapCanvas" id="mapCanvas-1" width="{{ map.width }}" height="{{ map.height }}"></canvas>
-        <canvas class="mapCanvas" id="mapCanvas0" width="{{ map.width }}" height="{{ map.height }}"></canvas>
-        <canvas class="mapCanvas" id="mapCanvas1" width="{{ map.width }}" height="{{ map.height }}"></canvas>
-        <canvas class="mapCanvas" id="mapCanvas2" width="{{ map.width }}" height="{{ map.height }}"></canvas>
-        <canvas class="mapCanvas" id="mapCanvas3" width="{{ map.width }}" height="{{ map.height }}"></canvas>
-        <canvas class="mapCanvas" id="mapCanvas4" width="{{ map.width }}" height="{{ map.height }}"></canvas>
-        <canvas class="mapCanvas" id="mapCanvas5" width="{{ map.width }}" height="{{ map.height }}"></canvas>
-        <canvas class="mapCanvas" id="mapCanvas6" width="{{ map.width }}" height="{{ map.height }}"></canvas>
-        <canvas class="mapCanvas" id="mapCanvas7" width="{{ map.width }}" height="{{ map.height }}"></canvas>
-        <canvas class="mapCanvas" id="mapCanvas8" width="{{ map.width }}" height="{{ map.height }}"></canvas>
+        <canvas class="mapCanvas" id="mapCanvas-1" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
+        <canvas class="mapCanvas" id="mapCanvas0" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
+        <canvas class="mapCanvas" id="mapCanvas1" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
+        <canvas class="mapCanvas" id="mapCanvas2" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
+        <canvas class="mapCanvas" id="mapCanvas3" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
+        <canvas class="mapCanvas" id="mapCanvas4" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
+        <canvas class="mapCanvas" id="mapCanvas5" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
+        <canvas class="mapCanvas" id="mapCanvas6" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
+        <canvas class="mapCanvas" id="mapCanvas7" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
+        <canvas class="mapCanvas" id="mapCanvas8" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
+        <span class="symbol areaCode" id="area1">1</span>
+        <span class="symbol areaCode" id="area2">2</span>
+        <span class="symbol areaCode" id="area3">3</span>
+        <span class="symbol areaCode" id="area4">4</span>
+        <span class="symbol areaCode" id="area5">5</span>
+        <span class="symbol areaCode" id="area6">6</span>
+        <span class="symbol areaCode" id="area7">7</span>
+        <span class="symbol areaCode" id="area8">8</span>
         </div>
-        <textarea rows="5" cols="100">
-        {{ map }}
+        <textarea json-text rows="5" cols="100" ng-model="map">
         </textarea>
         <span>{{ areaChange }}<button ng-hide="!areaChange" ng-click="areaChangeOk()">OK</button></span>
     </div>
