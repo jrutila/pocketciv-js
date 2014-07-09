@@ -14,7 +14,8 @@ module.exports = {
             the amount of Corruption. You may choose which \
             Cities to reduce. Any City Reduced to 0 AV is \
             Decimated. {% reduce('city', corruption) %}",
-            '3': "Decimate all Gold you currently have.",
+            '3': "Decimate all Gold you currently have.\
+            {% changes['gold'] = 0 %}",
     }
 }
     /*
