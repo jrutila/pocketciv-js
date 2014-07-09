@@ -2,6 +2,21 @@
 <html ng-app="pocketcivApp">
 <head>
 <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"/>
+<style>
+    #canvases {
+        position:relative;
+        width: 800px;
+        height: 800px;
+    }
+    .mapCanvas {
+        position:absolute;
+        top: 0px;
+        left: 0px;
+    }
+    #images {
+        display: none;
+    }
+</style>
 
 <script src="//code.jquery.com/jquery-2.1.1.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js"></script>
@@ -15,6 +30,30 @@
     <div>{{ card }}</div>
     
     <div id="map">
+        <div id="images">
+            <img id="mapImage7" src="app/img/modern/land7.png"/>
+            <img id="mapImage8" src="app/img/modern/land8.png"/>
+            <img id="mapImage-1" src="app/img/modern/water.png"/>
+            <img id="mapImage0" src="app/img/modern/land.png"/>
+            <img id="mapImage1" src="app/img/modern/land1.png"/>
+            <img id="mapImage2" src="app/img/modern/land2.png"/>
+            <img id="mapImage3" src="app/img/modern/land3.png"/>
+            <img id="mapImage4" src="app/img/modern/land4.png"/>
+            <img id="mapImage5" src="app/img/modern/land5.png"/>
+            <img id="mapImage6" src="app/img/modern/land6.png"/>
+        </div>
+        <div id="canvases">
+        <canvas class="mapCanvas" id="mapCanvas-1" width="{{ map.width }}" height="{{ map.height }}"></canvas>
+        <canvas class="mapCanvas" id="mapCanvas0" width="{{ map.width }}" height="{{ map.height }}"></canvas>
+        <canvas class="mapCanvas" id="mapCanvas1" width="{{ map.width }}" height="{{ map.height }}"></canvas>
+        <canvas class="mapCanvas" id="mapCanvas2" width="{{ map.width }}" height="{{ map.height }}"></canvas>
+        <canvas class="mapCanvas" id="mapCanvas3" width="{{ map.width }}" height="{{ map.height }}"></canvas>
+        <canvas class="mapCanvas" id="mapCanvas4" width="{{ map.width }}" height="{{ map.height }}"></canvas>
+        <canvas class="mapCanvas" id="mapCanvas5" width="{{ map.width }}" height="{{ map.height }}"></canvas>
+        <canvas class="mapCanvas" id="mapCanvas6" width="{{ map.width }}" height="{{ map.height }}"></canvas>
+        <canvas class="mapCanvas" id="mapCanvas7" width="{{ map.width }}" height="{{ map.height }}"></canvas>
+        <canvas class="mapCanvas" id="mapCanvas8" width="{{ map.width }}" height="{{ map.height }}"></canvas>
+        </div>
         <textarea rows="5" cols="100">
         {{ map }}
         </textarea>
@@ -72,6 +111,10 @@
         </ul>
     </div>
     
+    <script type="text/javascript" src="app/lib/HexagonTools/js/HexagonTools.js"></script>
+    <script type="text/javascript" src="app/lib/HexagonTools/js/HexCalcs.js"></script>
+    <script type="text/javascript" src="app/lib/HexagonTools/js/Grid.js"></script>
+    <script type="text/javascript" src="app/js/map.js"></script>
     <script type="text/javascript" src="bundle.js"></script>
 </body>
 </html>

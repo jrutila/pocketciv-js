@@ -50,6 +50,36 @@ pocketcivApp.controller('MainGame', function ($scope) {
         "volcano": true
     }
     };
+    pocketciv.Map.width = 9
+    pocketciv.Map.height = 9
+    pocketciv.Map.grid = [
+        [-1,-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+        [ 0,-1, 0, 0, 0, 0, 5, 8, 8, 8, 8, 0, 0, 0 ],
+        [ 0,-1, 0, 0, 5, 5, 3, 3, 3, 3, 7, 0, 0, 0 ],
+        [ 0, 0, 0, 0, 5, 1, 1, 2, 2, 3, 7, 7, 0, 0 ],
+        [-1, 0, 0, 0, 0, 5, 1, 1, 2, 4, 7, 0, 0, 0 ],
+        [-1, 0, 0, 0, 0, 5, 4, 2, 4, 4, 7, 0, 0, 0 ],
+        [-1,-1, 0, 0,-1, 6, 6, 4, 6, 6, 6, 0,-1, 0 ],
+        [-1,-1,-1, 0,-1,-1,-1, 6,-1,-1,-1,-1,-1, 0 ],
+        [-1,-1,-1, 0,-1,-1,-1,-1,-1,-1,-1,-1, 0, 0 ]
+        ];
+    pocketciv.Map.grid = [
+        [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+        [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+        [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+        [-1,-1, 0, 1, 1, 0, 0, 0, 0 ],
+        [-1,-1, 8, 8, 1, 1, 4, 4, 0 ],
+        [-1,-1,-1, 7, 8, 3, 4, 4, 0 ],
+        [-1,-1, 7, 7, 0, 8, 3, 3, 0 ],
+        [-1,-1, 5, 7, 0, 0, 2, 3, 0 ],
+        [-1,-1, 5, 5, 5, 2, 2, 2, 0 ],
+        [-1,-1,-1,-1,-1,-1,-1,-1,-1 ],
+        [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1 ],
+        [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1 ],
+        [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1 ],
+        [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1 ],
+        [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1 ],
+        ];
     $scope.map = pocketciv.Map;
     $scope.deck = pocketciv.EventDeck;
     
@@ -163,4 +193,16 @@ pocketcivApp.controller('MainGame', function ($scope) {
         'literacy': pocketciv.Advances['literacy'],
         //'agriculture': pocketciv.Advances['agriculture'],
     }
+    
+    var map = new Map(pocketciv.Map);
+    $scope.map = map;
+    map.getCanvas = function(i) {
+        return $('#mapCanvas'+i)[0];
+    }
+    map.getImage = function(i) {
+        return $('#mapImage'+i)[0];
+    }
+    angular.element(document).ready(function() {
+        map.paint();
+    })
 });
