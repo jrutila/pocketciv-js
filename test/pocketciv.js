@@ -446,7 +446,7 @@ describe("Engine", function() {
     });
 });
 
-describe.only("AdvanceAcquirer", function() {
+describe("AdvanceAcquirer", function() {
     beforeEach(function() {
         engine = pocketciv.Engine;
         engine.map.areas = {

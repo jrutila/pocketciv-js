@@ -380,10 +380,11 @@ final = function(d) {
                     }
                     
                     var keys = _.sortBy(_.keys(actual_steps), function(s) {
-                        if (s.indexOf('-') > 0) return 99999
+                        if (s.indexOf('-') >= 0) return 99999
                         var nums = s.split('.');
                         return parseInt(nums[0])*100 + parseInt(nums[1]);
                     });
+                    console.log(key)
                     _.each(keys, function(key)
                     {
                         var step = actual_steps[key];
