@@ -5,7 +5,7 @@ pp = pocketciv
 
 function getMovement(areas) {
     return _.object(_.map(pocketciv.Map.areas, function (area, id) {
-        return [id, area.tribes];
+        return [id, area.tribes ? area.tribes : 0 ];
     }));
 }
 
@@ -40,7 +40,6 @@ pocketcivApp.controller('MainGame', function ($scope) {
     },
     "7": {
         "id": 7,
-        "tribes": 1,
         "neighbours": [ 5, 8, 'sea' ],
         "forest": true
     },
@@ -185,7 +184,7 @@ pocketcivApp.controller('MainGame', function ($scope) {
     }
     
     $scope.engine = pocketciv.Engine;
-    $scope.engine.phase = "event";
+    $scope.engine.phase = "populate";
     $scope.engine.era = 1
     $scope.engine.acquired = {
         //'literacy': pocketciv.Advances['literacy'],

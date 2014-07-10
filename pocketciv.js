@@ -198,7 +198,7 @@ function Engine(map, deck) {
         map[key].id = key;
     }
     this.deck = deck;
-    this.phases = ["populate", "move", "event", "advance"];
+    this.phases = ["populate", "move", "event", "advance", "support", "gold_decimate", "city_support", "upkeep" ];
     this.phase = "populate";
     this.events = events;
     this.advances = advances;
@@ -297,6 +297,8 @@ area_card = function(done) {
             area = eng.map.areas[area_id];
             done();
         }
+        else
+            done && done();
     });
 };
 
@@ -434,6 +436,51 @@ final = function(d) {
                 done && done();
             }
         });
+    },
+    support: function() {
+        var engine = this;
+        var changes = {};
+        var areas = engine.map.areas;
+        for (var a in areas)
+        {
+            var area = areas[a];
+            var support_val = 0;
+            if (area.mountain || area.volcano) support_val++;
+            if (area.forest) support_val++;
+            if (area.farm) support_val++;
+            if (area.city) support_val += area.city;
+            
+            if (area.tribes > support_val)
+                changes[area.id] = {'tribes': (support_val-area.tribes).toString()};
+        }
+        engine.areaChange(changes, function() {
+            engine.nextPhase();
+        });
+    },
+    gold_decimate: function() {
+        var engine = this;
+        engine.areaChange({ 'gold': '0' }, function() {
+            engine.nextPhase();
+        });
+    },
+    city_support: function() {
+        var engine = this;
+        var areas = engine.map.areas;
+        var changes = {};
+        for (var a in areas)
+        {
+            if (areas[a].city && !areas[a].farm)
+            {
+                changes[a] = { 'city': '-1' };
+            }
+        }
+        engine.areaChange(changes, function() {
+            engine.nextPhase();
+        });
+    },
+    upkeep: function() {
+        this.round = {};
+        this.phase = 'populate';
     },
     areaChange: function(changes, done) {
         this.areaChanger(changes, function() {
