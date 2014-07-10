@@ -1,6 +1,8 @@
 var pocketciv = require("../../pocketciv");
 var pocketcivApp = angular.module('pocketcivApp', []);
 
+pp = pocketciv
+
 function getMovement(areas) {
     return _.object(_.map(pocketciv.Map.areas, function (area, id) {
         return [id, area.tribes];
@@ -38,6 +40,7 @@ pocketcivApp.controller('MainGame', function ($scope) {
     },
     "7": {
         "id": 7,
+        "tribes": 1,
         "neighbours": [ 5, 8, 'sea' ],
         "forest": true
     },
@@ -88,8 +91,10 @@ pocketcivApp.controller('MainGame', function ($scope) {
     var drawnFunc = undefined;
     $scope.hideDrawer = true;
     $scope.drawCard = function() {
-        $scope.card = $scope.deck.draw;
-        $scope.card = pocketciv.EventDeck.specific(6);
+        $scope.card = $scope.deck.draw();
+        if ($scope.specificCard)
+            $scope.card = pocketciv.EventDeck.specific($scope.specificCard);
+        $scope.specificCard = undefined;
         $scope.hideDrawer = true;
         drawnFunc.call(pocketciv.Engine, $scope.card);
     }
@@ -173,13 +178,21 @@ pocketcivApp.controller('MainGame', function ($scope) {
         $scope.possibleAdvances = undefined;
     }
     
+    $scope.changePhase = undefined;
+    $scope.goPhase = function() {
+        $scope.engine.phase = $scope.changePhase;
+        $scope.changePhase = undefined;
+    }
+    
     $scope.engine = pocketciv.Engine;
-    $scope.engine.phase = "populate";
+    $scope.engine.phase = "event";
     $scope.engine.era = 1
     $scope.engine.acquired = {
         //'literacy': pocketciv.Advances['literacy'],
         //'agriculture': pocketciv.Advances['agriculture'],
     }
+    
+    $scope.godMode = true;
     
     var map = new Map(pocketciv.Map);
     $scope.mapArea = map
@@ -198,6 +211,8 @@ pocketcivApp.controller('MainGame', function ($scope) {
     })
     $scope.$watch('map', function() {
         console.log("Hey! Map changed!")
+        pocketciv.Engine.map = $scope.map
+        pocketciv.Map = $scope.map
         for (var reg in $scope.map.areas)
         {
             if (!(reg in map.symbols))
@@ -266,7 +281,7 @@ pocketcivApp.directive('jsonText', function() {
           } catch(e) {
             ngModelCtrl.$setValidity('invalidJson', false);
           }
-          return lastValid;
+          return lastValid
         }
       }
 

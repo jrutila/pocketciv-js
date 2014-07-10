@@ -6,6 +6,7 @@ var events = {
     'anarchy': require('./events/anarchy'),
     'civil_war': require('./events/civil_war'),
     'corruption': require('./events/corruption'),
+    'visitation': require('./events/visitation'),
 }
 
 var actions = {
@@ -116,6 +117,7 @@ function sum(arr) {
 
     for (var i in arr)
     {
+        if (arr[i] == undefined) arr[i] = 0;
         total += arr[i];
     }
 
@@ -153,6 +155,7 @@ TribeMover.prototype = {
         for (var key in situation)
         {
             var curr = situation[key];
+            if (curr == undefined) curr = 0;
             if (curr > this.max[key]) return false;
             if (ngh[key] < this.start[key]) return false;
             if (ngh[key] > this.ngh2[key]) return false;
@@ -200,7 +203,9 @@ function Engine(map, deck) {
     this.events = events;
     this.advances = advances;
     this.acquired = {};
+    this.trading = [];
     this.actions = actions;
+    this.gold = 0;
     this.round = {} // Will be emptied after upkeep!
     this.era = 1;
 }
@@ -271,7 +276,7 @@ Engine.prototype = {
                 if (ev.hasOwnProperty('run'))
                     ev.run(eng, event, function() {
                         eng.nextPhase();
-                        done();
+                        done && done();
                     });
                 else
                 {
@@ -432,28 +437,42 @@ final = function(d) {
     },
     areaChange: function(changes, done) {
         this.areaChanger(changes, function() {
+            var applyChange = function(elem, change)
+            {
+                for (var k in change)
+                {
+                    if (change[k] === true || change[k] === false)
+                        elem[k] = change[k];
+                    else
+                    {
+                        var v = change[k];
+                        if (!elem[k])
+                            elem[k] = 0;
+                        
+                        if (v.indexOf('-') == 0 || v.indexOf('+') == 0)
+                            elem[k] += parseInt(v);
+                        else
+                            elem[k] = parseInt(v);
+                            
+                        if (elem[k] < 0)
+                            elem[k] = 0;
+                    }
+                }
+            };
+            
             for (var a in changes)
             {
                 var change = changes[a];
                 var area = this.map.areas[a];
-                for (var k in change)
+                if (area)
                 {
-                    if (change[k] === true || change[k] === false)
-                        area[k] = change[k];
-                    else
-                    {
-                        var v = change[k];
-                        if (!area[k])
-                            area[k] = 0;
-                        
-                        if (v.indexOf('-') == 0 || v.indexOf('+') == 0)
-                            area[k] += parseInt(v);
-                        else
-                            area[k] = parseInt(v);
-                            
-                        if (area[k] < 0)
-                            area[k] = 0;
-                    }
+                    applyChange(area, change);
+                }
+                else
+                {
+                    change = {};
+                    change[a] = changes[a];
+                    applyChange(this, change)
                 }
             }
             done && done.call(this);

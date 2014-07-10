@@ -46,9 +46,16 @@
 </head>    
 <body ng-controller="MainGame">
     <div>{{ deck.cardsLeft }}
-        <button ng-hide="hideDrawer" ng-click="drawCard()">draw</button>
+        <div ng-hide="hideDrawer">
+        <button ng-click="drawCard()">draw</button>
+        <input ng-hide="!godMode" type="text" ng-model="specificCard" />
+        </div>
     </div>
     <div>{{ card }}</div>
+    
+    <div>
+        <span>Gold: {{ engine.gold }}</span>
+    </div>
     
     <div id="map">
         <div id="images">
@@ -90,7 +97,7 @@
         <span class="symbol areaCode" id="area7">7</span>
         <span class="symbol areaCode" id="area8">8</span>
         </div>
-        <textarea json-text rows="5" cols="100" ng-model="map">
+        <textarea ng-hide="!godMode" json-text rows="5" cols="100" ng-model="map" ng-change="mapChanged()">
         </textarea>
         <span>{{ areaChange }}<button ng-hide="!areaChange" ng-click="areaChangeOk()">OK</button></span>
     </div>
@@ -124,11 +131,19 @@
     
     <div id="phaser">
     <h2>Phases</h2>
+    <span ng-hide="!godMode">
+        <select ng-model="changePhase">
+            <option value="populate">1. Population</option>
+            <option value="move">2. Move</option>
+            <option value="event">3. Event</option>
+            <option value="advance">4. Advance</option>
+        </select>
+        <button ng-click="goPhase()">Change</button>
+    </span>
         <ul>
             <li><button ng-click="engine.populate()" ng-disabled="engine.phase != 'populate'">1. Population</button></li>
             <li><button ng-click="engine.move()" ng-disabled="engine.phase != 'move'">2. Move</button></li>
-<!--            <li><button ng-click="engine.event()" ng-disabled="engine.phase != 'event'">3. Event card</button></li>-->
-            <li><button ng-click="engine.event()">3. Event card</button></li>
+            <li><button ng-click="engine.event()" ng-disabled="engine.phase != 'event'">3. Event card</button></li>
             <li>
                 <ul ng-hide="engine.phase != 'advance'">
                     <li><button ng-click="engine.advance('farm')">4.1 Create a Farm</button></li>
@@ -140,7 +155,9 @@
     </div>
     
     <div id="advances">
+        <div ng-hide="!godMode">
         <input type="text" ng-model="acquireAdvance"/><button ng-click="engine.acquire(acquireAdvance)">Acquire!</button>
+        </div>
         <ul>
             <li ng-repeat="adv in engine.acquired">{{ adv.title }}</li>
         </ul>
