@@ -362,6 +362,7 @@ describe("Engine", function() {
                 'test': {
                     name: "Test event",
                     description: "Reset tribe count to one on selected area",
+                    steps: "{%; run() %}",
                     run: function(engine, event, done) {
                         engine.drawer(engine.deck, function(card) {
                             var area_id = card.circle;
@@ -379,9 +380,9 @@ describe("Engine", function() {
                     punchline: 'Event is upon us!',
                     description: "",
                     steps: {
-                    '1': "{% area_card %}",
+                    '1': "{%; area_card() %}",
                     '1.1': "{% cityNumber = '7' %}",
-                    '2.1': "In {{ Active Region|area }}, Decimate Tribes and Farms. Reduce City AV by 2. {% change = { tribes: '0', farm: true} %}",
+                    '2.1': "In Active Region, Decimate Tribes and Farms. Reduce City AV by 2. {% change({ tribes: '0', farm: true}) %}",
                     '-': '{% change.city = cityNumber; change.farm = farmValue %}',
                     '1.2': "{% farmValue = false %}",
                     },
@@ -414,70 +415,6 @@ describe("Engine", function() {
             engine.event(function () {
                 pocketciv.EventDeck.cardsLeft.should.equal(11);
                 engine.phase.should.equal("advance");
-            });
-        });
-        it('should call the event', function(done) {
-            engine.drawer = function(deck, drawn) {
-                var card = deck.draw();
-                card = testdeck.pop();
-                drawn.call(engine, card);
-            }
-            engine.phase.should.equal("event");
-            engine.event(function () {
-                pocketciv.EventDeck.cardsLeft.should.equal(10);
-                // because testdeck card had circle: 1
-                pocketciv.Map.areas[1].tribes.should.equal(1);
-                pocketciv.Map.areas[2].tribes.should.equal(1);
-                engine.phase.should.equal("advance");
-                done();
-            });
-        });
-        it('should do the steps', function(done) {
-            engine.drawer = function(deck, drawn) {
-                var card = deck.draw();
-                card = stepsdeck.pop();
-                drawn.call(engine, card);
-            }
-            engine.phase.should.equal("event");
-            engine.event(function () {
-                pocketciv.EventDeck.cardsLeft.should.equal(10);
-                // because testdeck card had circle: 1
-                pocketciv.Map.areas[1].tribes.should.equal(0);
-                pocketciv.Map.areas[1].farm.should.equal(false);
-                pocketciv.Map.areas[2].tribes.should.equal(1);
-                engine.phase.should.equal("advance");
-                done();
-            });
-        });
-        it('should do the steps with acquired advance', function(done) {
-            engine.acquired = {
-                'test_adv': {
-                    events: {
-                        'steps_event': {
-                            steps: {
-                                '2.2': "{% change = { 'tribes': '10', farm: true } %}",
-                                '2.3': "{% cityNumber = '2' %}"
-                            }
-                        }
-                    }
-                }
-            };
-            engine.drawer = function(deck, drawn) {
-                var card = deck.draw();
-                card = stepsdeck.pop();
-                drawn.call(engine, card);
-            }
-            engine.phase.should.equal("event");
-            engine.event(function () {
-                pocketciv.EventDeck.cardsLeft.should.equal(10);
-                // because testdeck card had circle: 1
-                // AND there is test_adv acquired
-                pocketciv.Map.areas[1].tribes.should.equal(10);
-                pocketciv.Map.areas[1].farm.should.equal(false);
-                pocketciv.Map.areas[1].city.should.equal(2);
-                pocketciv.Map.areas[2].tribes.should.equal(1);
-                engine.phase.should.equal("advance");
-                done();
             });
         });
     });
@@ -642,10 +579,13 @@ describe("AdvanceAcquirer", function() {
     });
 });
 
-describe.only('EventRunner', function() {
+describe('EventRunner', function() {
     beforeEach(function() {
         engine = pocketciv.Engine;
         runner = event.runEvent;
+        engine.map.areas = {
+            5: { id: 5 }
+        }
     });
     describe('steps', function() {
         beforeEach(function() {
@@ -669,24 +609,24 @@ describe.only('EventRunner', function() {
             var ev = new function()
             {
                 this.steps = {
-                    '1': "{% active_region = 5 %}",
+                    '1': "{% active_region = 10 %}",
                     '2': "{% run() %}",
                 }
                 this.run = function() {
-                    this.active_region = 10;
+                    this.active_region = 5;
                     this.change({ 'tribes': '-2'})
                 }
                 return this;
             }();
             runner(engine, ev, {}, function(changes) {
-                changes.should.deep.equal({ 10: { 'tribes': '-2'}});
+                changes.should.deep.equal({ 5: { 'tribes': '-2'}});
                 done();
             });
         });
         it('should be able to use engine', function(done) {
             var ev = new function()
             {
-                engine.gold = 6;
+                engine.gold = 5;
                 this.steps = {
                     '1': "{% active_region = engine.gold %}",
                     '2': "{% change({ 'tribes': '-1' }) %}"
@@ -694,7 +634,7 @@ describe.only('EventRunner', function() {
                 return this;
             }();
             runner(engine, ev, {}, function(changes) {
-                changes.should.deep.equal({ 6: { 'tribes': '-1'}});
+                changes.should.deep.equal({ 5: { 'tribes': '-1'}});
                 done();
             });
         });
@@ -745,12 +685,41 @@ describe.only('EventRunner', function() {
                 done();
             });
         });
+        it('should merge the advance steps', function(done) {
+            var ev = new function()
+            {
+                this.name = "event1";
+                this.steps = {
+                    '1.2': "{% active_region = 4 %}",
+                    '1.1': "{% active_region = 3 %}",
+                    '4': "{% change({ 'tribes': '-1' }) %}",
+                }
+                return this;
+            }();
+            engine.acquired = {
+                'adv1': {
+                    'events': {
+                        'event1': {
+                            'steps': {
+                                '2': "{% active_region = 5 %}",
+                            }
+                        }
+                    }
+                }
+            }
+            runner(engine, ev, {}, function(changes) {
+                changes.should.deep.equal({ 5: { 'tribes': '-1'}});
+                done();
+            });
+        });
+        
     });
     it('should have area_card function', function(done) {
         engine.drawer = function(deck, done)
         {
             done({ 'circle': 5 });
         }
+        engine.acquired = {}
         var ev = new function()
         {
             this.steps = {

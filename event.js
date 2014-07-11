@@ -13,6 +13,8 @@ Context.prototype = {
     change: function(chg, area)
     {
         area = area ? area : this.active_region;
+        if (typeof area === "object")
+            area = area.id
         this.changes[area] = chg;
     },
     break_if: function(expr)
@@ -22,9 +24,10 @@ Context.prototype = {
     },
     area_card: function()
     {
+        console.log("AREA CARD")
         var ctx = this;
         this.engine.drawer(this.engine.deck, function(c) {
-            ctx.active_region = c.circle;
+            ctx.active_region = ctx.engine.map.areas[c.circle.toString()];
             ctx.done()
         });
     },
@@ -35,42 +38,42 @@ Context.prototype = {
             ctx.done();
         });
     },
-    reduce: function(t, amount, areas, done) {
+    reduce: function(t, amount, areas) {
         var redAreas = _.map(areas, function(a) { return a.id; });
-        eng.reducer(t, amount, redAreas,
-            function(reductions) {
+        var ctx = this;
+        this.engine.reducer(t, amount, redAreas, function(reductions) {
                 for (var r in reductions)
                 {
                     if (reductions[r])
                     {
-                        var tr = (changes[r].tribes && parseInt(changes[r].tribes)) || 0;
+                        var tr = (ctx.changes[r].tribes && parseInt(ctx.changes[r].tribes)) || 0;
                         tr -= reductions[r];
-                        changes[r].tribes = tr.toString();
+                        ctx.changes[r].tribes = tr.toString();
                     }
                 }
-                done && done();
+                ctx.done && ctx.done();
             }
         );
     },
-neighbours: function(area) {
-    return _.pick(eng.map.areas, area.neighbours);
-},
+    active_regions: function(expr) {
+        var act = []
+        for (var a in this.engine.map.areas)
+        {
+            if (expr(this.engine.map.areas[a]))
+                act.push(this.engine.map.areas[a]);
+        }
+        this.active_region = act;
+    },
+    neighbours: function(area) {
+        return _.pick(this.engine.map.areas, area.neighbours);
+    },
+    card_value: function(expr) {
+        var h = this.card.hexagon;
+        var c = this.card.circle;
+        var s = this.card.square;
+        return eval(expr);
+    },
 
-
-card_value: function(expr) {
-    var h = card.hexagon;
-    var c = card.circle;
-    var s = card.square;
-    return eval(expr);
-},
-
-select_areas: function(expr) {
-    for (var a in eng.map.areas)
-    {
-        if (expr(eng.map.areas[a]))
-            areas.push(eng.map.areas[a]);
-    }
-},
 };
 
 function contextEval(cmd, context, done, wait) {
@@ -98,19 +101,33 @@ runEvent = function(engine, event, ev, done)
 {
     console.log("Running event")
     if (!engine) throw "Engine should not be null"
-    var steps_cmd = [];
+    
+    var context = new Context();
+    _.extend(context, event);
+    context.engine = engine;
+    
     var actual_steps = _.clone(event.steps);
+    var steps_cmd = [];
+    
+    for (var key in engine.acquired)
+    {
+        if (_.has(engine.acquired[key].events, event.name))
+        {
+            console.log('Extending with '+key)
+            _.extend(actual_steps, engine.acquired[key].events[event.name].steps);
+            //_.extend(context, engine.acquired[key].events[ev.name])
+        }
+    }
     var keys = _.sortBy(_.keys(actual_steps), function(s) {
         if (s.indexOf('-') >= 0) return 99999
         var nums = s.split('.');
-        var s = 0;
+        var rs = 0;
         for (var n in nums)
         {
-            s += parseInt(nums[n])*(1000-100*n)
+            rs += parseInt(nums[n])*(10000/Math.pow(100,n));
         }
-        return s
+        return rs
     });
-    console.log(keys)
     _.each(keys, function(key)
     {
         var step = actual_steps[key];
@@ -126,9 +143,6 @@ runEvent = function(engine, event, ev, done)
     var final = function(ctx) {
         done && done(ctx.changes);
     }
-    var context = new Context();
-    _.extend(context, event);
-    context.engine = engine;
     stepper(steps_cmd, context, final);
 }
 
