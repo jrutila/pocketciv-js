@@ -1,5 +1,6 @@
 var should = require('chai').should()
 var pocketciv = require('../pocketciv')
+var event = require('../event')
 
 describe('#example', function() {
     it("adds -- to a string", function() {
@@ -640,3 +641,128 @@ describe("AdvanceAcquirer", function() {
         
     });
 });
+
+describe.only('EventRunner', function() {
+    beforeEach(function() {
+        engine = pocketciv.Engine;
+        runner = event.runEvent;
+    });
+    describe('steps', function() {
+        beforeEach(function() {
+            engine.acquired = {}
+        });
+        it('should go through steps', function(done) {
+            var ev = new function()
+            {
+                this.steps = {
+                    '1': "{% active_region = 5 %}",
+                    '2': "{% change({ 'tribes': '-1' }) %}"
+                }
+                return this;
+            }();
+            runner(engine, ev, {}, function(changes) {
+                changes.should.deep.equal({ 5: { 'tribes': '-1'}});
+                done();
+            });
+        });
+        it('should merge the context', function(done) {
+            var ev = new function()
+            {
+                this.steps = {
+                    '1': "{% active_region = 5 %}",
+                    '2': "{% run() %}",
+                }
+                this.run = function() {
+                    this.active_region = 10;
+                    this.change({ 'tribes': '-2'})
+                }
+                return this;
+            }();
+            runner(engine, ev, {}, function(changes) {
+                changes.should.deep.equal({ 10: { 'tribes': '-2'}});
+                done();
+            });
+        });
+        it('should be able to use engine', function(done) {
+            var ev = new function()
+            {
+                engine.gold = 6;
+                this.steps = {
+                    '1': "{% active_region = engine.gold %}",
+                    '2': "{% change({ 'tribes': '-1' }) %}"
+                }
+                return this;
+            }();
+            runner(engine, ev, {}, function(changes) {
+                changes.should.deep.equal({ 6: { 'tribes': '-1'}});
+                done();
+            });
+        });
+        it('should break if', function(done) {
+            var ev = new function()
+            {
+                this.steps = {
+                    '1': "{% active_region = 5 %}",
+                    '2': "{% change({ 'tribes': '-1' }) %}",
+                    '3': "{% break_if(active_region == 5) %}",
+                    '4': "{% change({ 'tribes': '-5' }) %}",
+                }
+                return this;
+            }();
+            runner(engine, ev, {}, function(changes) {
+                changes.should.deep.equal({ 5: { 'tribes': '-1'}});
+                done();
+            });
+        });
+        it('should support variables', function(done) {
+            var ev = new function()
+            {
+                this.steps = {
+                    '1': "{% var variable = 3 %}",
+                    '2': "{% variable = 5 %}",
+                    '3': "{% active_region = variable %}",
+                    '4': "{% change({ 'tribes': '-1' }) %}",
+                }
+                return this;
+            }();
+            runner(engine, ev, {}, function(changes) {
+                changes.should.deep.equal({ 5: { 'tribes': '-1'}});
+                done();
+            });
+        });
+        it('should sort the steps', function(done) {
+            var ev = new function()
+            {
+                this.steps = {
+                    '1.2': "{% active_region = 5 %}",
+                    '1.1': "{% active_region = 3 %}",
+                    '4': "{% change({ 'tribes': '-1' }) %}",
+                }
+                return this;
+            }();
+            runner(engine, ev, {}, function(changes) {
+                changes.should.deep.equal({ 5: { 'tribes': '-1'}});
+                done();
+            });
+        });
+    });
+    it('should have area_card function', function(done) {
+        engine.drawer = function(deck, done)
+        {
+            done({ 'circle': 5 });
+        }
+        var ev = new function()
+        {
+            this.steps = {
+                // {%; means that the step will call done by itself
+                '1': "{%; area_card() %}",
+                '4': "{% change({ 'tribes': '-1' }) %}",
+            }
+            return this;
+        }();
+        runner(engine, ev, {}, function(changes) {
+            changes.should.deep.equal({ 5: { 'tribes': '-1'}});
+            done();
+        });
+    });
+})

@@ -177,6 +177,15 @@ pocketcivApp.controller('MainGame', function ($scope) {
         $scope.possibleAdvances = undefined;
     }
     
+    $scope.doEvent = function() {
+        try {
+        var ev = JSON.parse($scope.startEvent)
+        } catch(e) {
+            var ev = { name: $scope.startEvent };
+        }
+        $scope.engine.doEvent(ev)
+    }
+    
     $scope.changePhase = undefined;
     $scope.goPhase = function() {
         $scope.engine.phase = $scope.changePhase;

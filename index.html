@@ -139,6 +139,7 @@
     
     <div id="phaser">
     <h2>Phases</h2>
+    <input type="checkbox" ng-model="godMode" />God Mode
     <span ng-hide="!godMode">
         <select ng-model="changePhase">
             <option value="populate">1. Population</option>
@@ -170,7 +171,8 @@
     
     <div id="advances">
         <div ng-hide="!godMode">
-        <input type="text" ng-model="acquireAdvance"/><button ng-click="engine.acquire(acquireAdvance)">Acquire!</button>
+        <input type="text" ng-model="acquireAdvance"/><button ng-click="engine.acquire(acquireAdvance)">Acquire!</button><br/>
+        <input type="text" ng-model="startEvent"/><button ng-click="doEvent()">Start!</button>
         </div>
         <ul>
             <li ng-repeat="adv in engine.acquired">{{ adv.title }}</li>

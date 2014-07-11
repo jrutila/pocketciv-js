@@ -1,5 +1,6 @@
 var eventDeck = require('./eventdeck').EventDeck;
 var _ = require("underscore");
+var eventRunner = require('./event')
 
 var events = {
     'famine': require('./events/famine'),
@@ -7,6 +8,7 @@ var events = {
     'civil_war': require('./events/civil_war'),
     'corruption': require('./events/corruption'),
     'visitation': require('./events/visitation'),
+    'flood': require('./events/flood'),
 }
 
 var actions = {
@@ -270,171 +272,26 @@ Engine.prototype = {
             var eng = this;
             if (eng.era in eventcard.events)
             {
-                var event = eventcard.events[eng.era];
-                console.log("Event: "+event);
-                var ev = eng.events[event.name];
-                if (ev.hasOwnProperty('run'))
-                    ev.run(eng, event, function() {
-                        eng.nextPhase();
-                        done && done();
-                    });
-                else
-                {
-                    console.log('No run method. Doing steps!')
-                    var patt = /{%(=? .*?) %}/g;
-                    var area = undefined;
-                    var areas = [];
-                    var change = undefined;
-                    var changes = {};
-                    var card = undefined;
-                    
-area_card = function(done) {
-    console.log("Drawing area card");
-    eng.drawer(eng.deck, function(c) {
-        var area_id = c.circle;
-        if (area_id in eng.map.areas)
-        {
-            area = eng.map.areas[area_id];
-            done();
-        }
-        else
-            done && done();
-    });
-};
-
-draw_card = function(done) {
-    console.log("Drawing a card");
-    eng.drawer(eng.deck, function(c) {
-        card = c;
-        done();
-    });
-};
-
-neighbours = function(area) {
-    return _.pick(eng.map.areas, area.neighbours);
-};
-
-reduce = function(t, amount, areas, done) {
-    var redAreas = _.map(areas, function(a) { return a.id; });
-    eng.reducer(t, amount, redAreas,
-        function(reductions) {
-            for (var r in reductions)
-            {
-                if (reductions[r])
-                {
-                    var tr = (changes[r].tribes && parseInt(changes[r].tribes)) || 0;
-                    tr -= reductions[r];
-                    changes[r].tribes = tr.toString();
-                }
-            }
-            done && done();
-        }
-    );
-};
-
-card_value = function(expr) {
-    var h = card.hexagon;
-    var c = card.circle;
-    var s = card.square;
-    return eval(expr);
-};
-
-select_areas = function(expr) {
-    for (var a in eng.map.areas)
-    {
-        if (expr(eng.map.areas[a]))
-            areas.push(eng.map.areas[a]);
-    }
-};
-
-var adv = function(advance) {
-    return false;
-};
-
-final = function(d) {
-    console.log(area);
-    console.log(change);
-    console.log(areas);
-    console.log(changes);
-    if (area && change)
-    {
-        var cngs= {};
-        cngs[area.id] = change;
-        eng.areaChange(cngs, function() {
-            eng.nextPhase();
-            d();
-        });
-    } else if (areas && changes)
-    {
-        eng.areaChange(changes, function() {
-            eng.nextPhase();
-            d();
-        });
-    }
-    else {
-        console.log("No area change");
-        d();
-    }
-};
-                    var steps_cmd = [];
-                    var actual_steps = _.clone(ev.steps);
-                    for (var key in eng.acquired)
-                    {
-                        if (ev.name in eng.acquired[key].events)
-                        {
-                            _.extend(actual_steps, eng.acquired[key].events[ev.name].steps);
-                        }
-                    }
-                    
-                    var keys = _.sortBy(_.keys(actual_steps), function(s) {
-                        if (s.indexOf('-') >= 0) return 99999
-                        var nums = s.split('.');
-                        return parseInt(nums[0])*100 + parseInt(nums[1]);
-                    });
-                    console.log(key)
-                    _.each(keys, function(key)
-                    {
-                        var step = actual_steps[key];
-                        var m = step.match(patt);
-                        var cmd = "";
-                        for (var s in m)
-                        {
-                            cmd += m[s].replace(patt, "$1") + "\n";
-                        }
-                        steps_cmd.push(cmd);
-                    });
-                    steps_cmd.push("final");
-                    console.log(steps_cmd)
-                    
-                    var stepper = function(steps) {
-                        if (steps.length == 0)
-                        {
-                            return done && done();
-                        }
-                        var cmd = steps.shift();
-                        var callback = function() { stepper(steps); }
-                        if (cmd.trim() in this)
-                        {
-                            // It is a function
-                            this[cmd.trim()].call(eng, callback);
-                        } else if (cmd.indexOf('=') == 0) {
-                            var par = cmd.lastIndexOf(')');
-                            cmd = cmd.substring(1, par) + ", callback)";
-                            eval(cmd);
-                        } else {
-                            (function(d) {
-                                eval(cmd);
-                                d();
-                            })(callback);
-                        }
-                    };
-                    stepper(steps_cmd);
-                }
+                var ev = eventcard.events[eng.era];
+                console.log("Drew event: "+ev.name);
+                eng.doEvent(ev, function() {
+                    eng.nextPhase();
+                    done && done();
+                });
             } else {
                 console.log("No event!");
                 eng.nextPhase();
                 done && done();
             }
+        });
+    },
+    doEvent: function(ev, done) {
+        var eng = this;
+        var event = eng.events[ev.name];
+        eventRunner.runEvent(eng, event, ev, function(changes) {
+            eng.areaChange(changes, function() {
+                done && done();
+            });
         });
     },
     support: function() {
