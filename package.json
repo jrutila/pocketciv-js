@@ -3,7 +3,7 @@
     "version": "0.0.1",
     "scripts": {
         "test": "make test",
-        "watch-js": "watchify app/js/*.js advances/*.js actions/*.js events/*.js *.js -o bundle.js -dv"
+        "watch-js": "watchify app/js/*.js advances/*.js actions/*.js events/*.js pocketciv.js event.js -o bundle.js -dv"
     },
     "dependencies": {
             "browserify": "*",
