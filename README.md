@@ -32,5 +32,5 @@ There is couple of callback functions that the client must implement:
 - changer: Shows the upcoming changes to user and asks confirmation 
 - reducer: Reduces tribes and other stuff from the map (use Reducer)
 - mover: Moves tribes around (use TribeMover)
-- 
+
 These callback function should implement the UI part of the software using the engine and workers. No business logic is allowed in the UI client.
