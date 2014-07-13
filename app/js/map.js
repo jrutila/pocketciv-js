@@ -124,6 +124,7 @@ Map.prototype.paint = function(ctx) {
                     commonPoints[key]++;
                 }
             }
+            ctx.globalCompositeOperation = 'source-over';
             for (var h in region)
             {
                 var hex = region[h];
