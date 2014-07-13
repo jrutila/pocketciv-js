@@ -105,6 +105,7 @@ runEvent = function(engine, event, ev, done)
     var context = new Context();
     _.extend(context, event);
     context.engine = engine;
+    context.event = ev;
     
     var actual_steps = _.clone(event.steps);
     var steps_cmd = [];

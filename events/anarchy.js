@@ -11,9 +11,9 @@ module.exports = {
             City AV’s this way until the City AV is 1, or until \
             amount of Tribes is less than the City AV.\
             {% tribeCount = 3 %}",
-            '-': "{% reduce() %}"
+            '-': "{% reduceAreas() %}"
     },
-    reduce: function() {
+    reduceAreas: function() {
         for (var ar in this.active_region)
         {
             var area = this.active_region[ar];
