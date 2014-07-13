@@ -1,4 +1,4 @@
-var pocketciv = require("../../pocketciv");
+var pocketciv = require("../../core/pocketciv");
 var pocketcivApp = angular.module('pocketcivApp', []);
 
 pp = pocketciv

@@ -1,6 +1,6 @@
 var should = require('chai').should()
-var eventRunner = require('../event')
-var pocketciv = require('../pocketciv')
+var eventRunner = require('../core/event')
+var pocketciv = require('../core/pocketciv')
 
 describe('Famine', function() {
     beforeEach(function() {
@@ -18,7 +18,7 @@ describe('Famine', function() {
     });
 });
 
-describe.only('Flood', function() {
+describe('Flood', function() {
     beforeEach(function() {
         runEvent = eventRunner.runEvent;
         event = require('../events/flood')

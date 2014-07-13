@@ -3,24 +3,24 @@ var _ = require("underscore");
 var eventRunner = require('./event')
 
 var events = {
-    'famine': require('./events/famine'),
-    'anarchy': require('./events/anarchy'),
-    'civil_war': require('./events/civil_war'),
-    'corruption': require('./events/corruption'),
-    'visitation': require('./events/visitation'),
-    'flood': require('./events/flood'),
+    'famine': require('../events/famine'),
+    'anarchy': require('../events/anarchy'),
+    'civil_war': require('../events/civil_war'),
+    'corruption': require('../events/corruption'),
+    'visitation': require('../events/visitation'),
+    'flood': require('../events/flood'),
 }
 
 var actions = {
-    'farm': require('./actions/farm'),
-    'city': require('./actions/city'),
-    'acquire': require('./actions/acquire'),
+    'farm': require('../actions/farm'),
+    'city': require('../actions/city'),
+    'acquire': require('../actions/acquire'),
 }
 
 var advances = {
-    'irrigation': require('./advances/irrigation'),
-    'literacy': require('./advances/literacy'),
-    'agriculture': require('./advances/agriculture'),
+    'irrigation': require('../advances/irrigation'),
+    'literacy': require('../advances/literacy'),
+    'agriculture': require('../advances/agriculture'),
 }
 
 

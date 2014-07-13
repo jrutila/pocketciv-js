@@ -1,6 +1,6 @@
 var should = require('chai').should()
-var pocketciv = require('../pocketciv')
-var event = require('../event')
+var pocketciv = require('../core/pocketciv')
+var event = require('../core/event')
 
 describe('#example', function() {
     it("adds -- to a string", function() {

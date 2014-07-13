@@ -8,15 +8,15 @@ if (!module.parent){
     }).addFile(__filename).run(process.exit);
 }*/
 
-var Mocha = require('./node_modules/mocha'); //The root mocha path 
+var Mocha = require('mocha'); //The root mocha path 
 
 var mocha = new Mocha();
 
 var passed = [];
 var failed = [];
 
-mocha.addFile('test/pocketciv'); // direct mocha to exampleTest.js
-mocha.addFile('test/events'); // direct mocha to exampleTest.js
+mocha.addFile('./test/pocketciv'); // direct mocha to exampleTest.js
+mocha.addFile('./test/events'); // direct mocha to exampleTest.js
 
 
 mocha.run(function(){

@@ -1,4 +1,4 @@
-var i18n = require('../i18n');
+var i18n = require('../lib/i18n');
 module.exports = {
     run: function(context) {
         var engine = this;
