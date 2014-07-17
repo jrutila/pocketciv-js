@@ -19,12 +19,12 @@ describe('Famine', function() {
     });
 });
 
-describe.only('Flood', function() {
+describe('Flood', function() {
     beforeEach(function() {
         runEvent = eventRunner.runEvent;
         event = require('../events/flood')
         engine = pocketciv.Engine;
-        engine.map.areas = { 
+        engine.map.areas = {
             5: { id: 5, neighbours: [ 4, 'sea' ]},
             4: { id: 4, neighbours: [ 3, 5, 'sea' ]},
             3: { id: 3, neighbours: [ 4, 2 ] },
@@ -82,6 +82,98 @@ describe.only('Flood', function() {
             chg.should.deep.equal({
                 5: {'tribes': '0', 'city': '3' },
                 4: {'city': '2' },
+            })
+            done();
+        })
+    });
+})
+
+describe('Epidemic', function() {
+    beforeEach(function() {
+        runEvent = eventRunner.runEvent;
+        event = require('../events/epidemic')
+        engine = pocketciv.Engine;
+        engine.map.areas = {
+            5: { id: 5, tribes: 2, neighbours: [ 4 ]},
+            4: { id: 4, tribes: 3, neighbours: [ 3, 5 ]},
+            3: { id: 3, tribes: 0, neighbours: [ 4, 2 ] },
+            2: { id: 2, tribes: 5, neighbours: [ 3 ] },
+        }
+    });
+    it('should expand to other areas from 5', function(done) {
+        var deckk = [{ circle: 5 }, { square: 5 }]
+        var areaa = [ 4 ];
+        engine.drawer = function(deck, done) { done(deckk.shift()) }
+        engine.selector = function(areas, done) {
+          done(areas[areaa.shift()]);
+        }
+        runEvent(engine, event, { expr: 's' }, function(chg) {
+            chg.should.deep.equal({
+                5: {'tribes': '0' },
+                4: {'tribes': '0' },
+            })
+            done();
+        })
+    });
+    it('should expand to other areas from 5 using only tribes', function(done) {
+        var deckk = [{ circle: 5 }, { square: 4 }]
+        var areaa = [ 4 ];
+        engine.drawer = function(deck, done) { done(deckk.shift()) }
+        engine.selector = function(areas, done) {
+          done(areas[areaa.shift()]);
+        }
+        runEvent(engine, event, { expr: 's' }, function(chg) {
+            chg.should.deep.equal({
+                5: {'tribes': '0' },
+                4: {'tribes': '1' },
+            })
+            done();
+        })
+    });
+    it('should stop to area 3', function(done) {
+        var deckk = [{ circle: 5 }, { square: 6 }]
+        var areaa = [ 4, 2 ];
+        engine.drawer = function(deck, done) { done(deckk.shift()) }
+        engine.selector = function(areas, done) {
+          done(areas[areaa.shift()]);
+        }
+        runEvent(engine, event, { expr: 's' }, function(chg) {
+            chg.should.deep.equal({
+                5: {'tribes': '0' },
+                4: {'tribes': '0' },
+            })
+            done();
+        })
+    });
+    it('should go on to area 2', function(done) {
+        engine.map.areas[3].tribes = 3
+        var deckk = [{ circle: 5 }, { square: 7 }]
+        var areaa = [ 4, 3 ];
+        engine.drawer = function(deck, done) { done(deckk.shift()) }
+        engine.selector = function(areas, done) {
+          done(areas[areaa.shift()]);
+        }
+        runEvent(engine, event, { expr: 's' }, function(chg) {
+            chg.should.deep.equal({
+                5: {'tribes': '0' },
+                4: {'tribes': '0' },
+                3: {'tribes': '1' },
+            })
+            done();
+        })
+    });
+    it('should stop to area 5 when starting from 4', function(done) {
+        engine.map.areas[3].tribes = 3
+        var deckk = [{ circle: 4 }, { square: 8 }]
+        var areaa = [ 5, 2 ];
+        engine.drawer = function(deck, done) { done(deckk.shift()) }
+        engine.selector = function(areas, done) {
+          done(areas[areaa.shift()]);
+        }
+        runEvent(engine, event, { expr: 's' }, function(chg) {
+            chg.should.deep.equal({
+                5: {'tribes': '0' },
+                4: {'tribes': '0' },
             })
             done();
         })

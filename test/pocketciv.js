@@ -97,6 +97,18 @@ describe('Map', function() {
             });
         })
     });
+    describe('tribeCount', function() {
+      it('should count tribes from areas', function() {
+        var target = pocketciv.Map;
+        target.areas = {
+          4: { 'tribes': 5 },
+          3: { tribes: 0 },
+          2: { tribes: 4 },
+          1: { },
+        }
+        target.tribeCount.should.equal(9);
+      });
+    });
 });
 
 describe('TribeMover', function() {

@@ -17,6 +17,7 @@ var failed = [];
 
 mocha.addFile('./test/pocketciv'); // direct mocha to exampleTest.js
 mocha.addFile('./test/events'); // direct mocha to exampleTest.js
+mocha.addFile('./test/events'); // direct mocha to exampleTest.js
 
 
 mocha.run(function(){

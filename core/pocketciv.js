@@ -84,7 +84,10 @@ Map.prototype = {
     removeTribe: function(area, amount) {
         amount = typeof amount !== 'undefined' ? amount : 1;
         this.areas[area].tribes -= amount;
-    }
+    },
+    get tribeCount() {
+      return _.reduce(_.values(this.areas), function(memo, area){ return area.tribes ?  memo + area.tribes: memo }, 0)
+    },
 }
 
 function TribeMover(map, moveLimit) {

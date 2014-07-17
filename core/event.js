@@ -140,7 +140,6 @@ runEvent = function(engine, event, ev, done)
         }
         steps_cmd.push(cmd);
     });
-    console.log(steps_cmd)
     var final = function(ctx) {
         done && done(ctx.changes);
     }
