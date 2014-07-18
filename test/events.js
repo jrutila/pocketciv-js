@@ -178,4 +178,18 @@ describe('Epidemic', function() {
             done();
         })
     });
+    it('should stop to area 3 when starting from 4', function(done) {
+        var deckk = [{ circle: 4 }, { square: 8 }]
+        var areaa = [ 4, 2 ];
+        engine.drawer = function(deck, done) { done(deckk.shift()) }
+        engine.selector = function(areas, done) {
+          done(areas[areaa.shift()]);
+        }
+        runEvent(engine, event, { expr: 's' }, function(chg) {
+            chg.should.deep.equal({
+                4: {'tribes': '0' },
+            })
+            done();
+        })
+    });
 })

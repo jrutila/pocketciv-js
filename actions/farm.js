@@ -2,7 +2,7 @@ var i18n = require('../lib/i18n');
 module.exports = {
     run: function(context) {
         var engine = this;
-        var possibleAreas = [];
+        var possibleAreas = {};
         for (var key in engine.map.areas)
         {
             if (!engine.map.areas[key].farm &&
@@ -14,18 +14,18 @@ module.exports = {
                 )
                 )
             {
-                possibleAreas.push(key);
+                possibleAreas[key] = engine.map.areas[key];
             }
         }
         engine.areaSelector(possibleAreas, function(area) {
             var changes = {};
-            changes[area] = {
+            changes[area.id] = {
                 'tribes': '-2',
                 'farm': true };
             var built_without_forest = true;
             if (!context || !context.forest_free)
             {
-                changes[area].forest = false;
+                changes[area.id].forest = false;
                 built_without_forest = false;
             }
             if (context && context.forest_free && engine.map.areas[area].forest == true)
@@ -33,7 +33,7 @@ module.exports = {
                 var msg = i18n.translate('Do you want to use the forest in the area %s?').fetch(area);
                 if (engine.queryUser('yesno', msg))
                 {
-                    changes[area].forest = false;
+                    changes[area.id].forest = false;
                     built_without_forest = false;
                 }
             }

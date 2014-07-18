@@ -23,12 +23,21 @@ module.exports = {
     },
     reduce: function() {
       var rdc = new reducer.Reducer(this.engine)
+      console.log('Current area '+this.active_region.id)
       rdc.currentArea = this.active_region
+      console.log('Population loss '+population_loss)
       rdc.startAmount = population_loss
       rdc.reduce = function(area) {
+        if (area.tribes == 0)
+        {
+          this.amount = 0;
+          return;
+        }
         var rTrb = Math.min(area.tribes, this.amount);
         //if (this.engine.map.tribeCount - (this.original_amount - this.amount - rTrb) <= 2)
         this.amount -= rTrb;
+        console.log('Reduce area '+area.id+' with '+rTrb)
+        console.log('Loss left: '+this.amount)
         return { 'tribes': (area.tribes - rTrb).toString() }
       }
       rdc.areas = function() {
@@ -38,6 +47,8 @@ module.exports = {
           if (unvisitedngh.indexOf(parseInt(key)) > -1)
             areas[key] = area;
         });
+        console.log('Possible ares to '+this.currentArea.id+' are ')
+        console.log(areas)
         return areas;
         //return this.engine.map.areas;
       }

@@ -22,6 +22,7 @@ describe('Reducer', function() {
         done(areas[areaQ.shift()]);
       }
       var target = new reducer.Reducer(engine);
+      target.startAmount = 10;
       target.reduce = function(area) {
         return { 'tribes': '-1' }
       };
@@ -40,8 +41,9 @@ describe('Reducer', function() {
       engine.map.areas = {
         4: { id: 4, 'tribes': 3, 'neighbours': [ 3 ] },
         3: { id: 3, 'tribes': 2, 'neighbours': [ 4 ] },
+        2: { id: 2, 'tribes': 2, 'neighbours': [ 3 ] },
       }
-      var areaQ = [4, 3]
+      var areaQ = [4, 3, 2]
       engine.selector = function(areas, done) {
         done(areas[areaQ.shift()]);
       }

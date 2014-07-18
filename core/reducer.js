@@ -15,6 +15,11 @@ var visitArea = function(area, done) {
   this.changes[area.id] = chg;
   this.currentArea = area;
   this.visited.push(area.id)
+  if (this.amount <= 0)
+  {
+    visitArea.call(this, undefined, done)
+    return;
+  }
   var areas = this.areas()
   var rdc = this;
   this.engine.selector(areas, function(area) {

@@ -9,6 +9,7 @@ var events = {
     'corruption': require('../events/corruption'),
     'visitation': require('../events/visitation'),
     'flood': require('../events/flood'),
+    'epidemic': require('../events/epidemic'),
 }
 
 var actions = {

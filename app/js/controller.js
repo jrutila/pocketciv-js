@@ -127,7 +127,7 @@ pocketcivApp.controller('MainGame', function ($scope) {
         $scope.hideDrawer = false;
         drawnFunc = drawn;
     }
-    
+
     $scope.areaChangeOk = function() {
         $scope.areaChange = undefined;
         areaChangeDone.call($scope.engine);
@@ -143,14 +143,19 @@ pocketcivApp.controller('MainGame', function ($scope) {
     $scope.selectedArea = undefined;
     var areaSelect = undefined;
     $scope.selectArea = function() {
-        areaSelect.call(pocketciv.Engine, $scope.selectedArea);
         $scope.possibleAreas = []
+        areaSelect(pocketciv.Engine.map.areas[$scope.selectedArea]);
     }
+
     pocketciv.Engine.areaSelector = function(possibleAreas, select)
     {
-        $scope.possibleAreas = possibleAreas;
+      console.log('Area select');
+        $scope.possibleAreas = _.keys(possibleAreas);
+        console.log($scope.possibleAreas);
         areaSelect = select;
     }
+
+    pocketciv.Engine.selector = pocketciv.Engine.areaSelector;
     
     pocketciv.Engine.queryUser = function(type, message)
     {
