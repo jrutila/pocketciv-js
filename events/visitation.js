@@ -6,24 +6,27 @@ module.exports = {
     steps: {
             '1': "If you are a Trading Partner with the visiting \
                 Empire, go immediately to TRADE." ,
+            '-': "{%; run() %}",
     },
-    run: function(engine, event, done) {
-        console.log("Visitor: "+event.visitor)
+    run: function() {
+        console.log("Visitor: "+this.event.visitor)
         var trade = this.trade;
-        if (event.visitor in engine.trading)
-            trade(engine, event, done);
+        var ctx = this;
+        if (event.visitor in this.engine.trading)
+            this.trade();
         else    
         {
-            engine.drawer(engine.deck, function(card) {
+            engine.drawer(ctx.engine.deck, function(card) {
                 if (card.friendly)
-                    trade(engine, event, done)
+                    ctx.trade()
             });
         }
     },
-    trade: function(engine, event, done) {
-        engine.drawer(engine.deck, function(card) {
-            var change = { 'gold': '+'+card.circle };
-            engine.areaChange(change, done);
+    trade: function() {
+        var ctx = this;
+        this.engine.drawer(this.engine.deck, function(card) {
+            ctx.changes = { 'gold': '+'+card.circle };
+            ctx.done && ctx.done();
         });
     }
 }

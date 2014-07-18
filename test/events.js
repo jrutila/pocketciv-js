@@ -193,3 +193,43 @@ describe('Epidemic', function() {
         })
     });
 })
+
+describe.only('Visitation', function() {
+    beforeEach(function() {
+        deck = [];
+        runEvent = eventRunner.runEvent;
+        event = require('../events/visitation')
+        engine = pocketciv.Engine;
+        engine.drawer = function(d, done) { done(deck.shift()) }
+    });
+    describe('trade', function() {
+        it('should go to trade if next card is friendly', function(done) {
+            deck = [{ friendly: true }, { circle: 3 }]
+            runEvent(engine, event, { visitor: 'nordic' }, function(chg) {
+                chg.should.deep.equal({
+                    'gold': '+3',
+                })
+                done();
+            })
+        });
+    });
+    describe('attack', function() {
+        beforeEach(function() {
+            engine.map.areas = {
+                5: { id: 5, tribes: 2, neighbours: [ 4 ]},
+                4: { id: 4, tribes: 3, neighbours: [ 3, 5 ]},
+                3: { id: 3, tribes: 0, neighbours: [ 4, 2 ] },
+                2: { id: 2, tribes: 5, neighbours: [ 3 ] },
+            }
+        });
+        it('should go to attack if next card is not friendly', function(done) {
+            deck = [{ friendly: false }, { square: 3, hexagon: 6 }]
+            runEvent(engine, event, { visitor: 'nordic', expr: 's+h' }, function(chg) {
+                chg.should.deep.equal({
+                    'gold': '+3',
+                })
+                done();
+            })
+        });
+    });
+});
