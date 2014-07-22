@@ -1,9 +1,8 @@
+var _ = require('underscore')
+
 Reducer = function(engine) {
   this.engine = engine;
-  this.amount = 0;
-  this.changes = {};
-  this.visited = [];
-  this.currentArea = undefined;
+  this.init();
 }
 
 var visitArea = function(area, done) {
@@ -22,20 +21,48 @@ var visitArea = function(area, done) {
   }
   var areas = this.areas()
   var rdc = this;
-  this.engine.selector(areas, function(area) {
+  this.interactive && this.engine.selector(areas, function(area) {
     visitArea.call(rdc, area, done);
   });
 }
 
 Reducer.prototype = {
+  init: function() {
+    this.amount = this.startAmount;
+    this.changes = {};
+    this.visited = [];
+    this.currentArea = this.startRegion;
+  },
   start: function(done) {
+    if (done) this.interactive = true;
     var rdc = this;
     if (this.currentArea)
       visitArea.call(rdc, this.currentArea, done);
     else
-      this.engine.selector(this.areas(), function(area) {
+      this.interactive && this.engine.selector(this.areas(), function(area) {
         visitArea.call(rdc, area, done);
       });
+  },
+  ok: function(phases) {
+    this.init();
+    var rdc = this;
+    if (this.currentArea) {
+      visitArea.call(rdc, this.currentArea)
+    }
+    _.each(phases, function(p) {
+      var area = rdc.areas()[p]
+      if (!area) return false;
+      visitArea.call(rdc, area)
+    })
+    if (this.amount > 0)
+    {
+      return {
+        'ok': false,
+        'amount': this.amount,
+        'areas': this.areas(),
+      };
+    }
+    return this.changes
   },
   set startAmount(value) {
     this.start_amount = value;
@@ -43,6 +70,13 @@ Reducer.prototype = {
   },
   get startAmount() {
     return this.start_amount;
+  },
+  set startRegion(value) {
+    this.start_region = value;
+    this.currentArea = value;
+  },
+  get startRegion() {
+    return this.start_region;
   }
 }
 

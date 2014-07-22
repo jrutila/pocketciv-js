@@ -194,7 +194,7 @@ describe('Epidemic', function() {
     });
 })
 
-describe.only('Visitation', function() {
+describe('Visitation', function() {
     beforeEach(function() {
         deck = [];
         runEvent = eventRunner.runEvent;
