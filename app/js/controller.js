@@ -40,6 +40,7 @@ pocketcivApp.controller('MainGame', function ($scope) {
     },
     "7": {
         "id": 7,
+        "tribes": 2,
         "neighbours": [ 5, 8, 'sea' ],
         "forest": true
     },
@@ -107,14 +108,26 @@ pocketcivApp.controller('MainGame', function ($scope) {
     
     var reduceFunc = undefined;
     $scope.hideReducer = true;
-    pocketciv.Engine.reducer = function(t, amount, areas, done) {
-        console.log("Show reducer for "+t)
+    pocketciv.Engine.reducer = function(reducer, done) {
+        console.log("Show reducer")
         $scope.hideReducer = false;
-        $scope.reduceAmount = amount;
-        $scope.reduceAreas = areas;
-        $scope.reductions = {};
+        $scope.reducer = reducer;
+        $scope.reduceArray = [];
         reduceFunc = done;
+        checkReducer();
     }
+    var checkReducer = function() {
+        console.log('reduce array change')
+        console.log($scope.reduceArray)
+        var ok = $scope.reducer.ok($scope.reduceArray);
+        $scope.reduceAreas = ok.areas;
+        if (! $scope.reduceAreas)
+        {
+            $scope.hideReducer = true;
+            reduceFunc(ok);
+        }
+    };
+    $scope.$watchCollection('reduceArray', checkReducer);
     
     $scope.reduceTribes = function() {
         reduceFunc.call($scope.engine, $scope.reductions);
@@ -224,8 +237,7 @@ pocketcivApp.controller('MainGame', function ($scope) {
     })
     $scope.$watch('map', function() {
         console.log("Hey! Map changed!")
-        pocketciv.Engine.map = $scope.map
-        pocketciv.Map = $scope.map
+        pocketciv.Map.areas = $scope.map.areas
         for (var reg in $scope.map.areas)
         {
             if (!(reg in map.symbols))

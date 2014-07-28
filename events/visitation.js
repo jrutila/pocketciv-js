@@ -1,4 +1,4 @@
-var Reducer = require('../core/reducer').Reducer
+var reducer = require('../core/reducer')
 var _ = require('underscore')
 
 module.exports = {
@@ -15,11 +15,11 @@ module.exports = {
         console.log("Visitor: "+this.event.visitor)
         var trade = this.trade;
         var ctx = this;
-        if (event.visitor in this.engine.trading)
+        if (this.event.visitor in this.engine.trading)
             this.trade();
         else    
         {
-            engine.drawer(ctx.engine.deck, function(card) {
+            this.engine.drawer(ctx.engine.deck, function(card) {
                 if (card.friendly)
                     ctx.trade()
                 else
@@ -46,12 +46,14 @@ module.exports = {
               ctx.done && ctx.done({});
               return
             }
-            var reducer = new Reducer()
-            reducer.startRegion = this.active_region;
+            var rdc = new reducer.Reducer(ctx.engine);
+            rdc.areas = reducer.Attack.areas;
+            rdc.reduce = reducer.Attack.reduce;
+            rdc.startRegion = this.active_region;
             ctx.engine.drawer(ctx.engine.deck, function(card) {
               ctx.card = card;
-              reducer.startAmount = ctx.card_value(ctx.event.expr);
-              ctx.engine.reducer(reducer, function(chg) {
+              rdc.startAmount = ctx.card_value(ctx.event.expr);
+              ctx.engine.reducer(rdc, function(chg) {
                   ctx.changes = chg;
                   ctx.done && ctx.done();
               });

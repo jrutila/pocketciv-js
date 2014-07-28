@@ -38,6 +38,7 @@ Reducer.prototype = {
     this.changes = {};
     this.visited = [];
     this.currentArea = this.startRegion;
+    _.extend(this, this.initValues);
   },
   start: function(done) {
     if (done) this.interactive = true;

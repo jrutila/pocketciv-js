@@ -121,11 +121,11 @@
     </div>
     
     <div id="reducer" ng-hide="hideReducer">
-        <span>Decimate {{ reduceAmount - reductions.length }} tribes</span>
+        <span>Amount to reduce {{ reducer.amount }}</span>
+        <input type="text" value="{{ reduceArray }}" />
         <ul>
-            <li ng-repeat="id in reduceAreas">{{ id }}: <input type="number" value="0" ng-model="reductions[id]"/></li>
+            <li ng-repeat="area in reduceAreas"><button ng-click="reduceArray.push(area.id)">{{ area.id }}</button></li>
         </ul>
-        <button ng-click="reduceTribes()">Decimate</button>
     </div>
     
     <div id="areaselect" ng-hide="possibleAreas.length == 0">

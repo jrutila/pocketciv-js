@@ -24,18 +24,27 @@ module.exports = {
     reduce: function() {
       var rdc = new reducer.Reducer(this.engine)
       console.log('Current area '+this.active_region.id)
-      rdc.currentArea = this.active_region
+      rdc.startRegion = this.active_region
       console.log('Population loss '+population_loss)
       rdc.startAmount = population_loss
+      rdc.initValues = {
+        tribeCount: this.engine.map.tribeCount-2
+      }
+      console.log(rdc.initValues)
       rdc.reduce = function(area) {
         if (area.tribes == 0)
         {
           this.amount = 0;
           return;
         }
-        var rTrb = Math.min(area.tribes, this.amount);
+        var rTrb = Math.min(area.tribes, this.amount, this.tribeCount);
+        this.tribeCount -= rTrb;
         //if (this.engine.map.tribeCount - (this.original_amount - this.amount - rTrb) <= 2)
         this.amount -= rTrb;
+        if (this.tribeCount === 0)
+        {
+          this.amount = 0;
+        }
         console.log('Reduce area '+area.id+' with '+rTrb)
         console.log('Loss left: '+this.amount)
         return { 'tribes': (area.tribes - rTrb).toString() }
@@ -45,7 +54,10 @@ module.exports = {
         var areas = {}
         _.each(this.engine.map.areas, function(area, key) {
           if (unvisitedngh.indexOf(parseInt(key)) > -1)
-            areas[key] = area;
+          {
+            if (area.tribes > 0)
+              areas[key] = area;
+          }
         });
         console.log('Possible ares to '+this.currentArea.id+' are ')
         console.log(areas)
@@ -53,9 +65,9 @@ module.exports = {
         //return this.engine.map.areas;
       }
       var ctx = this;
-      rdc.start(function(chg) {
-        ctx.changes = chg;
-        ctx.done();
-      })
+      ctx.engine.reducer(rdc, function(chg) {
+          ctx.changes = chg;
+          ctx.done && ctx.done();
+      });
     }
 }
