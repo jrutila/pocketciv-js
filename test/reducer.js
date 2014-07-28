@@ -131,3 +131,77 @@ describe('Reducer', function() {
     });
   });
 });
+
+describe.only('Attack (worker)', function() {
+  beforeEach(function() {
+    target = new reducer.Reducer(engine);
+    target.areas = reducer.Attack.areas;
+    target.reduce = reducer.Attack.reduce;
+  });
+  describe('basic', function() {
+    beforeEach(function() {
+      engine.map.areas = {
+        4: { id: 4, 'tribes': 3, 'neighbours': [ 3 ] },
+        3: { id: 3, 'tribes': 2, 'neighbours': [ 4, 2 ] },
+        2: { id: 2, 'tribes': 2, 'neighbours': [ 3 ] },
+      }
+    });
+    it('should work in basic case', function() {
+      target.startAmount = 4;
+      target.startRegion = engine.map.areas[4];
+      target.ok([3]).should.deep.equal({
+        4: { 'tribes': '0' },
+        3: { 'tribes': '1' },
+      });
+    });
+  });
+  describe('automatic movement', function() {
+    it('attack should go to lowest tribe', function() {
+      engine.map.areas = {
+        4: { id: 4, 'tribes': 3, 'neighbours': [ 3, 2 ] },
+        3: { id: 3, 'tribes': 2, 'neighbours': [ 4, 2 ] },
+        2: { id: 2, 'tribes': 1, 'neighbours': [ 3, 4 ] },
+      }
+      target.startAmount = 4;
+      target.startRegion = engine.map.areas[4];
+      target.ok([2]).should.deep.equal({
+        4: { 'tribes': '0' },
+        2: { 'tribes': '0' },
+      });
+      target.startAmount = 4;
+      target.startRegion = engine.map.areas[2];
+      target.ok([3, 4]).should.deep.equal({
+        4: { 'tribes': '2' },
+        3: { 'tribes': '0' },
+        2: { 'tribes': '0' },
+      });
+      target.ok([]).ok.should.equal(false)
+      _.keys(target.ok([]).areas).should.deep.equal([ '3' ])
+      _.keys(target.ok([3]).areas).should.deep.equal([ '4' ])
+      target.ok([4, 3]).ok.should.equal(false)
+    });
+    it('attack should stop', function() {
+      engine.map.areas = {
+        4: { id: 4, 'tribes': 3, 'neighbours': [ 3 ] },
+        3: { id: 3, 'tribes': 0, 'neighbours': [ 4, 2 ] },
+        2: { id: 2, 'tribes': 1, 'neighbours': [ 3 ] },
+      }
+      target.startAmount = 4;
+      target.startRegion = engine.map.areas[4];
+      target.ok([2]).ok.should.equal(false)
+      target.ok([]).should.deep.equal({
+        4: { 'tribes': '0' },
+      });
+      target.startAmount = 4;
+      target.startRegion = engine.map.areas[2];
+      target.ok([3, 4]).should.deep.equal({
+        4: { 'tribes': '2' },
+        3: { 'tribes': '0' },
+        2: { 'tribes': '0' },
+      });
+      _.keys(target.ok([]).areas).should.deep.equal([ '3' ])
+      _.keys(target.ok([3]).areas).should.deep.equal([ '4' ])
+      target.ok([4, 3]).ok.should.equal(false)
+    });
+  });
+});

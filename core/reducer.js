@@ -80,6 +80,45 @@ Reducer.prototype = {
   }
 }
 
+var Attack = {
+  areas: function() {
+      var unvisitedngh = _.difference(this.currentArea.neighbours, this.visited)
+      var areas = {}
+      _.each(this.engine.map.areas, function(area, key) {
+        if (unvisitedngh.indexOf(parseInt(key)) > -1)
+          if (area.tribes)
+            areas[key] = area;
+      });
+      var sorted = _.sortBy(_.values(areas), function(a) { return a.tribes; })
+      var minTribes = 999;
+      areas = {}
+      for(var s in sorted)
+      {
+        if (sorted[s].tribes <= minTribes)
+        {
+          areas[sorted[s].id] = sorted[s]
+          minTribes = sorted[s].tribes
+        }
+          
+      }
+      return areas;
+  },
+  reduce: function(area) {
+      if (area.tribes == 0)
+      {
+        this.amount = 0;
+        return;
+      }
+      var rTrb = Math.min(area.tribes, this.amount);
+      //if (this.engine.map.tribeCount - (this.original_amount - this.amount - rTrb) <= 2)
+      this.amount -= rTrb;
+      console.log('Reduce area '+area.id+' with '+rTrb)
+      console.log('Loss left: '+this.amount)
+      return { 'tribes': (area.tribes - rTrb).toString() }
+  }
+}
+
 module.exports = {
-  Reducer: Reducer
+  Reducer: Reducer,
+  Attack: Attack
 }
