@@ -121,11 +121,19 @@
     </div>
     
     <div id="reducer" ng-hide="hideReducer">
-        <span>Amount to reduce {{ reducer.amount }}</span>
-        <input type="text" value="{{ reduceArray }}" />
+        <span ng-hide="!reducer.amount">Amount to reduce {{ reducer.amount }} in mode {{ reducer.mode }}</span>
+        <div><input type="text" value="{{ reduceArray }}" /></div>
         <ul>
-            <li ng-repeat="area in reduceAreas"><button ng-click="reduceArray.push(area.id)">{{ area.id }}</button></li>
+            <li ng-repeat="area in reduceAreas">
+            <div ng-switch on="reducer.mode">
+                <div ng-switch-when="Overall">{{ area.id }}
+                    <input type="number" ng-model="reduceArray[area.id]['tribes']"/>
+                </div>
+                <button ng-switch-default ng-click="reduceArray.push(area.id)">{{ area.id }}</button>
+            </div>    
+            </li>
         </ul>
+        <button ng-hide="reducer.amount > 0" ng-click="reduceReady()">reduce</button>
     </div>
     
     <div id="areaselect" ng-hide="possibleAreas.length == 0">

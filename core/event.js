@@ -1,4 +1,5 @@
 var _ = require("underscore");
+var reducer = require("./reducer")
 
 var patt = /{%(;? .*?) %}/g;
 
@@ -39,21 +40,26 @@ Context.prototype = {
         });
     },
     reduce: function(t, amount, areas) {
-        var redAreas = _.map(areas, function(a) { return a.id; });
         var ctx = this;
-        this.engine.reducer(t, amount, redAreas, function(reductions) {
-                for (var r in reductions)
-                {
-                    if (reductions[r])
-                    {
-                        var tr = (ctx.changes[r].tribes && parseInt(ctx.changes[r].tribes)) || 0;
-                        tr -= reductions[r];
-                        ctx.changes[r].tribes = tr.toString();
-                    }
-                }
-                ctx.done && ctx.done();
-            }
-        );
+        var rdc = new reducer.Reducer(this.engine);
+        rdc.mode = reducer.Modes.Overall;
+        var total = _.reduce(_.values(areas), function(memo, area){ return area[t] ?  memo + area[t]: memo }, 0)
+        rdc.startAmount = amount;
+        rdc.reduce = function(r) {
+            this.amount += r[t];
+            if (this.startAmount - this.amount == total)
+                this.amount = 0;
+        };
+        rdc.areas = function() {
+            return _.omit(areas, _.map(this.visited, function(v) { return v.toString() }));
+        };
+        
+        this.engine.reducer(rdc, function(chg) {
+            _.each(chg, function(v, k) {
+                ctx.changes[k] = _.extend(ctx.changes[k], v)
+            })
+            ctx.done && ctx.done();
+        });
     },
     active_regions: function(expr) {
         var act = []

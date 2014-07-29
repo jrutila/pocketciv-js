@@ -112,7 +112,17 @@ pocketcivApp.controller('MainGame', function ($scope) {
         console.log("Show reducer")
         $scope.hideReducer = false;
         $scope.reducer = reducer;
-        $scope.reduceArray = [];
+        if (reducer.mode == 'Overall')
+        {
+            $scope.reduceArray = {};
+            var areas = $scope.reducer.areas();
+            _.each(areas, function(area) {
+                $scope.reduceArray[area.id] = { 'tribes': 0 }
+            });
+            $scope.reduceAreas = areas;
+        }
+        else
+            $scope.reduceArray = [];
         reduceFunc = done;
         checkReducer();
     }
@@ -120,19 +130,31 @@ pocketcivApp.controller('MainGame', function ($scope) {
         console.log('reduce array change')
         console.log($scope.reduceArray)
         var ok = $scope.reducer.ok($scope.reduceArray);
-        $scope.reduceAreas = ok.areas;
-        if (! $scope.reduceAreas)
+        if ($scope.reducer.mode == 'AreaWalker')
+        {
+            $scope.reduceAreas = ok.areas;
+            if (! $scope.reduceAreas)
+            {
+                $scope.hideReducer = true;
+                reduceFunc(ok);
+            }
+        } else {
+            $scope.reducer.amount = ok.amount;
+        }
+    };
+    $scope.reduceReady = function() {
+        var arr = _.filter(_.keys($scope.reduceArray), function(k) {
+            return $scope.reduceArray[k]['tribes'] != "0";
+        })
+        var ok = $scope.reducer.ok(_.pick($scope.reduceArray, arr));
+        if (ok.ok != false)
         {
             $scope.hideReducer = true;
             reduceFunc(ok);
         }
-    };
-    $scope.$watchCollection('reduceArray', checkReducer);
-    
-    $scope.reduceTribes = function() {
-        reduceFunc.call($scope.engine, $scope.reductions);
-        $scope.hideReducer = true;
     }
+    $scope.$watchCollection('reduceArray', checkReducer);
+    $scope.$watch('reduceArray', checkReducer, true);
     
     pocketciv.Engine.drawer = function(deck, drawn) {
         console.log("Show drawer")

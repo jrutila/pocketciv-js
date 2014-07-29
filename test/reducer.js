@@ -19,6 +19,7 @@ describe('Reducer', function() {
       target.currentArea.should.equal(target.startRegion)
     });
     describe('worker mode', function() {
+      describe('area walker', function() {
         beforeEach(function() {
           engine.map.areas = {
             4: { id: 4, 'tribes': 3, 'neighbours': [ 3 ] },
@@ -73,8 +74,46 @@ describe('Reducer', function() {
             3: { 'tribes': '0' }
           });
         });
+      });
+      describe('overall reducer', function() {
+        beforeEach(function() {
+          engine.map.areas = {
+            5: { id: 5, 'tribes': 1, 'neighbours': [ 4 ] },
+            4: { id: 4, 'tribes': 3, 'neighbours': [ 3, 5 ] },
+            3: { id: 3, 'tribes': 2, 'neighbours': [ 4 ] },
+          }
+          target = new reducer.Reducer(engine)
+          target.mode = reducer.Modes.Overall
+          target.startAmount = 4;
+          target.areas = function() {
+            return _.omit(engine.map.areas, _.map(this.visited, function(v) { return v.toString(); }))
+          }
+          target.reduce = function(r) {
+            this.amount += r.tribes;
+          }
+        })
+        it('should return changes', function() {
+          target.ok({ 3: { 'tribes': -2 }, 4: { 'tribes': -2 } }).should.deep.equal({
+            3: { 'tribes': '-2' },
+            4: { 'tribes': '-2' },
+          });
+        })
+        it('should give possible areas', function() {
+          target.ok({}).areas.should.deep.equal(engine.map.areas)
+          target.ok({ 3: { 'tribes': -1 } }).ok.should.equal(false);
+          _.keys(target.ok({ 3: { 'tribes': -1 } }).areas).should.deep.equal([ '4', '5' ]);
+        })
+        it('should have remaining amount', function() {
+          target.ok({}).amount.should.equal(4)
+          target.ok({ 3: { 'tribes': -1 } }).amount.should.equal(3);
+        })
+        it('should return false if the reduction is bad', function() {
+          target.ok({ 3: { 'tribes': -3 } }).should.equal(false);
+        })
+      });
     });
     describe('interactive mode', function() {
+      describe('area walker', function() {
         it('should let user choose start region', function(done) {
           engine.map.areas = {
             4: { id: 4, 'tribes': 3, 'neighbours': [ 3 ] },
@@ -128,11 +167,12 @@ describe('Reducer', function() {
             done();
           });
         });
+      });
     });
   });
 });
 
-describe.only('Attack (worker)', function() {
+describe('Attack (worker)', function() {
   beforeEach(function() {
     target = new reducer.Reducer(engine);
     target.areas = reducer.Attack.areas;

@@ -1,7 +1,8 @@
 var _ = require('underscore')
 
-Reducer = function(engine) {
+var Reducer = function(engine) {
   this.engine = engine;
+  this.mode = Modes.AreaWalker;
   this.init();
 }
 
@@ -50,19 +51,40 @@ Reducer.prototype = {
         visitArea.call(rdc, area, done);
       });
   },
-  ok: function(phases) {
+  ok: function(reduction) {
     this.init();
     var rdc = this;
-    if (this.currentArea) {
-      visitArea.call(rdc, this.currentArea)
-    }
     var failed = false;
-    _.each(phases, function(p) {
-      var area = rdc.areas()[p]
-      if (!area) failed = true;
-      visitArea.call(rdc, area)
-    })
+    
+    switch (this.mode) {
+      case Modes.Overall:
+        _.each(reduction, function(v, k) {
+          rdc.reduce(v);
+          var val = {}
+          var area = rdc.areas()[k];
+          _.each(v, function(vv, kk) {
+            val[kk] = (vv).toString();
+            if (area[kk] + vv < 0)
+              failed = true;
+            rdc.visited.push(area.id)
+          })
+          rdc.changes[k] = val;
+        })
+        break;
+      case Modes.AreaWalker:
+      default:
+        if (this.currentArea) {
+          visitArea.call(rdc, this.currentArea)
+        }
+        _.each(reduction, function(p) {
+          var area = rdc.areas()[p]
+          if (!area) failed = true;
+          visitArea.call(rdc, area)
+        })
+    }
+    
     if (failed) return false;
+    
     if (this.amount > 0)
     {
       return {
@@ -71,6 +93,7 @@ Reducer.prototype = {
         'areas': this.areas(),
       };
     }
+    
     return this.changes
   },
   set startAmount(value) {
@@ -157,7 +180,10 @@ var Attack = {
   }
 }
 
+var Modes = { AreaWalker: 'AreaWalker', Overall: 'Overall' };
+
 module.exports = {
   Reducer: Reducer,
-  Attack: Attack
+  Attack: Attack,
+  Modes: Modes,
 }

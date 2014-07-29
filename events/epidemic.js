@@ -7,6 +7,9 @@ module.exports = {
     description: "",
     steps: {
       '1': "{%; area_card() %}",
+      '1.1': " If the Active \
+      Region has no Tribes, disregard the Epidemic Event \
+      {% break_if(! active_region.tribes) %}",
       '2': " Draw the next {{ Event Card| {%; draw_card() %} }}. Based on the symbols on \
       the right side of the Event box of the ORIGINAL \
       Epidemic Event, add up the values in the same symbols on the newly drawn card.",
