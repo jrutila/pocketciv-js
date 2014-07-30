@@ -10,6 +10,7 @@ var events = {
     'visitation': require('../events/visitation'),
     'flood': require('../events/flood'),
     'epidemic': require('../events/epidemic'),
+    'tribal_war': require('../events/tribal_war'),
 }
 
 var actions = {

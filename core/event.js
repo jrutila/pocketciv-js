@@ -54,12 +54,7 @@ Context.prototype = {
             return _.omit(areas, _.map(this.visited, function(v) { return v.toString() }));
         };
         
-        this.engine.reducer(rdc, function(chg) {
-            _.each(chg, function(v, k) {
-                ctx.changes[k] = _.extend(ctx.changes[k], v)
-            })
-            ctx.done && ctx.done();
-        });
+        this.engine.reducer(rdc, ctx.done);
     },
     active_regions: function(expr) {
         var act = []
