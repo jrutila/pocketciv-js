@@ -9,28 +9,44 @@ if (!module.parent){
 }*/
 
 var Mocha = require('mocha'); //The root mocha path 
+var fs = require('fs');
+var path = require('path');
 
 var mocha = new Mocha();
 
 var passed = [];
 var failed = [];
 
-mocha.addFile('./test/pocketciv'); // direct mocha to exampleTest.js
-mocha.addFile('./test/events'); // direct mocha to exampleTest.js
-mocha.addFile('./test/events'); // direct mocha to exampleTest.js
+mocha.addFile('./test/pocketciv');
+mocha.addFile('./test/reducer');
 
+// Here is an example:
+fs.readdirSync('test/events').filter(function(file){
+    // Only keep the .js files
+    return file.substr(-3) === '.js';
+
+}).forEach(function(file){
+    // Use the method "addFile" to add the file to mocha
+    mocha.addFile(
+        path.join('./test/events', file)
+    );
+});
 
 mocha.run(function(){
 
     console.log(passed.length + ' Tests Passed');
+    /*
     passed.forEach(function(testName){
         console.log('Passed:', testName);
     });
+    */
 
     console.log("\n"+failed.length + ' Tests Failed');
+    /*
     failed.forEach(function(testName){
         console.log('Failed:', testName);
     });
+    */
 
 }).on('fail', function(test){
     failed.push(test.title);

@@ -2,9 +2,9 @@
     "name": "pocketciv",
     "version": "0.0.1",
     "scripts": {
-        "test": "make test",
+        "test": "node test/test.js",
         "watch-js": "watchify app/js/*.js advances/*.js actions/*.js events/*.js core/*.js -o bundle.js -dv",
-        "autotest": "./node_modules/.bin/supervisor -q -n exit -x ./node_modules/.bin/mocha -- -b"
+        "autotest": "./node_modules/.bin/supervisor -q -n exit -x node test/test.js"
     },
     "dependencies": {
             "browserify": "*",
