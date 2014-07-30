@@ -129,6 +129,8 @@ pocketcivApp.controller('MainGame', function ($scope) {
     var checkReducer = function() {
         console.log('reduce array change')
         console.log($scope.reduceArray)
+        if ($scope.hideReducer)
+            return;
         var ok = $scope.reducer.ok($scope.reduceArray);
         if ($scope.reducer.mode == 'AreaWalker')
         {
