@@ -23,6 +23,7 @@ var advances = {
     'irrigation': require('../advances/irrigation'),
     'literacy': require('../advances/literacy'),
     'agriculture': require('../advances/agriculture'),
+    'cartage': require('../advances/cartage'),
 }
 
 
@@ -271,8 +272,21 @@ Engine.prototype = {
             }
         }
         this.actions[name].run.call(this, context);
-    }
-    ,
+    },
+    runPhase: function(name) {
+        var ctx = {};
+        this[name](ctx);
+        _.each(this.acquired, function(acq) {
+            if (_.has(acq.phases, name+'.post'))
+            {
+                acq.phases[name+".post"].call(this, ctx);
+            }
+        }, this)
+        var eng = this;
+        this.areaChange(ctx.changes, function() {
+            eng.nextPhase();
+        });
+    },
     acquire: function(name, done) {
         this.acquired[name] = this.advances[name];
         console.log("Acquired "+name);
@@ -333,7 +347,7 @@ Engine.prototype = {
             engine.nextPhase();
         });
     },
-    city_support: function() {
+    city_support: function(ctx) {
         var engine = this;
         var areas = engine.map.areas;
         var changes = {};
@@ -344,9 +358,7 @@ Engine.prototype = {
                 changes[a] = { 'city': '-1' };
             }
         }
-        engine.areaChange(changes, function() {
-            engine.nextPhase();
-        });
+        ctx.changes = changes;
     },
     upkeep: function() {
         this.round = {};

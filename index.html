@@ -176,7 +176,7 @@
             </li>
             <li><button ng-click="engine.support()" ng-disabled="engine.phase != 'support'">5.1 Upkeek - Support</button></li>
             <li><button ng-click="engine.gold_decimate()" ng-disabled="engine.phase != 'gold_decimate'">5.2 Upkeek - Decimate Gold</button></li>
-            <li><button ng-click="engine.city_support()" ng-disabled="engine.phase != 'city_support'">5.3 Upkeek - City Support</button></li>
+            <li><button ng-click="engine.runPhase('city_support')" ng-disabled="engine.phase != 'city_support'">5.3 Upkeek - City Support</button></li>
             <li><button ng-click="engine.upkeep()" ng-disabled="engine.phase != 'upkeep'">5. Upkeek</button></li>
         </ul>
     </div>

@@ -72,7 +72,7 @@ module.exports = {
                 })
                 engine.support();
                 engine.gold_decimate();
-                engine.city_support();
+                engine.runPhase('city_support');
                 engine.upkeep();
             }
         }
