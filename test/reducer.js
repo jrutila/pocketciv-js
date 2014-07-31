@@ -221,6 +221,35 @@ describe('Attack (worker)', function() {
       _.keys(target.ok([3]).areas).should.deep.equal([ '4' ])
       target.ok([4, 3]).should.equal(false)
     });
+    it('should not go to empty region', function() {
+      engine.map.areas = {
+        4: { id: 4, 'tribes': 3, 'neighbours': [ 3, 2 ] },
+        3: { id: 3, 'tribes': 0, 'neighbours': [ 4, 2 ] },
+        2: { id: 2, 'tribes': 1, 'neighbours': [ 3, 4 ] },
+      }
+      target.startAmount = 4;
+      target.startRegion = engine.map.areas[4];
+      _.keys(target.ok([]).areas).should.deep.equal(['2'])
+      target.ok([3]).should.equal(false)
+    });
+    it('should be able to start from empty region', function() {
+      engine.map.areas = {
+        4: { id: 4, 'tribes': 3, 'neighbours': [ 3, 2 ] },
+        3: { id: 3, 'neighbours': [ 4, 2 ] },
+        2: { id: 2, 'tribes': 1, 'neighbours': [ 3, 4 ] },
+      }
+      target.startAmount = 3;
+      target.startRegion = engine.map.areas[3];
+      _.keys(target.ok([]).areas).should.deep.equal(['2'])
+      _.keys(target.ok([2]).areas).should.deep.equal(['4'])
+      target.ok([3]).should.equal(false)
+      target.ok([2, 4]).should.deep.equal({
+        4: { 'tribes': '1' },
+        3: { },
+        2: { 'tribes': '0' },
+        
+      })
+    });
     describe('attack should go to the highest city in tribe tie', function() {
       beforeEach(function() {
         engine.map.areas = {
@@ -304,13 +333,12 @@ describe('Attack (worker)', function() {
         target.ok([4, 3]).should.equal(false)
       })
       it('case 2', function() {
-        target.startAmount = 4;
+        target.startAmount = 8;
         target.startRegion = engine.map.areas[4];
-        _.keys(target.ok([]).areas).should.deep.equal([ '3' ])
-        target.ok([3, 2]).should.deep.equal({
+        _.keys(target.ok([]).areas).should.deep.equal([ '5' ])
+        target.ok([5]).should.deep.equal({
           4: { 'tribes': '0' },
-          3: { },
-          2: { 'tribes': '0' },
+          5: { 'tribes': '0' },
         });
         target.ok([2]).should.equal(false)
       })
@@ -326,6 +354,24 @@ describe('Attack (worker)', function() {
         target.ok([3]).should.equal(false)
         target.ok([5]).should.equal(false)
       })
+      it('case 4', function() {
+        engine.map.areas = { //require("../app/scenarios/scenario1").map.areas;
+          2: { id: 2, 'neighbours': [ 3,8,5 ] },
+          3: { id: 3, 'neighbours': [ 1,2,8 ] },
+          8: { id: 8, 'tribes': 2, 'neighbours': [ 1,2,3,7 ] },
+          5: { id: 5, 'tribes': 0, 'neighbours': [ 2,7 ] },
+          7: { id: 7, 'tribes': 1, 'neighbours': [ 5,8 ] },
+          1: { id: 1, 'tribes': 1, 'neighbours': [ 3,8 ] },
+        }
+        target.startAmount = 8;
+        target.startRegion = engine.map.areas[2];
+        _.keys(target.ok([]).areas).should.deep.equal([ '8' ])
+        target.ok([8, 7]).should.deep.equal({
+          2: { },
+          8: { 'tribes': '0' },
+          7: { 'tribes': '0' },
+        });
+    });
     });
   });
 });

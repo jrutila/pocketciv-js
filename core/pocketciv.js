@@ -227,7 +227,7 @@ Engine.prototype = {
             _.extend(this.map, state.map)
             for (var key in this.map.areas)
             {
-                this.map.areas[key].id = key;
+                this.map.areas[key].id = parseInt(key);
             }
         }
     },

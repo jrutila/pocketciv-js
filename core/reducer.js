@@ -121,7 +121,7 @@ var Attack = {
           areas[key] = area;
       });
       var sorted = _.sortBy(_.values(areas), function(a) { return a.city ? -1*a.city : 0; })
-      sorted = _.sortBy(sorted, function(a) { return a.tribes; })
+      sorted = _.sortBy(sorted, function(a) { return a.tribes || 0; })
       var minTribes = 999;
       var maxTribes = 0;
       var maxCity = 0;
@@ -131,7 +131,7 @@ var Attack = {
         var tribes = sorted[s].tribes || 0;
         var city = sorted[s].city || 0;
         
-        if (tribes <= minTribes && (tribes > 0 || tribes == maxTribes)
+        if (tribes > 0 && tribes <= minTribes && (tribes > 0 || tribes == maxTribes)
         &&
         (city >= maxCity))
         {
@@ -149,7 +149,7 @@ var Attack = {
       return areas;
   },
   reduce: function(area) {
-      var rTrb = Math.min(area.tribes, this.amount);
+      var rTrb = Math.min(area.tribes || 0, this.amount);
       //if (this.engine.map.tribeCount - (this.original_amount - this.amount - rTrb) <= 2)
       this.amount -= rTrb;
       var RCITY = 5;
