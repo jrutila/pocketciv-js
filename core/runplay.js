@@ -39,9 +39,10 @@ module.exports = {
         engine.mover = function(situation, done) {
             var move = play.move.shift();
             if (!move) {
-                old['move'](situation, done)
+                old['mover'](situation, done)
                 throw "END"
             }
+            console.log(move)
             done.call(engine, move);
         }
 

@@ -196,6 +196,7 @@
         <ul>
             <li ng-repeat="(k, g) in $storage"><button ng-click="loadGamePlay(k, g)">{{ k }}</button><button ng-click="delete $storage[k]">X</button></li>
         </ul>
+        <textarea ng-model="gameScript"></textarea><button ng-click="loadGamePlay('new', gameScript)">load</button>
     </div>
     
     <script type="text/javascript" src="app/lib/HexagonTools/js/HexagonTools.js"></script>

@@ -24,8 +24,8 @@ try {
     runplay.run(engine, play);
 }
 catch (e) {
-    if (e == "END") {
-        console.log('ENDED')
+    if (e == "END" || e == "Not implemented") {
+        console.log('ENDED -- Checking')
         check(engine, play.check);
     }
     else throw e
