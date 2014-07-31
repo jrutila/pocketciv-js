@@ -55,12 +55,12 @@ EventDeck.prototype = {
     specific: function(n) {
       return eventDeck[n];  
     },
-    draw: function() {
+    draw: function(nn) {
         if (this.cardsLeft == 0)
             throw new NoMoreCardsError("No more cards");
         var that = this;
         var left = Object.keys(eventDeck).filter(function (x) { return that.usedCards.indexOf(parseInt(x)) < 0 });
-        var n = left[Math.floor((Math.random() * left.length))]
+        var n = nn || left[Math.floor((Math.random() * left.length))]
         var card = eventDeck[n];
         card.id = parseInt(n);
         this.usedCards.push(parseInt(n));
@@ -199,12 +199,15 @@ TribeMover.prototype = {
 
 function Engine(map, deck) {
     this.mover = function() { throw "Not implemented"; }
-    this.map = map;
+    this.reducer = function() { throw "Not implemented"; }
+    this.drawer = function() { throw "Not implemented"; }
+    this.areaChanger = function() { throw "Not implemented"; }
+    this.map = map || theMap;
     for (var key in map)
     {
         map[key].id = key;
     }
-    this.deck = deck;
+    this.deck = deck || theDeck;
     this.phases = ["populate", "move", "event", "advance", "support", "gold_decimate", "city_support", "upkeep" ];
     this.phase = "populate";
     this.events = events;
@@ -223,6 +226,10 @@ Engine.prototype = {
         if ('deck' in state)
         {
             this.deck.usedCards = state.deck.usedCards;
+        }
+        if (_.has(state, 'map'))
+        {
+            _.extend(this.map, state.map)
         }
     },
     nextPhase: function() {
