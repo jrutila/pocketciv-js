@@ -1,5 +1,6 @@
 var pocketciv = require("../../core/pocketciv");
-var pocketcivApp = angular.module('pocketcivApp', []);
+var pocketcivApp = angular.module('pocketcivApp', ['ngStorage']);
+var runplay = require("../../core/runplay")
 
 pp = pocketciv
 
@@ -9,7 +10,18 @@ function getMovement(areas) {
     }));
 }
 
-pocketcivApp.controller('MainGame', function ($scope) {
+gameLog = {
+    "move": [],
+    "deck": [],
+    "reduce": [],
+    "areas": [],
+    "advance": []
+};
+
+
+pocketcivApp.controller('MainGame', function ($scope, $localStorage) {
+    $scope.$storage = $localStorage;
+    
     pocketciv.Map.areas =
     {
     "1": {
@@ -82,6 +94,7 @@ pocketcivApp.controller('MainGame', function ($scope) {
             console.log("OK MOVE!");
             moveFunc.call(pocketciv.Engine, $scope.movement);
             $scope.hideMover = true;
+            gameLog.move.push($scope.movement)
         } else {
             console.log("FAILED MOVE")
         }
@@ -97,6 +110,7 @@ pocketcivApp.controller('MainGame', function ($scope) {
         $scope.specificCard = undefined;
         $scope.hideDrawer = true;
         drawnFunc.call(pocketciv.Engine, $scope.card);
+        gameLog.deck.push($scope.card.id)
     }
     
     pocketciv.Engine.mover = function(situation, move) {
@@ -139,6 +153,7 @@ pocketcivApp.controller('MainGame', function ($scope) {
             {
                 $scope.hideReducer = true;
                 reduceFunc(ok);
+                gameLog.reduce.push($scope.reduceArray)
             }
         } else {
             $scope.reducer.amount = ok.amount;
@@ -153,6 +168,7 @@ pocketcivApp.controller('MainGame', function ($scope) {
         {
             $scope.hideReducer = true;
             reduceFunc(ok);
+            gameLog.reduce.push($scope.reduceArray)
         }
     }
     $scope.$watchCollection('reduceArray', checkReducer);
@@ -182,6 +198,7 @@ pocketcivApp.controller('MainGame', function ($scope) {
     $scope.selectArea = function() {
         $scope.possibleAreas = []
         areaSelect(pocketciv.Engine.map.areas[$scope.selectedArea]);
+        gameLog.areas.push($scope.selectedArea)
     }
 
     pocketciv.Engine.areaSelector = function(possibleAreas, select)
@@ -259,6 +276,32 @@ pocketcivApp.controller('MainGame', function ($scope) {
             $('#area'+reg).css({top: map.symbols[reg]['area'].Y, left: map.symbols[reg]['area'].X }).show()
         }
     })
+    
+    $scope.advance = function(name) {
+        $scope.engine.advance(name);
+        _.last(gameLog.advance).push(name);
+    }
+    
+    $scope.$watch(function(){ return pocketciv.Engine.phase; }, function(name) {
+        if (name == 'advance')
+        {
+            console.log("gameLog advance")
+            gameLog.advance.push([]);
+        }
+    })
+    
+    $scope.saveGamePlay = function() {
+        console.log("Saving game "+$scope.gameName)
+        $scope.$storage[$scope.gameName] = JSON.stringify(gameLog);
+    }
+    
+    $scope.loadGamePlay = function(name, game) {
+        $scope.gameName = name;
+        console.log("run: "+game)
+        gameLog = JSON.parse(game);
+        runplay.run(pocketciv.Engine, JSON.parse(game))
+    }
+
     $scope.$watch('map', function() {
         console.log("Hey! Map changed!")
         pocketciv.Map.areas = $scope.map.areas

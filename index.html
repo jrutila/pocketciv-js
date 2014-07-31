@@ -53,6 +53,7 @@
 <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
 <script src="//code.angularjs.org/1.2.9/angular.min.js"></script>
 <script>window.angular || document.write('<script src="bower_components/angular/angular.miangular.min.js">\x3C/script>')</script>
+<script type="text/javascript" src="bower_components/ngstorage/ngStorage.js"></script>
 </head>    
 <body ng-controller="MainGame">
     <div>{{ deck.cardsLeft }}
@@ -167,9 +168,9 @@
             <li><button ng-click="engine.event()" ng-disabled="engine.phase != 'event'">3. Event card</button></li>
             <li>4. Advance
                 <ul ng-hide="engine.phase != 'advance'">
-                    <li><button ng-click="engine.advance('farm')">Create a Farm</button></li>
-                    <li><button ng-click="engine.advance('city')">Build a City</button></li>
-                    <li><button ng-click="engine.advance('acquire')">Acquire Advances</button></li>
+                    <li><button ng-click="advance('farm')">Create a Farm</button></li>
+                    <li><button ng-click="advance('city')">Build a City</button></li>
+                    <li><button ng-click="advance('acquire')">Acquire Advances</button></li>
                     <li><button ng-click="engine.nextPhase()">DONE!</button></li>
                 </ul>
             </li>
@@ -187,6 +188,13 @@
         </div>
         <ul>
             <li ng-repeat="adv in engine.acquired">{{ adv.title }}</li>
+        </ul>
+    </div>
+    
+    <div id="replay">
+        <input type="text" ng-model="gameName" /><button ng-click="saveGamePlay()">save</button>
+        <ul>
+            <li ng-repeat="(k, g) in $storage"><button ng-click="loadGamePlay(k, g)">{{ k }}</button><button ng-click="delete $storage[k]">X</button></li>
         </ul>
     </div>
     
