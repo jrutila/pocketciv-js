@@ -203,10 +203,6 @@ function Engine(map, deck) {
     this.drawer = function() { throw "Not implemented"; }
     this.areaChanger = function() { throw "Not implemented"; }
     this.map = map || theMap;
-    for (var key in map)
-    {
-        map[key].id = key;
-    }
     this.deck = deck || theDeck;
     this.phases = ["populate", "move", "event", "advance", "support", "gold_decimate", "city_support", "upkeep" ];
     this.phase = "populate";
@@ -220,7 +216,6 @@ function Engine(map, deck) {
     this.era = 1;
 }
 
-
 Engine.prototype = {
     init: function(state) {
         if ('deck' in state)
@@ -230,6 +225,10 @@ Engine.prototype = {
         if (_.has(state, 'map'))
         {
             _.extend(this.map, state.map)
+            for (var key in this.map.areas)
+            {
+                this.map.areas[key].id = key;
+            }
         }
     },
     nextPhase: function() {

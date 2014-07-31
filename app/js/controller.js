@@ -18,70 +18,12 @@ gameLog = {
     "advance": []
 };
 
+var scenarios = {
+    "1": require("../scenarios/scenario1")
+}
 
 pocketcivApp.controller('MainGame', function ($scope, $localStorage) {
     $scope.$storage = $localStorage;
-    
-    pocketciv.Map.areas =
-    {
-    "1": {
-        "id": 1,
-        "neighbours": [ 3, 4, 8, 'frontier' ],
-        "forest": true
-    },
-    "2": {
-        "id": 2,
-        "desert": true,
-        "neighbours": [ 3, 5, 8, 'sea', 'frontier' ] 
-    },
-    "3": {
-        "id": 3,
-        "desert": true,
-        "neighbours": [ 1, 2, 4, 8, 'frontier' ],
-    },
-    "4": {
-        "id": 4,
-        "desert": true,
-        "neighbours": [ 1, 3, 'frontier' ] 
-    },
-    "5": {
-        "id": 5,
-        "tribes": 1,
-        "neighbours": [ 2, 7, 'sea' ],
-        "mountain": true
-    },
-    "7": {
-        "id": 7,
-        "tribes": 2,
-        "neighbours": [ 5, 8, 'sea' ],
-        "forest": true
-    },
-    "8": {
-        "id": 8,
-        "neighbours": [ 1, 2, 3, 7, 'sea', 'frontier' ],
-        "forest": true,
-        "mountain": true
-    }
-    };
-    pocketciv.Map.width = 9
-    pocketciv.Map.height = 9
-    pocketciv.Map.grid = [
-        [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
-        [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
-        [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
-        [-1,-1, 0, 1, 1, 0, 0, 0, 0 ],
-        [-1,-1, 8, 8, 1, 1, 4, 4, 0 ],
-        [-1,-1,-1, 7, 8, 3, 4, 4, 0 ],
-        [-1,-1, 7, 7, 0, 8, 3, 3, 0 ],
-        [-1,-1, 5, 7, 0, 0, 2, 3, 0 ],
-        [-1,-1, 5, 5, 5, 2, 2, 2, 0 ],
-        [-1,-1,-1,-1,-1,-1,-1,-1,-1 ],
-        [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1 ],
-        [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1 ],
-        [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1 ],
-        [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1 ],
-        [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1 ],
-        ];
     $scope.map = pocketciv.Map;
     $scope.deck = pocketciv.EventDeck;
     
@@ -252,13 +194,6 @@ pocketcivApp.controller('MainGame', function ($scope, $localStorage) {
     }
     
     $scope.engine = pocketciv.Engine;
-    $scope.engine.phase = "populate";
-    $scope.engine.era = 1
-    $scope.engine.acquired = {
-        //'literacy': pocketciv.Advances['literacy'],
-        //'agriculture': pocketciv.Advances['agriculture'],
-    }
-    
     $scope.godMode = true;
     
     var map = new Map(pocketciv.Map);
@@ -331,6 +266,8 @@ pocketcivApp.controller('MainGame', function ($scope, $localStorage) {
         }
     })
 });
+
+pocketciv.Engine.init(scenarios["1"]);
 
 pocketcivApp.directive('jsonText', function() {
   return {
