@@ -12,6 +12,7 @@ module.exports = {
         'city_support.post': function(ctx) {
             // TODO: Implement me!
             ctx.changes['gold'] = '+5';
+            ctx.done && ctx.done();
         }
     }
 }

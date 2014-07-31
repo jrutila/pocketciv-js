@@ -235,10 +235,10 @@ Engine.prototype = {
         }
     },
     nextPhase: function() {
-        this.phase = this.phases[this.phases.indexOf(this.phase)+1];
+        this.phase = this.phases[this.phases.indexOf(this.phase)+1] || this.phases[0];
         console.log("Phase is now "+this.phase);
     },
-    populate: function() {
+    populate: function(ctx) {
         console.log("Populating areas");
         var changes = {};
         for (var key in this.map.areas)
@@ -246,46 +246,64 @@ Engine.prototype = {
             if (this.map.areas[key].tribes > 0)
                 changes[key] = { 'tribes': '+1' };
         }
-        this.areaChange(changes, function() {
-            this.nextPhase();
-        })
+        ctx.changes = changes;
+        ctx.done && ctx.done();
     },
-    move: function() {
+    move: function(ctx) {
         console.log("Moving tribes with mover");
         this.mover(this.map.areas, function(end) {
             for (var key in this.map.areas)
             {
                 this.map.areas[key].tribes = end[key];
             }
-            this.nextPhase();
+            ctx.done && ctx.done();
         });
     },
-    advance: function(name) {
+    advance: function(ctx, name) {
         console.log("Running advance "+name);
-        var context = {};
         var eng = this;
         for (var key in eng.acquired)
         {
             if (name in eng.acquired[key].actions)
             {
-                _.extend(context, eng.acquired[key].actions[name].context(this));
+                _.extend(ctx, eng.acquired[key].actions[name].context(this));
             }
         }
-        this.actions[name].run.call(this, context);
+        this.actions[name].run.call(this, ctx);
     },
-    runPhase: function(name) {
+    runPhase: function(name, arg) {
         var ctx = {};
-        this[name](ctx);
+        var eng = this;
+        var posts = [];
+        
         _.each(this.acquired, function(acq) {
             if (_.has(acq.phases, name+'.post'))
             {
-                acq.phases[name+".post"].call(this, ctx);
+                posts.push(acq.phases[name+".post"])
             }
         }, this)
-        var eng = this;
-        this.areaChange(ctx.changes, function() {
-            eng.nextPhase();
-        });
+        
+        var final = function() {
+                        ctx.confirm && ctx.confirm();
+                        eng.nextPhase();
+                    };
+        
+        var runpost = function() {
+            var post = posts.pop();
+            if (post) post.call(eng, ctx);
+            else {
+                if (_.has(ctx, 'changes'))
+                {
+                    eng.areaChange(ctx.changes, final);
+                } else {
+                    final();
+                }
+            }
+        }
+        ctx.done = runpost;
+
+        this[name](ctx, arg);
+        
     },
     acquire: function(name, done) {
         this.acquired[name] = this.advances[name];
@@ -293,7 +311,7 @@ Engine.prototype = {
         done && done();
     }
     ,
-    event: function(done) {
+    event: function(ctx) {
         console.log("Drawing event card")
         this.drawer(this.deck, function(eventcard) {
             var eng = this;
@@ -301,14 +319,14 @@ Engine.prototype = {
             {
                 var ev = eventcard.events[eng.era];
                 console.log("Drew event: "+ev.name);
-                eng.doEvent(ev, function() {
-                    eng.nextPhase();
-                    done && done();
+                eng.doEvent(ev, function(changes) {
+                    console.log("Event ended: "+ev.name);
+                    ctx.changes = changes;
+                    ctx.done && ctx.done();
                 });
             } else {
                 console.log("No event!");
-                eng.nextPhase();
-                done && done();
+                ctx.done && ctx.done();
             }
         });
     },
@@ -316,12 +334,10 @@ Engine.prototype = {
         var eng = this;
         var event = eng.events[ev.name];
         eventRunner.runEvent(eng, event, ev, function(changes) {
-            eng.areaChange(changes, function() {
-                done && done();
-            });
+            done && done(changes);
         });
     },
-    support: function() {
+    support: function(ctx) {
         var engine = this;
         var changes = {};
         var areas = engine.map.areas;
@@ -337,15 +353,13 @@ Engine.prototype = {
             if (area.tribes > support_val)
                 changes[area.id] = {'tribes': (support_val-area.tribes).toString()};
         }
-        engine.areaChange(changes, function() {
-            engine.nextPhase();
-        });
+        ctx.changes = changes;
+        ctx.done && ctx.done();
     },
-    gold_decimate: function() {
+    gold_decimate: function(ctx) {
         var engine = this;
-        engine.areaChange({ 'gold': '0' }, function() {
-            engine.nextPhase();
-        });
+        ctx.changes = { 'gold': '0' };
+        ctx.done && ctx.done();
     },
     city_support: function(ctx) {
         var engine = this;
@@ -359,10 +373,11 @@ Engine.prototype = {
             }
         }
         ctx.changes = changes;
+        ctx.done && ctx.done();
     },
-    upkeep: function() {
+    upkeep: function(ctx) {
         this.round = {};
-        this.phase = 'populate';
+        ctx.done() && ctx.done();
     },
     areaChange: function(changes, done) {
         this.areaChanger(changes, function() {

@@ -60,20 +60,18 @@ module.exports = {
 
         try {
 
+            console.log('Start cycle')
             while (true) {
-                console.log('Start cycle')
-                engine.populate();
-                engine.move();
-                engine.event();
-                var advances = play.advance.shift();
-                if (advances === undefined) throw "END";
-                _.each(advances, function(adv) {
-                    engine.advance(adv);
-                })
-                engine.support();
-                engine.gold_decimate();
-                engine.runPhase('city_support');
-                engine.upkeep();
+                if (engine.phase == "advance") {
+                    var advances = play.advance.shift();
+                    if (advances === undefined) throw "END";
+                    _.each(advances, function(adv) {
+                        engine.runPhase('advance', adv);
+                    })
+                    engine.nextPhase();
+                }
+                else
+                    engine.runPhase(engine.phase);
             }
         }
         catch (e) {

@@ -213,7 +213,7 @@ pocketcivApp.controller('MainGame', function ($scope, $localStorage) {
     })
     
     $scope.advance = function(name) {
-        $scope.engine.advance(name);
+        $scope.engine.runPhase('advance', name);
         _.last(gameLog.advance).push(name);
     }
     

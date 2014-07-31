@@ -20,7 +20,8 @@ function check(final, chk, path) {
 }
 
 try {
-    play.engine = require(play.scenario)
+    if (play.scenario)
+        play.engine = require(play.scenario)
     runplay.run(engine, play);
 }
 catch (e) {

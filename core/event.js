@@ -29,6 +29,10 @@ Context.prototype = {
         var ctx = this;
         this.engine.drawer(this.engine.deck, function(c) {
             ctx.active_region = ctx.engine.map.areas[c.circle.toString()];
+            if (!ctx.active_region) {
+                console.log("No such area!")
+                ctx.break = true;
+            }
             ctx.done()
         });
     },

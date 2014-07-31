@@ -38,9 +38,11 @@ module.exports = {
                 }
             }
             
-            engine.areaChange(changes, function() {
+            context.changes = changes;
+            context.confirm =  function() {
                 context && built_without_forest && context['forest_free_used']();
-            });
+            };
+            context.done && context.done();
         });
     }
 }

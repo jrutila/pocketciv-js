@@ -163,9 +163,9 @@
         <button ng-click="goPhase()">Change</button>
     </span>
         <ul>
-            <li><button ng-click="engine.populate()" ng-disabled="engine.phase != 'populate'">1. Population</button></li>
-            <li><button ng-click="engine.move()" ng-disabled="engine.phase != 'move'">2. Move</button></li>
-            <li><button ng-click="engine.event()" ng-disabled="engine.phase != 'event'">3. Event card</button></li>
+            <li><button ng-click="engine.runPhase('populate')" ng-disabled="engine.phase != 'populate'">1. Population</button></li>
+            <li><button ng-click="engine.runPhase('move')" ng-disabled="engine.phase != 'move'">2. Move</button></li>
+            <li><button ng-click="engine.runPhase('event')" ng-disabled="engine.phase != 'event'">3. Event card</button></li>
             <li>4. Advance
                 <ul ng-hide="engine.phase != 'advance'">
                     <li><button ng-click="advance('farm')">Create a Farm</button></li>
@@ -174,10 +174,10 @@
                     <li><button ng-click="engine.nextPhase()">DONE!</button></li>
                 </ul>
             </li>
-            <li><button ng-click="engine.support()" ng-disabled="engine.phase != 'support'">5.1 Upkeek - Support</button></li>
-            <li><button ng-click="engine.gold_decimate()" ng-disabled="engine.phase != 'gold_decimate'">5.2 Upkeek - Decimate Gold</button></li>
+            <li><button ng-click="engine.runPhase('support')" ng-disabled="engine.phase != 'support'">5.1 Upkeek - Support</button></li>
+            <li><button ng-click="engine.runPhase('gold_decimate')" ng-disabled="engine.phase != 'gold_decimate'">5.2 Upkeek - Decimate Gold</button></li>
             <li><button ng-click="engine.runPhase('city_support')" ng-disabled="engine.phase != 'city_support'">5.3 Upkeek - City Support</button></li>
-            <li><button ng-click="engine.upkeep()" ng-disabled="engine.phase != 'upkeep'">5. Upkeek</button></li>
+            <li><button ng-click="engine.runPhase('upkeep')" ng-disabled="engine.phase != 'upkeep'">5. Upkeek</button></li>
         </ul>
     </div>
     
