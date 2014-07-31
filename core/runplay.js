@@ -12,7 +12,10 @@ module.exports = {
         }
         engine.drawer = function(deck, done) {
             var id = play.deck.shift();
-            if (!id) throw "END"
+            if (!id) {
+                old['drawer'](deck, done)
+                throw "END"
+            }
             var card = engine.deck.draw(id);
             console.log(card)
             done.call(engine, card)
@@ -26,19 +29,28 @@ module.exports = {
 
         engine.areaSelector = function(possibleAreas, done) {
             var id = play.areas.shift();
-            if (!id) throw "END"
+            if (!id) {
+                old['areaSelector'](possibleAreas, done)
+                throw "END"
+            }
             done(possibleAreas[id])
         }
 
         engine.mover = function(situation, done) {
             var move = play.move.shift();
-            if (!move) throw "END"
+            if (!move) {
+                old['move'](situation, done)
+                throw "END"
+            }
             done.call(engine, move);
         }
 
         engine.reducer = function(reducer, done) {
             var red = play.reduce.shift();
-            if (!red) throw "END"
+            if (!red) {
+                old['reducer'](reducer, done)
+                throw "END"
+            }
             done(reducer.ok(red));
         }
 

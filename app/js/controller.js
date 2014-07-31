@@ -51,8 +51,8 @@ pocketcivApp.controller('MainGame', function ($scope, $localStorage) {
             $scope.card = pocketciv.EventDeck.specific($scope.specificCard);
         $scope.specificCard = undefined;
         $scope.hideDrawer = true;
-        drawnFunc.call(pocketciv.Engine, $scope.card);
         gameLog.deck.push($scope.card.id)
+        drawnFunc.call(pocketciv.Engine, $scope.card);
     }
     
     pocketciv.Engine.mover = function(situation, move) {
