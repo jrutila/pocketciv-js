@@ -52,12 +52,12 @@ module.exports = {
                 engine.populate();
                 engine.move();
                 engine.event();
-                engine.support();
                 var advances = play.advance.shift();
                 if (advances === undefined) throw "END";
                 _.each(advances, function(adv) {
                     engine.advance(adv);
                 })
+                engine.support();
                 engine.gold_decimate();
                 engine.city_support();
                 engine.upkeep();
