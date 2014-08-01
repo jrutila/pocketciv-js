@@ -260,6 +260,7 @@ Engine.prototype = {
         });
     },
     advance: function(ctx, name) {
+        if (!name) return;
         console.log("Running advance "+name);
         var eng = this;
         for (var key in eng.acquired)

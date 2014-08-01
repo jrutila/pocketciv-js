@@ -92,8 +92,9 @@
         </div>
         <textarea ng-hide="!godMode" json-text rows="5" cols="100" ng-model="map" ng-change="mapChanged()">
         </textarea>
-        <span>{{ areaChange }}<button ng-hide="!areaChange" ng-click="areaChangeOk()">OK</button></span>
     </div>
+    
+    <div>{{ areaChange }}<button ng-hide="!areaChange" ng-click="areaChangeOk()">OK</button></div>
     
     <div id="mover" ng-hide="hideMover">
         <ul>
@@ -132,6 +133,7 @@
     
     <div id="phaser">
     <h2>Phases</h2>
+    <button ng-click="engine.phase = 'populate'" ng-hide="engine.phase">Start!</button>
     <input type="checkbox" ng-model="godMode" />God Mode
     <span ng-hide="!godMode">
         <select ng-model="changePhase">
@@ -143,7 +145,7 @@
         </select>
         <button ng-click="goPhase()">Change</button>
     </span>
-        <ul>
+        <ul ng-hide="!godMode">
             <li><button ng-click="engine.runPhase('populate')" ng-disabled="engine.phase != 'populate'">1. Population</button></li>
             <li><button ng-click="engine.runPhase('move')" ng-disabled="engine.phase != 'move'">2. Move</button></li>
             <li><button ng-click="engine.runPhase('event')" ng-disabled="engine.phase != 'event'">3. Event card</button></li>

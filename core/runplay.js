@@ -1,7 +1,7 @@
 var _ = require("underscore")
 
 module.exports = {
-    run: function(engine, play) {
+    run: function(engine, play, done) {
 
         var old = {
             'drawer': engine.drawer,
@@ -76,6 +76,7 @@ module.exports = {
         }
         catch (e) {
             _.extend(engine, old);
+            done && done();
             throw e;
         }
     }

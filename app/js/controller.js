@@ -132,6 +132,8 @@ pocketcivApp.controller('MainGame', function ($scope, $localStorage) {
     pocketciv.Engine.areaChanger = function(changes, done) {
         $scope.areaChange = changes;
         areaChangeDone = done;
+        if (_.isEmpty(changes))
+            $scope.areaChangeOk();
     }
     
     $scope.possibleAreas = []
@@ -194,7 +196,8 @@ pocketcivApp.controller('MainGame', function ($scope, $localStorage) {
     }
     
     $scope.engine = pocketciv.Engine;
-    $scope.godMode = true;
+    $scope.engine.phase = "";
+    $scope.godMode = false;
     
     var map = new Map(pocketciv.Map);
     $scope.mapArea = map
@@ -218,11 +221,13 @@ pocketcivApp.controller('MainGame', function ($scope, $localStorage) {
     }
     
     $scope.$watch(function(){ return pocketciv.Engine.phase; }, function(name) {
+        if (loading || !name) return;
         if (name == 'advance')
         {
             console.log("gameLog advance")
             gameLog.advance.push([]);
         }
+        pocketciv.Engine.runPhase(name);
     })
     
     $scope.saveGamePlay = function() {
@@ -230,11 +235,14 @@ pocketcivApp.controller('MainGame', function ($scope, $localStorage) {
         $scope.$storage[$scope.gameName] = JSON.stringify(gameLog);
     }
     
+    var loading = false;
     $scope.loadGamePlay = function(name, game) {
         $scope.gameName = name;
         console.log("run: "+game)
         gameLog = JSON.parse(game);
-        runplay.run(pocketciv.Engine, JSON.parse(game))
+        loading = true;
+        pocketciv.Engine.phase = "populate";
+        runplay.run(pocketciv.Engine, JSON.parse(game), function() { loading = false; })
     }
 
     $scope.$watch('map', function() {
