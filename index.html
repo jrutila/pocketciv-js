@@ -131,6 +131,15 @@
         <button ng-click="acquireOk()">Acquire!</button>
     </div>
     
+    <div id="advancePhase" ng-hide="engine.phase != 'advance'">
+        <ul>
+            <li><button ng-click="advance('farm')">Create a Farm</button></li>
+            <li><button ng-click="advance('city')">Build a City</button></li>
+            <li><button ng-click="advance('acquire')">Acquire Advances</button></li>
+        </ul>
+        <button ng-click="engine.nextPhase()">Done</button>
+    </div>
+    
     <div id="phaser">
     <h2>Phases</h2>
     <button ng-click="engine.phase = 'populate'" ng-hide="engine.phase">Start!</button>

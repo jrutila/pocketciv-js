@@ -1,0 +1,23 @@
+#advancePhase {
+    position: absolute;
+    width: $mapWidth / 2;
+    height: $mapHeight / 2;
+    left: $mapWidth / 4;
+    top: $mapWidth / 4;
+    background-color: lightYellow;
+    text-align: center;
+    z-index: 50;
+    padding-top: 15px;
+    
+    li button {
+        width: 80%;
+        background-color: darkYellow;
+        color: darkYellow;
+        height: 30px;
+        margin-bottom: 15px;
+    }
+    
+    > button {
+        bottom: 10px;
+    }
+}
