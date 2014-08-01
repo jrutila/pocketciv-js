@@ -59,9 +59,9 @@ Reducer.prototype = {
     switch (this.mode) {
       case Modes.Overall:
         _.each(reduction, function(v, k) {
-          rdc.reduce(v);
-          var val = {}
           var area = rdc.areas()[k];
+          rdc.reduce(v, area);
+          var val = {}
           _.each(v, function(vv, kk) {
             val[kk] = (vv).toString();
             if (area[kk] + vv < 0)
@@ -70,6 +70,7 @@ Reducer.prototype = {
           })
           rdc.changes[k] = val;
         })
+        if (_.isEmpty(this.areas())) this.amount = 0;
         break;
       case Modes.AreaWalker:
       default:
@@ -81,6 +82,7 @@ Reducer.prototype = {
           if (!area) failed = true;
           visitArea.call(rdc, area)
         })
+        if (_.isEmpty(this.areas())) this.amount = 0;
     }
     
     if (failed) return false;

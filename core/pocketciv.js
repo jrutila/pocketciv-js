@@ -12,6 +12,7 @@ var events = {
     'epidemic': require('../events/epidemic'),
     'tribal_war': require('../events/tribal_war'),
     'sandstorm': require('../events/sandstorm'),
+    'earthquake': require('../events/earthquake'),
 }
 
 var actions = {
@@ -47,9 +48,6 @@ function EventDeck() {
 EventDeck.prototype = {
     shuffle: function() {
         this.usedCards = [];
-        this.draw();
-        this.draw();
-        this.draw();
     },
     get cardsLeft() {
         return 13 - this.usedCards.length;

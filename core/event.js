@@ -141,7 +141,14 @@ runEvent = function(engine, event, ev, done)
         var cmd = "";
         for (var s in m)
         {
-            cmd += m[s].replace(patt, "$1") + "\n";
+            var line = m[s].replace(patt, "$1");
+            if (line[0] == ";")
+            {
+                steps_cmd.push(cmd);
+                steps_cmd.push(line);
+                cmd = "";
+            } else
+                cmd += line + "\n";
         }
         steps_cmd.push(cmd);
     });
