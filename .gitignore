@@ -29,3 +29,6 @@ bower_components
 bundle.js
 
 .c9
+
+.sass-cache
+stylesheets

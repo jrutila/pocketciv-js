@@ -1,0 +1,79 @@
+@mixin hex ($size, $color, $direction: vertical, $margin: true) {
+  $height: 0;
+  $width: 0;
+
+  @if $direction == vertical {
+    $width: $size;
+    $height: round($size * (30 / 52));
+  }
+
+  @else {
+    $height: $size;
+    $width: round($size * (30 / 52));
+  }
+
+  $half-width: round($width / 2);
+  $half-height: round($height / 2);
+
+  width: $width;
+  height: $height;
+  background-color: $color;
+
+  @if $margin == true {
+    @if $direction == vertical {
+      margin-top: $half-height;
+      margin-bottom: $half-height;
+    }
+
+    @else {
+      margin-left: $half-width;
+      margin-right: $half-width;
+    }
+  }
+
+  &:before,
+  &:after {
+    content: "";
+    width: 0;
+    height: 0;
+    position: absolute;
+
+    @if $direction == vertical {
+      left: 0;
+
+      border-left: $half-width solid transparent;
+      border-right: $half-width solid transparent;
+    }
+
+    @else {
+      top: 0;
+
+      border-top: $half-height solid transparent;
+      border-bottom: $half-height solid transparent;
+    }
+  }
+
+  @if $direction == vertical {
+    &:before {
+      border-bottom: $half-height solid $color;
+      top: -$half-height;
+    }
+
+    &:after {
+      bottom: -$half-height;
+      border-top: $half-height solid $color;
+    }
+  }
+
+  @else {
+    &:before {
+      border-right: $half-width solid $color;
+      left: -$half-width;
+    }
+
+    &:after {
+      right: -$half-width;
+      border-left: $half-width solid $color;
+    }
+  }
+}

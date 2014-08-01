@@ -2,49 +2,11 @@
 <html ng-app="pocketcivApp">
 <head>
 <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"/>
-<style>
-    #canvases {
-        position:relative;
-        width: 800px;
-        height: 800px;
-    }
-    .mapCanvas {
-        position:absolute;
-        top: 0px;
-        left: 0px;
-    }
-    #images {
-        display: none;
-    }
-    .symbol {
-        position: absolute;
-        z-index: 9000;
-        display: none;
-    }
-    .areaCode {
-        background-color: darkRed;
-        color: white;
-        border-radius: 90px;
-        width: 21px;
-        height: 21px;
-        font-weight: bolder;
-        text-align: center;
-    }
-    .tribes {
-        background-color: darksalmon;
-        width: 25px;
-        color: black;
-        font-weight: bolder;
-        text-align: center;
-    }
-    .city {
-        background-color: lightGrey;
-        width: 25px;
-        color: black;
-        font-weight: bolder;
-        text-align: center;
-    }
-</style>
+<link href="app/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css" />
+<link href="app/stylesheets/print.css" media="print" rel="stylesheet" type="text/css" />
+<!--[if IE]>
+  <link href="/stylesheets/ie.css" media="screen, projection" rel="stylesheet" type="text/css" />
+<![endif]-->
 
 <script src="//code.jquery.com/jquery-2.1.1.min.js"></script>
 <script>window.jQuery || document.write('<script src="bower_components/jquery/dist/jquery.min.js">\x3C/script>')</script>
@@ -56,13 +18,32 @@
 <script type="text/javascript" src="bower_components/ngstorage/ngStorage.js"></script>
 </head>    
 <body ng-controller="MainGame">
-    <div>{{ deck.cardsLeft }}
+    <div id="deck">{{ deck.cardsLeft }}
         <div ng-hide="hideDrawer">
         <button ng-click="drawCard()">draw</button>
         <input ng-hide="!godMode" type="text" ng-model="specificCard" />
         </div>
     </div>
-    <div>{{ card }}</div>
+    <div id="card">
+        <span class="circle border">
+            <span class="inner">{{ card.circle }}</span>
+        </span>
+        <span class="square">{{ card.square }}</span>
+        <span class="hexagon border">
+            <span class="inner">{{ card.hexagon }}</span>
+        </span>
+        <span class="friendly">{{ card.friendly }}</span>
+        <span class="gold">{{ card.gold }}</span>
+        <span class="id">{{ card.id }}</span>
+        <ul>
+            <li class="event" ng-repeat="(era, e) in card.events">
+                <span class="era">{{ era }}</span>
+                <span class="name">{{ e.name }} {{ e.visitor }}</span>
+                <span class="expr">{{ e.expr }}</span>
+            </li>
+        </ul>
+    </div>
+    <!--{{ card }}-->
     
     <div>
         <span>Gold: {{ engine.gold }}</span>

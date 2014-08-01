@@ -1,0 +1,185 @@
+/* Welcome to Compass.
+ * In this file you should write your main styles. (or centralize your imports)
+ * Import this file using the following HTML or equivalent:
+ * <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css" /> */
+
+@import "compass/reset";
+@import "Hexagon.scss";
+
+$mapHeight: 800px;
+$mapWidth: 800px;
+
+$mapSymbolSize: 21px;
+
+#canvases {
+    position: relative;
+    width: $mapWidth;
+    height: $mapHeight;
+}
+
+.mapCanvas {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+}
+
+#images {
+    display: none;
+}
+
+.symbol {
+    position: absolute;
+    z-index: 9;
+    display: none;
+}
+
+.areaCode {
+        background-color: darkRed;
+        color: white;
+        border-radius: 90px;
+        width: $mapSymbolSize;
+        height: $mapSymbolSize;
+        font-weight: bolder;
+        text-align: center;
+        padding-top: 3px;
+}
+
+.tribes {
+    background-color: darksalmon;
+    width: 25px;
+    color: black;
+    font-weight: bolder;
+    text-align: center;
+}
+.city {
+    background-color: lightGrey;
+    width: 25px;
+    color: black;
+    font-weight: bolder;
+    text-align: center;
+}
+
+$cardSymbolSize: 30px;
+$borderSize: 3px;
+$hexColor-border: lightBlue;
+$hexColor-inner: black;
+$hexColor-text: lightBlue;
+$circleColor-border: lightPink;
+$circleColor-inner: black;
+$circleColor-text: lightPink;
+$squareColor-border: lightGreen;
+$squareColor-inner: black;
+$squareColor-text: lightGreen;
+$eventColor: lightGray;
+
+$cardHeight: 260px;
+$cardWidth: 170px;
+
+#card {
+    .hexagon.border {
+        @include hex($cardSymbolSize, $hexColor-border, horizontal);
+        .inner {
+            $width: $cardSymbolSize - ($borderSize * 3);
+            @include hex($width, $hexColor-inner, horizontal);
+            position: absolute;
+            left: $borderSize - floor($cardSymbolSize / 4);
+            top: round($borderSize * 1.3);
+            z-index: 2;
+            color: $hexColor-text;
+        }
+    }
+    
+    .circle.border {
+        border-radius: 90px;
+        width: $cardSymbolSize;
+        height: $cardSymbolSize;
+        background-color: $circleColor-border;
+        .inner {
+            border-radius: 90px;
+            background-color: $circleColor-inner;
+            width: $cardSymbolSize - ($borderSize * 3);
+            height: $cardSymbolSize - ($borderSize * 3);
+            position: absolute;
+            left: ceil($cardSymbolSize / 4) - $borderSize;
+            top: floor($cardSymbolSize / 4) - $borderSize;
+            color: $circleColor-text;
+        }
+    }
+
+    .square {
+        background-color: $squareColor-inner;
+        border: $borderSize * 1.5 solid $squareColor-border;
+        color: $squareColor-text;
+        width: $cardSymbolSize;
+        height: $cardSymbolSize;
+    }
+    
+    .circle, .square, .hexagon {
+        text-align: center;
+        font-size: $cardSymbolSize - $borderSize * 3;
+        font-weight: bold;
+        top: 10px;
+        position: absolute;
+        z-index: 1;
+    }
+    
+    
+    .circle {
+        left: 10px;
+    }
+    .square {
+        left: 45px;
+    }
+    .hexagon {
+        left: 79px;
+    }
+    
+    ul {
+        top: 70px;
+        left: 10px;
+        width: $cardWidth - 20;
+        position: absolute;
+        .event {
+            margin-left: 0px;
+            margin-bottom: 2px;
+            display: inline-block;
+            background-color: $eventColor;
+            position: relative;
+            border: 1px solid black;
+            width: 100%;
+            
+            .era {
+                font-size: 20px;
+            }
+            
+            .expr {
+                float: right;
+            }
+        }
+    }
+    
+    .id {
+        position: absolute;
+        right: 10px;
+        top: 50px;
+    }
+    
+    background-color: brown;
+    position: fixed;
+    width: $cardWidth;
+    height: $cardHeight;
+    z-index: 100;
+    left: $mapWidth;
+    top: 20px;
+}
+
+#deck {
+    background-color: brown;
+    position: fixed;
+    width: $cardWidth;
+    height: $cardHeight;
+    z-index: 100;
+    left: $mapWidth;
+    top: $cardHeight + (2 * 20);
+    
+}

@@ -51,7 +51,7 @@ EventDeck.prototype = {
         this.draw();
     },
     get cardsLeft() {
-        return 16 - this.usedCards.length;
+        return 13 - this.usedCards.length;
     },
     specific: function(n) {
       var card = eventDeck[n];  
