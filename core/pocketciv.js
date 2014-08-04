@@ -285,7 +285,8 @@ Engine.prototype = {
         
         var final = function() {
                         ctx.confirm && ctx.confirm();
-                        eng.nextPhase();
+                        if (name != "advance")
+                            eng.nextPhase();
                     };
         
         var runpost = function() {

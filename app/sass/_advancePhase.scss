@@ -4,7 +4,7 @@
     height: $mapHeight / 2;
     left: $mapWidth / 4;
     top: $mapWidth / 4;
-    background-color: lightYellow;
+    background-color: rgba(lightYellow, .4);
     text-align: center;
     z-index: 50;
     padding-top: 15px;
@@ -20,4 +20,12 @@
     > button {
         bottom: 10px;
     }
+}
+
+#advancePhase.away {
+    ul {
+        display: none;
+    }
+    
+    height: 40px;
 }

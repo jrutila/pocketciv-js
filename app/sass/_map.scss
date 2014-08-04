@@ -1,0 +1,56 @@
+#canvases {
+    position: relative;
+    width: $mapWidth;
+    height: $mapHeight;
+    
+    canvas {
+        position: absolute;
+        top: 0px;
+        left: 0px;
+    }
+}
+
+.focusCanvas, .activeCanvas {
+    visibility: hidden;
+}
+
+.focusCanvas.focus, .activeCanvas.active {
+    visibility: visible;
+}
+
+#images {
+    display: none;
+}
+
+.symbol {
+    position: absolute;
+    z-index: 9;
+    display: none;
+}
+
+.areaCode {
+        background-color: darkRed;
+        color: white;
+        border-radius: 90px;
+        width: $mapSymbolSize;
+        height: $mapSymbolSize;
+        font-weight: bolder;
+        text-align: center;
+        padding-top: 3px;
+}
+
+.tribes {
+    background-color: darksalmon;
+    width: 25px;
+    color: black;
+    font-weight: bolder;
+    text-align: center;
+}
+.city {
+    background-color: lightGrey;
+    width: 25px;
+    color: black;
+    font-weight: bolder;
+    text-align: center;
+}
+

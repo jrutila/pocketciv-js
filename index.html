@@ -71,30 +71,55 @@
             <img class="symbol desert" id="desert" src="app/img/modern/desert.png"></img>
         </div>
         <div id="canvases">
-        <canvas class="mapCanvas" id="mapCanvas-1" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
-        <canvas class="mapCanvas" id="mapCanvas0" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
-        <canvas class="mapCanvas" id="mapCanvas1" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
-        <canvas class="mapCanvas" id="mapCanvas2" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
-        <canvas class="mapCanvas" id="mapCanvas3" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
-        <canvas class="mapCanvas" id="mapCanvas4" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
-        <canvas class="mapCanvas" id="mapCanvas5" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
-        <canvas class="mapCanvas" id="mapCanvas6" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
-        <canvas class="mapCanvas" id="mapCanvas7" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
-        <canvas class="mapCanvas" id="mapCanvas8" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
-        <span class="symbol areaCode" id="area1">1</span>
-        <span class="symbol areaCode" id="area2">2</span>
-        <span class="symbol areaCode" id="area3">3</span>
-        <span class="symbol areaCode" id="area4">4</span>
-        <span class="symbol areaCode" id="area5">5</span>
-        <span class="symbol areaCode" id="area6">6</span>
-        <span class="symbol areaCode" id="area7">7</span>
-        <span class="symbol areaCode" id="area8">8</span>
+            <canvas class="mapCanvas" id="mapCanvas-1" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
+            <canvas class="mapCanvas" id="mapCanvas0" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
+            <canvas class="mapCanvas" id="mapCanvas1" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
+            <canvas class="mapCanvas" id="mapCanvas2" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
+            <canvas class="mapCanvas" id="mapCanvas3" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
+            <canvas class="mapCanvas" id="mapCanvas4" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
+            <canvas class="mapCanvas" id="mapCanvas5" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
+            <canvas class="mapCanvas" id="mapCanvas6" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
+            <canvas class="mapCanvas" id="mapCanvas7" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
+            <canvas class="mapCanvas" id="mapCanvas8" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
+            <canvas class="activeCanvas" id="activeCanvas1" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
+            <canvas class="activeCanvas" id="activeCanvas2" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
+            <canvas class="activeCanvas" id="activeCanvas3" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
+            <canvas class="activeCanvas" id="activeCanvas4" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
+            <canvas class="activeCanvas" id="activeCanvas5" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
+            <canvas class="activeCanvas" id="activeCanvas6" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
+            <canvas class="activeCanvas" id="activeCanvas7" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
+            <canvas class="activeCanvas" id="activeCanvas8" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
+            <canvas class="focusCanvas" id="focusCanvas1" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
+            <canvas class="focusCanvas" id="focusCanvas2" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
+            <canvas class="focusCanvas" id="focusCanvas3" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
+            <canvas class="focusCanvas" id="focusCanvas4" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
+            <canvas class="focusCanvas" id="focusCanvas5" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
+            <canvas class="focusCanvas" id="focusCanvas6" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
+            <canvas class="focusCanvas" id="focusCanvas7" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
+            <canvas class="focusCanvas" id="focusCanvas8" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
+            <span class="symbol areaCode" id="area1">1</span>
+            <span class="symbol areaCode" id="area2">2</span>
+            <span class="symbol areaCode" id="area3">3</span>
+            <span class="symbol areaCode" id="area4">4</span>
+            <span class="symbol areaCode" id="area5">5</span>
+            <span class="symbol areaCode" id="area6">6</span>
+            <span class="symbol areaCode" id="area7">7</span>
+            <span class="symbol areaCode" id="area8">8</span>
+            <canvas ng-click="mapClick($event)" ng-mousemove="mapFocus($event)"
+                class="mapCanvas" id="clickCanvas" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
         </div>
         <textarea ng-hide="!godMode" json-text rows="5" cols="100" ng-model="map" ng-change="mapChanged()">
         </textarea>
+        <div id="mapinfo" ng-hide="mapInfo == undefined">{{ mapInfo }}<button ng-click="mapDone()">done</button></div>
     </div>
     
-    <div>{{ areaChange }}<button ng-hide="!areaChange" ng-click="areaChangeOk()">OK</button></div>
+    <div id="changePrompt" ng-hide="!areaChange">
+        <div id="cover"></div>
+        <div id="change">
+            <span>{{ areaChange }}</span>
+            <button ng-click="areaChangeOk()">OK</button>
+        </div>
+    </div>
     
     <div id="mover" ng-hide="hideMover">
         <ul>
@@ -126,12 +151,14 @@
     
     <div ng-hide="!possibleAdvances">
         <textarea cols="100">{{ possibleAdvances }}</textarea><br/>
-        <input ng-model="acquire_name" /><input ng-model="acquire_area" /><button ng-click="acquireGo()">Go</button>
+        <input ng-model="acquire_name" /><input ng-model="acquire_area" />
+        <button ng-click="acquireGo()">Go</button>
         <textarea cols="50">{{ acquired }}</textarea><br/>
         <button ng-click="acquireOk()">Acquire!</button>
     </div>
     
-    <div id="advancePhase" ng-hide="engine.phase != 'advance'">
+    <div id="advancePhase" ng-hide="engine.phase != 'advance'" ng-class="{away: mapInfo!=undefined}">
+        <h2>Advance</h2>
         <ul>
             <li><button ng-click="advance('farm')">Create a Farm</button></li>
             <li><button ng-click="advance('city')">Build a City</button></li>

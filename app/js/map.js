@@ -81,12 +81,23 @@ function getCPKey(p1, p2)
 Map.prototype.paint = function(ctx) {
     console.log('Painting the grid')
     var hexCnvs = {}
+    var focusCnvs = {}
     var hexCtxs = {}
+    var focusCtxs = {}
+    var activeCtxs = {}
     for (var i = -1; i <= regionCount; i++)
     {
-        var hexCnv = this.getCanvas(i);
-        hexCnvs[i] = hexCnv
-        hexCtxs[i] = hexCnv.getContext('2d')
+        var cnv = this.getCanvas(i);
+        hexCnvs[i] = cnv[0];
+        hexCtxs[i] = cnv[0].getContext('2d');
+        if (cnv[1]) {
+            focusCnvs[i] = cnv[1];
+            focusCtxs[i] = cnv[1].getContext('2d');
+        }
+        if (cnv[2]) {
+            //activeCnvs[i] = cnv[2];
+            activeCtxs[i] = cnv[2].getContext('2d');
+        }
     }
 
     for (var h = 0; h < this.grid.Hexes.length; h++)
@@ -125,24 +136,35 @@ Map.prototype.paint = function(ctx) {
                 }
             }
             ctx.globalCompositeOperation = 'source-over';
-            for (var h in region)
-            {
-                var hex = region[h];
+                    ctx.lineWidth = 1
+                    ctx.strokeStyle = "black"
+            for (var i = 0; i < 3; i++) {
+                for (var h in region) {
+                    var hex = region[h];
 
-                for (var n=0; n < 6; n++)
+                    for (var n = 0; n < 6; n++) {
+                        var start = [hex.Points[n].X, hex.Points[n].Y]
+                        var end = [hex.Points[(n + 1) % 6].X, hex.Points[(n + 1) % 6].Y]
+
+                        if (commonPoints[getCPKey(start, end)] > 1) continue;
+                        ctx.beginPath()
+                        ctx.moveTo(start[0], start[1])
+                        ctx.lineTo(end[0], end[1])
+                        ctx.closePath()
+                        ctx.stroke()
+                    }
+                }
+                if (focusCtxs[this.reg] && ctx != focusCtxs[this.reg])
                 {
-                            var start = [hex.Points[n].X, hex.Points[n].Y]
-                            var end = [hex.Points[(n+1)%6].X, hex.Points[(n+1)%6].Y]
-
-                            if (commonPoints[getCPKey(start, end)] > 1)
-                                continue;
-                            ctx.beginPath()
-                            ctx.moveTo(start[0], start[1])
-                            ctx.lineTo(end[0], end[1])
-                            ctx.closePath()
-                            ctx.lineWidth = 1
-                            ctx.strokeStyle = "black"
-                            ctx.stroke()
+                    ctx = focusCtxs[this.reg];
+                    ctx.strokeStyle = "red";
+                    ctx.lineWidth = 3;
+                }
+                else if (activeCtxs[this.reg] && ctx != activeCtxs[this.reg])
+                {
+                    ctx = activeCtxs[this.reg];
+                    ctx.strokeStyle = "blue";
+                    ctx.lineWidth = 5;
                 }
             }
         }
@@ -200,11 +222,10 @@ Map.prototype.paint = function(ctx) {
     */
 }
 
-Map.prototype.click = function(x, y) {
+Map.prototype.getRegionAt = function(x, y) {
     var p = {}
     p.X = x
     p.Y = y
     var hex = this.grid.GetHexAt(p)
-    console.log(hex.Id)
-    console.log(this.hex[hex.Id])
+    return hex != undefined ? this.hex[hex.Id] : undefined;
 }

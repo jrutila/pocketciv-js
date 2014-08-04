@@ -10,54 +10,45 @@ $mapWidth: 800px;
 
 $mapSymbolSize: 21px;
 
+
 @import "_deck";
 @import "_advancePhase";
+@import "_map";
 
-#canvases {
-    position: relative;
-    width: $mapWidth;
-    height: $mapHeight;
+#mapinfo {
+    position: fixed;
+    top: 10px;
+    left: 112px;
+    width: 500px;
+    background-color: yellow;
+    padding: 20px;
+    z-index: 500;
+    
+    button {
+        float: right;
+    }
 }
 
-.mapCanvas {
-    position: absolute;
-    top: 0px;
-    left: 0px;
+#changePrompt {
+    #cover {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        top: 0px;
+        left: 0px;
+        z-index: 100;
+        background:rgba(0,0,0,0.6);
+    }
+    
+    #change {
+        z-index: 102;
+        position: fixed;
+        top: $mapWidth / 4;
+        left: $mapWidth / 4;
+        background-color: white;
+    }
 }
 
-#images {
-    display: none;
+.highlight {
+    z-index: 101;
 }
-
-.symbol {
-    position: absolute;
-    z-index: 9;
-    display: none;
-}
-
-.areaCode {
-        background-color: darkRed;
-        color: white;
-        border-radius: 90px;
-        width: $mapSymbolSize;
-        height: $mapSymbolSize;
-        font-weight: bolder;
-        text-align: center;
-        padding-top: 3px;
-}
-
-.tribes {
-    background-color: darksalmon;
-    width: 25px;
-    color: black;
-    font-weight: bolder;
-    text-align: center;
-}
-.city {
-    background-color: lightGrey;
-    width: 25px;
-    color: black;
-    font-weight: bolder;
-    text-align: center;
-}
-

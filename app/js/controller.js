@@ -126,6 +126,8 @@ pocketcivApp.controller('MainGame', function ($scope, $localStorage) {
     $scope.areaChangeOk = function() {
         $scope.areaChange = undefined;
         areaChangeDone.call($scope.engine);
+        areaChangeDone = undefined;
+        $(".highlight").removeClass('highlight');
     }
     
     var areaChangeDone = undefined;
@@ -134,21 +136,58 @@ pocketcivApp.controller('MainGame', function ($scope, $localStorage) {
         areaChangeDone = done;
         if (_.isEmpty(changes))
             $scope.areaChangeOk();
+        else {
+            _.each(_.keys(changes), function(k) {
+                $("[id$='"+k+"']:not([id$='-1'])").addClass('highlight');
+            });
+        }
     }
+    
+    // TODO: These region functions to map.js ?
+    var clearRegions = function() {
+        $(".activeCanvas").removeClass('active');
+    }
+    
+    var selectRegion = function(region) {
+        $(".activeCanvas:not(#activeCanvas"+region+")").removeClass('active');
+        $("#activeCanvas"+region).addClass('active');
+    }
+    
+    // End region functions
     
     $scope.possibleAreas = []
     $scope.selectedArea = undefined;
     var areaSelect = undefined;
     $scope.selectArea = function() {
         $scope.possibleAreas = []
-        areaSelect(pocketciv.Engine.map.areas[$scope.selectedArea]);
-        gameLog.areas.push($scope.selectedArea)
+        mapClicked = oldClicked;
+        $scope.mapInfo = undefined;
+        if ($scope.selectedArea)
+        {
+            areaSelect(pocketciv.Engine.map.areas[$scope.selectedArea]);
+            gameLog.areas.push($scope.selectedArea)
+        }
+        clearRegions();
+        $scope.selectedArea = undefined;
     }
 
+    var oldClicked = undefined;
     pocketciv.Engine.areaSelector = function(possibleAreas, select)
     {
-      console.log('Area select');
+        console.log('Area select');
         $scope.possibleAreas = _.keys(possibleAreas);
+        $scope.mapInfo = "Select an area from areas "+$scope.possibleAreas;
+        oldClicked = mapClicked;
+        mapClicked = function(region) {
+            if ($scope.possibleAreas.indexOf(region.toString()) > -1)
+            {
+                $scope.selectedArea = region.toString();
+                selectRegion(region);
+            }
+        }
+        $scope.mapDone = function() {
+            $scope.selectArea();
+        }
         console.log($scope.possibleAreas);
         areaSelect = select;
     }
@@ -201,12 +240,49 @@ pocketcivApp.controller('MainGame', function ($scope, $localStorage) {
     
     var map = new Map(pocketciv.Map);
     $scope.mapArea = map
+    
     map.getCanvas = function(i) {
-        return $('#mapCanvas'+i)[0];
+        return [$('#mapCanvas'+i)[0],
+                $('#focusCanvas'+i).get(0),
+                $('#activeCanvas'+i).get(0)];
     }
     map.getImage = function(i) {
         return $('#mapImage'+i)[0];
     }
+    
+    function getMousePos(canvas, evt) {
+        var rect = canvas.getBoundingClientRect();
+        return {
+          X: evt.clientX - rect.left,
+          Y: evt.clientY - rect.top
+        };
+    }
+    
+    var mouseCanvas = document.getElementById("clickCanvas");
+    var focusCnvs = $.makeArray($(".focusCanvas"));
+    $scope.mapClick = function(ev) {
+        var pnt = getMousePos(mouseCanvas, ev);
+        var hex = map.getRegionAt(pnt.X, pnt.Y);
+        mapClicked(hex);
+    }
+    
+    var mapClicked = function(region) {
+        console.log("Map clicked on region "+region);
+        $("#activeCanvas"+region).toggleClass('active');
+    }
+    
+    $scope.mapFocus= function(ev) {
+        var pnt = getMousePos(mouseCanvas, ev);
+        var hex = map.getRegionAt(pnt.X, pnt.Y);
+        for (var i = 1; i <= 8; i++)
+        {
+            if (i == hex)
+                $(focusCnvs[i-1]).addClass('focus');
+            else
+                $(focusCnvs[i-1]).removeClass('focus');
+        }
+    }
+    
     angular.element(document).ready(function() {
         map.paint();
         for (var reg in map.symbols)
