@@ -36,12 +36,59 @@ pocketcivApp.controller('MainGame', function ($scope, $localStorage) {
             console.log("OK MOVE!");
             moveFunc.call(pocketciv.Engine, $scope.movement);
             $scope.hideMover = true;
+            $scope.mapInfo = undefined;
+            mapClicked = oldClicked;
             gameLog.move.push($scope.movement)
         } else {
             console.log("FAILED MOVE")
         }
     }
     $scope.hideMover = true;
+    
+    var moveFrom = 0;
+    pocketciv.Engine.mover = function(situation, move) {
+        console.log("Show mover")
+        // Plain mover
+        $scope.movement = getMovement(situation);
+        $scope.hideMover = false;
+        moveFunc = move;
+        var mover = new pocketciv.TribeMover(pocketciv.Map.areas);
+        
+        // UI
+        $scope.mapInfo = "Move tribes by clicking start region and then target region";
+        oldClicked = mapClicked;
+        mapClicked = function(region) {
+            if (region < 1 || region > 8)
+                return;
+            if (moveFrom == 0)
+            {
+                if ($scope.movement[region] > 0)
+                {
+                    moveFrom = region;
+                    selectRegion(region);
+                }
+            } else {
+                mover.init(getMovement(pocketciv.Map.areas));
+                $scope.movement[moveFrom]--;
+                $scope.movement[region]++;
+                if (mover.ok($scope.movement))
+                {
+                    drawElem("tribes", region, $scope.movement[region]);
+                    drawElem("tribes", moveFrom, $scope.movement[moveFrom]);
+                    moveFrom = 0;
+                    clearRegions();
+                } else {
+                    $scope.movement[moveFrom]++;
+                    $scope.movement[region]--;
+                }
+            }
+        }
+        $scope.mapDone = function() {
+            $scope.moveTribes();
+        }
+        
+    }
+    
     
     var drawnFunc = undefined;
     $scope.hideDrawer = true;
@@ -53,13 +100,6 @@ pocketcivApp.controller('MainGame', function ($scope, $localStorage) {
         $scope.hideDrawer = true;
         gameLog.deck.push($scope.card.id)
         drawnFunc && drawnFunc.call(pocketciv.Engine, $scope.card);
-    }
-    
-    pocketciv.Engine.mover = function(situation, move) {
-        console.log("Show mover")
-        $scope.movement = getMovement(situation);
-        $scope.hideMover = false;
-        moveFunc = move;
     }
     
     var reduceFunc = undefined;
@@ -320,7 +360,21 @@ pocketcivApp.controller('MainGame', function ($scope, $localStorage) {
         pocketciv.Engine.phase = "populate";
         runplay.run(pocketciv.Engine, JSON.parse(game), function() { loading = false; })
     }
+    
+    var drawElem = function(prop, reg, val) {
+        var $elem = $('#' + prop + reg);
 
+        if ($elem.length == 0 && val) {
+            $elem = $('#' + prop).clone().attr('id', prop + reg).appendTo("#canvases")
+            $elem.css({
+                top: map.symbols[reg][prop].Y,
+                left: map.symbols[reg][prop].X
+            })
+        }
+        if ($elem.length > 0 && !val) $elem.remove()
+        else $elem.html(val).show()
+    }
+    
     $scope.$watch('map', function() {
         console.log("Hey! Map changed!")
         pocketciv.Map.areas = $scope.map.areas
@@ -334,18 +388,8 @@ pocketcivApp.controller('MainGame', function ($scope, $localStorage) {
                 if (!(prop in map.symbols[reg]))
                     continue;
                     
-                var $elem = $('#'+prop+reg);
                 var val = $scope.map.areas[reg][prop];
-                
-                if ($elem.length == 0 && val)
-                {
-                    $elem = $('#'+prop).clone().attr('id', prop+reg).appendTo("#canvases")
-                    $elem.css({ top: map.symbols[reg][prop].Y, left: map.symbols[reg][prop].X})
-                }
-                if ($elem.length > 0 && !val)
-                    $elem.remove()
-                else
-                    $elem.html($scope.map.areas[reg][prop]).show()
+                drawElem(prop, reg, val);
             }
         }
     })
