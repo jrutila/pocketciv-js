@@ -10,6 +10,10 @@
     }
 }
 
+#clickCanvas {
+    z-index: 10;
+}
+
 .focusCanvas, .activeCanvas {
     visibility: hidden;
 }
