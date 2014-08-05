@@ -28,7 +28,7 @@ module.exports = {
                 changes[area.id].forest = false;
                 built_without_forest = false;
             }
-            if (context && context.forest_free && engine.map.areas[area].forest == true)
+            if (context && context.forest_free && area.forest == true)
             {
                 var msg = i18n.translate('Do you want to use the forest in the area %s?').fetch(area);
                 if (engine.queryUser('yesno', msg))
