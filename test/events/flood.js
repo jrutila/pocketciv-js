@@ -32,8 +32,8 @@ describe('Flood', function() {
         engine.drawer = function(deck, done) { done(deckk.shift()) }
         runEvent(engine, event, { expr: 's' }, function(chg) {
             chg.should.deep.equal({
-                5: {'tribes': '0', 'city': '2' },
-                4: {'tribes': '0', 'city': '4' },
+                5: {'tribes': '-4', 'city': '-2' },
+                4: {'tribes': '-5', 'city': '-1' },
             })
             done();
         })
@@ -48,8 +48,8 @@ describe('Flood', function() {
         engine.drawer = function(deck, done) { done(deckk.shift()) }
         runEvent(engine, event, { expr: 's' }, function(chg) {
             chg.should.deep.equal({
-                5: {'tribes': '0' },
-                4: {'tribes': '1' },
+                5: {'tribes': '-4' },
+                4: {'tribes': '-4' },
             })
             done();
         })
@@ -64,8 +64,8 @@ describe('Flood', function() {
         engine.drawer = function(deck, done) { done(deckk.shift()) }
         runEvent(engine, event, { expr: 's' }, function(chg) {
             chg.should.deep.equal({
-                5: {'tribes': '0', 'city': '3' },
-                4: {'city': '2' },
+                5: {'tribes': '-4', 'city': '-1' },
+                4: {'city': '-3' },
             })
             done();
         })

@@ -13,6 +13,7 @@ var events = {
     'tribal_war': require('../events/tribal_war'),
     'sandstorm': require('../events/sandstorm'),
     'earthquake': require('../events/earthquake'),
+    'volcano': require('../events/volcano'),
 }
 
 var actions = {
@@ -277,7 +278,7 @@ Engine.prototype = {
         var posts = [];
         
         _.each(this.acquired, function(acq) {
-            if (_.has(acq.phases, name+'.post'))
+            if (acq.phases && _.has(acq.phases, name+'.post'))
             {
                 posts.push(acq.phases[name+".post"])
             }

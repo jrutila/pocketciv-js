@@ -52,8 +52,8 @@ Wonders of your choice in the Region, one at a time. \
                 if (tribes || city)
                 {
                     this.changes[area.id] = {}
-                    if (tribes) this.changes[area.id].tribes = (area.tribes-tribes).toString();
-                    if (city) this.changes[area.id].city = (area.city-city).toString();
+                    if (tribes) this.changes[area.id].tribes = (-1*tribes).toString();
+                    if (city) this.changes[area.id].city = (-1*city).toString();
                 }
             }
         }

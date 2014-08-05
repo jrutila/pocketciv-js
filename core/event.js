@@ -13,10 +13,17 @@ var Context = function() {
 Context.prototype = {
     change: function(chg, area)
     {
+        if (typeof chg === "string")
+        {
+            ar = chg;
+            chg = area;
+            area = ar;
+        }
         area = area ? area : this.active_region;
         if (typeof area === "object")
             area = area.id
-        this.changes[area] = chg;
+        this.changes[area] || (this.changes[area] = {})
+        _.extend(this.changes[area], chg);
     },
     break_if: function(expr)
     {
