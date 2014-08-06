@@ -8,12 +8,64 @@
 $mapHeight: 800px;
 $mapWidth: 800px;
 
+$cardHeight: 260px;
+$cardWidth: 170px;
+
+
 $mapSymbolSize: 21px;
 
 
 @import "_deck";
 @import "_advancePhase";
 @import "_map";
+@import "_advances";
+
+#advances {
+    position: fixed;
+    left: $mapWidth + $cardWidth + 10;
+    top: 10px;
+}
+
+.cover {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0px;
+    left: 0px;
+    z-index: 100;
+    background:rgba(0,0,0,0.6);
+}
+
+#techtree {
+    .content {
+        z-index: 102;
+        position: fixed;
+        top:  25px;
+        left: 25px;
+        background-color: white;
+        width: $mapWidth - 50;
+        height: $mapHeight - 50;
+    }
+    tbody {
+        color: gray;
+    }
+    
+    .available {
+        color: black;
+    }
+    
+    .areas {
+        color: lightGreen;
+    }
+    
+    .acquired {
+        color: darkGreen;
+    }
+    
+    .selected {
+        background-color: lightBlue;
+    }
+}
 
 #mapinfo {
     position: fixed;
@@ -22,7 +74,7 @@ $mapSymbolSize: 21px;
     width: 500px;
     background-color: yellow;
     padding: 20px;
-    z-index: 500;
+    z-index: 50;
     
     button {
         float: right;
@@ -30,17 +82,7 @@ $mapSymbolSize: 21px;
 }
 
 #changePrompt {
-    #cover {
-        position: fixed;
-        width: 100%;
-        height: 100%;
-        top: 0px;
-        left: 0px;
-        z-index: 100;
-        background:rgba(0,0,0,0.6);
-    }
-    
-    #change {
+    .content {
         z-index: 102;
         position: fixed;
         top: $mapWidth / 4;

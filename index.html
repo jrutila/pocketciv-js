@@ -113,9 +113,83 @@
         <div id="mapinfo" ng-hide="mapInfo == undefined">{{ mapInfo }}<button ng-click="mapDone()">done</button></div>
     </div>
     
+    <div id="advances">
+        <h2>Acquired advances</h2>
+        <div ng-hide="!godMode">
+        <input type="text" ng-model="acquireAdvance"/><button ng-click="engine.acquire(acquireAdvance)">Acquire!</button><br/>
+        </div>
+        <ul>
+            <li ng-repeat="(key, adv) in engine.acquired">
+                <span>{{ adv.title }}</span>
+            </li>
+        </ul>
+        <a ng-click="showTechTree()">Open tech tree</a>
+    </div>
+    
+    <div id="techtree" ng-hide="!showTT">
+        <div class="cover"></div>
+        <div class="content">
+            <h2>Tech tree</h2><button ng-click="showTT = false">X</button>
+            <div id="cityinfo">
+                <table>
+                    <thead><th>Area</th><th>AV</th><th>Tribes</th><th>Resources</th></thead>
+                    <tbody>
+                        <tr ng-repeat="c in engine.map.areas | filter:city">
+                            <td>{{ c.id }}</td><td>{{ c.city }}</td><td>{{ c.tribes }}</td><td>TBD</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div id="advanceinfo">
+                <div id="advancereq">
+                    <ul>
+                        <li ng-repeat="r in selAdv.requires">
+                            {{ r }}
+                        </li>
+                    </ul>
+                </div>
+                <h1>{{ selAdv.title }}</h1>
+                <div id="advancecost">
+                    <h2>Cost</h2>
+                    <span>Tribes: {{ selAdv.cost.tribes }}</span>
+                    <span>Gold: {{ selAdv.cost.gold }}</span>
+                </div>
+                <div id="advanceres">
+                    <h2>Resources</h2>
+                    <ul>
+                        <li ng-repeat="r in selAdv.resources">
+                            {{ r }}
+                        </li>
+                    </ul>
+                </div>
+                <div id="advanceareas">
+                    <h2>Available on areas:</h2>
+                    <ul>
+                        <li ng-repeat="a in possibleAdvances[selAdv.name].areas">
+                            {{ a }}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <table>
+                <thead><th>Name</th><th>VP</th><th>Cost</th><th>Resources</th><th>Requires</th></thead>
+                <tbody>
+                    <tr ng-click="selectAdv(adv)" ng-class="{ acquired: engine.acquired[key], available: possibleAdvances[key], areas: possibleAdvances[key].areas.length, selected: selAdv == adv }" ng-repeat="(key, adv) in engine.advances">
+                        <td>{{ adv.title }}</td>
+                        <td>{{ adv.points }}</td>
+                        <td>{{ adv.cost }}</td>
+                        <td>{{ adv.resources }}</td>
+                        <td>{{ adv.requires }}</td>
+                        <td>{{ possibleAdvances[key].areas }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
     <div id="changePrompt" ng-hide="!areaChange">
-        <div id="cover"></div>
-        <div id="change">
+        <div class="cover"></div>
+        <div class="content">
             <span>{{ areaChange }}</span>
             <button ng-click="areaChangeOk()">OK</button>
         </div>
@@ -198,17 +272,9 @@
             <li><button ng-click="engine.runPhase('city_support')" ng-disabled="engine.phase != 'city_support'">5.3 Upkeek - City Support</button></li>
             <li><button ng-click="engine.runPhase('upkeep')" ng-disabled="engine.phase != 'upkeep'">5. Upkeek</button></li>
         </ul>
+        <input type="text" ng-model="startEvent"/><button ng-click="doEvent()">Start event!</button>
     </div>
     
-    <div id="advances">
-        <div ng-hide="!godMode">
-        <input type="text" ng-model="acquireAdvance"/><button ng-click="engine.acquire(acquireAdvance)">Acquire!</button><br/>
-        <input type="text" ng-model="startEvent"/><button ng-click="doEvent()">Start!</button>
-        </div>
-        <ul>
-            <li ng-repeat="adv in engine.acquired">{{ adv.title }}</li>
-        </ul>
-    </div>
     
     <div id="replay">
         <input type="text" ng-model="gameName" /><button ng-click="saveGamePlay()">save</button>

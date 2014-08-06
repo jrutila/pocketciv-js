@@ -259,6 +259,17 @@ pocketcivApp.controller('MainGame', function ($scope, $localStorage) {
         $scope.possibleAdvances = undefined;
     }
     
+    $scope.selAdv = undefined;
+    $scope.showTechTree = function() {
+        $scope.showTT = true;
+        $scope.acquirer = new pocketciv.AdvanceAcquirer($scope.engine);
+        $scope.possibleAdvances = $scope.acquirer.possibleAdvances();
+    }
+    
+    $scope.selectAdv = function(adv) {
+        $scope.selAdv = adv;
+    }
+    
     $scope.doEvent = function() {
         try {
         var ev = JSON.parse($scope.startEvent)

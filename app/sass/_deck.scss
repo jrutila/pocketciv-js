@@ -13,10 +13,6 @@ $squareColor-inner: black;
 $squareColor-text: lightGreen;
 $eventColor: lightGray;
 
-$cardHeight: 260px;
-$cardWidth: 170px;
-
-
 #card {
     .hexagon.border {
         @include hex($cardSymbolSize, $hexColor-border, horizontal);
