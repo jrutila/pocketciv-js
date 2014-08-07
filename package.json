@@ -2,13 +2,21 @@
     "name": "pocketciv",
     "version": "0.0.1",
     "scripts": {
-        "test": "node test/test.js",
-        "watch-js": "watchify app/js/*.js advances/*.js actions/*.js events/*.js core/*.js -o bundle.js -dv",
-        "autotest": "./node_modules/.bin/supervisor -q -n exit -x node test/test.js"
+        "test": "make test",
+        "watch": "make watch",
+        "autotest": "make autotest",
+        "start": "node web.js",
+        "postinstall": "make build"
     },
     "dependencies": {
+            "node-static": "*",
             "browserify": "*",
             "underscore": "*",
-            "jed": "*"
+            "jed": "*",
+            "bower": "*"
+    },
+    "engines": {
+        "node": "0.10.x",
+        "npm": "1.2.x"
     }
 }
