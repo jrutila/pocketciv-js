@@ -44,6 +44,7 @@ NoMoreCardsError.prototype = Error.prototype;
 
 function EventDeck() {
     this.usedCards = [];
+    this.noMoreCards = function() { throw "Not implemented"; }
 }
 
 EventDeck.prototype = {
@@ -67,6 +68,8 @@ EventDeck.prototype = {
         var card = eventDeck[n];
         card.id = parseInt(n);
         this.usedCards.push(parseInt(n));
+        if (this.cardsLeft == 0)
+            this.noMoreCards();
         return card;
     },
 };
@@ -207,7 +210,9 @@ function Engine(map, deck) {
     this.areaChanger = function() { throw "Not implemented"; }
     this.map = map || theMap;
     this.deck = deck || theDeck;
-    this.phases = ["populate", "move", "event", "advance", "support", "gold_decimate", "city_support", "upkeep" ];
+    var eng = this;
+    this.deck.noMoreCards = function() { eng.endOfEra(); };
+    this.phases = ["populate", "move", "event", "advance", "support", "gold_decimate", "city_advance", "city_support", "upkeep" ];
     this.phase = "populate";
     this.events = events;
     this.advances = advances;
@@ -233,6 +238,11 @@ Engine.prototype = {
                 this.map.areas[key].id = parseInt(key);
             }
         }
+    },
+    endOfEra: function() {
+        console.log("End of era");
+        this.deck.shuffle();
+        this.era++;
     },
     nextPhase: function() {
         this.phase = this.phases[this.phases.indexOf(this.phase)+1] || this.phases[0];
@@ -377,9 +387,22 @@ Engine.prototype = {
         ctx.changes = changes;
         ctx.done && ctx.done();
     },
+    city_advance: function(ctx) {
+        if (ctx.engine.max_city > 1)
+        {
+            _.each(ctx.engine.map.areas, function(a) {
+                if (a.city)
+                {
+                    console.log(a);
+                    ctx.changes[a.id] = { 'city': '+1' };
+                }
+            })
+        }
+        ctx.done && ctx.done();
+    },
     upkeep: function(ctx) {
         this.round = {};
-        ctx.done() && ctx.done();
+        ctx.done && ctx.done();
     },
     areaChange: function(changes, done) {
         this.areaChanger(changes, function() {

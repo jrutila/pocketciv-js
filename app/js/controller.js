@@ -19,7 +19,8 @@ gameLog = {
 };
 
 var scenarios = {
-    "1": require("../scenarios/scenario1")
+    "1": require("../scenarios/scenario1"),
+    "2": require("../scenarios/scenario2"),
 }
 
 pocketcivApp.controller('MainGame', function ($scope, $localStorage) {
@@ -406,7 +407,7 @@ pocketcivApp.controller('MainGame', function ($scope, $localStorage) {
     })
 });
 
-pocketciv.Engine.init(scenarios["1"]);
+pocketciv.Engine.init(scenarios["2"]);
 
 pocketcivApp.directive('jsonText', function() {
   return {
