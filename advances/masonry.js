@@ -5,7 +5,7 @@ module.exports = {
     cost: { 'tribes': 2 },
     resources: [ 'stone' ],
     requires: [ ],
-    required_by: [ 'irrigation', 'equestrian' ],
+    required_by: [ 'engineering' ],
     events: { },
     actions: {
     }

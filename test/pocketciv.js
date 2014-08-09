@@ -19,10 +19,11 @@ describe('EventDeck', function() {
         it('should return a different card when drawn', function() {
             var all = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16];
             var drawn = [];
-            for (var i = 0; i < 13; i++)
+            for (var i = 0; i < 12; i++)
             {
                 var card = pocketciv.EventDeck.draw();
                 card.id.should.be.within(1,16);
+                drawn.should.not.include(card.id)
                 drawn.push(card.id);
                 pocketciv.EventDeck.cardsLeft.should.equal(12-i);
             }

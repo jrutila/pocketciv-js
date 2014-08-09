@@ -23,7 +23,7 @@ describe('Earthquake', function() {
         }
         engine.drawer = function(d, done) { done(deck.shift()) }
         engine.reducer = function(reducer, done) {
-            done(reducer.ok(reduces.shift()));
+            done(reducer.ok(reduces.shift()).changes);
         }
         
     });

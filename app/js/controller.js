@@ -135,7 +135,7 @@ pocketcivApp.controller('MainGame', function ($scope, $localStorage) {
             if (! $scope.reduceAreas)
             {
                 $scope.hideReducer = true;
-                reduceFunc(ok);
+                reduceFunc(ok.changes);
                 gameLog.reduce.push($scope.reduceArray)
             }
         } else {

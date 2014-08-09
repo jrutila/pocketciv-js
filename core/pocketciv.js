@@ -1,6 +1,7 @@
 var eventDeck = require('./eventdeck').EventDeck;
 var _ = require("underscore");
 var eventRunner = require('./event')
+var reducer = require('../core/reducer')
 
 var events = {
     'famine': require('../events/famine'),
@@ -388,15 +389,23 @@ Engine.prototype = {
         ctx.done && ctx.done();
     },
     city_advance: function(ctx) {
-        if (ctx.engine.max_city > 1)
+        console.log("Max city is "+this.max_city)
+        ctx.changes = {};
+        var possibleAreas = [];
+        if (this.max_city > 1)
         {
-            _.each(ctx.engine.map.areas, function(a) {
-                if (a.city)
+            _.each(this.map.areas, function(a) {
+                if (a.city && a.tribes >= a.city+1)
                 {
-                    console.log(a);
-                    ctx.changes[a.id] = { 'city': '+1' };
+                    possibleAreas.push(a.id);
+                    ctx.changes[a.id] = { 'city': '+1', 'tribes': (-1*(a.city+1)).toString() };
                 }
             })
+        }
+        if (possibleAreas)
+        {
+            var rdc= new reducer.Reducer(this);
+            rdc.mode = reducer.Modes.Overall;
         }
         ctx.done && ctx.done();
     },

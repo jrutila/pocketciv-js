@@ -94,9 +94,7 @@ long as you Decimate Tribes up to the described value.\
         }
         rdc.reduce = function(chg, area) {
             this.amount += chg.tribes;
-            var tRdc = chg.tribes*-1;
-            if (area.id == ctx.active_region.id)
-                tRdc -= 4;
+            var tRdc = chg.tribes;
             return { 'tribes': (tRdc).toString() }
         }
         ctx.engine.reducer(rdc, function(chg) {

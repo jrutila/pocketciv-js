@@ -24,7 +24,7 @@ describe('Epidemic', function() {
         }
         engine.reducer = function(rdc, done) {
             rdc.startRegion.id.should.equal(5);
-            done(rdc.ok(areaa))
+            done(rdc.ok(areaa).changes)
         }
         runEvent(engine, event, { expr: 's' }, function(chg) {
             chg.should.deep.equal({
@@ -36,7 +36,7 @@ describe('Epidemic', function() {
     });
     it('should expand to other areas from 5 using only tribes', function(done) {
         var deckk = [{ circle: 5 }, { square: 4 }]
-        var areaa = [ 4 ];
+        var areaa = [ 4 ]
         engine.drawer = function(deck, done) { done(deckk.shift()) }
         engine.selector = function(areas, done) {
           done(areas[areaa.shift()]);
@@ -74,7 +74,7 @@ describe('Epidemic', function() {
         }
         engine.reducer = function(rdc, done) {
             rdc.startRegion.id.should.equal(5);
-            done(rdc.ok(areaa))
+            done(rdc.ok(areaa).changes)
         }
         runEvent(engine, event, { expr: 's' }, function(chg) {
             chg.should.deep.equal({
@@ -95,7 +95,7 @@ describe('Epidemic', function() {
         }
         engine.reducer = function(rdc, done) {
             rdc.startRegion.id.should.equal(4);
-            done(rdc.ok([ 5 ]))
+            done(rdc.ok([ 5 ]).changes)
         }
         runEvent(engine, event, { expr: 's' }, function(chg) {
             chg.should.deep.equal({
@@ -114,7 +114,7 @@ describe('Epidemic', function() {
         }
         engine.reducer = function(rdc, done) {
             rdc.startRegion.id.should.equal(4);
-            done(rdc.ok([ 5 ]))
+            done(rdc.ok([ 5 ]).changes)
         }
         runEvent(engine, event, { expr: 's' }, function(chg) {
             chg.should.deep.equal({
@@ -134,7 +134,7 @@ describe('Epidemic', function() {
         }
         engine.reducer = function(rdc, done) {
             rdc.startRegion.id.should.equal(5);
-            done(rdc.ok(areaa))
+            done(rdc.ok(areaa).changes)
         }
         runEvent(engine, event, { expr: 's' }, function(chg) {
             chg.should.deep.equal({

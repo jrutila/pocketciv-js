@@ -53,6 +53,7 @@ Reducer.prototype = {
   },
   ok: function(reduction) {
     this.init();
+    this.changes = {};
     var rdc = this;
     var failed = false;
     
@@ -60,8 +61,14 @@ Reducer.prototype = {
       case Modes.Overall:
         _.each(reduction, function(v, k) {
           var area = rdc.areas()[k];
-          rdc.reduce(v, area);
-          var val = {}
+          var rdd = rdc.reduce(v, area);
+          if (rdd === false)
+            failed = true;
+          else
+            v = rdd || v;
+          console.log(k)
+          console.log(v)
+          var val = rdc.changes[k] || {}; 
           _.each(v, function(vv, kk) {
             val[kk] = (vv).toString();
             if (area[kk] + vv < 0)
@@ -69,8 +76,17 @@ Reducer.prototype = {
             rdc.visited.push(area.id)
           })
           rdc.changes[k] = val;
-        })
+        });
         if (_.isEmpty(this.areas())) this.amount = 0;
+        break;
+      case Modes.Selector:
+        _.each(reduction, function(v, k) {
+          var area = rdc.areas()[k];
+          var chg = rdc.reduce(v, area);
+          if (chg === false)
+            failed = true;
+          rdc.changes[k] = chg;
+        })
         break;
       case Modes.AreaWalker:
       default:
@@ -87,16 +103,12 @@ Reducer.prototype = {
     
     if (failed) return false;
     
-    if (this.amount > 0)
-    {
-      return {
-        'ok': false,
-        'amount': this.amount,
-        'areas': this.areas(),
-      };
-    }
-    
-    return this.changes
+    return {
+      'ok': this.amount === 0,
+      'amount': this.amount,
+      'changes': this.changes,
+      'areas': this.amount > 0 && this.areas(),
+    };
   },
   set startAmount(value) {
     this.start_amount = value;
@@ -182,7 +194,7 @@ var Attack = {
   }
 }
 
-var Modes = { AreaWalker: 'AreaWalker', Overall: 'Overall' };
+var Modes = { AreaWalker: 'AreaWalker', Overall: 'Overall', Selector: 'Selector' };
 
 module.exports = {
   Reducer: Reducer,

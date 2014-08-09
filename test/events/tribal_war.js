@@ -35,7 +35,7 @@ describe('Tribal War', function() {
         engine.reducer = function(rdc, done) {
             rdc.startAmount.should.equal(8);
             _.keys(rdc.ok([]).areas).should.deep.equal([ '5', '6' ])
-            done(rdc.ok([5, 6]))
+            done(rdc.ok([5, 6]).changes)
         }
         runEvent(engine, event, {}, function(chg) {
             chg.should.deep.equal({
@@ -52,7 +52,7 @@ describe('Tribal War', function() {
         engine.reducer = function(rdc, done) {
             rdc.startAmount.should.equal(8);
             _.keys(rdc.ok([]).areas).should.deep.equal([ '3', '5', '6' ])
-            done(rdc.ok([3, 5]))
+            done(rdc.ok([3, 5]).changes)
         }
         runEvent(engine, event, {}, function(chg) {
             chg.should.deep.equal({
@@ -71,7 +71,7 @@ describe('Tribal War', function() {
             _.keys(rdc.ok([]).areas).should.deep.equal([ '3', '5', '6' ])
             rdc.ok([ 2 ]).should.equal(false);
             rdc.ok([ 3, 5, 6 ]).should.equal(false);
-            done(rdc.ok([5, 6]))
+            done(rdc.ok([5, 6]).changes)
         }
         runEvent(engine, event, {}, function(chg) {
             chg.should.deep.equal({
@@ -88,7 +88,7 @@ describe('Tribal War', function() {
         engine.reducer = function(rdc, done) {
             rdc.startAmount.should.equal(8);
             _.keys(rdc.ok([]).areas).should.deep.equal([ '5' ])
-            done(rdc.ok([ 5 ]))
+            done(rdc.ok([ 5 ]).changes)
         }
         runEvent(engine, event, {}, function(chg) {
             chg.should.deep.equal({
