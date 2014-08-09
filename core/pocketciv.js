@@ -28,6 +28,7 @@ var advances = {
     'literacy': require('../advances/literacy'),
     'agriculture': require('../advances/agriculture'),
     'cartage': require('../advances/cartage'),
+    'masonry': require('../advances/masonry'),
 }
 
 
@@ -287,11 +288,16 @@ Engine.prototype = {
         var ctx = {};
         var eng = this;
         var posts = [];
+        var pres = [];
         
         _.each(this.acquired, function(acq) {
             if (acq.phases && _.has(acq.phases, name+'.post'))
             {
                 posts.push(acq.phases[name+".post"])
+            }
+            if (acq.phases && _.has(acq.phases, name+'.pre'))
+            {
+                pres.push(acq.phases[name+".pre"])
             }
         }, this)
         
@@ -300,6 +306,12 @@ Engine.prototype = {
                         if (name != "advance")
                             eng.nextPhase();
                     };
+        
+        var runpre = function() {
+            var pre = pres.pop();
+            if (pre) pre.call(eng, ctx);
+            else eng[name](ctx, arg);
+        }
         
         var runpost = function() {
             var post = posts.pop();
@@ -313,10 +325,13 @@ Engine.prototype = {
                 }
             }
         }
-        ctx.done = runpost;
-
-        this[name](ctx, arg);
         
+        ctx.done = function() {
+            ctx.done = runpost;
+            eng[name](ctx, arg);
+        }
+
+        runpre();
     },
     acquire: function(name, done) {
         this.acquired[name] = this.advances[name];
@@ -398,16 +413,45 @@ Engine.prototype = {
                 if (a.city && a.tribes >= a.city+1)
                 {
                     possibleAreas.push(a.id);
-                    ctx.changes[a.id] = { 'city': '+1', 'tribes': (-1*(a.city+1)).toString() };
                 }
             })
         }
-        if (possibleAreas)
-        {
-            var rdc= new reducer.Reducer(this);
+        if (possibleAreas) {
+            var rdc = new reducer.Reducer(this);
             rdc.mode = reducer.Modes.Overall;
-        }
-        ctx.done && ctx.done();
+            var that = this;
+            rdc.areas = function() {
+                var areas = {};
+                _.each(that.map.areas, function(a) {
+                    if (a.city && a.tribes) {
+                        var chg = this.changes[a.id] || {};
+                        var t = chg.tribes ? eval(a.tribes + chg.tribes) : a.tribes;
+                        var c = chg.city ? eval(a.city + chg.city) : a.city;
+                        if (t >= c + 1) areas[a.id] = a;
+                    }
+                }, this)
+                return areas;
+            }
+            rdc.reduce = function(r, area) {
+                var c = area.city;
+                var t = area.tribes;
+                while (c < area.city + r.city) {
+                    // If there is not enough tribes
+                    c++;
+                    if (t - c < 0) return false;
+                    t -= c;
+                }
+                return {
+                    'city': '+' + (c - area.city),
+                    'tribes': (t - area.tribes).toString()
+                }
+            }
+            this.reducer(rdc, function(chg) {
+                ctx.changes = chg;
+                ctx.done && ctx.done();
+            });
+        } else
+            ctx.done && ctx.done();
     },
     upkeep: function(ctx) {
         this.round = {};

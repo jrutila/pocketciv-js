@@ -7,6 +7,13 @@ module.exports = {
     requires: [ ],
     required_by: [ 'engineering' ],
     events: { },
+    phases: {
+        'city_advance.pre': function(ctx) {
+            console.log('Masonry max city 2')
+            this.max_city = 2;
+            ctx.done && ctx.done();
+        }
+    },
     actions: {
     }
 }

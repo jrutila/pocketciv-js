@@ -135,7 +135,7 @@ describe('Reducer', function() {
           target.reduce = function(r, area) {
             var c = area.city;
             var t = area.tribes;
-            while (c < r.city)
+            while (c < area.city + r.city)
             {
               // If there is not enough tribes
               c++;
@@ -153,10 +153,10 @@ describe('Reducer', function() {
           }
           target.ok({}).ok.should.be.false;
           _.keys(target.ok({}).areas).should.deep.equal([ "4" ]);
-          target.ok({ 4: { "city": 2 }}).changes.should.deep.equal({
+          target.ok({ 4: { "city": 1 }}).changes.should.deep.equal({
             4: { 'city': '+1', 'tribes': '-2' }
           });
-          target.ok({ 4: { "city": 5 }}).should.be.false;
+          target.ok({ 4: { "city": 4 }}).should.be.false;
         })
         it('should return possible areas even one area is used', function() {
           engine.map.areas = {
@@ -166,12 +166,12 @@ describe('Reducer', function() {
           }
           target.ok({}).ok.should.be.false;
           _.keys(target.ok({}).areas).should.deep.equal([ "4", "5" ]);
-          target.ok({ 4: { "city": 2 }}).changes.should.deep.equal({
+          target.ok({ 4: { "city": 1 }}).changes.should.deep.equal({
             4: { 'city': '+1', 'tribes': '-2' }
           });
-          _.keys(target.ok({ 4: { "city": 2 }}).areas).should.deep.equal([ "4", "5" ]);
-          _.keys(target.ok({ 4: { "city": 3 }}).areas).should.deep.equal([ "5" ]);
-          target.ok({ 4: { "city": 5 }}).should.be.false;
+          _.keys(target.ok({ 4: { "city": 1 }}).areas).should.deep.equal([ "4", "5" ]);
+          _.keys(target.ok({ 4: { "city": 2 }}).areas).should.deep.equal([ "5" ]);
+          target.ok({ 4: { "city": 4 }}).should.be.false;
         })
       });
     });
