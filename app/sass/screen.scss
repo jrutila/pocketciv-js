@@ -11,7 +11,7 @@ $mapWidth: 800px;
 $cardHeight: 260px;
 $cardWidth: 170px;
 
-
+$buttonHeight: 40px;
 $mapSymbolSize: 21px;
 
 
@@ -69,16 +69,31 @@ $mapSymbolSize: 21px;
 
 #mapinfo {
     position: fixed;
-    top: 10px;
-    left: 112px;
-    width: 500px;
+    top: 30px;
     background-color: yellow;
     padding: 20px;
     z-index: 50;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
     
     button {
-        float: right;
+        display: block;
+        height: $buttonHeight;
+        width: 50%;
+        margin-left: auto;
+        margin-right: auto;
     }
+}
+
+#infobar {
+    width: 100%;
+    background-color: rgba(gray, .7);
+    height: 25px;
+    font-weight: bold;
+    top: 0px;
+    position: fixed;
+    z-index: 2000;
 }
 
 #changePrompt {
@@ -86,8 +101,18 @@ $mapSymbolSize: 21px;
         z-index: 102;
         position: fixed;
         top: $mapWidth / 4;
-        left: $mapWidth / 4;
+        width: 100%;
         background-color: white;
+        text-align: center;
+        
+        button {
+            display: block;
+            text-align: center;
+            width: 50%;
+            height: 30px;
+            margin-left: auto;
+            margin-right: auto;
+        }
     }
 }
 

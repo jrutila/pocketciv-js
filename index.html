@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html ng-app="pocketcivApp">
 <head>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/> <!--320-->
 <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"/>
 <link href="app/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css" />
 <link href="app/stylesheets/print.css" media="print" rel="stylesheet" type="text/css" />
@@ -18,13 +19,14 @@
 <script type="text/javascript" src="bower_components/ngstorage/ngStorage.js"></script>
 </head>    
 <body ng-controller="MainGame">
-    <div id="deck">{{ deck.cardsLeft }}
+    <div id="deck" ng-class="{ pushed: hideDrawer }">
+        <span id="cardsLeft">{{ deck.cardsLeft }}</span>
         <div ng-hide="hideDrawer">
         <button ng-click="drawCard()">draw</button>
         <input ng-hide="!godMode" type="text" ng-model="specificCard" />
         </div>
     </div>
-    <div id="card">
+    <div id="card" ng-mouseover="showCard = true" ng-mouseout="showCard = false" ng-class="{ pushed: hideDrawer, shown: showCard }">
         <span class="circle border">
             <span class="inner">{{ card.circle }}</span>
         </span>
@@ -45,9 +47,9 @@
     </div>
     <!--{{ card }}-->
     
-    <div>
-        <span>Gold: {{ engine.gold }}</span>
+    <div id="infobar">
         <span>ERA: {{ engine.era }}</span>
+        <span>Gold: {{ engine.gold }}</span>
     </div>
     
     <div id="map">
@@ -111,7 +113,17 @@
         </div>
         <textarea ng-hide="!godMode" json-text rows="5" cols="100" ng-model="map" ng-change="mapChanged()">
         </textarea>
-        <div id="mapinfo" ng-hide="mapInfo == undefined">{{ mapInfo }}<button ng-click="mapDone()">done</button></div>
+        <div id="mapinfo" ng-hide="mapInfo == undefined">
+            {{ mapInfo }}
+            <ul ng-hide="reduceObject == undefined">
+                <li ng-repeat="(k,v) in reduceObject">
+                    {{ k }}:
+                    tribes: <input type="number" ng-model="reduceObject[k]['tribes']" />
+                    city: <input type="number" ng-model="reduceObject[k]['city']" />
+                </li>
+            </ul>
+            <button ng-click="mapDone()">done</button>
+        </div>
     </div>
     
     <div id="advances">
@@ -203,22 +215,6 @@
         <button ng-click="moveTribes()">Move</button>
     </div>
     
-    <div id="reducer" ng-hide="hideReducer">
-        <span ng-hide="!reducer.amount">Amount to reduce {{ reducer.amount }} in mode {{ reducer.mode }}</span>
-        <div><input type="text" value="{{ reduceArray }}" /></div>
-        <ul>
-            <li ng-repeat="area in reduceAreas">
-            <div ng-switch on="reducer.mode">
-                <div ng-switch-when="Overall">{{ area.id }}
-                    <input type="number" ng-model="reduceArray[area.id]['tribes']"/>
-                </div>
-                <button ng-switch-default ng-click="reduceArray.push(area.id)">{{ area.id }}</button>
-            </div>    
-            </li>
-        </ul>
-        <button ng-hide="reducer.amount > 0" ng-click="reduceReady()">reduce</button>
-    </div>
-    
     <div id="areaselect" ng-hide="possibleAreas.length == 0">
         <select ng-model="selectedArea" ng-options="a for a in possibleAreas"></select>
         <button ng-click="selectArea()">Select</button>
@@ -232,8 +228,8 @@
         <button ng-click="acquireOk()">Acquire!</button>
     </div>
     
-    <div id="advancePhase" ng-hide="engine.phase != 'advance'" ng-class="{away: mapInfo!=undefined}">
-        <h2>Advance</h2>
+    <div id="advancePhase" ng-hide="engine.phase != 'advance'" ng-class="{away: mapInfo!=undefined || advAway }">
+        <h2 ng-click="advAway = !advAway">Advance</h2>
         <ul>
             <li><button ng-click="advance('farm')">Create a Farm</button></li>
             <li><button ng-click="advance('city')">Build a City</button></li>

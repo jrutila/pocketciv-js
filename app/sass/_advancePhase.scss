@@ -1,24 +1,31 @@
 #advancePhase {
-    position: absolute;
-    width: $mapWidth / 2;
-    height: $mapHeight / 2;
-    left: $mapWidth / 4;
-    top: $mapWidth / 4;
+    position: fixed;
+    width: 100%;
+    top: 100px;
     background-color: rgba(lightYellow, .4);
     text-align: center;
     z-index: 50;
-    padding-top: 15px;
+    padding-bottom: 15px;
     
     li button {
         width: 80%;
         background-color: darkYellow;
         color: darkYellow;
-        height: 30px;
+        height: $buttonHeight;
         margin-bottom: 15px;
     }
     
     > button {
         bottom: 10px;
+        height: $buttonHeight;
+        width: 70%;
+    }
+    
+    h2 {
+        background-color: rgba(lightYellow, .8);
+        padding-top: 10px;
+        padding-bottom: 10px;
+        margin-bottom: 10px;
     }
 }
 
@@ -27,5 +34,11 @@
         display: none;
     }
     
+    > button {
+        display: none;
+    }
+    
     height: 40px;
+    width: 40px;
+    left: 0px;
 }

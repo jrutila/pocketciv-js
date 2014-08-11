@@ -308,12 +308,14 @@ Engine.prototype = {
                     };
         
         var runpre = function() {
+            // TODO: Only supports one pre for now
             var pre = pres.pop();
             if (pre) pre.call(eng, ctx);
-            else eng[name](ctx, arg);
+            else ctx.done && ctx.done();
         }
         
         var runpost = function() {
+            // TODO: Only supports one post for now
             var post = posts.pop();
             if (post) post.call(eng, ctx);
             else {
@@ -416,7 +418,7 @@ Engine.prototype = {
                 }
             })
         }
-        if (possibleAreas) {
+        if (possibleAreas.length > 0) {
             var rdc = new reducer.Reducer(this);
             rdc.mode = reducer.Modes.Overall;
             var that = this;

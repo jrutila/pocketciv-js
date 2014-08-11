@@ -111,51 +111,85 @@ pocketcivApp.controller('MainGame', function ($scope, $localStorage) {
         $scope.reducer = reducer;
         if (reducer.mode == 'Overall')
         {
-            $scope.reduceArray = {};
             var areas = $scope.reducer.areas();
+            var rdcObj = {};
             _.each(areas, function(area) {
-                $scope.reduceArray[area.id] = { 'tribes': 0 }
-            });
-            $scope.reduceAreas = areas;
+                rdcObj[area.id] = {
+                    'tribes': area.tribes,
+                    'city': area.city }
+            }, this);
+            $scope.reduceObject= rdcObj;
+            $scope.mapDone = function() {
+                $scope.reduceReady();
+            }
         }
-        else
+        else {
+            oldClicked = mapClicked;
             $scope.reduceArray = [];
+            if (reducer.startRegion)
+                selectRegion(reducer.startRegion.id);
+            mapClicked = function(region) {
+                if (_.keys($scope.reduceAreas).indexOf(region.toString()) > -1) {
+                    $scope.reduceArray.push(region.toString())
+                    addRegion(region);
+                    checkReducer();
+                }
+            }
+            $scope.mapDone = function() {
+                $scope.reduceReady();
+            }
+        }
         reduceFunc = done;
         checkReducer();
+    }
+    var reduceSubstr = function(areas, rdcObj) {
+        var ret = {};
+        _.each(rdcObj, function(val, key) {
+            ret[key] = {
+                'tribes': val.tribes - (areas[key].tribes || 0),
+                'city': val.city - (areas[key].city || 0)
+            }
+        });
+        return ret;
     }
     var checkReducer = function() {
         console.log('reduce array change')
         console.log($scope.reduceArray)
         if ($scope.hideReducer)
             return;
-        var ok = $scope.reducer.ok($scope.reduceArray);
         if ($scope.reducer.mode == 'AreaWalker')
         {
+            var ok = $scope.reducer.ok($scope.reduceArray);
             $scope.reduceAreas = ok.areas;
-            if (! $scope.reduceAreas)
-            {
-                $scope.hideReducer = true;
-                reduceFunc(ok.changes);
-                gameLog.reduce.push($scope.reduceArray)
-            }
+            $scope.mapInfo = "Select an area from areas "+_.keys($scope.reduceAreas)+". \
+            Still left "+ok.amount;
         } else {
-            $scope.reducer.amount = ok.amount;
+            var ok = $scope.reducer.ok(reduceSubstr($scope.engine.map.areas, $scope.reduceObject));
+            $scope.mapInfo = "Reduce from areas "+_.keys(ok.areas)+". \
+            Still left "+ok.amount;
         }
     };
     $scope.reduceReady = function() {
-        var arr = _.filter(_.keys($scope.reduceArray), function(k) {
-            return $scope.reduceArray[k]['tribes'] != "0";
-        })
-        var ok = $scope.reducer.ok(_.pick($scope.reduceArray, arr));
+        var rdc = undefined;
+        if ($scope.reducer.mode == 'AreaWalker')
+            rdc = $scope.reduceArray;
+        else
+            rdc = reduceSubstr($scope.engine.map.areas, $scope.reduceObject);
+        var ok = $scope.reducer.ok(rdc);
         if (ok.ok != false)
         {
+            gameLog.reduce.push(rdc)
+            clearRegions();
             $scope.hideReducer = true;
-            reduceFunc(ok);
-            gameLog.reduce.push($scope.reduceArray)
+            mapClicked = oldClicked;
+            $scope.mapInfo = undefined;
+            $scope.reduceArray = undefined;
+            $scope.reduceObject = undefined;
+            reduceFunc(ok.changes);
         }
     }
     $scope.$watchCollection('reduceArray', checkReducer);
-    $scope.$watch('reduceArray', checkReducer, true);
+    $scope.$watch('reduceObject', checkReducer, true);
     
     pocketciv.Engine.drawer = function(deck, drawn) {
         console.log("Show drawer")
@@ -191,6 +225,10 @@ pocketcivApp.controller('MainGame', function ($scope, $localStorage) {
     
     var selectRegion = function(region) {
         $(".activeCanvas:not(#activeCanvas"+region+")").removeClass('active');
+        $("#activeCanvas"+region).addClass('active');
+    }
+    
+    var addRegion = function(region) {
         $("#activeCanvas"+region).addClass('active');
     }
     

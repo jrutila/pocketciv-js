@@ -12,6 +12,8 @@ $squareColor-border: lightGreen;
 $squareColor-inner: black;
 $squareColor-text: lightGreen;
 $eventColor: lightGray;
+$eventTop: 70px;
+$deckPeek: 50px;
 
 #card {
     .hexagon.border {
@@ -73,7 +75,7 @@ $eventColor: lightGray;
     }
     
     ul {
-        top: 70px;
+        top: $eventTop;
         left: 10px;
         width: $cardWidth - 20;
         position: absolute;
@@ -101,14 +103,25 @@ $eventColor: lightGray;
         right: 10px;
         top: 50px;
     }
-    
+}
+
+#card {
     background-color: brown;
     position: fixed;
     width: $cardWidth;
     height: $cardHeight;
     z-index: 100;
-    left: $mapWidth;
-    top: 20px;
+    bottom: 3px;
+    right: $cardWidth + 2px;
+}
+
+#card.pushed {
+    right: $deckPeek + 2px;
+    bottom: -1*($cardHeight - $eventTop);
+}
+
+#card.shown {
+    bottom: 3px;
 }
 
 #deck {
@@ -117,7 +130,43 @@ $eventColor: lightGray;
     width: $cardWidth;
     height: $cardHeight;
     z-index: 100;
-    left: $mapWidth;
-    top: $cardHeight + (2 * 20);
     
+    right: 10px;
+    bottom: 3px;
+
+    #cardsLeft {
+        color: red;
+        font-size: 54px;
+        width: 100%;
+        display: block;
+        text-align: center;
+        top: 56px;
+        position: absolute;
+    }
+    
+    button {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        opacity: 0.2;
+    }
+    
+    input {
+        position: absolute;
+        top: 152px;
+        left: $cardWidth / 4;
+        width: 50%;
+    }
+}
+
+#deck.pushed {
+    right: -1*($cardWidth - $deckPeek);
+    //top: $cardHeight + (2 * 20);
+    bottom: -1*($cardHeight / 2);
+    
+    #cardsLeft {
+        width: $deckPeek;
+        text-align: left;
+        font-size: 28px;
+    }
 }
