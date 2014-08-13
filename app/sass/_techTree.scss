@@ -9,11 +9,26 @@
         overflow: auto;
     }
     
-    .cityinfo, .advanceinfo {
+    #cityinfo, #advanceinfo {
         display: inline-block;
     }
     
-    .cityinfo table {
+    #advanceinfo {
+        position: absolute;
+        
+        #advancereq, #advancereqby {
+            height: 30px;
+        }
+        h1 {
+            padding-left: 30px;
+        }
+    }
+    #cityinfo {
+        float: right;
+        margin-left: 200px;
+    }
+    
+    #cityinfo table {
         width: auto;
     }
     
@@ -34,6 +49,7 @@
     }
     .advancelist tbody {
         color: gray;
+        cursor: default;
     }
     
     .available {

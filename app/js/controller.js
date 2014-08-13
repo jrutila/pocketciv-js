@@ -24,6 +24,7 @@ var scenarios = {
 }
 
 pocketcivApp.controller('MainGame', function ($scope, $localStorage) {
+    $scope._ = _;
     $scope.$storage = $localStorage;
     $scope.map = pocketciv.Map;
     $scope.deck = pocketciv.EventDeck;

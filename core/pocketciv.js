@@ -29,6 +29,7 @@ var advances = {
     'agriculture': require('../advances/agriculture'),
     'cartage': require('../advances/cartage'),
     'masonry': require('../advances/masonry'),
+    'engineering': require('../advances/engineering'),
 }
 
 
