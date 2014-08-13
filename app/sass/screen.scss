@@ -58,6 +58,13 @@ $infoBarHeight: 25px;
     }
 }
 
+#startButton {
+    position: fixed;
+    left: 25%;
+    top: 25%;
+    z-index: 300;
+}
+
 #infobar {
     width: 100%;
     background-color: rgba(gray, .7);

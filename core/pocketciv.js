@@ -243,7 +243,12 @@ Engine.prototype = {
                 this.map.areas[key].id = parseInt(key);
             }
         }
-        this.phase = ""
+        this.phase = state.phase || "";
+        this.acquired = state.acquired || {};
+        this.trading = state.trading || [];
+        this.gold = state.gold || 0;
+        this.era = state.era || 1;
+        this.round = state.round || {};
     },
     endOfEra: function() {
         console.log("End of era");

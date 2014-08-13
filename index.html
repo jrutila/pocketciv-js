@@ -242,7 +242,7 @@
         </div>
     </div>
     
-    <div id="mover" ng-hide="hideMover">
+    <div ng-show="godMode && !hideMover" id="mover"
         <ul>
             <li ng-repeat="(id, area) in movement">{{ id }}: <input type="number" value="{{ area.tribes }}" ng-model="movement[id]"/></li>
         </ul>
@@ -254,7 +254,7 @@
         <button ng-click="selectArea()">Select</button>
     </div>
     
-    <div ng-hide="!possibleAdvances">
+    <div ng-show="acquiring && godMode">
         <textarea cols="100">{{ possibleAdvances }}</textarea><br/>
         <input ng-model="acquire_name" /><input ng-model="acquire_area" />
         <button ng-click="acquireGo()">Go</button>
@@ -271,10 +271,10 @@
         </ul>
         <button ng-click="engine.nextPhase()">Done</button>
     </div>
+    <button id="startButton" class="btn" ng-click="engine.phase = 'populate'" ng-hide="engine.phase">Start!</button>
     
-    <div id="phaser">
+    <div ng-show="godMode" id="phaser">
     <h2>Phases</h2>
-    <button ng-click="engine.phase = 'populate'" ng-hide="engine.phase">Start!</button>
     <input type="checkbox" ng-model="godMode" />God Mode
     <span ng-hide="!godMode">
         <select ng-model="changePhase">
