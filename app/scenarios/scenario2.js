@@ -1,4 +1,5 @@
 module.exports = {
+    "title": "Scenario 2",
     "map": {
         "areas": {
             "3": {

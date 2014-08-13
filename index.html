@@ -19,6 +19,18 @@
 <script type="text/javascript" src="bower_components/ngstorage/ngStorage.js"></script>
 </head>    
 <body ng-controller="MainGame">
+    <div id="mainmenu_toggle" ng-click="mainMenu = !mainMenu">-</div>
+    <div id="mainmenu" ng-hide="!mainMenu">
+        <div class="cover"></div>
+        <ul>
+            <li>
+                <button ng-click="mm_newGame = true">New Game</button>
+                <ul ng-hide="!mm_newGame">
+                    <li ng-repeat="(k, s) in scenarios" ng-click="load(s)">{{ s.title }}</li>
+                </ul>
+            </li>
+        </ul>
+    </div>
     <div id="deck" ng-class="{ pushed: hideDrawer }">
         <span id="cardsLeft">{{ deck.cardsLeft }}</span>
         <div ng-hide="hideDrawer">

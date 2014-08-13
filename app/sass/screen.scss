@@ -13,6 +13,7 @@ $cardWidth: 170px;
 
 $buttonHeight: 40px;
 $mapSymbolSize: 21px;
+$infoBarHeight: 25px;
 
 
 @import "_deck";
@@ -89,11 +90,11 @@ $mapSymbolSize: 21px;
 #infobar {
     width: 100%;
     background-color: rgba(gray, .7);
-    height: 25px;
+    height: $infoBarHeight;
     font-weight: bold;
     top: 0px;
     position: fixed;
-    z-index: 2000;
+    z-index: 200;
 }
 
 #changePrompt {
@@ -118,4 +119,40 @@ $mapSymbolSize: 21px;
 
 .highlight {
     z-index: 101;
+}
+
+#mainmenu_toggle {
+    background-color: red;
+    position: fixed;
+    top: 0px;
+    height: 40px;
+    width: 40px;
+    right: 0px;
+    z-index: 400;
+}
+
+#mainmenu {
+    
+    ul {
+        z-index: 300;
+        width: 100%;
+        background-color: rgba(red, .8);
+        padding-top: 40px;
+        padding-bottom: 40px;
+        position: fixed;
+        top: $infoBarHeight;
+        
+        li button {
+            width: 80%;
+            background-color: darkYellow;
+            color: darkYellow;
+            height: $buttonHeight;
+            margin-bottom: 15px;
+        }
+    
+    }
+    
+    .cover {    
+        z-index: 280;
+    }
 }

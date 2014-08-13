@@ -231,6 +231,8 @@ Engine.prototype = {
         if ('deck' in state)
         {
             this.deck.usedCards = state.deck.usedCards;
+        } else {
+            this.deck.usedCards = [];
         }
         if (_.has(state, 'map'))
         {
@@ -240,6 +242,7 @@ Engine.prototype = {
                 this.map.areas[key].id = parseInt(key);
             }
         }
+        this.phase = ""
     },
     endOfEra: function() {
         console.log("End of era");

@@ -133,6 +133,7 @@ describe('Reducer', function() {
             return areas;
           }
           target.reduce = function(r, area) {
+            if (r.city == 0 && r.tribes == 0) return;
             var c = area.city;
             var t = area.tribes;
             while (c < area.city + r.city)
@@ -172,6 +173,15 @@ describe('Reducer', function() {
           _.keys(target.ok({ 4: { "city": 1 }}).areas).should.deep.equal([ "4", "5" ]);
           _.keys(target.ok({ 4: { "city": 2 }}).areas).should.deep.equal([ "5" ]);
           target.ok({ 4: { "city": 4 }}).should.be.false;
+        })
+        it('should ignore zeroes', function() {
+          engine.map.areas = {
+            5: { id: 5,'city': 1, 'tribes': 2, 'neighbours': [ 4 ] },
+            4: { id: 4,'city': 1, 'tribes': 7, 'neighbours': [ 3, 5 ] },
+            3: { id: 3, 'tribes': 2, 'neighbours': [ 4 ] },
+          }
+          target.ok({}).changes.should.deep.equal({})
+          target.ok({ 5: { 'city': 0, 'tribes': 0 }}).changes.should.deep.equal({})
         })
       });
     });

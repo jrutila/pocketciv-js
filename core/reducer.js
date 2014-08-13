@@ -61,32 +61,32 @@ Reducer.prototype = {
       case Modes.Overall:
         _.each(reduction, function(v, k) {
           var area = rdc.areas()[k];
+          if (area === undefined)
+          {
+            failed = true;
+            return;
+          }
           var rdd = rdc.reduce(v, area);
           if (rdd === false)
             failed = true;
           else
             v = rdd || v;
-          console.log(k)
-          console.log(v)
           var val = rdc.changes[k] || {}; 
           _.each(v, function(vv, kk) {
-            val[kk] = (vv).toString();
-            if (area[kk] + vv < 0)
-              failed = true;
-            rdc.visited.push(area.id)
+            if (vv)
+            {
+              val[kk] = (vv).toString();
+              if (area[kk] + vv < 0)
+                failed = true;
+              rdc.visited.push(area.id)
+            }
           })
-          rdc.changes[k] = val;
+          if (_.isEmpty(val))
+            delete rdc.changes[k];
+          else
+            rdc.changes[k] = val;
         });
         if (_.isEmpty(this.areas())) this.amount = 0;
-        break;
-      case Modes.Selector:
-        _.each(reduction, function(v, k) {
-          var area = rdc.areas()[k];
-          var chg = rdc.reduce(v, area);
-          if (chg === false)
-            failed = true;
-          rdc.changes[k] = chg;
-        })
         break;
       case Modes.AreaWalker:
       default:

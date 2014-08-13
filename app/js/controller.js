@@ -27,6 +27,7 @@ pocketcivApp.controller('MainGame', function ($scope, $localStorage) {
     $scope.$storage = $localStorage;
     $scope.map = pocketciv.Map;
     $scope.deck = pocketciv.EventDeck;
+    $scope.scenarios = scenarios;
     
     var moveFunc = undefined;
     $scope.moveTribes = function() {
@@ -164,7 +165,10 @@ pocketcivApp.controller('MainGame', function ($scope, $localStorage) {
             $scope.mapInfo = "Select an area from areas "+_.keys($scope.reduceAreas)+". \
             Still left "+ok.amount;
         } else {
-            var ok = $scope.reducer.ok(reduceSubstr($scope.engine.map.areas, $scope.reduceObject));
+            var subtr = reduceSubstr($scope.engine.map.areas, $scope.reduceObject);
+            var ok = $scope.reducer.ok(subtr);
+            console.log("Substracted")
+            console.log(subtr)
             $scope.mapInfo = "Reduce from areas "+_.keys(ok.areas)+". \
             Still left "+ok.amount;
         }
@@ -324,22 +328,6 @@ pocketcivApp.controller('MainGame', function ($scope, $localStorage) {
         $scope.changePhase = undefined;
     }
     
-    $scope.engine = pocketciv.Engine;
-    $scope.engine.phase = "";
-    $scope.godMode = false;
-    
-    var map = new Map(pocketciv.Map);
-    $scope.mapArea = map
-    
-    map.getCanvas = function(i) {
-        return [$('#mapCanvas'+i)[0],
-                $('#focusCanvas'+i).get(0),
-                $('#activeCanvas'+i).get(0)];
-    }
-    map.getImage = function(i) {
-        return $('#mapImage'+i)[0];
-    }
-    
     function getMousePos(canvas, evt) {
         var rect = canvas.getBoundingClientRect();
         return {
@@ -372,14 +360,6 @@ pocketcivApp.controller('MainGame', function ($scope, $localStorage) {
                 $(focusCnvs[i-1]).removeClass('focus');
         }
     }
-    
-    angular.element(document).ready(function() {
-        map.paint();
-        for (var reg in map.symbols)
-        {
-            $('#area'+reg).css({top: map.symbols[reg]['area'].Y, left: map.symbols[reg]['area'].X }).show()
-        }
-    })
     
     $scope.advance = function(name) {
         $scope.engine.runPhase('advance', name);
@@ -425,6 +405,48 @@ pocketcivApp.controller('MainGame', function ($scope, $localStorage) {
         else $elem.html(val).show()
     }
     
+    $scope.engine = pocketciv.Engine;
+    $scope.engine.phase = "";
+    $scope.godMode = false;
+    
+    var map = new Object();
+    
+    var getCanvas = function(i) {
+        return [$('#mapCanvas'+i)[0],
+                $('#focusCanvas'+i).get(0),
+                $('#activeCanvas'+i).get(0)];
+    }
+    var getImage = function(i) {
+        return $('#mapImage'+i)[0];
+    }
+    
+    $scope.resetUI = function() {
+        $scope.mapInfo = undefined;
+        $scope.areaChange = undefined;
+        $scope.hideDrawer = true;
+        $scope.mainMenu = false;
+    }
+    
+    $scope.mainMenu = true;
+    $scope.load = function(scen) {
+        console.log("Loading "+scen.title);
+        $scope.resetUI();
+        $scope.engine.init(scen);
+        
+        map = new Map(pocketciv.Map);
+        $scope.map = pocketciv.Map;
+        map.getCanvas = getCanvas;
+        map.getImage = getImage;
+        
+        $("#canvases .symbol:not(.areaCode)").remove();
+        $('.areaCode').hide();
+        map.paint();
+        for (var reg in map.symbols)
+        {
+            $('#area'+reg).css({top: map.symbols[reg]['area'].Y, left: map.symbols[reg]['area'].X }).show()
+        }
+        $scope.mapArea = map;
+        
     $scope.$watch('map', function() {
         console.log("Hey! Map changed!")
         pocketciv.Map.areas = $scope.map.areas
@@ -443,9 +465,10 @@ pocketcivApp.controller('MainGame', function ($scope, $localStorage) {
             }
         }
     })
+    
+    }
 });
 
-pocketciv.Engine.init(scenarios["2"]);
 
 pocketcivApp.directive('jsonText', function() {
   return {

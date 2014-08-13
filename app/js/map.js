@@ -98,6 +98,9 @@ Map.prototype.paint = function(ctx) {
             //activeCnvs[i] = cnv[2];
             activeCtxs[i] = cnv[2].getContext('2d');
         }
+        hexCtxs[i].clearRect(0,0,1000, 1000);
+        focusCtxs[i] && focusCtxs[i].clearRect(0,0,1000, 1000);
+        activeCtxs[i] && activeCtxs[i].clearRect(0,0,1000, 1000);
     }
 
     for (var h = 0; h < this.grid.Hexes.length; h++)
@@ -112,63 +115,53 @@ Map.prototype.paint = function(ctx) {
     for (var i = -1; i <= regionCount; i++)
     {
         hexCtxs[i].globalCompositeOperation = 'source-in';
-        var img = new Image();
-        img.ctx = hexCtxs[i];
-        img.reg = i;
-        img.onload = function() {
-            var ctx = this.ctx;
-            var region = regions[this.reg]
-            ctx.drawImage(this, 0, 0);
-            var commonPoints= {};
-            for (var h in region)
-            {
-                var hex = region[h];
-                for (var n=0; n < 6; n++)
-                {
-                    var start = [hex.Points[n].X, hex.Points[n].Y]
-                    var end = [hex.Points[(n+1)%6].X, hex.Points[(n+1)%6].Y]
-                    
-                    var key = getCPKey(start, end)
+        var img = this.getImage(i);
+        var ctx = hexCtxs[i];
+        var region = regions[i]
+        ctx.drawImage(img, 0, 0);
+        var commonPoints = {};
+        for (var h in region) {
+            var hex = region[h];
+            for (var n = 0; n < 6; n++) {
+                var start = [hex.Points[n].X, hex.Points[n].Y]
+                var end = [hex.Points[(n + 1) % 6].X, hex.Points[(n + 1) % 6].Y]
 
-                    if (!(key in commonPoints))
-                        commonPoints[key] = 0
-                    commonPoints[key]++;
-                }
-            }
-            ctx.globalCompositeOperation = 'source-over';
-                    ctx.lineWidth = 1
-                    ctx.strokeStyle = "black"
-            for (var i = 0; i < 3; i++) {
-                for (var h in region) {
-                    var hex = region[h];
+                var key = getCPKey(start, end)
 
-                    for (var n = 0; n < 6; n++) {
-                        var start = [hex.Points[n].X, hex.Points[n].Y]
-                        var end = [hex.Points[(n + 1) % 6].X, hex.Points[(n + 1) % 6].Y]
-
-                        if (commonPoints[getCPKey(start, end)] > 1) continue;
-                        ctx.beginPath()
-                        ctx.moveTo(start[0], start[1])
-                        ctx.lineTo(end[0], end[1])
-                        ctx.closePath()
-                        ctx.stroke()
-                    }
-                }
-                if (focusCtxs[this.reg] && ctx != focusCtxs[this.reg])
-                {
-                    ctx = focusCtxs[this.reg];
-                    ctx.strokeStyle = "red";
-                    ctx.lineWidth = 3;
-                }
-                else if (activeCtxs[this.reg] && ctx != activeCtxs[this.reg])
-                {
-                    ctx = activeCtxs[this.reg];
-                    ctx.strokeStyle = "blue";
-                    ctx.lineWidth = 5;
-                }
+                if (!(key in commonPoints)) commonPoints[key] = 0
+                commonPoints[key]++;
             }
         }
-        img.src = this.getImage(i).src;
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.lineWidth = 1
+        ctx.strokeStyle = "black"
+        for (var c = 0; c < 3; c++) {
+            for (var h in region) {
+                var hex = region[h];
+
+                for (var n = 0; n < 6; n++) {
+                    var start = [hex.Points[n].X, hex.Points[n].Y]
+                    var end = [hex.Points[(n + 1) % 6].X, hex.Points[(n + 1) % 6].Y]
+
+                    if (commonPoints[getCPKey(start, end)] > 1) continue;
+                    ctx.beginPath()
+                    ctx.moveTo(start[0], start[1])
+                    ctx.lineTo(end[0], end[1])
+                    ctx.closePath()
+                    ctx.stroke()
+                }
+            }
+            if (focusCtxs[i] && ctx != focusCtxs[i]) {
+                ctx = focusCtxs[i];
+                ctx.strokeStyle = "red";
+                ctx.lineWidth = 3;
+            }
+            else if (activeCtxs[i] && ctx != activeCtxs[i]) {
+                ctx = activeCtxs[i];
+                ctx.strokeStyle = "blue";
+                ctx.lineWidth = 5;
+            }
+        }
     }
     
     for (var reg in this.regions)

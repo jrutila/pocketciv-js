@@ -288,6 +288,7 @@ describe("Engine", function() {
             }
         });
         it('should populate', function() {
+            engine.nextPhase();
             engine.phase.should.equal("populate");
             engine.runPhase('populate');
             pocketciv.Map.areas[1].tribes.should.equal(3);

@@ -20,17 +20,23 @@ var failed = [];
 mocha.addFile('./test/pocketciv');
 mocha.addFile('./test/reducer');
 
+function addDir(dir) {
 // Here is an example:
-fs.readdirSync('test/events').filter(function(file){
+fs.readdirSync(dir).filter(function(file){
     // Only keep the .js files
     return file.substr(-3) === '.js';
 
 }).forEach(function(file){
     // Use the method "addFile" to add the file to mocha
     mocha.addFile(
-        path.join('./test/events', file)
+        path.join('./'+dir, file)
     );
 });
+}
+
+addDir('test/events')
+addDir('test/advances')
+
 
 mocha.run(function(){
 
