@@ -6,7 +6,6 @@
         "watch": "make watch",
         "autotest": "make autotest",
         "start": "node web.js",
-        "postinstall": "make build"
     },
     "dependencies": {
             "node-static": "*",
