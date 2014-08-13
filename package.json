@@ -12,12 +12,12 @@
             "browserify": "*",
             "underscore": "*",
             "jed": "*",
-            "bower": "*"
-    },
-    "devDependencies": {
-        "grunt": "*",
+            "bower": "*",
         "grunt-contrib-compass": "*",
         "grunt-contrib-watch": "*"
+    },
+    "devDependencies": {
+        "grunt": "*"
     },
     "engines": {
         "node": "0.10.x",
