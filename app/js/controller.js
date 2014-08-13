@@ -284,14 +284,17 @@ pocketcivApp.controller('MainGame', function ($scope, $localStorage) {
     }
     
     var doAcquire = undefined;
+    $scope.acquiring = false;
     pocketciv.Engine.advanceAcquirer = function(engine, done) {
         $scope.acquirer = new pocketciv.AdvanceAcquirer(engine);
         $scope.possibleAdvances = $scope.acquirer.possibleAdvances();
+        $scope.acquiring = true;
         doAcquire = done;
+        $scope.toggleTechTree();
     }
     
     $scope.acquireGo = function() {
-        $scope.acquirer.acquire($scope.acquire_name, $scope.acquire_area);
+        $scope.acquirer.acquire($scope.selAdv.name, $scope.selArea.id);
         $scope.possibleAdvances = $scope.acquirer.possibleAdvances();
         $scope.acquired = _.map($scope.acquirer.acquired, function(v) {
             return v.title;
@@ -300,18 +303,31 @@ pocketcivApp.controller('MainGame', function ($scope, $localStorage) {
     
     $scope.acquireOk = function() {
         doAcquire.call($scope.engine, $scope.acquirer.acquired)
+        $scope.acquiring = false;
         $scope.possibleAdvances = undefined;
     }
     
     $scope.selAdv = undefined;
     $scope.toggleTechTree = function() {
         $scope.showTT = !$scope.showTT;
+        if (!$scope.showTT && $scope.acquiring)
+            $scope.acquireOk()
         $scope.acquirer = new pocketciv.AdvanceAcquirer($scope.engine);
         $scope.possibleAdvances = $scope.acquirer.possibleAdvances();
     }
     
     $scope.selectAdv = function(adv) {
         $scope.selAdv = adv;
+        $scope.selArea = undefined;
+        if ($scope.possibleAdvances[adv.name].areas.length == 1)
+            $scope.selArea = $scope.engine.map.areas[$scope.possibleAdvances[adv.name].areas[0]];
+    }
+    
+    $scope.selectArea = function(area) {
+        if (
+            $scope.selAdv && 
+            $scope.possibleAdvances[$scope.selAdv.name].areas.indexOf(area.id.toString()) > -1)
+            $scope.selArea = area;
     }
     
     $scope.doEvent = function() {
