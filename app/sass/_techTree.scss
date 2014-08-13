@@ -1,0 +1,54 @@
+#techtree {
+    .ttcont {
+        position: fixed;
+        top:  25px;
+        left: 25px;
+        right: 25px;
+        bottom: 25px;
+        z-index: 102;
+        overflow: auto;
+    }
+    
+    .cityinfo, .advanceinfo {
+        display: inline-block;
+    }
+    
+    .cityinfo table {
+        width: auto;
+    }
+    
+    .content {
+        position: absolute;
+        background-color: white;
+        //bottom: 25px;
+        min-height: 100%;
+        min-width: 100%;
+        //width: $mapWidth - 50;
+        //height: $mapHeight - 50;
+    }
+    .close {
+        position: absolute;
+        right: 5px;
+        top: 20px;
+        z-index: 110;
+    }
+    .advancelist tbody {
+        color: gray;
+    }
+    
+    .available {
+        color: black;
+    }
+    
+    .areas {
+        color: lightGreen;
+    }
+    
+    .acquired {
+        color: darkGreen;
+    }
+    
+    .selected {
+        background-color: lightBlue;
+    }
+}

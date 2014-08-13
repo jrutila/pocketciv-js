@@ -148,19 +148,21 @@
                 <span>{{ adv.title }}</span>
             </li>
         </ul>
-        <a id="showTechTree" ng-click="showTechTree()">Open tech tree</a>
     </div>
+    <a id="showTechTree" ng-click="toggleTechTree()">Open tech tree</a>
     
     <div id="techtree" ng-hide="!showTT">
         <div class="cover"></div>
+        <div class="ttcont">
+        <button class="close" ng-click="toggleTechTree()">X</button>
         <div class="content">
-            <h2>Tech tree</h2><button ng-click="showTT = false">X</button>
+            <h2>Tech tree</h2>
             <div id="cityinfo">
-                <table>
+                <table class="table">
                     <thead><th>Area</th><th>AV</th><th>Tribes</th><th>Resources</th></thead>
                     <tbody>
                         <tr ng-repeat="c in engine.map.areas | filter:city">
-                            <td>{{ c.id }}</td><td class="city">{{ c.city }}</td><td class="tribes">{{ c.tribes }}</td><td>TBD</td>
+                            <td>{{ c.id }}</td><td><span class="city">{{ c.city }}</span></td><td><span class="tribes">{{ c.tribes }}</span></td><td>TBD</td>
                         </tr>
                     </tbody>
                 </table>
@@ -196,7 +198,7 @@
                     </ul>
                 </div>
             </div>
-            <table>
+            <table class="advancelist table table-condensed table-hover">
                 <thead><th>Name</th><th>VP</th><th>Cost</th><th>Resources</th><th>Requires</th></thead>
                 <tbody>
                     <tr ng-click="selectAdv(adv)" ng-class="{ acquired: engine.acquired[key], available: possibleAdvances[key], areas: possibleAdvances[key].areas.length, selected: selAdv == adv }" ng-repeat="(key, adv) in engine.advances">
@@ -211,6 +213,7 @@
                     </tr>
                 </tbody>
             </table>
+        </div>
         </div>
     </div>
     

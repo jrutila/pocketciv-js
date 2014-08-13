@@ -15,11 +15,12 @@ $buttonHeight: 40px;
 $mapSymbolSize: 21px;
 $infoBarHeight: 25px;
 
-
+@import "_mediaQueries";
 @import "_deck";
 @import "_advancePhase";
 @import "_map";
 @import "_advances";
+@import "_techTree";
 
 #advances {
     position: fixed;
@@ -37,36 +38,6 @@ $infoBarHeight: 25px;
     background:rgba(0,0,0,0.6);
 }
 
-#techtree {
-    .content {
-        z-index: 102;
-        position: fixed;
-        top:  25px;
-        left: 25px;
-        background-color: white;
-        width: $mapWidth - 50;
-        height: $mapHeight - 50;
-    }
-    tbody {
-        color: gray;
-    }
-    
-    .available {
-        color: black;
-    }
-    
-    .areas {
-        color: lightGreen;
-    }
-    
-    .acquired {
-        color: darkGreen;
-    }
-    
-    .selected {
-        background-color: lightBlue;
-    }
-}
 
 #mapinfo {
     position: fixed;
@@ -138,6 +109,7 @@ $infoBarHeight: 25px;
     left: 0px;
     padding: 2px;
     background-color: rgba(green, .8);
+    cursor: pointer;
 }
 
 #mainmenu {

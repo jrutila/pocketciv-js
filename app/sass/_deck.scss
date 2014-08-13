@@ -14,6 +14,7 @@ $squareColor-text: lightGreen;
 $eventColor: lightGray;
 $eventTop: 70px;
 $deckPeek: 50px;
+$deckRightMargin: 2px;
 
 #card {
     .hexagon.border {
@@ -112,16 +113,26 @@ $deckPeek: 50px;
     height: $cardHeight;
     z-index: 100;
     bottom: 3px;
-    right: $cardWidth + 2px;
+    right: $cardWidth + $deckRightMargin * 2;
 }
 
+@include bigger-than-map {
 #card.pushed {
-    right: $deckPeek + 2px;
-    bottom: -1*($cardHeight - $eventTop);
+    right: $deckPeek + $deckRightMargin;
 }
-
 #card.shown {
     bottom: 3px;
+}
+}
+
+@include smaller-than-map {
+#card.pushed {
+    right: $deckPeek + $deckRightMargin;
+    bottom: -1*($cardHeight - $eventTop);
+}
+#card.shown {
+    bottom: 0px;
+}
 }
 
 #deck {
@@ -131,7 +142,7 @@ $deckPeek: 50px;
     height: $cardHeight;
     z-index: 100;
     
-    right: 10px;
+    right: $deckRightMargin;
     bottom: 3px;
 
     #cardsLeft {
@@ -159,6 +170,20 @@ $deckPeek: 50px;
     }
 }
 
+@include bigger-than-map {
+#deck.pushed {
+    right: -1*($cardWidth - $deckPeek);
+    //top: $cardHeight + (2 * 20);
+    
+    #cardsLeft {
+        width: $deckPeek;
+        text-align: left;
+        font-size: 28px;
+    }
+}
+}
+
+@include smaller-than-map {
 #deck.pushed {
     right: -1*($cardWidth - $deckPeek);
     //top: $cardHeight + (2 * 20);
@@ -169,4 +194,5 @@ $deckPeek: 50px;
         text-align: left;
         font-size: 28px;
     }
+}
 }
