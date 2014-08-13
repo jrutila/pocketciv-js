@@ -1,22 +1,28 @@
 {
-    "name": "pocketciv",
-    "version": "0.0.1",
-    "scripts": {
-        "test": "make test",
-        "watch": "make watch",
-        "autotest": "make autotest",
-        "start": "node web.js",
-        "postinstall": "make build"
-    },
-    "dependencies": {
-            "node-static": "*",
-            "browserify": "*",
-            "underscore": "*",
-            "jed": "*",
-            "bower": "*"
-    },
-    "engines": {
-        "node": "0.10.x",
-        "npm": "1.2.x"
-    }
+  "name": "pocketciv",
+  "version": "0.0.1",
+  "scripts": {
+    "test": "make test",
+    "watch": "make watch",
+    "autotest": "make autotest",
+    "start": "node web.js"
+  },
+  "dependencies": {
+    "node-static": "*",
+    "browserify": "~4.2.3",
+    "underscore": "*",
+    "jed": "*",
+    "bower": "*",
+    "grunt-contrib-compass": "~0.9.1",
+    "grunt-contrib-watch": "*",
+    "grunt-browserify": "~2.1.4",
+    "grunt-bower-task": "^0.4.0"
+  },
+  "devDependencies": {
+    "grunt": "*"
+  },
+  "engines": {
+    "node": "0.10.x",
+    "npm": "1.2.x"
+  }
 }
