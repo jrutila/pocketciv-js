@@ -9,12 +9,13 @@
     },
     "dependencies": {
             "node-static": "*",
-            "browserify": "*",
+            "browserify": "~4.2.3",
             "underscore": "*",
             "jed": "*",
             "bower": "*",
-        "grunt-contrib-compass": "*",
-        "grunt-contrib-watch": "*"
+        "grunt-contrib-compass": "~0.9.1",
+        "grunt-contrib-watch": "*",
+        "grunt-browserify": "~2.1.4"
     },
     "devDependencies": {
         "grunt": "*"

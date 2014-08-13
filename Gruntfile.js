@@ -14,10 +14,20 @@ module.exports = function(grunt) {
 				files: '**/*.scss',
 				tasks: ['compass']
 			}
-		}
+		},
+		browserify: {
+            dist: {
+                files: {
+                    'bundle.js': [
+                        'app/js/*.js',
+                        ]
+                }
+            },
+       }
 	});
 	grunt.loadNpmTasks('grunt-contrib-compass');
 	grunt.loadNpmTasks('grunt-contrib-watch');
-	grunt.registerTask('default',['compass']);
+	grunt.loadNpmTasks('grunt-browserify');
+	grunt.registerTask('default',['compass', 'browserify']);
 	grunt.registerTask('heroku',['compass']);
 }
