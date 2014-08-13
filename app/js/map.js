@@ -171,17 +171,17 @@ Map.prototype.paint = function(ctx) {
             this.symbols[reg] = {};
             var mp = this.regions[reg][0].MidPoint;
             this.symbols[reg]['area'] = new HT.Point(mp.X-25, mp.Y-25)
-            this.symbols[reg]['fault'] = new HT.Point(mp.X-15, mp.Y-15)
+            this.symbols[reg]['fault'] = new HT.Point(mp.X, mp.Y)
             mp = this.regions[reg][1].MidPoint;
             this.symbols[reg]['tribes'] = new HT.Point(mp.X-25, mp.Y-25)
-            this.symbols[reg]['desert'] = new HT.Point(mp.X-15, mp.Y-15)
+            this.symbols[reg]['desert'] = new HT.Point(mp.X, mp.Y)
             mp = this.regions[reg][2].MidPoint;
             this.symbols[reg]['city'] = new HT.Point(mp.X-25, mp.Y-25)
-            this.symbols[reg]['farm'] = new HT.Point(mp.X-15, mp.Y-15)
+            this.symbols[reg]['farm'] = new HT.Point(mp.X, mp.Y)
             mp = this.regions[reg][3].MidPoint;
             this.symbols[reg]['forest'] = new HT.Point(mp.X-25, mp.Y-25)
-            this.symbols[reg]['mountain'] = new HT.Point(mp.X-15, mp.Y-15)
-            this.symbols[reg]['volcano'] = new HT.Point(mp.X-15, mp.Y-15)
+            this.symbols[reg]['mountain'] = new HT.Point(mp.X, mp.Y)
+            this.symbols[reg]['volcano'] = new HT.Point(mp.X, mp.Y)
 
 
         }

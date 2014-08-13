@@ -131,6 +131,15 @@ $infoBarHeight: 25px;
     z-index: 400;
 }
 
+#showTechTree {
+    z-index: 200;
+    position: fixed;
+    bottom: 0px;
+    left: 0px;
+    padding: 2px;
+    background-color: rgba(green, .8);
+}
+
 #mainmenu {
     
     ul {

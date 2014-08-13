@@ -148,7 +148,7 @@
                 <span>{{ adv.title }}</span>
             </li>
         </ul>
-        <a ng-click="showTechTree()">Open tech tree</a>
+        <a id="showTechTree" ng-click="showTechTree()">Open tech tree</a>
     </div>
     
     <div id="techtree" ng-hide="!showTT">
@@ -160,7 +160,7 @@
                     <thead><th>Area</th><th>AV</th><th>Tribes</th><th>Resources</th></thead>
                     <tbody>
                         <tr ng-repeat="c in engine.map.areas | filter:city">
-                            <td>{{ c.id }}</td><td>{{ c.city }}</td><td>{{ c.tribes }}</td><td>TBD</td>
+                            <td>{{ c.id }}</td><td class="city">{{ c.city }}</td><td class="tribes">{{ c.tribes }}</td><td>TBD</td>
                         </tr>
                     </tbody>
                 </table>
@@ -176,8 +176,8 @@
                 <h1>{{ selAdv.title }}</h1>
                 <div id="advancecost">
                     <h2>Cost</h2>
-                    <span>Tribes: {{ selAdv.cost.tribes }}</span>
-                    <span>Gold: {{ selAdv.cost.gold }}</span>
+                    <span>Tribes: <span class="tribes">{{ selAdv.cost.tribes }}</span></span>
+                    <span>Gold: <span class="gold">{{ selAdv.cost.gold }}</span></span>
                 </div>
                 <div id="advanceres">
                     <h2>Resources</h2>
@@ -202,7 +202,9 @@
                     <tr ng-click="selectAdv(adv)" ng-class="{ acquired: engine.acquired[key], available: possibleAdvances[key], areas: possibleAdvances[key].areas.length, selected: selAdv == adv }" ng-repeat="(key, adv) in engine.advances">
                         <td>{{ adv.title }}</td>
                         <td>{{ adv.points }}</td>
-                        <td>{{ adv.cost }}</td>
+                        <td>
+                            <span ng-repeat="(k, v) in adv.cost" class="{{ k }}">{{ v }}</span>
+                        </td>
                         <td>{{ adv.resources }}</td>
                         <td>{{ adv.requires }}</td>
                         <td>{{ possibleAdvances[key].areas }}</td>
