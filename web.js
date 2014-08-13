@@ -5,6 +5,7 @@ var static = require('node-static');
 //
 var port = process.env.PORT || 5000;
 
+var file = new static.Server('.');
 require('http').createServer(function (request, response) {
     request.addListener('end', function () {
         //
