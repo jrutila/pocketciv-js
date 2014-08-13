@@ -23,11 +23,17 @@ module.exports = function(grunt) {
                         ]
                 }
             },
-       }
+       },
+       bower: {
+	     install: {
+	       //just run 'grunt bower:install' and you'll see files from your Bower packages in lib directory
+	     }
+	   }
 	});
 	grunt.loadNpmTasks('grunt-contrib-compass');
 	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadNpmTasks('grunt-browserify');
-	grunt.registerTask('default',['compass', 'browserify']);
-	grunt.registerTask('heroku',['compass']);
+	grunt.loadNpmTasks('grunt-bower-task');
+	grunt.registerTask('default',['compass', 'browserify', 'bower:install']);
+	grunt.registerTask('heroku',['compass', 'browserify', 'bower:install']);
 }
