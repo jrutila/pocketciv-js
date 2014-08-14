@@ -4,8 +4,9 @@ module.exports = function(grunt) {
 		compass: {
 			dist: {
 				options: {
-					sassDir: 'app/sass',
-					cssDir: 'app/stylesheets'
+					appDir: 'app/',
+					//sassDir: 'sass',
+					//cssDir: 'app/stylesheets'
 				}
 			}
 		},
@@ -18,7 +19,7 @@ module.exports = function(grunt) {
 		browserify: {
             dist: {
                 files: {
-                    'bundle.js': [
+                    'app/bundle.js': [
                         'app/js/*.js',
                         ]
                 }
@@ -27,6 +28,9 @@ module.exports = function(grunt) {
        bower: {
 	     install: {
 	       //just run 'grunt bower:install' and you'll see files from your Bower packages in lib directory
+	     },
+	     options: {
+	     	targetDir: './app/lib'
 	     }
 	   }
 	});

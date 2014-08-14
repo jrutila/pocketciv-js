@@ -1,0 +1,46 @@
+@import "compass/utilities/sprites";
+@import "modern/icons/*.png";
+
+@mixin icon {
+    height: 32px;
+    width: 32px;
+    display: inline-block;
+    /* Hide the text. */
+    text-indent: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+span[data-val='false'] {
+    background-color: red;
+}
+
+.farm {
+    @include icons-sprite(farm); 
+    @include icon
+}
+
+.forest {
+    @include icons-sprite(forest); 
+    @include icon
+}
+
+.fault {
+    @include icons-sprite(fault); 
+    @include icon
+}
+
+.mountain {
+    @include icons-sprite(mtn); 
+    @include icon
+}
+
+.volcano {
+    @include icons-sprite(vol); 
+    @include icon
+}
+
+.desert {
+    @include icons-sprite(desert); 
+    @include icon
+}

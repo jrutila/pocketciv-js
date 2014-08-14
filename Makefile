@@ -1,5 +1,5 @@
 watch:
-	watchify app/js/*.js advances/*.js actions/*.js events/*.js core/*.js -o bundle.js -dv &
+	watchify app/js/*.js advances/*.js actions/*.js events/*.js core/*.js -o app/bundle.js -dv &
 	compass watch app
 	
 test:

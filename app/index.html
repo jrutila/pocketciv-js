@@ -3,8 +3,8 @@
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/> <!--320-->
 <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"/>
-<link href="app/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css" />
-<link href="app/stylesheets/print.css" media="print" rel="stylesheet" type="text/css" />
+<link href="stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css" />
+<link href="stylesheets/print.css" media="print" rel="stylesheet" type="text/css" />
 <!--[if IE]>
   <link href="/stylesheets/ie.css" media="screen, projection" rel="stylesheet" type="text/css" />
 <![endif]-->
@@ -66,24 +66,24 @@
     
     <div id="map">
         <div id="images">
-            <img id="mapImage7" src="app/img/modern/land7.png"/>
-            <img id="mapImage8" src="app/img/modern/land8.png"/>
-            <img id="mapImage-1" src="app/img/modern/water.png"/>
-            <img id="mapImage0" src="app/img/modern/land.png"/>
-            <img id="mapImage1" src="app/img/modern/land1.png"/>
-            <img id="mapImage2" src="app/img/modern/land2.png"/>
-            <img id="mapImage3" src="app/img/modern/land3.png"/>
-            <img id="mapImage4" src="app/img/modern/land4.png"/>
-            <img id="mapImage5" src="app/img/modern/land5.png"/>
-            <img id="mapImage6" src="app/img/modern/land6.png"/>
-            <span class="symbol tribes" id="tribes"></span>
-            <span class="symbol city" id="city"></span>
-            <img class="symbol farm" id="farm" src="app/img/modern/farm.png"></img>
-            <img class="symbol forest" id="forest" src="app/img/modern/forest.png"></img>
-            <img class="symbol fault" id="fault" src="app/img/modern/fault.png"></img>
-            <img class="symbol mountain" id="mountain" src="app/img/modern/mtn.png"></img>
-            <img class="symbol volcano" id="volcano" src="app/img/modern/vol.png"></img>
-            <img class="symbol desert" id="desert" src="app/img/modern/desert.png"></img>
+            <img id="mapImage-1" src="images/modern/water.png"/>
+            <img id="mapImage0" src="images/modern/land.png"/>
+            <img id="mapImage1" src="images/modern/land1.png"/>
+            <img id="mapImage2" src="images/modern/land2.png"/>
+            <img id="mapImage3" src="images/modern/land3.png"/>
+            <img id="mapImage4" src="images/modern/land4.png"/>
+            <img id="mapImage5" src="images/modern/land5.png"/>
+            <img id="mapImage6" src="images/modern/land6.png"/>
+            <img id="mapImage7" src="images/modern/land7.png"/>
+            <img id="mapImage8" src="images/modern/land8.png"/>
+            <div class="symbol tribes" id="tribes"></div>
+            <div class="symbol city" id="city"></div>
+            <div class="icon farm" id="farm"></div>
+            <div class="icon forest" id="forest"></div>
+            <div class="icon fault" id="fault"></div>
+            <div class="icon mountain" id="mountain"></div>
+            <div class="icon volcano" id="volcano"></div>
+            <div class="icon desert" id="desert"></div>
         </div>
         <div id="canvases">
             <canvas class="mapCanvas" id="mapCanvas-1" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
@@ -112,20 +112,21 @@
             <canvas class="focusCanvas" id="focusCanvas6" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
             <canvas class="focusCanvas" id="focusCanvas7" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
             <canvas class="focusCanvas" id="focusCanvas8" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
-            <span class="symbol areaCode" id="area1">1</span>
-            <span class="symbol areaCode" id="area2">2</span>
-            <span class="symbol areaCode" id="area3">3</span>
-            <span class="symbol areaCode" id="area4">4</span>
-            <span class="symbol areaCode" id="area5">5</span>
-            <span class="symbol areaCode" id="area6">6</span>
-            <span class="symbol areaCode" id="area7">7</span>
-            <span class="symbol areaCode" id="area8">8</span>
+            <span class="areaCode" id="area1">1</span>
+            <span class="areaCode" id="area2">2</span>
+            <span class="areaCode" id="area3">3</span>
+            <span class="areaCode" id="area4">4</span>
+            <span class="areaCode" id="area5">5</span>
+            <span class="areaCode" id="area6">6</span>
+            <span class="areaCode" id="area7">7</span>
+            <span class="areaCode" id="area8">8</span>
             <canvas ng-click="mapClick($event)" ng-mousemove="mapFocus($event)"
                 class="mapCanvas" id="clickCanvas" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
         </div>
         <textarea ng-hide="!godMode" json-text rows="5" cols="100" ng-model="map" ng-change="mapChanged()">
         </textarea>
-        <div id="mapinfo" ng-hide="mapInfo == undefined">
+        <div id="mapinfo" class="actionElement" ng-hide="mapInfo == undefined">
+            <h2>{{ mapTitle }}</h2>
             {{ mapInfo }}
             <ul ng-hide="reduceObject == undefined">
                 <li ng-repeat="(k,v) in reduceObject">
@@ -237,7 +238,10 @@
     <div id="changePrompt" ng-hide="!areaChange">
         <div class="cover"></div>
         <div class="content">
-            <span>{{ areaChange }}</span>
+            <div class="areachange" ng-repeat="(a, c) in areaChange">
+                <span class="areaCode">{{ a }}</span>
+                <span ng-repeat="(k, v) in c" class="{{ k }}" data-val="{{ v }}">{{ v }}</span>
+            </div>
             <button ng-click="areaChangeOk()">OK</button>
         </div>
     </div>
@@ -262,8 +266,8 @@
         <button ng-click="acquireOk()">Acquire!</button>
     </div>
     
-    <div id="advancePhase" ng-hide="engine.phase != 'advance'" ng-class="{away: mapInfo!=undefined || advAway }">
-        <h2 ng-click="advAway = !advAway">Advance</h2>
+    <div id="advancePhase" class="actionElement collapsible" ng-hide="engine.phase != 'advance'" >
+        <h2>Advance</h2>
         <ul>
             <li><button ng-click="advance('farm')">Create a Farm</button></li>
             <li><button ng-click="advance('city')">Build a City</button></li>
@@ -271,7 +275,7 @@
         </ul>
         <button ng-click="engine.nextPhase()">Done</button>
     </div>
-    <button id="startButton" class="btn" ng-click="engine.phase = 'populate'" ng-hide="engine.phase">Start!</button>
+    <button id="startButton" class="btn actionElement" ng-click="engine.phase = 'populate'" ng-hide="engine.phase">Start!</button>
     
     <div ng-show="godMode" id="phaser">
     <h2>Phases</h2>
@@ -315,10 +319,10 @@
         <textarea ng-model="gameScript"></textarea><button ng-click="loadGamePlay('new', gameScript)">load</button>
     </div>
     
-    <script type="text/javascript" src="app/lib/HexagonTools/js/HexagonTools.js"></script>
-    <script type="text/javascript" src="app/lib/HexagonTools/js/HexCalcs.js"></script>
-    <script type="text/javascript" src="app/lib/HexagonTools/js/Grid.js"></script>
-    <script type="text/javascript" src="app/js/map.js"></script>
+    <script type="text/javascript" src="lib/HexagonTools/js/HexagonTools.js"></script>
+    <script type="text/javascript" src="lib/HexagonTools/js/HexCalcs.js"></script>
+    <script type="text/javascript" src="lib/HexagonTools/js/Grid.js"></script>
+    <script type="text/javascript" src="js/map.js"></script>
     <script type="text/javascript" src="bundle.js"></script>
 </body>
 </html>
