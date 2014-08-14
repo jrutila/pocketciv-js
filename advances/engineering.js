@@ -10,7 +10,7 @@ module.exports = {
     phases: {
         'city_advance.pre': function(ctx) {
             console.log('Engineering max city 3')
-            this.max_city = this.max_city < 3 ? 3 : this.max_city;
+            this.max_city = !this.max_city || this.max_city < 2 ? 2 : this.max_city;
             ctx.done && ctx.done();
         }
     },
