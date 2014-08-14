@@ -272,6 +272,7 @@ pocketcivApp.controller('MainGame', function ($scope, $localStorage) {
         $scope.mapDone = function() {
             $scope.selectArea();
         }
+
         console.log($scope.possibleAreas);
         areaSelect = select;
     }
@@ -323,7 +324,7 @@ pocketcivApp.controller('MainGame', function ($scope, $localStorage) {
             $scope.selArea = $scope.engine.map.areas[$scope.possibleAdvances[adv.name].areas[0]];
     }
     
-    $scope.selectArea = function(area) {
+    $scope.advArea = function(area) {
         if (
             $scope.selAdv && 
             $scope.possibleAdvances[$scope.selAdv.name].areas.indexOf(area.id.toString()) > -1)
@@ -442,6 +443,7 @@ pocketcivApp.controller('MainGame', function ($scope, $localStorage) {
         $scope.areaChange = undefined;
         $scope.hideDrawer = true;
         $scope.mainMenu = false;
+        $scope.card = undefined;
     }
     
     $scope.mainMenu = true;

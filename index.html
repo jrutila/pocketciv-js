@@ -202,7 +202,7 @@
                 <table class="table">
                     <thead><th>Area</th><th>AV</th><th>Tribes</th><th>Resources</th></thead>
                     <tbody>
-                        <tr ng-click="selectArea(c)" ng-class="{ areas: possibleAdvances[selAdv.name].areas.indexOf(c.id.toString()) > -1, selected: selArea == c }" ng-repeat="c in engine.map.areas | filter:city">
+                        <tr ng-click="advArea(c)" ng-class="{ areas: possibleAdvances[selAdv.name].areas.indexOf(c.id.toString()) > -1, selected: selArea == c }" ng-repeat="c in engine.map.areas | filter:city">
                             <td>{{ c.id }}</td>
                             <td><span class="city">{{ c.city }}</span></td>
                             <td><span class="tribes">{{ c.tribes }}</span></td>
