@@ -125,7 +125,7 @@
         </div>
         <textarea ng-hide="!godMode" json-text rows="5" cols="100" ng-model="map" ng-change="mapChanged()">
         </textarea>
-        <div id="mapinfo" class="actionElement" ng-hide="mapInfo == undefined">
+        <div id="mapinfo" class="actionElement collapsible" ng-hide="mapInfo == undefined">
             <h2>{{ mapTitle }}</h2>
             {{ mapInfo }}
             <ul ng-hide="reduceObject == undefined">
@@ -273,7 +273,7 @@
             <li><button ng-click="advance('city')">Build a City</button></li>
             <li><button ng-click="advance('acquire')">Acquire Advances</button></li>
         </ul>
-        <button ng-click="engine.nextPhase()">Done</button>
+        <button ng-click="actionStack.pop(); engine.nextPhase()">Done</button>
     </div>
     <button id="startButton" class="btn actionElement" ng-click="engine.phase = 'populate'" ng-hide="engine.phase">Start!</button>
     

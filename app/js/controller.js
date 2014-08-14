@@ -59,6 +59,7 @@ pocketcivApp.controller('MainGame', function ($scope, $localStorage) {
         
         // UI
         $scope.mapInfo = "Move tribes by clicking start region and then target region";
+        $scope.mapTitle = "MOVE"
         oldClicked = mapClicked;
         mapClicked = function(region) {
             if (region < 1 || region > 8)
@@ -246,6 +247,7 @@ pocketcivApp.controller('MainGame', function ($scope, $localStorage) {
         $scope.possibleAreas = []
         mapClicked = oldClicked;
         $scope.mapInfo = undefined;
+        $scope.actionStack.pop();
         if ($scope.selectedArea)
         {
             areaSelect(pocketciv.Engine.map.areas[$scope.selectedArea]);
@@ -261,6 +263,7 @@ pocketcivApp.controller('MainGame', function ($scope, $localStorage) {
         console.log('Area select');
         $scope.possibleAreas = _.keys(possibleAreas);
         $scope.mapInfo = "Select an area from areas "+$scope.possibleAreas;
+        $scope.actionStack.push("#mapinfo");
         oldClicked = mapClicked;
         mapClicked = function(region) {
             if ($scope.possibleAreas.indexOf(region.toString()) > -1)
@@ -440,6 +443,7 @@ pocketcivApp.controller('MainGame', function ($scope, $localStorage) {
     
     $scope.resetUI = function() {
         $scope.mapInfo = undefined;
+        $scope.mapTitle = undefined;
         $scope.areaChange = undefined;
         $scope.hideDrawer = true;
         $scope.mainMenu = false;
@@ -466,27 +470,59 @@ pocketcivApp.controller('MainGame', function ($scope, $localStorage) {
         {
             $('#area'+reg).css({top: map.symbols[reg]['area'].Y, left: map.symbols[reg]['area'].X }).show()
         }
-        
-    $scope.$watch('map', function() {
-        console.log("Hey! Map changed!")
-        pocketciv.Map.areas = $scope.map.areas
-        for (var reg in $scope.map.areas)
-        {
-            if (!(reg in map.symbols))
-                continue
             
-            for (var prop in $scope.map.areas[reg])
+        $scope.$watch('map', function() {
+            console.log("Hey! Map changed!")
+            pocketciv.Map.areas = $scope.map.areas
+            for (var reg in $scope.map.areas)
             {
-                if (!(prop in map.symbols[reg]))
-                    continue;
-                    
-                var val = $scope.map.areas[reg][prop];
-                drawElem(prop, reg, val);
+                if (!(reg in map.symbols))
+                    continue
+                
+                for (var prop in $scope.map.areas[reg])
+                {
+                    if (!(prop in map.symbols[reg]))
+                        continue;
+                        
+                    var val = $scope.map.areas[reg][prop];
+                    drawElem(prop, reg, val);
+                }
             }
-        }
+        })
+    }
+    
+    
+    $scope.$watch('engine.phase', function(val) {
+        if (val == 'advance')
+            $scope.actionStack.push("#advancePhase");
+    });
+
+    var actionStack = new Object();
+    var aStack =[];
+    actionStack.push = function(sel) {
+        $(_.last(aStack)).addClass('away');
+        aStack.push(sel);
+        $(sel).removeClass('away');
+    }
+    actionStack.pop = function() {
+        var sel = aStack.pop();
+        $(sel).removeClass('away');
+        $(_.last(aStack)).removeClass('away');
+    }
+    $scope.actionStack = actionStack;
+    
+    $(document).ready(function() {
+        $(".collapsible h2").click(function() {
+            console.log("HEIEHIE")
+            var $par = $(this).parent();
+            if ($par.is('.away.temp'))
+                $par.removeClass('away').removeClass('temp');
+            else if ($par.is('.away')) {}
+            else
+                $par.addClass('away').addClass('temp');
+        } )
     })
     
-    }
 });
 
 

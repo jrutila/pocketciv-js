@@ -67,6 +67,7 @@ $infoBarHeight: 25px;
 #mapinfo {
     background-color: yellow;
     padding: 20px;
+    z-index: 52;
     
     button {
         display: block;
@@ -75,6 +76,20 @@ $infoBarHeight: 25px;
         margin-left: auto;
         margin-right: auto;
     }
+}
+
+.away {
+    * {
+        display: none;
+    }
+    
+    h2 {
+        display: inline;
+    }
+    
+    height: 40px;
+    width: 40px;
+    left: 0px;
 }
 
 #startButton {
@@ -120,7 +135,7 @@ $infoBarHeight: 25px;
 }
 
 .highlight {
-    z-index: 101;
+    z-index: 101 !important;
 }
 
 #mainmenu_toggle {
