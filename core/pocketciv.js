@@ -430,6 +430,7 @@ Engine.prototype = {
         if (possibleAreas.length > 0) {
             var rdc = new reducer.Reducer(this);
             rdc.mode = reducer.Modes.Overall;
+            rdc.startAmount = 0;
             var that = this;
             rdc.areas = function() {
                 var areas = {};
@@ -452,10 +453,13 @@ Engine.prototype = {
                     if (t - c < 0) return false;
                     t -= c;
                 }
-                return {
-                    'city': '+' + (c - area.city),
-                    'tribes': (t - area.tribes).toString()
-                }
+                if (c - area.city > 0)
+                    return {
+                        'city': '+' + (c - area.city),
+                        'tribes': (t - area.tribes).toString()
+                    }
+                else
+                    return {}
             }
             this.reducer(rdc, function(chg) {
                 ctx.changes = chg;

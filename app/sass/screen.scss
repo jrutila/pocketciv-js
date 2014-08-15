@@ -110,9 +110,11 @@ $infoBarHeight: 35px;
     
     .navbar-toggle {
         margin: 0px;
-        border: 1px solid black;
         display: inline-block;
         float: left;
+        span {
+            background-color: black;
+        }
     }
 }
 
@@ -169,6 +171,12 @@ nav {
     a.accordion-toggle {
         display: inline-block;
         width: 100%;
+    }
+}
+
+@include smaller-than-map {
+    #github {
+        display: none;
     }
 }
 

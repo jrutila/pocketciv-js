@@ -107,7 +107,7 @@ Reducer.prototype = {
       'ok': this.amount === 0,
       'amount': this.amount,
       'changes': this.changes,
-      'areas': this.amount > 0 && this.areas(),
+      'areas':this.areas(),
     };
   },
   set startAmount(value) {

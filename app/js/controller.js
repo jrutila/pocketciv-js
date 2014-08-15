@@ -10,6 +10,7 @@ function getMovement(areas) {
     }));
 }
 
+resetGameLog = function(){
 gameLog = {
     "move": [],
     "deck": [],
@@ -17,6 +18,8 @@ gameLog = {
     "areas": [],
     "advance": []
 };
+};
+resetGameLog();
 
 var scenarios = {
     "1": require("../scenarios/scenario1"),
@@ -450,6 +453,8 @@ pocketcivApp.controller('MainGame', function ($scope, $localStorage) {
         $scope.hideDrawer = true;
         $scope.mainMenu = false;
         $scope.card = undefined;
+        resetGameLog();
+        
     }
     
     $scope.mainMenu = true;

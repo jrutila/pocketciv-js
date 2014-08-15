@@ -117,7 +117,7 @@ describe('Reducer', function() {
         beforeEach(function() {
           target = new reducer.Reducer(engine)
           target.mode = reducer.Modes.Overall;
-          target.startAmount = 1;
+          target.startAmount = 0;
           target.areas = function() {
             var areas = {};
             _.each(engine.map.areas, function(a) {
@@ -152,7 +152,7 @@ describe('Reducer', function() {
             4: { id: 4,'city': 1, 'tribes': 3, 'neighbours': [ 3, 5 ] },
             3: { id: 3, 'tribes': 2, 'neighbours': [ 4 ] },
           }
-          target.ok({}).ok.should.be.false;
+          target.ok({}).ok.should.be.true;
           _.keys(target.ok({}).areas).should.deep.equal([ "4" ]);
           target.ok({ 4: { "city": 1 }}).changes.should.deep.equal({
             4: { 'city': '+1', 'tribes': '-2' }
@@ -165,7 +165,7 @@ describe('Reducer', function() {
             4: { id: 4,'city': 1, 'tribes': 7, 'neighbours': [ 3, 5 ] },
             3: { id: 3, 'tribes': 2, 'neighbours': [ 4 ] },
           }
-          target.ok({}).ok.should.be.false;
+          target.ok({}).ok.should.be.true;
           _.keys(target.ok({}).areas).should.deep.equal([ "4", "5" ]);
           target.ok({ 4: { "city": 1 }}).changes.should.deep.equal({
             4: { 'city': '+1', 'tribes': '-2' }
@@ -181,7 +181,9 @@ describe('Reducer', function() {
             3: { id: 3, 'tribes': 2, 'neighbours': [ 4 ] },
           }
           target.ok({}).changes.should.deep.equal({})
+          target.ok({}).ok.should.be.true;
           target.ok({ 5: { 'city': 0, 'tribes': 0 }}).changes.should.deep.equal({})
+          target.ok({ 5: { 'city': 0, 'tribes': 0 }}).ok.should.be.true;
         })
       });
     });
@@ -336,7 +338,9 @@ describe('Attack (worker)', function() {
         target.startAmount = 33;
         target.startRegion = engine.map.areas[4];
         _.keys(target.ok([]).areas).should.deep.equal([ '5' ])
-        _.keys(target.ok([5]).areas).should.deep.equal([ ])
+        _.keys(target.ok([5]).areas).should.deep.equal([ '2' ])
+        target.ok([5]).ok.should.be.true;
+        target.ok([5]).amount.should.equal(0);
         target.ok([5]).changes.should.deep.equal({
           4: { 'city': '0', 'tribes': '0' },
           5: { 'tribes': '0', 'city': '2' },
