@@ -132,8 +132,6 @@
             <canvas ng-click="mapClick($event)" ng-mousemove="mapFocus($event)"
                 class="mapCanvas" id="clickCanvas" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
         </div>
-        <textarea ng-hide="!godMode" json-text rows="5" cols="100" ng-model="map" ng-change="mapChanged()">
-        </textarea>
     </div>
     <div id="mapinfo" class="actionElement collapsible" ng-hide="mapInfo == undefined">
         <h2>{{ mapTitle }}</h2>

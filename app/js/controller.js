@@ -466,7 +466,6 @@ pocketcivApp.controller('MainGame', function ($scope, $localStorage) {
         map = new Map(pocketciv.Map);
         $scope.mapArea = map;
         $scope.$apply();
-        $scope.map = pocketciv.Map;
         map.getCanvas = getCanvas;
         map.getImage = getImage;
         
@@ -478,9 +477,8 @@ pocketcivApp.controller('MainGame', function ($scope, $localStorage) {
             $('#area'+reg).css({top: map.symbols[reg]['area'].Y, left: map.symbols[reg]['area'].X }).show()
         }
             
-        $scope.$watch('map', function() {
+        $scope.$watch('engine.map', function() {
             console.log("Hey! Map changed!")
-            pocketciv.Map.areas = $scope.map.areas
             for (var reg in $scope.map.areas)
             {
                 if (!(reg in map.symbols))
@@ -495,7 +493,7 @@ pocketcivApp.controller('MainGame', function ($scope, $localStorage) {
                     drawElem(prop, reg, val);
                 }
             }
-        })
+        }, true)
     }
     
     
