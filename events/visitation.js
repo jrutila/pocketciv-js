@@ -41,7 +41,7 @@ module.exports = {
         this.done = function() {
             ctx.done = oldDone;
             console.log(this.active_region)
-            if (!_.find(this.active_region.neighbours, function(a) { return typeof a === 'string'; }))
+            if (!this.active_region || !_.find(this.active_region.neighbours, function(a) { return typeof a === 'string'; }))
             {
               ctx.done && ctx.done({});
               return
