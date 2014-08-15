@@ -1,5 +1,5 @@
 var pocketciv = require("../../core/pocketciv");
-var pocketcivApp = angular.module('pocketcivApp', ['ngStorage']);
+var pocketcivApp = angular.module('pocketcivApp', ['ngStorage', 'snap', 'ui.bootstrap']);
 var runplay = require("../../core/runplay")
 
 pp = pocketciv
@@ -24,6 +24,8 @@ var scenarios = {
 }
 
 pocketcivApp.controller('MainGame', function ($scope, $localStorage) {
+    $scope.snapOpts = {
+    }
     $scope._ = _;
     $scope.$storage = $localStorage;
     $scope.map = pocketciv.Map;
@@ -463,7 +465,7 @@ pocketcivApp.controller('MainGame', function ($scope, $localStorage) {
         map.getCanvas = getCanvas;
         map.getImage = getImage;
         
-        $("#canvases .symbol:not(.areaCode)").remove();
+        $("#canvases .icon, #canvases .symbol").remove();
         $('.areaCode').hide();
         map.paint();
         for (var reg in map.symbols)

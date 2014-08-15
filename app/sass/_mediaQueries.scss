@@ -9,7 +9,7 @@ $largeWidth: $mapWidth + 2 * $cardWidth;
 }
 
 @mixin bigger-than-map {
-    @media (min-width : $smallWidth) and (max-width: $largeWidth)  {
+    @media (min-width : $smallWidth) { // and (max-width: $largeWidth)  {
     		@content;
 	}    
 }

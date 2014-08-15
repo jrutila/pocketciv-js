@@ -15,21 +15,35 @@
 <script>window._ || document.write('<script src="lib/underscore/underscore.js">\x3C/script>')</script>
 <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
 <script src="//code.angularjs.org/1.2.9/angular.min.js"></script>
-<script>window.angular || document.write('<script src="lib/angular/angular.miangular.min.js">\x3C/script>')</script>
+<script>window.angular || document.write('<script src="lib/angular/angular.js">\x3C/script>')</script>
+<script type="text/javascript" src="lib/jquery-ui/jquery-ui.js"></script>
 <script type="text/javascript" src="lib/ngstorage/ngStorage.js"></script>
+<script type="text/javascript" src="lib/snapjs/snap.js"></script>
+<script type="text/javascript" src="lib/angular-snap/angular-snap.js"></script>
+<script type="text/javascript" src="lib/angular-bootstrap/ui-bootstrap-tpls.js"></script>
 </head>    
 <body ng-controller="MainGame">
-    <div id="mainmenu_toggle" ng-click="mainMenu = !mainMenu">-</div>
-    <div id="mainmenu" ng-hide="!mainMenu">
-        <div class="cover"></div>
-        <ul>
-            <li>
-                <button class="btn" ng-click="mm_newGame = true">New Game</button>
-                <ul ng-hide="!mm_newGame">
-                    <li class="btn" ng-repeat="(k, s) in scenarios" ng-click="load(s)">{{ s.title }}</li>
-                </ul>
+    <a id="github" target="_blank" href="https://github.com/jrutila/pocketciv-js"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
+    <nav snap-drawer>
+        <accordion>
+            <accordion-group>
+                <accordion-heading class="pull-right">New Game</accordion-heading>
+                <div class="button-group">
+                    <button class="btn btn-primary" ng-repeat="(k, s) in scenarios" ng-click="load(s)" snap-toggle>{{ s.title }}</button>
+                </div>
+            </accordion-group>
             </li>
-        </ul>
+        </accordion>
+    </nav>
+    <div id="main" snap-content snap-options="snapOpts">
+    <div id="infobar">
+        <div id="mainmenu_toggle" class="navbar-toggle" snap-toggle="left">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+        </div>
+        <span>ERA: {{ engine.era }}</span>
+        <span>Gold: {{ engine.gold }}</span>
     </div>
     <div id="deck" ng-class="{ pushed: hideDrawer }">
         <span id="cardsLeft">{{ deck.cardsLeft }}</span>
@@ -58,11 +72,6 @@
         </ul>
     </div>
     <!--{{ card }}-->
-    
-    <div id="infobar">
-        <span>ERA: {{ engine.era }}</span>
-        <span>Gold: {{ engine.gold }}</span>
-    </div>
     
     <div id="map">
         <div id="images">
@@ -314,10 +323,12 @@
     <div id="replay">
         <input type="text" ng-model="gameName" /><button ng-click="saveGamePlay()">save</button>
         <ul>
-            <li ng-repeat="(k, g) in $storage"><button ng-click="loadGamePlay(k, g)">{{ k }}</button><button ng-click="delete $storage[k]">X</button></li>
+            <li ng-repeat="(k, g) in $storage"><button ng-click="loadGamePlay(k, g)">{{ k }}</button><button>X</button></li>
         </ul>
         <textarea ng-model="gameScript"></textarea><button ng-click="loadGamePlay('new', gameScript)">load</button>
     </div>
+    
+    </div><!-- snap-content -->
     
     <script type="text/javascript" src="lib/HexagonTools/js/HexagonTools.js"></script>
     <script type="text/javascript" src="lib/HexagonTools/js/HexCalcs.js"></script>
