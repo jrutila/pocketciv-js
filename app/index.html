@@ -27,12 +27,24 @@
     <nav snap-drawer>
         <accordion>
             <accordion-group>
-                <accordion-heading class="pull-right">New Game</accordion-heading>
+                <accordion-heading>New Game</accordion-heading>
                 <div class="button-group">
                     <button class="btn btn-primary" ng-repeat="(k, s) in scenarios" ng-click="load(s)" snap-toggle>{{ s.title }}</button>
                 </div>
             </accordion-group>
-            </li>
+            <accordion-group>
+                <accordion-heading>God Mode</accordion-heading>
+                <label class="btn btn-primary" ng-model="godMode" btn-checkbox>God Mode</label>
+                <textarea ng-show="godMode" json-text rows="5" cols="30" ng-model="engine.map.areas"></textarea>
+            </accordion-group>
+            <accordion-group>
+                <accordion-heading>Report a Bug</accordion-heading>
+                <!--
+                <input type="textarea" rows=5 cols=20 ng-model="bugDescr" placeholder="Write a small description what you did and what should have happened..."></textarea>
+                -->
+                <button class="btn btn-primary" ng-click="sendBug()" ng-hide="bugSent">Send game log</button>
+                <i ng-show="bugSent" ng-click="bugSent = false">Bug sent!</i>
+            </accordion-group>
         </accordion>
     </nav>
     <div id="main" snap-content snap-options="snapOpts">
@@ -48,9 +60,9 @@
     <div id="deck" ng-class="{ pushed: hideDrawer }">
         <span id="cardsLeft">{{ deck.cardsLeft }}</span>
         <div ng-hide="hideDrawer">
-        <button ng-click="drawCard()">draw</button>
-        <input ng-hide="!godMode" type="text" ng-model="specificCard" />
+            <button ng-click="drawCard()">draw</button>
         </div>
+        <input ng-show="godMode && !hideDrawer" type="text" ng-model="specificCard" />
     </div>
     <div id="card" ng-mouseover="showCard = true" ng-mouseout="showCard = false" ng-class="{ pushed: hideDrawer, shown: showCard }">
         <span class="circle border">
@@ -284,7 +296,6 @@
     </div>
     <button id="startButton" class="btn actionElement" ng-click="engine.phase = 'populate'" ng-hide="engine.phase">Start!</button>
     
-    <input type="checkbox" ng-model="godMode" id="godMode" />God Mode
     <div ng-show="godMode" id="phaser">
     <h2>Phases</h2>
     <span ng-hide="!godMode">

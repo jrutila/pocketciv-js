@@ -33,3 +33,6 @@ bundle.js
 
 .sass-cache
 stylesheets
+
+#mongo
+/data

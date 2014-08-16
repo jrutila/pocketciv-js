@@ -26,7 +26,7 @@ var scenarios = {
     "2": require("../scenarios/scenario2"),
 }
 
-pocketcivApp.controller('MainGame', function ($scope, $localStorage) {
+pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
     $scope.snapOpts = {
     }
     $scope._ = _;
@@ -515,6 +515,18 @@ pocketcivApp.controller('MainGame', function ($scope, $localStorage) {
         $(_.last(aStack)).removeClass('away');
     }
     $scope.actionStack = actionStack;
+    
+    $scope.bugDescr = undefined;
+    $scope.sendBug = function() {
+        console.log("Sending bug")
+        var gLog = _.clone(gameLog)
+        gLog.comment = $scope.bugDescr;
+        console.log($scope)
+        $http.post('gamelog/add', gLog).success(function(data) {
+            $scope.bugSent = true;
+            setTimeout(function() { $scope.bugSent = false; }, 3000);
+        })
+    }
     
     $(document).ready(function() {
         $(".collapsible h2").click(function() {
