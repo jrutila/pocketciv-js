@@ -10,8 +10,9 @@ function getMovement(areas) {
     }));
 }
 
-resetGameLog = function(){
+resetGameLog = function(scen){
 gameLog = {
+    "scenario": scen,
     "move": [],
     "deck": [],
     "reduce": [],
@@ -453,14 +454,13 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
         $scope.hideDrawer = true;
         $scope.mainMenu = false;
         $scope.card = undefined;
-        resetGameLog();
-        
     }
     
     $scope.mainMenu = true;
     $scope.load = function(scen) {
         console.log("Loading "+scen.title);
         $scope.resetUI();
+        resetGameLog(scen);
         $scope.engine.init(scen);
         
         map = new Map(pocketciv.Map);
@@ -521,7 +521,7 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
         console.log("Sending bug")
         var gLog = _.clone(gameLog)
         gLog.comment = $scope.bugDescr;
-        console.log($scope)
+        gLog.engine = $scope.engine;
         $http.post('gamelog/add', gLog).success(function(data) {
             $scope.bugSent = true;
             setTimeout(function() { $scope.bugSent = false; }, 3000);

@@ -227,28 +227,38 @@ function Engine(map, deck) {
     this.era = 1;
 }
 
+var defaults= [
+    ['phase', ""],
+    ['deck.usedCards', []],
+    ['map.areas', undefined],
+    ['acquired', {}],
+    ['trading', []],
+    ['gold', 0],
+    ['era', 1],
+    ['round', {}],
+    ]
+
 Engine.prototype = {
     init: function(state) {
-        if ('deck' in state)
+        for (var d in defaults)
         {
-            this.deck.usedCards = state.deck.usedCards;
-        } else {
-            this.deck.usedCards = [];
-        }
-        if (_.has(state, 'map'))
-        {
-            _.extend(this.map, state.map)
-            for (var key in this.map.areas)
+            var def = defaults[d][0].split(".");
+            var en = this;
+            var st = state;
+            for (var s in def)
             {
-                this.map.areas[key].id = parseInt(key);
+                en = en[def[s]];
+                if (st && _.has(st, def[s]))
+                    st = st[def[s]];
+                else
+                    st = undefined;
             }
+            en = st || defaults[d][1];
         }
-        this.phase = state.phase || "";
-        this.acquired = state.acquired || {};
-        this.trading = state.trading || [];
-        this.gold = state.gold || 0;
-        this.era = state.era || 1;
-        this.round = state.round || {};
+        for (var key in this.map.areas)
+        {
+            this.map.areas[key].id = parseInt(key);
+        }
     },
     endOfEra: function() {
         console.log("End of era");
