@@ -219,7 +219,7 @@ function Engine(map, deck) {
     this.phase = "populate";
     this.events = events;
     this.advances = advances;
-    this.acquired = {};
+    this.acquired = [];
     this.trading = [];
     this.actions = actions;
     this.gold = 0;
@@ -227,38 +227,61 @@ function Engine(map, deck) {
     this.era = 1;
 }
 
-var defaults= [
-    ['phase', ""],
-    ['deck.usedCards', []],
-    ['map.areas', undefined],
-    ['acquired', {}],
-    ['trading', []],
-    ['gold', 0],
-    ['era', 1],
-    ['round', {}],
-    ]
+var defaults= {
+    'phase': "",
+    'deck.usedCards': [],
+    'map.areas': undefined,
+    'map.width': undefined,
+    'map.height': undefined,
+    'map.grid': undefined,
+    'acquired': [],
+    'trading': [],
+    'gold': 0,
+    'era': 1,
+    'round': {},
+}
 
 Engine.prototype = {
     init: function(state) {
+        console.log("init engine")
         for (var d in defaults)
         {
-            var def = defaults[d][0].split(".");
             var en = this;
             var st = state;
-            for (var s in def)
-            {
-                en = en[def[s]];
-                if (st && _.has(st, def[s]))
-                    st = st[def[s]];
-                else
-                    st = undefined;
+            var pp = d.split(".");
+            var p = pp.shift();
+            while (pp.length) {
+                _.extend(en[p], st[p]);
+                st = st[p];
+                en = en[p];
+                p = pp.shift();
             }
-            en = st || defaults[d][1];
+            en[p] = st && st[p] || _.clone(defaults[d]);
         }
         for (var key in this.map.areas)
         {
             this.map.areas[key].id = parseInt(key);
         }
+        if (this.phase)
+            this.runPhase(this.phase);
+    },
+    get state() {
+        var ret = {};
+        _.each(_.keys(defaults), function(d) {
+            var pp = d.split(".");
+            var p = pp.shift();
+            var en = ret;
+            var st = this;
+            while (pp.length)
+            {
+                ret[p] = ret[p] || {};
+                en = ret[p];
+                st = st[p];
+                p = pp.shift()
+            }
+            en[p] = JSON.parse(JSON.stringify(st[p]));
+        }, this);
+        return ret;
     },
     endOfEra: function() {
         console.log("End of era");
@@ -294,13 +317,12 @@ Engine.prototype = {
         if (!name) return;
         console.log("Running advance "+name);
         var eng = this;
-        for (var key in eng.acquired)
-        {
-            if (name in eng.acquired[key].actions)
+        _.each(eng.acquired, function(key) {
+            if (name in eng.advances[key].actions)
             {
-                _.extend(ctx, eng.acquired[key].actions[name].context(this));
+                _.extend(ctx, eng.advances[key].actions[name].context(this));
             }
-        }
+        }, this)
         this.actions[name].run.call(this, ctx);
     },
     runPhase: function(name, arg) {
@@ -309,7 +331,7 @@ Engine.prototype = {
         var posts = [];
         var pres = [];
         
-        _.each(this.acquired, function(acq) {
+        _.each(_.pick(this.advances, this.acquired), function(acq) {
             if (acq.phases && _.has(acq.phases, name+'.post'))
             {
                 posts.push(acq.phases[name+".post"])
@@ -355,7 +377,7 @@ Engine.prototype = {
         runpre();
     },
     acquire: function(name, done) {
-        this.acquired[name] = this.advances[name];
+        this.acquired.push(name);
         console.log("Acquired "+name);
         done && done();
     }
@@ -550,9 +572,9 @@ function getResources(area) {
 }
 
 function AdvanceAcquirer(engine) {
-    this.advances = _.omit(_.clone(engine.advances), _.keys(engine.acquired));
-    this.acquired = _.clone(engine.round.acquired) || {};
-    this.acquired_names = _.keys(engine.acquired);
+    this.advances = _.omit(_.clone(engine.advances), engine.acquired);
+    this.acquired = _.clone(engine.round.acquired) || [];
+    this.acquired_names = engine.acquired;
     this.areas = _.clone(engine.map.areas);
     this.areas = filterAreasWithoutCities(this.areas);
 }

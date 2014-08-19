@@ -32,6 +32,8 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
     }
     $scope._ = _;
     $scope.$storage = $localStorage;
+    if (!$localStorage.saves)
+        $localStorage.saves = {};
     $scope.map = pocketciv.Map;
     $scope.deck = pocketciv.EventDeck;
     $scope.scenarios = scenarios;
@@ -494,6 +496,18 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
                 }
             }
         }, true)
+        
+        $scope.$watch('engine', function(val) {
+            $scope.$storage.current = val.state;
+        }, true);
+
+    }
+    
+    $scope.saveName = "";
+    $scope.save = function(saveName) {
+        $scope.$storage.saves[saveName] = $scope.engine.state
+        $scope.saved = true;
+        setTimeout(function() { $scope.saved = false; }, 3000);
     }
     
     
@@ -501,6 +515,7 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
         if (val == 'advance')
             $scope.actionStack.push("#advancePhase");
     });
+    
 
     var actionStack = new Object();
     var aStack =[];

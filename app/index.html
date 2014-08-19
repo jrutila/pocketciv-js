@@ -33,6 +33,19 @@
                 </div>
             </accordion-group>
             <accordion-group>
+                <accordion-heading>Load Game</accordion-heading>
+                <button class="btn btn-primary" ng-click="load($storage['current'])" snap-toggle>Continue</button>
+                <div class="button-group">
+                    <button class="btn btn-primary" ng-repeat="(k, s) in $storage.saves" ng-click="saveName = k; load(s)" snap-toggle>{{ k }}</button>
+                </div>
+            </accordion-group>
+            <accordion-group>
+                <accordion-heading>Save Game</accordion-heading>
+                <input type="text" ng-model="saveName" />
+                <button ng-hide="saved" class="btn btn-primary" ng-click="save(saveName)">Save</button>
+                <span ng-show="saved" class="info">{{ saveName }} saved!</span>
+            </accordion-group>
+            <accordion-group>
                 <accordion-heading>God Mode</accordion-heading>
                 <label class="btn btn-primary" ng-model="godMode" btn-checkbox>God Mode</label>
                 <textarea ng-show="godMode" json-text rows="5" cols="30" ng-model="engine.map.areas"></textarea>
@@ -164,7 +177,7 @@
         <input type="text" ng-model="acquireAdvance"/><button ng-click="engine.acquire(acquireAdvance)">Acquire!</button><br/>
         </div>
         <ul>
-            <li ng-repeat="(key, adv) in engine.acquired">
+            <li ng-repeat="(key, adv) in _.pick(engine.advances, engine.acquired)">
                 <span>{{ adv.title }}</span>
             </li>
         </ul>

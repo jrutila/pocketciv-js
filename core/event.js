@@ -122,15 +122,14 @@ runEvent = function(engine, event, ev, done)
     var actual_steps = _.clone(event.steps);
     var steps_cmd = [];
     
-    for (var key in engine.acquired)
-    {
-        if (_.has(engine.acquired[key].events, event.name))
+    _.each(_.pick(engine.advances, engine.acquired), function(adv) {
+        if (_.has(adv.events, event.name))
         {
             console.log('Extending with '+key)
-            _.extend(actual_steps, engine.acquired[key].events[event.name].steps);
+            _.extend(actual_steps, adv.events[event.name].steps);
             //_.extend(context, engine.acquired[key].events[ev.name])
         }
-    }
+    }, this)
     var keys = _.sortBy(_.keys(actual_steps), function(s) {
         if (s.indexOf('-') >= 0) return 99999
         var nums = s.split('.');
