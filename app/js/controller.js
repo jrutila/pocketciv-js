@@ -295,6 +295,20 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
         return confirm(message);
     }
     
+    $scope.getAcquireClasses = function(key) {
+        var ret = [];
+        if (($scope.engine.acquired && $scope.engine.acquired.indexOf(key) > -1) || ($scope.acquired && $scope.acquirer.acquired[key]))
+            ret.push("acquired");
+        if ($scope.possibleAdvances && _.has($scope.possibleAdvances, key))
+        {
+            if ($scope.possibleAdvances[key].areas.length)
+                ret.push("areas");
+            ret.push("available");
+        }
+        if ($scope.selAdv && $scope.selAdv.name == key)
+            ret.push("selected");
+        return ret;
+    }
     var doAcquire = undefined;
     $scope.acquiring = false;
     pocketciv.Engine.advanceAcquirer = function(engine, done) {
@@ -370,12 +384,11 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
     $scope.mapClick = function(ev) {
         var pnt = getMousePos(mouseCanvas, ev);
         var hex = map.getRegionAt(pnt.X, pnt.Y);
-        mapClicked(hex);
+        mapClicked && mapClicked(hex);
     }
     
     var mapClicked = function(region) {
         console.log("Map clicked on region "+region);
-        $("#activeCanvas"+region).toggleClass('active');
     }
     
     $scope.mapFocus= function(ev) {
@@ -402,6 +415,9 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
             console.log("gameLog advance")
             gameLog.advance.push([]);
         }
+        $scope.mapInfo = undefined;
+        $scope.hideDrawer = true;
+        $scope.mapClicked = undefined;
         pocketciv.Engine.runPhase(name);
     })
     
@@ -557,6 +573,22 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
     
 });
 
+/*
+This directive allows us to pass a function in on an enter key to do what we want.
+ */
+pocketcivApp.directive('ngEnter', function () {
+    return function (scope, element, attrs) {
+        element.bind("keydown keypress", function (event) {
+            if(event.which === 13) {
+                scope.$apply(function (){
+                    scope.$eval(attrs.ngEnter);
+                });
+ 
+                event.preventDefault();
+            }
+        });
+    };
+});
 
 pocketcivApp.directive('jsonText', function() {
   return {
