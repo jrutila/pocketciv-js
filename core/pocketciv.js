@@ -30,6 +30,7 @@ var advances = {
     'cartage': require('../advances/cartage'),
     'masonry': require('../advances/masonry'),
     'engineering': require('../advances/engineering'),
+    'architecture': require('../advances/architecture'),
 }
 
 
