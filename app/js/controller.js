@@ -392,6 +392,7 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
     }
     
     $scope.mapFocus= function(ev) {
+        if ('ontouchstart' in document.documentElement) return;
         var pnt = getMousePos(mouseCanvas, ev);
         var hex = map.getRegionAt(pnt.X, pnt.Y);
         for (var i = 1; i <= 8; i++)
