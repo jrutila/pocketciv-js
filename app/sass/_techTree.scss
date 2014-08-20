@@ -24,10 +24,20 @@ $infoWidth: 250px;
         z-index: 110;
     }
     
+    #advanceinfo {
+        margin-top: $infoBarHeight;
+        .advancereq, .advancereqby {
+            height: 40px;
+        }
+        h2 {
+            display: inline;
+            font-weight: bold;
+        }
+    }
+    
     #cityinfo {
         
     }
-    
     
     #advancelist {
         position: absolute;
@@ -56,22 +66,22 @@ $infoWidth: 250px;
 
         .tt_layout_relative {
             position: relative;
-            border: 1px solid magenta; 
+            //border: 1px solid magenta; 
             height: 100%;
             
             overflow: auto;
         }
-        .tt_layout_left { vertical-align: top; }
+        .tt_layout_left { vertical-align: top; width: 100%; }
         .tt_layout_right { min-width: 100%; }
 
         .tt_layout_left_content {
-            border: 1px solid blue;
+            //border: 1px solid blue;
         }
         .tt_layout_bottom_content {
-            border: 1px solid green;
+            //border: 1px solid green;
         }
         .tt_layout_right_content {
-            border: 1px solid red;
+            //border: 1px solid red;
             float: right;
         }
     }
