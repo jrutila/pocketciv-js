@@ -5,7 +5,7 @@
     "test": "make test",
     "watch": "make watch",
     "autotest": "make autotest",
-    "start": "node web.js"
+    "start": "node bin/www"
   },
   "dependencies": {
     "node-static": "*",
