@@ -187,29 +187,34 @@
                 <span>{{ adv.title }}</span>
             </li>
         </ul>
+        <a ng-click="toggleTechTree()">Open tech tree</a>
     </div>
-    <a id="showTechTree" ng-click="toggleTechTree()">Open tech tree</a>
+    <a id="showTechTree" ng-click="toggleTechTree()"></a>
     
     <div id="techtree" ng-hide="!showTT">
         <div class="cover"></div>
         <div class="ttcont">
         <button class="close" ng-click="toggleTechTree()">X</button>
-        <div class="content container">
+        <div class="content">
             <h2>Tech tree</h2>
-            <div id="advanceinfo">
+            <div class="infos">
+            <div class="inforow">
+            <div class="infotable">
+            <div class="relative">
+                <div id="advanceinfo">
                 <div id="advancereq">
                     <ul>
-                        <li class="btn" ng-click="selectAdv(engine.advances[r])" ng-repeat="r in _.flatten(selAdv.requires)">
+                        <li class="btn" ng-class="getAcquireClasses(r)" ng-click="selectAdv(engine.advances[r])" ng-repeat="r in _.flatten(selAdv.requires)">
                             {{ engine.advances[r].title || r }}
                         </li>
                     </ul>
                 </div>
-                <h1 ng-class="{ acquired: engine.acquired[selAdv.name] || acquirer.acquired[selAdv], available: possibleAdvances[seladv.name], areas: possibleAdvances[selAdv.name].areas.length }">
+                <h1 ng-class="getAcquireClasses(selAdv.name)">
                     {{ selAdv.title }}
                 </h1>
                 <div id="advancereqby">
                     <ul>
-                        <li class="btn" ng-click="selectAdv(engine.advances[r])" ng-repeat="r in selAdv.required_by">
+                        <li class="btn" ng-class="getAcquireClasses(r)" ng-click="selectAdv(engine.advances[r])" ng-repeat="r in selAdv.required_by">
                             {{ engine.advances[r].title || r }}
                         </li>
                     </ul>
@@ -221,11 +226,7 @@
                 </div>
                 <div id="advanceres">
                     <h2>Resources</h2>
-                    <ul>
-                        <li ng-repeat="r in selAdv.resources">
-                            {{ r }}
-                        </li>
-                    </ul>
+                        <div class="icon" ng-class="{ forest: res == 'wood', mountain: res == 'stone', farm: res == 'food' }" ng-repeat="res in selAdv.resources">{{ res }}</div>
                 </div>
                 <div id="advanceareas">
                     <h2>Available on areas:</h2>
@@ -234,10 +235,12 @@
                             {{ a }}
                         </li>
                     </ul>
-                    <button ng-click="acquireGo()" class="btn" ng-show="engine.phase == 'advance' && possibleAdvances[selAdv.name].areas.length > 0 && selArea && acquiring">Acquire</button>
+                    <button ng-click="acquireGo()" class="btn btn-primary" ng-show="engine.phase == 'advance' && possibleAdvances[selAdv.name].areas.length > 0 && selArea && acquiring">Acquire</button>
+                </div>
                 </div>
             </div>
-            <div id="cityinfo">
+            <div class="relative cityinfo">
+                <div id="cityinfo">
                 <table class="table">
                     <thead><th>Area</th><th>AV</th><th>Tribes</th><th>Resources</th></thead>
                     <tbody>
@@ -245,12 +248,22 @@
                             <td>{{ c.id }}</td>
                             <td><span class="city">{{ c.city }}</span></td>
                             <td><span class="tribes">{{ c.tribes }}</span></td>
-                            <td>TBD</td>
+                            <td>
+                                <div class="icon forest" ng-if="c.forest"></div>
+                                <div class="icon mountain" ng-if="c.mountain || c.volcano"></div>
+                                <div class="icon farm" ng-if="c.farm"></div>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
+                </div>
             </div>
-            <table class="advancelist table table-condensed table-hover">
+            </div>
+            </div>
+            <div class="advancelist">
+                <div class="relative">
+                    <div class="scroll">
+            <table class="table table-condensed table-hover">
                 <thead><th>Name</th><th>VP</th><th>Cost</th><th>Resources</th><th>Requires</th></thead>
                 <tbody>
                     <tr ng-click="selectAdv(adv)" ng-class="getAcquireClasses(key)" ng-repeat="(key, adv) in engine.advances">
@@ -259,7 +272,9 @@
                         <td>
                             <div ng-repeat="(k, v) in adv.cost" class="{{ k }}">{{ v }}</div>
                         </td>
-                        <td>{{ adv.resources }}</td>
+                        <td>
+                        <div class="icon" ng-class="{ forest: res == 'wood', mountain: res == 'stone', farm: res == 'food' }" ng-repeat="res in adv.resources">{{ res }}</div>
+                        </td>
                         <td>
                             <div ng-repeat="r in adv.requires">
                                 {{ r.join(' or ') || r }}
@@ -269,6 +284,10 @@
                     </tr>
                 </tbody>
             </table>
+                    </div>
+                </div>
+            </div>
+            </div>
         </div>
         </div>
     </div>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Edited by hand -->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="256" height="256">
+  <defs>
+    <rect id="node" x="-24" y="-24" width="48" height="48" rx="8" style="fill:#FFF;" />
+  </defs>
+  <rect width="256" height="256" rx="32" style="fill:#0095ff" />
+  <use xlink:href="#node" x="50" y="148" />
+  <use xlink:href="#node" x="120" y="95" />
+  <use xlink:href="#node" x="120" y="180" />
+  <use xlink:href="#node" x="190" y="60" />
+  <use xlink:href="#node" x="190" y="120" />
+  <use xlink:href="#node" x="190" y="190" />
+  <g style="stroke:#FFF;stroke-width:8;fill:none;">
+    <path d="M 50 148, 120 95, 190 60 M 120 95, 190 120 M 50 148, 120 180, 190 120 M 120 180, 190 190" />
+  </g>
+</svg>

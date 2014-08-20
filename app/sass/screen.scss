@@ -25,6 +25,10 @@ $actionElementTopicHeight: 35px;
 @import "_techTree";
 @import "_welcome";
 
+a {
+    cursor: pointer;
+}
+
 #welcome {
     position: fixed;
     width: 100%;
@@ -34,10 +38,18 @@ $actionElementTopicHeight: 35px;
     top: 0px;
 }
 
+#advances { display: none; }
+
+@include really-large {
 #advances {
-    position: fixed;
-    left: $mapWidth + $cardWidth + 10;
-    top: 10px;
+    display: block;
+    position: absolute;
+    left: $mapWidth +  10;
+    top: 454px;
+}
+#showTechTree {
+    display: none;
+}
 }
 
 .actionElement {
@@ -198,12 +210,14 @@ $actionElementTopicHeight: 35px;
 #showTechTree {
     z-index: 170;
     position: fixed;
-    bottom: 0px;
-    left: 0px;
+    bottom: 3px;
+    left: 3px;
     padding: 2px;
-    background-color: rgba(green, .8);
+    background-image: url("/images/modern/techtree.svg");
+    background-size: 100% 100%;
     cursor: pointer;
     height: 70px;
+    width: 70px;
 }
 
 #main {
