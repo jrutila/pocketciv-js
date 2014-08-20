@@ -63,5 +63,5 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-watchify');
 	grunt.loadNpmTasks('grunt-bower-task');
 	grunt.registerTask('default',['bower:install', 'concurrent']);
-	grunt.registerTask('heroku',['compass', 'browserify', 'bower:install']);
+	grunt.registerTask('heroku',['compass:dist', 'browserify', 'bower:install']);
 }
