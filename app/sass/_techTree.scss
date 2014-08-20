@@ -24,83 +24,55 @@ $infoWidth: 250px;
         z-index: 110;
     }
     
-    #cityinfo table {
-        width: auto;
+    #cityinfo {
+        
     }
+    
+    
+    #advancelist {
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        right: 0px;
+    }
+    
     
     .content {
         position: absolute;
         background-color: white;
-        //bottom: 25px;
-        height: 100%;
-        width: 100%;
-//        min-width: 100%;
-        //width: $mapWidth - 50;
-        //height: $mapHeight - 50;
-    }
-    
-    .infos {
-        display: table;
         height: 100%;
         width: 100%;
         
-        .inforow {
-            display: table-row;
-            width: 100%;
-            height: 0px;
-        }
-        
-        .infotable {
+        .tt_layout_table {
             display: table;
-            .relative {
-                display: table-cell;
-                height: 100%;
-            }
-            .relative.cityinfo {
-                width: 100%;
-            }
         }
+        .tt_main_table {
+            width: 100%; height: 100%; position: absolute; left: 0px; top: 0px;
+        }
+        .tt_layout_row { display: table-row; }
+        .tt_layout_row.tt_bottom { height: 100%; }
         
-        
-        #cityinfo {
-            width: 100%;
+        .tt_layout_cell { display: table-cell; }
+
+        .tt_layout_relative {
+            position: relative;
+            border: 1px solid magenta; 
+            height: 100%;
             
-            table {
-                float: right;
-                margin-left: $infoWidth;
-            }
+            overflow: auto;
         }
-        #advanceinfo {
-            top: $titleHeight;
-            min-width: $infoWidth;
-            position: absolute;
-            
-            #advancereq, #advancereqby {
-                height: 30px;
-            }
-            h1 {
-                padding-left: 30px;
-            }
+        .tt_layout_left { vertical-align: top; }
+        .tt_layout_right { min-width: 100%; }
+
+        .tt_layout_left_content {
+            border: 1px solid blue;
         }
-    
-        .advancelist
-        {
-            display: table-row;
-            width: 100%;
-            
-            .relative {
-                position: relative;
-                height: 100%;
-                
-                .scroll {
-                    overflow: auto;
-                    position: absolute;
-                    top: 0px;
-                    left: 0px;
-                    right: 0px;
-                    bottom: 0px;
-                }
-            }
+        .tt_layout_bottom_content {
+            border: 1px solid green;
+        }
+        .tt_layout_right_content {
+            border: 1px solid red;
+            float: right;
         }
     }
     
