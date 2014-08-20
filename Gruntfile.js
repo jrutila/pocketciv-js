@@ -18,7 +18,7 @@ module.exports = function(grunt) {
 		},
 		concurrent: {
 			dev: 
-				['watchify', 'compass:dev']
+				['watch', 'compass:dev']
 		},
 		watchify: {
 	      dev: {
@@ -62,6 +62,6 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-browserify');
 	grunt.loadNpmTasks('grunt-watchify');
 	grunt.loadNpmTasks('grunt-bower-task');
-	grunt.registerTask('default',['bower:install', 'concurrent']);
+	grunt.registerTask('default',['bower:install', 'watchify', 'concurrent']);
 	grunt.registerTask('heroku',['compass:dist', 'browserify', 'bower:install']);
 }
