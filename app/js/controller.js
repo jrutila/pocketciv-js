@@ -37,6 +37,7 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
     $scope.map = pocketciv.Map;
     $scope.deck = pocketciv.EventDeck;
     $scope.scenarios = scenarios;
+    $scope.welcome = true;
     
     var moveFunc = undefined;
     $scope.moveTribes = function() {
@@ -516,7 +517,8 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
         $scope.$watch('engine', function(val) {
             $scope.$storage.current = val.state;
         }, true);
-
+        
+        $scope.welcome = false;
     }
     
     $scope.saveName = "";
@@ -561,7 +563,6 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
     
     $(document).ready(function() {
         $(".collapsible h2").click(function() {
-            console.log("HEIEHIE")
             var $par = $(this).parent();
             if ($par.is('.away.temp'))
                 $par.removeClass('away').removeClass('temp');

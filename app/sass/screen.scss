@@ -14,6 +14,7 @@ $cardWidth: 170px;
 $buttonHeight: 40px;
 $mapSymbolSize: 21px;
 $infoBarHeight: 35px;
+$actionElementTopicHeight: 35px;
 
 @import "_icons";
 @import "_mediaQueries";
@@ -22,6 +23,16 @@ $infoBarHeight: 35px;
 @import "_map";
 @import "_advances";
 @import "_techTree";
+@import "_welcome";
+
+#welcome {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background-color: wheat;
+    z-index: 199;
+    top: 0px;
+}
 
 #advances {
     position: fixed;
@@ -33,17 +44,68 @@ $infoBarHeight: 35px;
     position: fixed;
     top: 145px;
     z-index: 50;
-}
-@include smaller-than-map {
-    .actionElement {
-        width: 100%;
-        background-color: rgba(lightYellow, .8);
+    
+    h2 {
+        height: $actionElementTopicHeight;
+        background-color: rgba(Yellow, .8);
+        text-align: center;
+    }
+    
+    .actionContent {
+        margin-top: 5px;
+        margin-bottom: 5px;
+        display: block;
+        text-align: center;
+    }
+    
+    .actionDone {
+        display: block;
+        width: 50%;
+        margin-left: auto;
+        margin-right: auto;
+        height: $actionElementTopicHeight;
     }
 }
+.actionElement.away {
+    .actionContent, .actionDone {
+        display: none;
+    }
+}
+
+@include smaller-than-map {
+.actionElement.away.temp {
+    z-index: 51;    
+    .actionDone {
+        display: block;
+    }
+}
+    
+.actionElement.away {
+    top: $infoBarHeight;
+    left: 0px;
+    width: 85px;
+}
+.actionElement.away.temp {
+    .actionDone {
+        width: 100%;
+    }
+}
+.actionElement {
+    width: 100%;
+    background-color: rgba(lightYellow, .8);
+}
+
+}
+
 @include bigger-than-map {
     .actionElement {
         left: $mapWidth;
         right: 0px;
+    }
+    .actionElement.away.temp {
+        .actionContent, .actionDone {
+            display: block;
+        }
     }
 }
 @include really-large {
@@ -65,38 +127,21 @@ $infoBarHeight: 35px;
 }
 
 
-#mapinfo {
-    padding: 20px;
-    z-index: 52;
-    
-    button {
-        display: block;
-        height: $buttonHeight;
-        width: 50%;
-        margin-left: auto;
-        margin-right: auto;
-    }
-}
-
-.away {
-    * {
-        display: none;
-    }
-    
-    h2 {
-        display: inline;
-    }
-    
-    height: 40px;
-    width: 40px;
-    left: 0px;
-}
 
 #startButton {
     position: fixed;
     left: 25%;
     top: 25%;
-    z-index: 300;
+    z-index: 180;
+    width: 50%;
+    height: 50px;
+}
+
+@include bigger-than-map {
+#startButton {
+    width: $mapWidth / 2;
+    left: $mapWidth / 4;
+}
 }
 
 #infobar {
@@ -149,7 +194,7 @@ $infoBarHeight: 35px;
 
 
 #showTechTree {
-    z-index: 200;
+    z-index: 170;
     position: fixed;
     bottom: 0px;
     left: 0px;

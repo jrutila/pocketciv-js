@@ -169,7 +169,7 @@
     </div>
     <div id="mapinfo" class="actionElement collapsible" ng-hide="mapInfo == undefined">
         <h2>{{ mapTitle }}</h2>
-        {{ mapInfo }}
+        <span class="actionContent">{{ mapInfo }}</span>
         <ul ng-hide="reduceObject == undefined">
             <li ng-repeat="(k,v) in reduceObject">
                 {{ k }}:
@@ -177,7 +177,7 @@
                 city: <input type="number" ng-model="reduceObject[k]['city']" />
             </li>
         </ul>
-        <button ng-click="mapDone()">done</button>
+        <button class="actionDone" ng-click="mapDone()">done</button>
     </div>
     
     <div id="advances">
@@ -291,14 +291,30 @@
     
     <div id="advancePhase" class="actionElement collapsible" ng-hide="engine.phase != 'advance'" >
         <h2>Advance</h2>
-        <ul>
+        <ul class="actionContent">
             <li><button ng-click="advance('farm')">Create a Farm</button></li>
             <li><button ng-click="advance('city')">Build a City</button></li>
             <li><button ng-click="advance('acquire')">Acquire Advances</button></li>
         </ul>
-        <button ng-click="actionStack.pop(); engine.nextPhase()">Done</button>
+        <button class="actionDone" ng-click="actionStack.pop(); engine.nextPhase()">Done</button>
     </div>
-    <button id="startButton" class="btn actionElement" ng-click="engine.phase = 'populate'" ng-hide="engine.phase">Start!</button>
+    <button id="startButton" class="btn" ng-click="engine.phase = 'populate'" ng-hide="engine.phase">Start!</button>
+    
+    <div id="welcome" ng-show="welcome">
+        <div class="menu-arrow"></div>
+        <h1>Welcome to play Pocket Civ</h1>
+        <p>
+            This is a Javascript implementation of the great PocketCiv print'n'play.
+            Orignal game files and rules can be found <a href="http://www.backglass.org/scotts/games/PocketCiv/html/index.htm">here</a>.
+        </p>
+        <p>
+            You can start playing using the menu. <font style="color: red">Please note: Everything is not implemented at the moment. You can play only the Scenario 1 fully.</font>
+        </p>
+        <p>
+            Please join the development of this implementation at <a href="https://github.com/jrutila/pocketciv-js">GitHub</a>.
+        </p>
+        <a target="_blank" href="https://github.com/jrutila/pocketciv-js"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
+    </div>
     
     </div><!-- snap-content -->
     
