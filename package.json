@@ -3,8 +3,8 @@
   "version": "0.0.1",
   "scripts": {
     "test": "make test",
-    "watch": "make watch",
     "autotest": "make autotest",
+    "watch": "grunt default",
     "start": "node bin/www"
   },
   "dependencies": {
@@ -24,7 +24,9 @@
     "body-parser": "^1.6.4"
   },
   "devDependencies": {
-    "grunt": "*"
+    "grunt": "*",
+    "grunt-watchify": "^0.1.0",
+    "grunt-concurrent": "^0.5.0"
   },
   "engines": {
     "node": "0.10.x",

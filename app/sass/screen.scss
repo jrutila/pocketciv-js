@@ -66,9 +66,11 @@ $actionElementTopicHeight: 35px;
         height: $actionElementTopicHeight;
     }
 }
+
 .actionElement.away {
     .actionContent, .actionDone {
-        display: none;
+        display: none; 
+        background-color: red;
     }
 }
 

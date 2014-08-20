@@ -102,7 +102,6 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
         
     }
     
-    
     var drawnFunc = undefined;
     $scope.hideDrawer = true;
     $scope.drawCard = function() {
@@ -528,12 +527,10 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
         setTimeout(function() { $scope.saved = false; }, 3000);
     }
     
-    
     $scope.$watch('engine.phase', function(val) {
         if (val == 'advance')
             $scope.actionStack.push("#advancePhase");
     });
-    
 
     var actionStack = new Object();
     var aStack =[];
@@ -571,8 +568,8 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
                 $par.addClass('away').addClass('temp');
         } )
     })
-    
 });
+
 
 /*
 This directive allows us to pass a function in on an enter key to do what we want.

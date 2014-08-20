@@ -10,9 +10,9 @@ Development
 - Fork the repo
 - npm install
 - npm run test
-- npm run watch-js
-- Serve static files with some kind of web server (for example: python -m SipmleHTTPServer)
-- Open index.html with your browser
+- npm run watch
+- npm run start (in another terminal)
+- Open http://localhost:3000 with your browser
 
 Architecture
 =========

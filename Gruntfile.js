@@ -8,13 +8,35 @@ module.exports = function(grunt) {
 					//sassDir: 'sass',
 					//cssDir: 'app/stylesheets'
 				}
+			},
+			dev: {
+				options: {
+					appDir: 'app/',
+					watch: true
+				}
 			}
 		},
+		concurrent: {
+			dev: 
+				['watchify', 'compass:dev']
+		},
+		watchify: {
+	      dev: {
+	        src: './app/js/controller.js',
+	        dest: 'app/bundle.js'
+	      },
+	    },
 		watch: {
 			css: {
 				files: '**/*.scss',
 				tasks: ['compass']
-			}
+			},
+	        app: {
+		        files: 'app/js/bundle.js',
+		        options: {
+		          livereload: true
+	        	}
+		    }
 		},
 		browserify: {
             dist: {
@@ -34,10 +56,12 @@ module.exports = function(grunt) {
 	     }
 	   }
 	});
+	grunt.loadNpmTasks('grunt-concurrent');
 	grunt.loadNpmTasks('grunt-contrib-compass');
 	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadNpmTasks('grunt-browserify');
+	grunt.loadNpmTasks('grunt-watchify');
 	grunt.loadNpmTasks('grunt-bower-task');
-	grunt.registerTask('default',['compass', 'browserify', 'bower:install']);
+	grunt.registerTask('default',['bower:install', 'concurrent']);
 	grunt.registerTask('heroku',['compass', 'browserify', 'bower:install']);
 }
