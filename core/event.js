@@ -24,6 +24,10 @@ Context.prototype = {
             area = area.id
         this.changes[area] || (this.changes[area] = {})
         _.extend(this.changes[area], chg);
+        _.each(this.changes[area], function(v, k) {
+            if (v === undefined)
+                delete this.changes[area][k];
+        })
     },
     break_if: function(expr)
     {
@@ -95,6 +99,32 @@ function contextEval(cmd, context, done, wait) {
             done && done();
 }
 
+function StepsStack() {
+    this._step = undefined;
+    this.arr = [];
+    this.steps = [];
+}
+
+StepsStack.prototype = {
+    set step(value) {
+        this._step = value;
+    },
+    get step() {
+        return this._step;
+    },
+    get length() {
+        return this.arr.length;
+    },
+    push: function(value) {
+        this.arr.push(value);
+        this.steps.push(this._step);
+    },
+    shift: function() {
+        this._step = this.steps.shift();
+        return this.arr.shift();
+    }
+}
+
 var stepper = function(steps, ctx, done)
 {
     if (steps.length === 0)
@@ -102,11 +132,38 @@ var stepper = function(steps, ctx, done)
         return done && done(ctx);
     }
     var cmd = steps.shift();
+    ctx.engine.eventPhasing.dispatch(steps.step, ctx)
     contextEval(cmd, ctx, function() {
         if (ctx.break)
             steps = [];
         stepper(steps, ctx, done);
     },cmd.indexOf(';') === 0);
+}
+
+extendSteps = function(event, advances, limit)
+{
+    var actual_steps = _.clone(event.steps);
+    _.each(_.pick(advances, limit), function(adv) {
+        if (_.has(adv.events, event.name))
+        {
+            console.log('Extending with '+adv.name)
+            actual_steps = _.extend(actual_steps, adv.events[event.name].steps);
+            //_.extend(context, engine.acquired[key].events[ev.name])
+        }
+    }, this)
+    
+    var keys = _.sortBy(_.keys(actual_steps), function(s) {
+        if (s.indexOf('-') >= 0) return 99999
+        var nums = s.split('.');
+        var rs = 0;
+        for (var n in nums)
+        {
+            rs += parseInt(nums[n])*(10000/Math.pow(100,n));
+        }
+        return rs
+    });
+    
+    return [actual_steps, keys];
 }
 
 runEvent = function(engine, event, ev, done)
@@ -119,32 +176,19 @@ runEvent = function(engine, event, ev, done)
     context.engine = engine;
     context.event = ev;
     
-    var actual_steps = _.clone(event.steps);
-    var steps_cmd = [];
+    var ext= extendSteps(event, engine.advances, engine.acquired);
+    var actual_steps = ext[0];
+    var keys = ext[1];
+    var steps_cmd = new StepsStack();
     
-    _.each(_.pick(engine.advances, engine.acquired), function(adv) {
-        if (_.has(adv.events, event.name))
-        {
-            console.log('Extending with '+key)
-            _.extend(actual_steps, adv.events[event.name].steps);
-            //_.extend(context, engine.acquired[key].events[ev.name])
-        }
-    }, this)
-    var keys = _.sortBy(_.keys(actual_steps), function(s) {
-        if (s.indexOf('-') >= 0) return 99999
-        var nums = s.split('.');
-        var rs = 0;
-        for (var n in nums)
-        {
-            rs += parseInt(nums[n])*(10000/Math.pow(100,n));
-        }
-        return rs
-    });
+    console.log(actual_steps)
+    
     _.each(keys, function(key)
     {
         var step = actual_steps[key];
         var m = step.match(patt);
         var cmd = "";
+        steps_cmd.step = key;
         for (var s in m)
         {
             var line = m[s].replace(patt, "$1");
@@ -166,4 +210,5 @@ runEvent = function(engine, event, ev, done)
 
 module.exports = {
     runEvent: runEvent,
+    extendSteps: extendSteps,
 }

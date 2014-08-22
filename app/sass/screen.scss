@@ -25,6 +25,29 @@ $actionElementTopicHeight: 35px;
 @import "_techTree";
 @import "_welcome";
 
+#eventRunner {
+    position: fixed;
+    top: 72px;
+    left: 800px;
+    background-color: green;
+    color: lightGreen;
+    
+    .active {
+        background-color: blue;
+    }
+    .step {
+        width: 30px;
+        display: inline-block;
+    }
+    
+    .stepdescr .positive {
+        color: lightBlue;
+    }
+    .stepdescr .not_available {
+        text-decoration: line-through;
+    }
+}
+
 a {
     cursor: pointer;
 }

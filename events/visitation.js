@@ -3,7 +3,7 @@ var _ = require('underscore')
 
 module.exports = {
     name: 'visitation',
-    title: 'Visitation',
+    title: 'Visitation: %(visitor)s',
     punchline: 'We come in peace, NOT!',
     description: "",
     steps: {

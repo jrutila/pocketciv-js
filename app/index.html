@@ -18,6 +18,7 @@
 <script>window.angular || document.write('<script src="lib/angular/angular.js">\x3C/script>')</script>
 <script type="text/javascript" src="lib/jquery-ui/jquery-ui.js"></script>
 <script type="text/javascript" src="lib/ngstorage/ngStorage.js"></script>
+<script type="text/javascript" src="lib/angular-sanitize/angular-sanitize.js"></script>
 <script type="text/javascript" src="lib/snapjs/snap.js"></script>
 <script type="text/javascript" src="lib/angular-snap/angular-snap.js"></script>
 <script type="text/javascript" src="lib/angular-bootstrap/ui-bootstrap-tpls.js"></script>
@@ -79,12 +80,14 @@
         <span>ERA: {{ engine.era }}</span>
         <span>Gold: {{ engine.gold }}</span>
     </div>
+    
+    <!--BEGIN DECK AND CARD-->
     <div id="deck" ng-class="{ pushed: hideDrawer }">
         <span id="cardsLeft">{{ deck.cardsLeft }}</span>
         <div ng-hide="hideDrawer">
             <button ng-click="drawCard()">draw</button>
         </div>
-        <input ng-show="godMode" type="text" ng-model="specificCard" />
+        <input type="text" ng-model="specificCard" />
     </div>
     <div id="card" ng-mouseover="showCard = true" ng-mouseout="showCard = false" ng-class="{ pushed: hideDrawer, shown: showCard }">
         <span class="circle border">
@@ -100,12 +103,12 @@
         <ul>
             <li class="event" ng-repeat="(era, e) in card.events">
                 <span class="era">{{ era }}</span>
-                <span class="name">{{ e.name }} {{ e.visitor }}</span>
+                <span class="name">{{ engine.events[e.name].title || e.name | sprintf:e }}</span>
                 <span class="expr">{{ e.expr }}</span>
             </li>
         </ul>
     </div>
-    <!--{{ card }}-->
+    <!--END DECK AND CARD-->
     
     <div id="map">
         <div id="images">
@@ -325,6 +328,16 @@
             </div>
             <button ng-click="areaChangeOk()">OK</button>
         </div>
+    </div>
+    
+    <div id="eventRunner" ng-show="currentEvent">
+        <h2>{{ currentEvent.event.title | sprintf:currentEvent.info }} {{ currentEvent.step }}</h2>
+        <ul>
+            <li ng-class="{ active: step == currentEvent.step }" ng-repeat="step in currentEvent.sorder">
+                <span class="step">{{ step }}</span>
+                 <span class="stepdescr" ng-bind-html="currentEvent.steps[step] | eventFormat:currentEvent.context"></span>
+            </li>
+        </ul>
     </div>
     
     <div id="areaselect" ng-hide="possibleAreas.length == 0">

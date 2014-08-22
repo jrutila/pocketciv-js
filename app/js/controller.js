@@ -1,6 +1,9 @@
 var pocketciv = require("../../core/pocketciv");
-var pocketcivApp = angular.module('pocketcivApp', ['ngStorage', 'snap', 'ui.bootstrap']);
-var runplay = require("../../core/runplay")
+var pocketcivApp = angular.module('pocketcivApp', ['ngStorage', 'snap', 'ui.bootstrap', 'ngSanitize']);
+var runplay = require("../../core/runplay");
+var eventplay = require("../../core/event");
+var sprintf = require("sprintf");
+var mustache = require("mustache");
 
 pp = pocketciv
 
@@ -455,6 +458,31 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
     $scope.engine.phase = "";
     $scope.godMode = false;
     
+    pocketciv.Engine.eventPhasing.add(function(phase, ev) {
+        console.log("event phasing "+phase)
+        if (phase == "0")
+        {
+            var event = pocketciv.Engine.events[ev.name];
+            var ext = eventplay.extendSteps(event, pocketciv.Engine.advances, _.keys(pocketciv.Engine.advances));
+            var steps_order = ext[1];
+            var steps = ext[0];
+            $scope.currentEvent = {
+                event: event,
+                steps: steps,
+                sorder: steps_order,
+                info: ev,
+                step: phase
+            }
+        }
+        else if (phase == "-1")
+        {
+            $scope.currentEvent = undefined;
+        }
+        else
+            $scope.currentEvent.step = phase;
+            $scope.currentEvent.context = ev;
+    });
+    
     var map = new Object();
     
     var getCanvas = function(i) {
@@ -514,8 +542,8 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
             }
         }, true)
         
-        $scope.$watch('engine', function(val) {
-            $scope.$storage.current = val.state;
+        $scope.$watch('engine.state', function(val) {
+            $scope.$storage.current = val;
         }, true);
         
         $scope.welcome = false;
@@ -577,7 +605,40 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
     })
 });
 
+pocketcivApp.filter('eventFormat', function() {
+    return function(descr, context) {
+        var d = descr.replace(/{%.*?%}/g, "");
+        d = d.replace("{{ active_region }}", "{{{ active_region }}}")
+        var adv_regex = /{{ adv:(.*?) }}/g;
+        var m = adv_regex.exec(d);
+        var stepcl = "";
+        if (m)
+        {
+            var adv = engine.advances[m[1]];
+            var acq = engine.acquired.indexOf(m[1]) > -1;
+            stepcl = stepcl + (acq ? "available " : "not_available ");
+            d = d.replace(adv_regex, adv.title);
+        }
+        var ctx = _.clone(context);
+        if (context.active_region)
+            ctx.active_region = "<span class='areaCode'>"+context.active_region.id+"</span>"
+        var rctx = _.extend(window, ctx);
+        rctx = _.extend(rctx, engine.advances);
+        if (d.indexOf("+") == 0)
+        {
+            stepcl = stepcl + "positive";
+            d = d.trim("+ ");
+        }
+        d = "<span class='"+stepcl+"'>"+d+"</span>";
+        return mustache.render(d, rctx);
+    };
+});
 
+pocketcivApp.filter('sprintf', function() {
+    return function(str, params) {
+        return sprintf(str, params);
+    };
+});
 /*
 This directive allows us to pass a function in on an enter key to do what we want.
  */

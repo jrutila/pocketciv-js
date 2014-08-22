@@ -1,7 +1,8 @@
 var eventDeck = require('./eventdeck').EventDeck;
 var _ = require("underscore");
-var eventRunner = require('./event')
-var reducer = require('../core/reducer')
+var eventRunner = require('./event');
+var reducer = require('../core/reducer');
+var signals = require('signals');
 
 var events = {
     'famine': require('../events/famine'),
@@ -226,6 +227,8 @@ function Engine(map, deck) {
     this.gold = 0;
     this.round = {} // Will be emptied after upkeep!
     this.era = 1;
+    /** SIGNALS **/
+    this.eventPhasing = new signals.Signal();
 }
 
 var defaults= {
@@ -381,8 +384,7 @@ Engine.prototype = {
         this.acquired.push(name);
         console.log("Acquired "+name);
         done && done();
-    }
-    ,
+    },
     event: function(ctx) {
         console.log("Drawing event card")
         this.drawer(this.deck, function(eventcard) {
@@ -391,9 +393,11 @@ Engine.prototype = {
             {
                 var ev = eventcard.events[eng.era];
                 console.log("Drew event: "+ev.name);
+                eng.eventPhasing.dispatch("0", ev);
                 eng.doEvent(ev, function(changes) {
                     console.log("Event ended: "+ev.name);
                     ctx.changes = changes;
+                    eng.eventPhasing.dispatch("-1", ev);
                     ctx.done && ctx.done();
                 });
             } else {

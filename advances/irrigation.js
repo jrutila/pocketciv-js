@@ -10,7 +10,7 @@ module.exports = {
         'famine': {
             'steps': {
                 '2.2': "+ If you have {{ adv:irrigation }}, do not Decimate Farms.\
-                Reduce City AV by 1 instead 2.{% change({ tribes: '0', city: '-1' }) %}",
+                Reduce City AV by 1 instead 2.{% change({ tribes: '0', farm: undefined, city: '-1' }) %}",
             }
         },
         'flood': { },

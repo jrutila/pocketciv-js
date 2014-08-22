@@ -21,7 +21,11 @@
     "generator-express": "^2.0.5",
     "mongoskin": "^1.4.4",
     "debug": "*",
-    "body-parser": "^1.6.4"
+    "body-parser": "^1.6.4",
+    "signals": "^1.0.0",
+    "sprintf": "^0.1.4",
+    "mustache": "^0.8.2",
+    "angular-sanitize": "0.0.1"
   },
   "devDependencies": {
     "grunt": "*",
