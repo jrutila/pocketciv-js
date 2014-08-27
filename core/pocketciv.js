@@ -387,11 +387,13 @@ Engine.prototype = {
     },
     event: function(ctx) {
         console.log("Drawing event card")
+        // Take era before car draw if there is era change
+        var era = this.era;
         this.drawer(this.deck, function(eventcard) {
             var eng = this;
-            if (eng.era in eventcard.events)
+            if (era in eventcard.events)
             {
-                var ev = eventcard.events[eng.era];
+                var ev = eventcard.events[era];
                 console.log("Drew event: "+ev.name);
                 eng.eventPhasing.dispatch("0", ev);
                 eng.doEvent(ev, function(changes) {
