@@ -6,10 +6,10 @@ module.exports = {
     punchline: "Lawa eruption",
     description: "",
     steps: {
-            '1': "{%; area_card() %} \
-            {% change({'volcano': true}) %}",
+            '1': "Draw the next card.{%; area_card() %} Circle denotes the Active Region {{ active_region }}.",
             '2.1': "If the Active Region has no Mountains or Volcanoes: \
                     Create a new Volcano in the Active Region. \
+                    {% change({'volcano': true}) %} \
                     Tribes in the Active Region are reduced to 1. \
                 {% if (!active_region.mountain && !active_region.volcano && active_region.tribes) { %} \
                     {% change({ 'tribes': '1' }) %} \

@@ -4,16 +4,17 @@ module.exports = {
     punchline: 'Yo, bro! I\'m tired of your face!',
     description: "",
     steps: {
-            '1': "{%; area_card() %}",
-            '2': "All City AVs in the {{ Active Region | active_region }} and \
-                in {{ Neighboring Regions|neighbours(active_region) }} are reduced by 2.\
+            '1': "Draw the next card.{%; area_card() %} Circle denotes the Active Region {{ active_region }}.",
+            '2': "All City AVs in the Active Region {{ active_region }} and \
+                in Neighboring Regions {{ neighbours(active_region) }} are reduced by 2.\
                 Cities reduced to 0 are decimated.\
                 {% activeCityReduce = -2; neighbourCityReduce = -2; cityMin = 0; %}",
-            '3': "Draw the next card {%; draw_card() %}.",
+            '3': "{% cityReduce() %} Draw the next card. {%; draw_card() %}",
             '3.1': "The number in the BLUE HEX indicates\
                 your collateral damage. {% collateralDamage = card_value('h') %}",
-            '-': " {% cityReduce() %}",
-            '--': "{%; reduce('tribes', collateralDamage, areas) %}",
+            '3.2': "Reduce total Tribes in the Affected Regions by the \
+                value of your Collateral Damage. \
+                {%; reduce('tribes', collateralDamage, areas) %}",
     },
     cityReduce: function() {
         var act = this.active_region

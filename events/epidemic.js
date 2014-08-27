@@ -6,21 +6,20 @@ module.exports = {
     punchline: 'Interesting rash you have there...',
     description: "",
     steps: {
-      '1': "{%; area_card() %}",
+      '1': "Draw the next card.{%; area_card() %} Circle denotes the Active Region {{ active_region }}.",
       '1.1': " If the Active \
       Region has no Tribes, disregard the Epidemic Event \
       {% break_if(! active_region.tribes) %}",
-      '2': " Draw the next {{ Event Card| {%; draw_card() %} }}. Based on the symbols on \
-      the right side of the Event box of the ORIGINAL \
-      Epidemic Event, add up the values in the same symbols on the newly drawn card.",
+      '2': " Draw the next Event Card {%; draw_card() %}. Based on the symbols on \
+      {% population_loss = card_value(event.expr) %} \
+      the original Event card ({{ event.expr }}) calculate your Population loss ({{ population_loss }}).",
       '2.1': "Starting with the Active \
       Region, and working your way through Neighboring \
       Regions, Decimate Tribes equal to the amount of \
       Population Loss. Tribes in Regions must be fully \
-      Decimated before moving on to a new Region. \
-      {% population_loss = card_value(event.expr) %}",
+      Decimated before moving on to a new Region.",
       '3': "You must Reduce as many Tribes as possible until you \
-      have reached the Population Loss value, you have 2 \
+      have reached the Population Loss ({{ population_loss }}) value, or you have 2 \
       Tribes remaining in your Empire. \
       {%; reduce() %}"
     },

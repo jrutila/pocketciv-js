@@ -479,8 +479,10 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
             $scope.currentEvent = undefined;
         }
         else
+        {
             $scope.currentEvent.step = phase;
             $scope.currentEvent.context = ev;
+        }
     });
     
     var map = new Object();
@@ -608,7 +610,8 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
 pocketcivApp.filter('eventFormat', function() {
     return function(descr, context) {
         var d = descr.replace(/{%.*?%}/g, "");
-        d = d.replace("{{ active_region }}", "{{{ active_region }}}")
+        d = d.replace(/{{ ([a-z_]+) }}/g, "{{{ $1 }}}")
+        
         var adv_regex = /{{ adv:(.*?) }}/g;
         var m = adv_regex.exec(d);
         var stepcl = "";

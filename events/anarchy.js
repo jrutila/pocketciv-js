@@ -4,7 +4,7 @@ module.exports = {
     punchline: 'We are tired of those cities!',
     description: "",
     steps: {
-            '1': "In {{ any Region|{% active_regions(function(a) { return a.city > 0 && a.tribes > a.city }) %} }} \
+            '1': "In any Region {% active_regions(function(a) { return a.city > 0 && a.tribes > a.city }) %} \
             where the amount of Tribes is greater \
             than the City AV, Reduce the City AV by 1 and \
             Reduce Tribes by 3. Continue to Reduce Tribes and \
