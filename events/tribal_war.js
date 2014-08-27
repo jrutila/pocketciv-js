@@ -7,7 +7,7 @@ module.exports = {
     punchline: 'What did you say?',
     description: "",
     steps: {
-            '1': "{%; area_card() %}",
+            '1': "Draw the next card.{%; area_card() %} Circle denotes the Active Region {{ active_region }}.",
             '1.1': "Disregard event if there is no tribes. \
                     {% break_if(active_region.tribes == 0) %}",
             '2': "The amount of Tribes in the Active Region \
