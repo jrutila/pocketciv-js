@@ -452,7 +452,7 @@ describe("AdvanceAcquirer", function() {
                 'forest': true,
             }
         }
-        engine.acquired = { 'adv1': undefined }
+        engine.acquired = ['adv1']
     });
     it('should return empty advances', function() {
         engine.advances = {
@@ -563,7 +563,7 @@ describe("AdvanceAcquirer", function() {
                 requires: [ [ 'adv1', 'adv2'], 'adv3' ]
             }
         };
-        engine.acquired['adv3'] = undefined;
+        engine.acquired.push('adv3')
         acquirer = new pocketciv.AdvanceAcquirer(engine);
         acquirer.possibleAdvances().should.deep.equal({
             'adv2': { 'areas': ["1"] },
@@ -708,7 +708,7 @@ describe('EventRunner', function() {
                 }
                 return this;
             }();
-            engine.acquired = {
+            engine.advances = {
                 'adv1': {
                     'events': {
                         'event1': {
@@ -719,6 +719,7 @@ describe('EventRunner', function() {
                     }
                 }
             }
+            engine.acquired = ['adv1']
             runner(engine, ev, {}, function(changes) {
                 changes.should.deep.equal({ 5: { 'tribes': '-1'}});
                 done();
