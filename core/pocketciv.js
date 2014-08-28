@@ -353,10 +353,13 @@ Engine.prototype = {
                     };
         
         var runpre = function() {
-            // TODO: Only supports one pre for now
-            var pre = pres.pop();
-            if (pre) pre.call(eng, ctx);
-            else ctx.done && ctx.done();
+            var olddone = ctx.done;
+            ctx.done = function() {
+                var pre = pres.pop();
+                if (pre) pre.call(eng, ctx);
+                else olddone && olddone()
+            }
+            ctx.done()
         }
         
         var runpost = function() {
@@ -454,58 +457,28 @@ Engine.prototype = {
         ctx.done && ctx.done();
     },
     city_advance: function(ctx) {
-        console.log("Max city is "+this.max_city)
+        console.log("Max city is " + this.max_city)
+        console.log("Max city advance is " + this.city_advance_limit)
         ctx.changes = {};
-        var possibleAreas = [];
-        if (this.max_city > 1)
-        {
-            _.each(this.map.areas, function(a) {
-                if (a.city && a.tribes >= a.city+1)
-                {
-                    possibleAreas.push(a.id);
-                }
-            })
-        }
-        if (possibleAreas.length > 0) {
+        if (this.round.city_advance_limit && this.max_city > 1) {
             var rdc = new reducer.Reducer(this);
             rdc.mode = reducer.Modes.Overall;
-            rdc.startAmount = 0;
-            var that = this;
-            rdc.areas = function() {
-                var areas = {};
-                _.each(that.map.areas, function(a) {
-                    if (a.city && a.tribes) {
-                        var chg = this.changes[a.id] || {};
-                        var t = chg.tribes ? eval(a.tribes + chg.tribes) : a.tribes;
-                        var c = chg.city ? eval(a.city + chg.city) : a.city;
-                        if (t >= c + 1) areas[a.id] = a;
-                    }
-                }, this)
-                return areas;
-            }
-            rdc.reduce = function(r, area) {
-                var c = area.city;
-                var t = area.tribes;
-                while (c < area.city + r.city) {
-                    // If there is not enough tribes
-                    c++;
-                    if (t - c < 0) return false;
-                    t -= c;
-                }
-                if (c - area.city > 0)
-                    return {
-                        'city': '+' + (c - area.city),
-                        'tribes': (t - area.tribes).toString()
-                    }
-                else
-                    return {}
-            }
-            this.reducer(rdc, function(chg) {
-                ctx.changes = chg;
+            rdc.max_city = this.max_city
+            rdc.startAmount = -1 * this.round.city_advance_limit;
+            rdc.areas = reducer.CityAdvance.areas
+            rdc.reduce = reducer.CityAdvance.reduce
+
+            if (_.isEmpty(rdc.ok({}).areas)) {
                 ctx.done && ctx.done();
-            });
-        } else
-            ctx.done && ctx.done();
+            }
+            else {
+                this.reducer(rdc, function(chg) {
+                    ctx.changes = chg;
+                    ctx.done && ctx.done();
+                });
+            }
+        }
+        else ctx.done && ctx.done();
     },
     upkeep: function(ctx) {
         this.round = {};

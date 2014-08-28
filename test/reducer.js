@@ -452,3 +452,51 @@ describe('Attack (worker)', function() {
     });
   });
 });
+
+describe('City Advance (worker)', function() {
+  beforeEach(function() {
+    target = new reducer.Reducer(engine);
+    target.areas = reducer.CityAdvance.areas;
+    target.reduce = reducer.CityAdvance.reduce;
+    target.mode = reducer.Modes.Overall;
+  })
+  describe("basic", function() {
+    beforeEach(function() {
+      engine.map.areas = {
+        4: { id: 4, 'tribes': 3, 'city': 1, 'neighbours': [ 3 ] },
+        3: { id: 3, 'tribes': 2, 'city': 2, 'neighbours': [ 4, 2 ] },
+        2: { id: 2, 'tribes': 2, 'city': 1, 'neighbours': [ 3 ] },
+      }
+    })
+    it('should give negative amount', function() {
+      target.max_city = 2;
+      target.startAmount = -1;
+      target.startAmount.should.equal(-1);
+      _.keys(target.ok({}).areas).should.deep.equal([ '2', '4' ]);
+      target.ok({}).ok.should.equal(true);
+      target.ok({ 4: { city: 1 }}).amount.should.equal(0);
+      target.ok({ 4: { city: 1 }}).ok.should.equal(true);
+      _.keys(target.ok({ 4: { city: 1 }}).areas).should.deep.equal(['2']);
+      target.ok({2: { city: 1 }}).ok.should.equal(true);
+    })
+    it('should return false on too big city numbers', function() {
+      target.startAmount = -1;
+      target.max_city = 2;
+      target.ok({ 4: { city: 2 }}).should.equal(false);
+      target.ok({ 3: { city: 3 }}).should.equal(false);
+    })
+    it('should increase the amount on too many additions', function() {
+      target.startAmount = -1;
+      target.max_city = 2;
+      target.ok({ 4: { city: 1 }, 2: { city: 1 }}).amount.should.equal(1);
+    })
+    it('should not let increase over max_city', function() {
+      target.startAmount = -3;
+      target.max_city = 3;
+      engine.map.areas[3].tribes = 3;
+      _.keys(target.ok({}).areas).should.deep.equal([ '2', '3', '4' ]);
+      target.max_city = 2;
+      _.keys(target.ok({}).areas).should.deep.equal([ '2', '4' ]);
+    })
+  })
+})

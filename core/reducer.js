@@ -86,7 +86,7 @@ Reducer.prototype = {
           else
             rdc.changes[k] = val;
         });
-        if (_.isEmpty(this.areas())) this.amount = 0;
+        //if (_.isEmpty(this.areas())) this.amount = 0;
         break;
       case Modes.AreaWalker:
       default:
@@ -104,7 +104,7 @@ Reducer.prototype = {
     if (failed) return false;
     
     return {
-      'ok': this.amount === 0,
+      'ok': this.amount <= 0,
       'amount': this.amount,
       'changes': this.changes,
       'areas':this.areas(),
@@ -194,10 +194,46 @@ var Attack = {
   }
 }
 
+var CityAdvance = {
+  areas: function() {
+    var areas = {};
+    var max_city = this.max_city;
+    _.each(this.engine.map.areas, function(a) {
+      if (a.city && a.tribes) {
+        var chg = this.changes[a.id] || {};
+        var t = chg.tribes ? eval(a.tribes + chg.tribes) : a.tribes;
+        var c = chg.city ? eval(a.city + chg.city) : a.city;
+        if (t >= c + 1 && c + 1 <= max_city) areas[a.id] = a;
+      }
+    }, this)
+    return areas;
+  },
+  reduce: function(r, area) {
+    var c = area.city;
+    var t = area.tribes;
+    while (c < area.city + r.city) {
+      // If there is not enough tribes
+      c++;
+      if (t - c < 0) return false;
+      t -= c;
+      this.amount++;
+    }
+    console.log(this.amount)
+    if (c - area.city > 0)
+      return {
+        'city': '+' + (c - area.city),
+        'tribes': (t - area.tribes).toString()
+      }
+    else
+      return {}
+  }
+}
+
 var Modes = { AreaWalker: 'AreaWalker', Overall: 'Overall', Selector: 'Selector' };
 
 module.exports = {
   Reducer: Reducer,
   Attack: Attack,
+  CityAdvance: CityAdvance,
   Modes: Modes,
 }
