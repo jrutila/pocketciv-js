@@ -554,7 +554,8 @@ function getResources(area) {
 function AdvanceAcquirer(engine) {
     this.advances = _.omit(_.clone(engine.advances), engine.acquired);
     this.acquired = _.clone(engine.round.acquired) || [];
-    this.acquired_names = engine.acquired;
+    this.acquired_names = _.clone(engine.acquired)
+    this.amnt_of_acquird = engine.acquired.length;
     this.areas = _.clone(engine.map.areas);
     this.areas = filterAreasWithoutCities(this.areas);
 }
@@ -562,15 +563,13 @@ function AdvanceAcquirer(engine) {
 AdvanceAcquirer.prototype = {
     possibleAdvances: function() {
         var adv = {};
-        for (var key in _.omit(this.advances, this.acquired_names))
-        {
+        for (var key in _.omit(this.advances, this.acquired_names)) {
             // Check requirements
-            if (_.has(this.advances[key], 'requires') && this.advances[key].requires)
-            {
+            if (_.has(this.advances[key], 'requires') && this.advances[key].requires) {
                 var kk = _.keys(this.advances);
                 var aq = this.acquired_names;
                 var re = _.clone(this.advances[key].requires);
-                
+
                 // First, check optional requirements (either one must be required)
                 // Remove them from re if they are satisfied
                 var re = _.filter(re, function(r) {
@@ -578,41 +577,40 @@ AdvanceAcquirer.prototype = {
                     return _.intersection(r, aq).length < 1;
                 });
                 // Check that all requirements are acquired
-                if (!_.isEqual(_.intersection(aq, re), re))
-                {
+                if (!_.isEqual(_.intersection(aq, re), re)) {
                     continue;
                 }
             }
-            
-            adv[key] = { 'areas': [] };
-            
-            for (var a in _.omit(this.areas, _.keys(this.acquired)))
-            {
+
+            adv[key] = {
+                'areas': []
+            };
+
+        if (_.reduce(this.areas, function(m, a) {return a.city ? m + a.city : m }, 0) > _.keys(this.acquired).length + this.amnt_of_acquird)
+        {
+            for (var a in _.omit(this.areas, _.keys(this.acquired))) {
                 // Check tribes
                 var has_tribes = true;
                 var has_resources = true;
-                if ('tribes' in this.advances[key].cost)
-                {
+                if ('tribes' in this.advances[key].cost) {
                     if (!(this.areas[a].tribes >= this.advances[key].cost.tribes))
                         has_tribes = false;
                 }
-                
+
                 // Check resources
-                if ('resources' in this.advances[key])
-                {
+                if ('resources' in this.advances[key]) {
                     var area_resources = getResources(this.areas[a]);
-                    if(!_.intersection(
-                        area_resources, this.advances[key].resources).length
-                        ==
-                        this.advances[key].resources.length)
-                        {
-                            has_resources = false;
-                        }
+                    if (!_.intersection(
+                            area_resources, this.advances[key].resources).length ==
+                        this.advances[key].resources.length) {
+                        has_resources = false;
+                    }
                 }
-                
+
                 if (has_tribes && has_resources)
                     adv[key].areas.push(a);
             }
+        }
         }
         return adv;
     },

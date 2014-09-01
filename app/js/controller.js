@@ -345,6 +345,7 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
         $scope.possibleAdvances = $scope.acquirer.possibleAdvances();
     }
     
+    $scope.totalCity = function() { return _.reduce($scope.engine.map.areas, function(memo, a) { return a.city ? memo + a.city : memo; }, 0); };
     $scope.selectAdv = function(adv) {
         $scope.selAdv = adv;
         $scope.selArea = undefined;

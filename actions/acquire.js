@@ -3,6 +3,8 @@ module.exports = {
         var engine = this;
         engine.round.acquired = engine.round.acquired || {};
         engine.advanceAcquirer(engine, function(acquires) {
+            console.log("ACQUIRING ")
+            console.log(acquires)
             var changes = { };
             acquires = _.omit(acquires, _.keys(engine.round.acquired));
             for (var area in acquires)
