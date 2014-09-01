@@ -7,7 +7,7 @@ module.exports = {
     punchline: 'Darude..',
     description: "",
     steps: {
-            '1': "{%; area_card() %}",
+            '1': "Draw the next card.{%; area_card() %} Circle denotes the Active Region {{ active_region }}.",
             '2': " If the Active Region contains a Desert: \
                  Select two Neighboring Regions. Decimate Farms and \
                  Forests in these Regions. \
