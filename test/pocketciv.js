@@ -725,7 +725,39 @@ describe('EventRunner', function() {
                 done();
             });
         });
-        
+        it('should support goto clause', function(done) {
+            var ev = new function()
+            {
+                this.steps = {
+                    '1.1': "{% active_region = 5 %}",
+                    '1.2': "{% if (active_region == 5) goto('4') %}",
+                    '1.3': "{% active_region = 3 %}",
+                    '4': "{% change({ 'tribes': '-1' }) %}",
+                }
+                return this;
+            }();
+            runner(engine, ev, {}, function(changes) {
+                changes.should.deep.equal({ 5: { 'tribes': '-1'}});
+                done();
+            });
+        });
+        it('should support final clause', function(done) {
+            var ev = new function()
+            {
+                this.steps = {
+                    '1.1': "{% active_region = 5 %}",
+                    '1.2': "{% break_if(active_region == 5) %}",
+                    '1.3': "{% active_region = 3 %}",
+                    'final': "{% change({ 'tribes': '-1' }) %}",
+                }
+                return this;
+            }();
+            runner(engine, ev, {}, function(changes) {
+                changes.should.deep.equal({ 5: { 'tribes': '-1'}});
+                done();
+            });
+            
+        })
     });
     it('should have area_card function', function(done) {
         engine.drawer = function(deck, done)

@@ -7,7 +7,7 @@ module.exports = {
     punchline: "Let's get ready to RUMBLE!",
     description: "",
     steps: {
-            '1': "{%; area_card() %}",
+            '1': "Draw the next card.{%; area_card() %} Circle denotes the Active Region {{ active_region }}.",
             '2': " If the Active Region has no Fault Line: \
             Reduce City AV by 1 in the Active Region. \
             Reduce Tribes by 1 in the Active Region. \
@@ -15,7 +15,7 @@ module.exports = {
             Line does not exist already. \
             {% if (!active_region.fault) { change({ 'city': '-1', 'tribes': '-1', 'fault': true }); } %} \
             {% break_if(!active_region.fault) %}",
-            '3': "If the Active Region has a Fault Line: \
+            '3.1': "If the Active Region has a Fault Line: \
 Reduce City AV by 3 in the Active Region. \
 Reduce Tribes by 4 in the Active Region. \
 Decimate all Wonders in the Active Region \
@@ -23,7 +23,7 @@ Create a Fault Line in up to two Neighboring Regions \
 of your choice that do not have Fault Lines.\
                 {% change({ 'city': '-3', 'tribes': '-4' }) %} \
                 {%; createFaults() %}",
-            '4': "Draw the next Event card. {%; draw_card() %} Using the symbols \
+            '3.2': "Draw the next Event card. {%; draw_card() %} Using the symbols \
 shown on the ORIGINAL Event card to the far right of \
 the Earthquake event, add up the values in the symbols \
 on the newly drawn card. The total value that this \

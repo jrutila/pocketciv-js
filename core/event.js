@@ -7,6 +7,7 @@ var Context = function() {
     this.active_region = undefined;
     this.changes = {};
     this.break = false;
+    this.go = undefined;
     this.done = undefined;
     };
     
@@ -33,6 +34,11 @@ Context.prototype = {
     {
         if (expr)
             this.break = true;
+    },
+    goto: function(phase)
+    {
+        console.log("goingto "+phase)
+        this.go = phase;
     },
     area_card: function()
     {
@@ -122,6 +128,10 @@ StepsStack.prototype = {
     shift: function() {
         this._step = this.steps.shift();
         return this.arr.shift();
+    },
+    break: function() {
+        while (this.steps[0] != "final" && this.length)
+            this.shift();
     }
 }
 
@@ -132,23 +142,30 @@ var stepper = function(steps, ctx, done)
         return done && done(ctx);
     }
     var cmd = steps.shift();
+    if (ctx.go && ctx.go != steps.step)
+    {
+        stepper(steps, ctx, done);
+        return;
+    }
     ctx.engine.eventPhasing.dispatch(steps.step, ctx)
     contextEval(cmd, ctx, function() {
         if (ctx.break)
-            steps = [];
+        {
+            steps.break();
+        }
         stepper(steps, ctx, done);
     },cmd.indexOf(';') === 0);
 }
 
-extendSteps = function(event, advances, limit)
+extendSteps = function(event, advances, limit, context)
 {
     var actual_steps = _.clone(event.steps);
     _.each(_.pick(advances, limit), function(adv) {
         if (_.has(adv.events, event.name))
         {
-            console.log('Extending with '+adv.name)
+            console.log('Extending with steps with '+adv.name)
             actual_steps = _.extend(actual_steps, adv.events[event.name].steps);
-            //_.extend(context, engine.acquired[key].events[ev.name])
+            context && _.extend(context, adv.events[event.name])
         }
     }, this)
     
@@ -176,7 +193,7 @@ runEvent = function(engine, event, ev, done)
     context.engine = engine;
     context.event = ev;
     
-    var ext= extendSteps(event, engine.advances, engine.acquired);
+    var ext = extendSteps(event, engine.advances, engine.acquired, context);
     var actual_steps = ext[0];
     var keys = ext[1];
     var steps_cmd = new StepsStack();
