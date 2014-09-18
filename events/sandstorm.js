@@ -8,12 +8,12 @@ module.exports = {
     description: "",
     steps: {
             '1': "Draw the next card.{%; area_card() %} Circle denotes the Active Region {{ active_region }}.",
-            '2': " If the Active Region contains a Desert: \
+            '2': "If the Active Region contains a Desert: \
+                 {% if (!active_region.desert) goto('3') %} \
                  Select two Neighboring Regions. Decimate Farms and \
                  Forests in these Regions. \
                  Create Deserts in the selected Regions. \
-                 {%; reduceNeighbours() %} \
-                 {% break_if(active_region.desert) %}",
+                 {%; reduceNeighbours() %}",
             '3': "If the Active Region does not contain a Desert: \
                  Decimate Farms and Forests in the Active Region. \
                  Create a Desert in the Active Region. \

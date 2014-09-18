@@ -130,7 +130,7 @@ StepsStack.prototype = {
         return this.arr.shift();
     },
     break: function() {
-        while (this.steps[0] != "final" && this.length)
+        while (this.length && this.steps[0][0] != "f")
             this.shift();
     }
 }
@@ -147,7 +147,8 @@ var stepper = function(steps, ctx, done)
         stepper(steps, ctx, done);
         return;
     }
-    ctx.engine.eventPhasing.dispatch(steps.step, ctx)
+    ctx.go = undefined;
+    ctx.engine.signals.eventPhasing.dispatch(steps.step, ctx)
     contextEval(cmd, ctx, function() {
         if (ctx.break)
         {

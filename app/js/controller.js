@@ -459,7 +459,7 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
     $scope.engine.phase = "";
     $scope.godMode = false;
     
-    pocketciv.Engine.eventPhasing.add(function(phase, ev) {
+    pocketciv.Engine.signals.eventPhasing.add(function(phase, ev) {
         console.log("event phasing "+phase)
         if (phase == "0")
         {
@@ -477,13 +477,17 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
         }
         else if (phase == "-1")
         {
-            $scope.currentEvent = undefined;
         }
         else
         {
             $scope.currentEvent.step = phase;
             $scope.currentEvent.context = ev;
         }
+    });
+    pocketciv.Engine.signals.phaser.add(function(status, phase) {
+        console.log(phase+": "+status);
+        if (status == "end" && phase == "event")
+            $scope.currentEvent = undefined;
     });
     
     var map = new Object();

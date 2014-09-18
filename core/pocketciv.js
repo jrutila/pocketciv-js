@@ -32,6 +32,7 @@ var advances = {
     'masonry': require('../advances/masonry'),
     'engineering': require('../advances/engineering'),
     'architecture': require('../advances/architecture'),
+    'medicine': require('../advances/medicine'),
 }
 
 
@@ -228,7 +229,10 @@ function Engine(map, deck) {
     this.round = {} // Will be emptied after upkeep!
     this.era = 1;
     /** SIGNALS **/
-    this.eventPhasing = new signals.Signal();
+    this.signals = {
+        'eventPhasing': new signals.Signal(),
+        'phaser': new signals.Signal()
+    }
 }
 
 var defaults= {
@@ -293,7 +297,9 @@ Engine.prototype = {
         this.era++;
     },
     nextPhase: function() {
+        this.signals.phaser.dispatch("end", this.phase)
         this.phase = this.phases[this.phases.indexOf(this.phase)+1] || this.phases[0];
+        this.signals.phaser.dispatch("start", this.phase)
         console.log("Phase is now "+this.phase);
     },
     populate: function(ctx) {
@@ -398,11 +404,11 @@ Engine.prototype = {
             {
                 var ev = eventcard.events[era];
                 console.log("Drew event: "+ev.name);
-                eng.eventPhasing.dispatch("0", ev);
+                eng.signals.eventPhasing.dispatch("0", ev);
                 eng.doEvent(ev, function(changes) {
                     console.log("Event ended: "+ev.name);
                     ctx.changes = changes;
-                    eng.eventPhasing.dispatch("-1", ev);
+                    eng.signals.eventPhasing.dispatch("-1", ev);
                     ctx.done && ctx.done();
                 });
             } else {
