@@ -11,7 +11,7 @@ module.exports = {
         },
         'earthquake': {
             'steps': {
-                'final': "+ If you have {{ adv:engineering }}, Cities cannot be \
+                'f4.1': "+ If you have {{ adv:engineering }}, Cities cannot be \
                         Reduced below 1 AV. Decimated Cities are instead reduced to 1 AV. \
                         {% saveCities() %}"
             },
