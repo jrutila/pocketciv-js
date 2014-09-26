@@ -33,6 +33,7 @@ var advances = {
     'engineering': require('../advances/engineering'),
     'architecture': require('../advances/architecture'),
     'medicine': require('../advances/medicine'),
+    'horticulture': require('../advances/horticulture'),
 }
 
 
@@ -324,11 +325,24 @@ Engine.prototype = {
         });
     },
     advance: function(ctx, name) {
-        if (!name) return;
+        if (!name)
+        {
+            this.actions = actions;
+            var extra = {};
+            _.each(_.pick(this.advances, this.acquired), function(adv) {
+                _.each(adv.actions, function(act, key) {
+                    if (act.run)
+                        extra[key] = act;
+                })
+            });
+            _.extend(this.actions, extra);
+            return;
+        }
         console.log("Running advance "+name);
         var eng = this;
         _.each(eng.acquired, function(key) {
-            if (name in eng.advances[key].actions)
+            if (name in eng.advances[key].actions &&
+            eng.advances[key].actions[name].context)
             {
                 _.extend(ctx, eng.advances[key].actions[name].context(this));
             }

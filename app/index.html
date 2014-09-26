@@ -349,9 +349,9 @@
     <div id="advancePhase" class="actionElement collapsible" ng-hide="engine.phase != 'advance'" >
         <h2>Advance</h2>
         <ul class="actionContent">
-            <li><button ng-click="advance('farm')">Create a Farm</button></li>
-            <li><button ng-click="advance('city')">Build a City</button></li>
-            <li><button ng-click="advance('acquire')">Acquire Advances</button></li>
+            <li ng-repeat="(a, act) in engine.actions">
+                <button ng-click="advance(a)">{{ act.title }}</button>
+            </li>
         </ul>
         <button class="actionDone" ng-click="actionStack.pop(); engine.nextPhase()">Done</button>
     </div>

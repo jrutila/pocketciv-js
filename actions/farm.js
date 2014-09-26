@@ -1,5 +1,6 @@
 var i18n = require('../lib/i18n');
 module.exports = {
+    title: "Create a Farm",
     run: function(context) {
         var engine = this;
         var possibleAreas = {};

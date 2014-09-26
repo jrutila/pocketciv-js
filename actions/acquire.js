@@ -1,4 +1,5 @@
 module.exports = {
+    title: "Acquire Advances",
     run: function() {
         var engine = this;
         engine.round.acquired = engine.round.acquired || {};

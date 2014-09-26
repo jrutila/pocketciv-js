@@ -1,4 +1,5 @@
 module.exports = {
+    title: "Build a City",
     run: function() {
         var engine = this;
         var possibleAreas = {};
