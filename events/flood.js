@@ -5,8 +5,8 @@ module.exports = {
     description: "",
     steps: {
             '1': "{%; area_card() %}",
-            '2.1': "If the {{ Active Region|active_region}} neighbors the Sea then see TSUNAMI below",
-            '2.2.1': "If the Active Region does not Neighbor the Sea: \
+            '2': "If the {{ Active Region|active_region}} neighbors the Sea then see TSUNAMI below",
+            '2.1': "If the Active Region does not Neighbor the Sea: \
                     Reduce Tribes by 2 in the Active Region. \
                     Decimate Farms in the Active Region. \
                     Reduce City AV by 1 in the Active Region. \
@@ -31,8 +31,8 @@ Wonders of your choice in the Region, one at a time. \
  \
 1 Tribe = 1 Damage. {% dmgTr = 1 %} \
 1 City AV = 2 Damage. {% dmgCt = 2 %} \
-1 Wonder = 3 Damage. {% dmgWn = 3 %}",
-            '-': "{% tsunami() %}"
+1 Wonder = 3 Damage. {% dmgWn = 3 %} \
+{% tsunami() %}"
     },
     'tsunami': function() {
         console.log("Running TSUNAMI!")

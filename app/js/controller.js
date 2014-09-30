@@ -360,11 +360,11 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
             $scope.selArea = area;
     }
     
-    $scope.doEvent = function() {
+    $scope.doEvent = function(startEvent) {
         try {
-        var ev = JSON.parse($scope.startEvent)
+        var ev = JSON.parse(startEvent)
         } catch(e) {
-            var ev = { name: $scope.startEvent };
+            var ev = { name: startEvent };
         }
         $scope.engine.doEvent(ev)
     }

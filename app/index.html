@@ -51,6 +51,7 @@
                 <label class="btn btn-primary" ng-model="godMode" btn-checkbox>God Mode</label>
                 <textarea ng-show="godMode" json-text rows="5" cols="30" ng-model="engine.map.areas"></textarea>
                 <input ng-show="godMode" type="text" ng-model="acquireAdvance" placeholder="Acquire advance" ng-enter="engine.acquire(acquireAdvance); acquireAdvance = ''"/>
+                <input ng-show="godMode" type="text" ng-model="startEvent" placeholder="Start event" ng-enter="doEvent(startEvent); startEvent = ''"/>
                 <select ng-show="godMode" ng-model="engine.phase">
                     <option value="populate">1. Population</option>
                     <option value="move">2. Move</option>

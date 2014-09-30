@@ -418,11 +418,9 @@ Engine.prototype = {
             {
                 var ev = eventcard.events[era];
                 console.log("Drew event: "+ev.name);
-                eng.signals.eventPhasing.dispatch("0", ev);
                 eng.doEvent(ev, function(changes) {
                     console.log("Event ended: "+ev.name);
                     ctx.changes = changes;
-                    eng.signals.eventPhasing.dispatch("-1", ev);
                     ctx.done && ctx.done();
                 });
             } else {
@@ -434,7 +432,9 @@ Engine.prototype = {
     doEvent: function(ev, done) {
         var eng = this;
         var event = eng.events[ev.name];
+        eng.signals.eventPhasing.dispatch("0", ev);
         eventRunner.runEvent(eng, event, ev, function(changes) {
+            eng.signals.eventPhasing.dispatch("-1", ev);
             done && done(changes);
         });
     },
