@@ -24,7 +24,7 @@ module.exports = {
                     {% if (active_region.tribes) change({ 'tribes': '1' }) %} \
                 {% } %} \
                 ",
-            '2.3': "If the Active Region has a Volcano: \
+            '2.3': "{% break_if(!active_region.volcano) %}If the Active Region has a Volcano: \
                 Decimate Cities, Farms, Tribes, Forest and Wonders \
                 in the Active Region. \
                 Create a Desert in the Active Region. \
