@@ -6,7 +6,14 @@ module.exports = {
     resources: [ 'stone', 'wood' ],
     requires: [ 'engineering' ],
     required_by: [ ],
-    events: { },
+    events: {
+        'civil_war': {
+            'steps': {
+                '2.4': "+ If you have {{ adv:architecture }}, City AV reductions are reduced by 1 \
+                {% activeCityReduce++; neighbourCityReduce++ %}"
+            }
+        }
+    },
     phases: {
         'city_advance.pre': function(ctx) {
             console.log('Architecture max city 4')
