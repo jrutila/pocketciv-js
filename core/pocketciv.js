@@ -34,6 +34,7 @@ var advances = {
     'architecture': require('../advances/architecture'),
     'medicine': require('../advances/medicine'),
     'horticulture': require('../advances/horticulture'),
+    'sense_of_community': require('../advances/sense_of_community'),
 }
 
 
