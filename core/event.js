@@ -20,6 +20,11 @@ Context.prototype = {
             chg = area;
             area = ar;
         }
+        if (area === null)
+        {
+            _.extend(this.changes, chg);
+            return;
+        }
         area = area ? area : this.active_region;
         if (typeof area === "object")
             area = area.id

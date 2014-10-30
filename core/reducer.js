@@ -86,7 +86,7 @@ Reducer.prototype = {
           else
             rdc.changes[k] = val;
         });
-        //if (_.isEmpty(this.areas())) this.amount = 0;
+//        if (_.isEmpty(this.areas())) this.amount = 0;
         break;
       case Modes.AreaWalker:
       default:
@@ -104,10 +104,10 @@ Reducer.prototype = {
     if (failed) return false;
     
     return {
+      'areas':this.areas(),
       'ok': this.amount <= 0,
       'amount': this.amount,
       'changes': this.changes,
-      'areas':this.areas(),
     };
   },
   set startAmount(value) {
