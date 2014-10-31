@@ -36,6 +36,10 @@ var advances = {
     'horticulture': require('../advances/horticulture'),
     'sense_of_community': require('../advances/sense_of_community'),
     'music': require('../advances/music'),
+    'literacy': require('../advances/literacy'),
+    'slave_labor': require('../advances/slave_labor'),
+    'coinage': require('../advances/coinage'),
+    'government': require('../advances/government'),
 }
 
 
@@ -461,7 +465,8 @@ Engine.prototype = {
     },
     gold_decimate: function(ctx) {
         var engine = this;
-        ctx.changes = { 'gold': '0' };
+        if (!ctx.do_not_decimate)
+            ctx.changes = { 'gold': '0' };
         ctx.done && ctx.done();
     },
     city_support: function(ctx) {
