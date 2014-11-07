@@ -612,6 +612,65 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
     })
 });
 
+pocketcivApp.directive('pcEventView', function() {
+    return {
+        restrict: 'E',
+        scope:
+        {
+            event: "=event",
+            engine: "=engine",
+        },
+        templateUrl: 'partials/widgets/event.html',
+        controller: function($scope) {
+            var ext = eventplay.extendSteps($scope.event, $scope.engine.advances, _.keys($scope.engine.advances));
+            $scope.steps_order = ext[1];
+            $scope.steps = ext[0];
+        }
+      }
+})
+
+pocketcivApp.directive('pcEventStep', ['$sce', function($sce) {
+    return {
+        restrict: 'E',
+        transclude: true,
+        scope:
+        {
+            step: "=step",
+            event: "=event",
+            engine: "=engine",
+        },
+        link: function($scope, tElem, tAttr) {
+            var context = $scope.event.context || {};
+            var d = $scope.step.replace(/{%.*?%}/g, "");
+            d = d.replace(/{{ ([a-z_]+) }}/g, "{{{ $1 }}}")
+            
+            var adv_regex = /{{ adv:(.*?) }}/g;
+            var m = adv_regex.exec(d);
+            var stepcl = "";
+            if (m)
+            {
+                var adv = $scope.engine.advances[m[1]];
+                var acq = $scope.engine.acquired.indexOf(m[1]) > -1;
+                stepcl = stepcl + (acq ? "available " : "not_available ");
+                d = d.replace(adv_regex, adv.title);
+            }
+            var ctx = _.clone(context);
+            if (context.active_region)
+                ctx.active_region = "<span class='areaCode'>"+context.active_region.id+"</span>"
+            var rctx = _.extend(window, ctx);
+            rctx = _.extend(rctx, $scope.engine.advances);
+            if (d.indexOf("+") == 0)
+            {
+                stepcl = stepcl + "positive";
+                d = d.trim("+ ");
+            }
+            d = "<span class='"+stepcl+"'>"+d+"</span>";
+            var final = mustache.render(d, rctx);
+            $(tElem).replaceWith(final);
+        },
+      }
+}])
+
 pocketcivApp.filter('eventFormat', function() {
     return function(descr, context) {
         var d = descr.replace(/{%.*?%}/g, "");

@@ -1,6 +1,9 @@
 module.exports = {
     name: "agriculture",
     title: "Agriculture",
+    description: "Farms can be created in any Region, and you do NOT \
+decimate Forests to create Farms once per turn. You still must \
+Decimate 2 Tribes to create a Farm.",
     points: 5,
     cost: { 'tribes': 4 },
     resources: [ 'stone' ],

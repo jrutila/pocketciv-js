@@ -243,6 +243,18 @@
     </div>
     <button ng-click="acquireGo()" class="btn btn-primary" ng-show="engine.phase == 'advance' && possibleAdvances[selAdv.name].areas.length > 0 && selArea && acquiring">Acquire</button>
 </div>
+<div id="advanceinfo_details">
+    <div id="advanceinfo_description">{{ selAdv.description }}</div>
+    <div id="advanceinfo_events">
+    {{ selAdv.events }}
+        <ul>
+            <li ng-repeat="(e,s) in selAdv.events">
+                {{ engine.events[e].title }}
+                <pc-event-view event="engine.events[e]" engine="engine"></pc-event-view>
+            </li>
+        </ul>
+    </div>
+</div>
                     <!-- END LEFT CONTENT -->
                     </div>
                 </div>

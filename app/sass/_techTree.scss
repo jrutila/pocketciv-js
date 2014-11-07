@@ -25,7 +25,8 @@ $infoWidth: 250px;
     }
     
     #advanceinfo {
-        margin-top: $infoBarHeight;
+        float: left;
+        width: $infoWidth;
         .advancereq, .advancereqby {
             height: 40px;
         }
@@ -33,6 +34,16 @@ $infoWidth: 250px;
             display: inline;
             font-weight: bold;
         }
+    }
+    
+    #advanceinfo_details {
+        margin-left: $infoWidth;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+    
+    .tt_layout_left_content {
+        margin-top: $infoBarHeight;
     }
     
     #cityinfo {

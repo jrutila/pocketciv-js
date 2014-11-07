@@ -1,6 +1,7 @@
 module.exports = {
     name: "horticulture",
     title: "Horticulture",
+    description: "Decimate 4 Tribes in a Region to Create a Forest.",
     points: 8,
     cost: { 'tribes': 2 },
     resources: [ 'wood' ],
