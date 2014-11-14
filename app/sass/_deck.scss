@@ -11,10 +11,14 @@ $circleColor-text: lightPink;
 $squareColor-border: lightGreen;
 $squareColor-inner: black;
 $squareColor-text: lightGreen;
-$eventColor: lightGray;
+$eventColor: $color-primary-2;
+$eventBorderColor: $color-primary-0;
 $eventTop: 70px;
+$eventTextColor: black;
 $deckPeek: 50px;
 $deckRightMargin: 2px;
+$deckColor: $color-primary-4;
+$cardsLeftColor: $color-primary-2;
 
 #card {
     .hexagon.border {
@@ -85,8 +89,9 @@ $deckRightMargin: 2px;
             margin-bottom: 2px;
             display: inline-block;
             background-color: $eventColor;
+            color: $eventTextColor;
             position: relative;
-            border: 1px solid black;
+            border: 1px solid $eventBorderColor;
             width: 100%;
             
             .era {
@@ -107,7 +112,7 @@ $deckRightMargin: 2px;
 }
 
 #card {
-    background-color: brown;
+    background-color: $deckColor;
     position: fixed;
     width: $cardWidth;
     height: $cardHeight;
@@ -136,7 +141,7 @@ $deckRightMargin: 2px;
 }
 
 #deck {
-    background-color: brown;
+    background-color: $deckColor;
     position: fixed;
     width: $cardWidth;
     height: $cardHeight;
@@ -146,7 +151,7 @@ $deckRightMargin: 2px;
     bottom: 3px;
 
     #cardsLeft {
-        color: red;
+        color: $cardsLeftColor;
         font-size: 54px;
         width: 100%;
         display: block;

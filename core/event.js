@@ -165,6 +165,7 @@ var stepper = function(steps, ctx, done)
 
 extendSteps = function(event, advances, limit, context)
 {
+    if (!event || !event.steps) return [{}, []];
     var actual_steps = _.clone(event.steps);
     _.each(_.pick(advances, limit), function(adv) {
         if (_.has(adv.events, event.name))

@@ -1,5 +1,6 @@
 $titleHeight: 30px;
 $infoWidth: 250px;
+$infoDetailsWidth: 350px;
 
 #techtree {
     .ttcont {
@@ -40,6 +41,36 @@ $infoWidth: 250px;
         margin-left: $infoWidth;
         padding-left: 10px;
         padding-right: 10px;
+    }
+    
+    #advanceinfo_event_details {
+        position: absolute;
+        margin-right: 213px;
+        display: block;
+        margin-top: 10px;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+    
+@include smaller-than-map {
+    #advanceinfo_event_details {
+        left: 0px;
+        margin-right: 140px;
+    }
+    
+    #advanceinfo_details {
+        margin-left: 0px;
+    }
+}    
+@include really-large {
+    #advanceinfo_event_details {
+        left: $infoWidth + $infoDetailsWidth;
+        top: 10px;
+    }
+}    
+    
+    #advanceinfo_description {
+        max-width: $infoDetailsWidth;
     }
     
     .tt_layout_left_content {

@@ -9,10 +9,20 @@ module.exports = {
     events: {
         'anarchy': {
             'steps': {
+                '2': "- If you have {{ adv:slave_labor }}, Draw the next card {%; draw_card() %}. \
+                       Reduce Tribes throughout your Empire an \
+                       additional amount as shown in the RED CIRCLE. \
+                       {%; reduce('tribes', card_value('c')) %}"
             }
         },
         'uprising': {
-            
+            'steps': {
+                '3': "- If you have {{ adv:slave_labor }}, Decimate farms in areas that have no cities.\
+                     {% reduceFarms() %}"
+            },
+            reduceFarms: function() {
+                
+            }
         },
         'bandits': {
             

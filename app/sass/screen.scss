@@ -16,6 +16,7 @@ $mapSymbolSize: 21px;
 $infoBarHeight: 35px;
 $actionElementTopicHeight: 35px;
 
+@import "_colors";
 @import "_icons";
 @import "_mediaQueries";
 @import "_deck";
@@ -32,20 +33,55 @@ $actionElementTopicHeight: 35px;
     max-width: 500px;
     background-color: green;
     color: lightGreen;
+}
+
+$eventWidth: 750px;
+div.event {
+    background-color: $color-secondary-2-0;
+    padding: 7px;
+    max-width: $eventWidth;
+    border-radius: 10px;
+    position: relative;
+    z-index: 900;
     
+    h2 {
+        color: $color-secondary-2-3;
+        font-weight: bold;
+    }
     .active {
         background-color: blue;
     }
     .step {
+        float: left;
+        border: 3px solid $color-secondary-2-4;
+        border-radius: 1.5em;
         width: 30px;
-        display: inline-block;
+        height: 30px;
+        background-color: $color-secondary-2-1;
+        color: $color-secondary-2-4;
+        font-weight: bold;
+        text-align: center;
+        padding-top: 4px;
     }
     
-    .stepdescr .positive {
-        color: lightBlue;
+    .stepdescr {
+        display: block;
+        margin-left: 40px;
     }
-    .stepdescr .not_available {
+    
+    .positive {
+        color: blue;
+    }
+    .negative{
+        color: red;
+    }
+    .not_available {
         text-decoration: line-through;
+    }
+    
+    li {
+        margin-bottom: 10px;
+        min-height: 30px;
     }
 }
 

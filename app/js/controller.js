@@ -337,6 +337,7 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
     }
     
     $scope.selAdv = undefined;
+    $scope.selEvent = undefined;
     $scope.toggleTechTree = function() {
         $scope.showTT = !$scope.showTT;
         if (!$scope.showTT && $scope.acquiring)
@@ -349,8 +350,14 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
     $scope.selectAdv = function(adv) {
         $scope.selAdv = adv;
         $scope.selArea = undefined;
+        $scope.selEvent = undefined;
+        if (!$scope.possibleAdvances[adv.name]) return;
         if ($scope.possibleAdvances[adv.name].areas.length == 1)
             $scope.selArea = $scope.engine.map.areas[$scope.possibleAdvances[adv.name].areas[0]];
+    }
+    
+    $scope.selectEvent = function(ev) {
+        $scope.selEvent = ev
     }
     
     $scope.advArea = function(area) {
@@ -621,10 +628,12 @@ pocketcivApp.directive('pcEventView', function() {
             engine: "=engine",
         },
         templateUrl: 'partials/widgets/event.html',
-        controller: function($scope) {
-            var ext = eventplay.extendSteps($scope.event, $scope.engine.advances, _.keys($scope.engine.advances));
-            $scope.steps_order = ext[1];
-            $scope.steps = ext[0];
+        link: function($scope) {
+            $scope.$watch('event', function (event) {
+                var ext = eventplay.extendSteps(event, $scope.engine.advances, _.keys($scope.engine.advances));
+                $scope.steps_order = ext[1];
+                $scope.steps = ext[0];
+            });
         }
       }
 })
@@ -664,7 +673,12 @@ pocketcivApp.directive('pcEventStep', ['$sce', function($sce) {
                 stepcl = stepcl + "positive";
                 d = d.trim("+ ");
             }
-            d = "<span class='"+stepcl+"'>"+d+"</span>";
+            if (d.indexOf("-") == 0)
+            {
+                stepcl = stepcl + "negative";
+                d = d.trim("- ");
+            }
+            d = "<span class='stepdescr "+stepcl+"'>"+d+"</span>";
             var final = mustache.render(d, rctx);
             $(tElem).replaceWith(final);
         },

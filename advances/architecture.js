@@ -1,6 +1,8 @@
 module.exports = {
     name: "architecture",
     title: "Architecture",
+    description: "The maximum AV of a City is 4. \
+During Attacks, Reduce 8 Attacking Force for every 1 City AV",
     points: 8,
     cost: { 'tribes': 6, 'gold': 6 },
     resources: [ 'stone', 'wood' ],

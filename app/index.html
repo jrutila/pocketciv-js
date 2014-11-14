@@ -211,17 +211,17 @@
 <div id="advanceinfo">
     <div class="advancereq">
         <ul>
-            <li class="btn" ng-class="getAcquireClasses(r)" ng-click="selectAdv(engine.advances[r])" ng-repeat="r in _.flatten(selAdv.requires)">
+            <li class="btn btn-default" ng-class="getAcquireClasses(r)" ng-click="selectAdv(engine.advances[r])" ng-repeat="r in _.flatten(selAdv.requires)">
                 {{ engine.advances[r].title || r }}
             </li>
         </ul>
     </div>
-    <h1 ng-class="getAcquireClasses(selAdv.name)">
+    <h1 ng-class="getAcquireClasses(selAdv.name)" class="btn btn-primary">
                     {{ selAdv.title }}
                 </h1>
     <div class="advancereqby">
         <ul>
-            <li class="btn" ng-class="getAcquireClasses(r)" ng-click="selectAdv(engine.advances[r])" ng-repeat="r in selAdv.required_by">
+            <li class="btn btn-default" ng-class="getAcquireClasses(r)" ng-click="selectAdv(engine.advances[r])" ng-repeat="r in selAdv.required_by">
                 {{ engine.advances[r].title || r }}
             </li>
         </ul>
@@ -245,14 +245,14 @@
 </div>
 <div id="advanceinfo_details">
     <div id="advanceinfo_description">{{ selAdv.description }}</div>
-    <div id="advanceinfo_events">
-    {{ selAdv.events }}
-        <ul>
-            <li ng-repeat="(e,s) in selAdv.events">
-                {{ engine.events[e].title }}
-                <pc-event-view event="engine.events[e]" engine="engine"></pc-event-view>
-            </li>
-        </ul>
+    <div id="advanceinfo_events" ng-if="_.size(selAdv.events) > 0">
+        <div>Affects following events:</div>
+        <div class="btn-group">
+            <a ng-class="{ 'disabled': selEvent == engine.events[e]}" ng-repeat="(e,s) in selAdv.events" href="#" class="btn btn-default" ng-click="selectEvent(engine.events[e])">{{ engine.events[e].title }}</a>
+        </div>
+    </div>
+    <div id="advanceinfo_event_details">
+        <pc-event-view event="selEvent" engine="engine"></pc-event-view>
     </div>
 </div>
                     <!-- END LEFT CONTENT -->
@@ -344,6 +344,7 @@
         </div>
     </div>
     
+    <!--
     <div id="eventRunner" ng-show="currentEvent">
         <h2>{{ currentEvent.event.title | sprintf:currentEvent.info }} {{ currentEvent.step }}</h2>
         <ul>
@@ -353,6 +354,7 @@
             </li>
         </ul>
     </div>
+    -->
     
     <div id="areaselect" ng-hide="possibleAreas.length == 0">
         <select ng-model="selectedArea" ng-options="a for a in possibleAreas"></select>

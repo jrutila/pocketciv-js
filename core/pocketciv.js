@@ -16,6 +16,7 @@ var events = {
     'sandstorm': require('../events/sandstorm'),
     'earthquake': require('../events/earthquake'),
     'volcano': require('../events/volcano'),
+    'uprising': require('../events/uprising'),
 }
 
 var actions = {
