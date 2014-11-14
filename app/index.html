@@ -344,17 +344,9 @@
         </div>
     </div>
     
-    <!--
     <div id="eventRunner" ng-show="currentEvent">
-        <h2>{{ currentEvent.event.title | sprintf:currentEvent.info }} {{ currentEvent.step }}</h2>
-        <ul>
-            <li ng-class="{ active: step == currentEvent.step }" ng-repeat="step in currentEvent.sorder">
-                <span class="step">{{ step }}</span>
-                 <span class="stepdescr" ng-bind-html="currentEvent.steps[step] | eventFormat:currentEvent.context"></span>
-            </li>
-        </ul>
+        <pc-event-view event="currentEvent" engine="engine"></pc-event-view>
     </div>
-    -->
     
     <div id="areaselect" ng-hide="possibleAreas.length == 0">
         <select ng-model="selectedArea" ng-options="a for a in possibleAreas"></select>

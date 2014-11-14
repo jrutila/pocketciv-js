@@ -5,8 +5,8 @@
 
 @import "compass/reset";
 
-$mapHeight: 800px;
-$mapWidth: 800px;
+$mapHeight: 700px;
+$mapWidth: 700px;
 
 $cardHeight: 260px;
 $cardWidth: 170px;
@@ -26,16 +26,17 @@ $actionElementTopicHeight: 35px;
 @import "_techTree";
 @import "_welcome";
 
+$eventWidth: 750px;
+
 #eventRunner {
+    z-index: 1000;
     position: fixed;
     top: 72px;
     left: 1200px;
-    max-width: 500px;
-    background-color: green;
-    color: lightGreen;
+    max-width: $eventWidth;
+    margin-right: 10px;
 }
 
-$eventWidth: 750px;
 div.event {
     background-color: $color-secondary-2-0;
     padding: 7px;
@@ -48,8 +49,9 @@ div.event {
         color: $color-secondary-2-3;
         font-weight: bold;
     }
-    .active {
-        background-color: blue;
+    .active .step {
+        background-color: $color-secondary-2-3;
+        color: $color-secondary-2-2;
     }
     .step {
         float: left;
@@ -260,6 +262,16 @@ a {
         padding-bottom: 2px;
     }
 }
+@include really-large {
+#changePrompt {
+    .content {
+        width: $mapWidth;
+    }
+}
+}
+        
+
+    
 
 .highlight {
     z-index: 101 !important;
