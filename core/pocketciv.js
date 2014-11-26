@@ -222,6 +222,7 @@ function Engine(map, deck) {
     this.reducer = function() { throw "Not implemented"; }
     this.drawer = function() { throw "Not implemented"; }
     this.areaChanger = function() { throw "Not implemented"; }
+    this.eventStepper = function(done) { done & done(); }
     this.map = map || theMap;
     this.deck = deck || theDeck;
     var eng = this;

@@ -159,7 +159,11 @@ var stepper = function(steps, ctx, done)
         {
             steps.break();
         }
-        stepper(steps, ctx, done);
+        console.log(steps.step+":")
+        console.log(cmd);
+        ctx.engine.eventStepper(function() {
+            stepper(steps, ctx, done);
+        }, steps.step, ctx);
     },cmd.indexOf(';') === 0);
 }
 
@@ -170,7 +174,6 @@ extendSteps = function(event, advances, limit, context)
     _.each(_.pick(advances, limit), function(adv) {
         if (_.has(adv.events, event.name))
         {
-            console.log('Extending with steps with '+adv.name)
             actual_steps = _.extend(actual_steps, adv.events[event.name].steps);
             context && _.extend(context, adv.events[event.name])
         }
@@ -205,7 +208,7 @@ runEvent = function(engine, event, ev, done)
     var keys = ext[1];
     var steps_cmd = new StepsStack();
     
-    console.log(actual_steps)
+    //console.log(actual_steps)
     
     _.each(keys, function(key)
     {

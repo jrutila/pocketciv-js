@@ -357,7 +357,11 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
     }
     
     $scope.selectEvent = function(ev) {
-        $scope.selEvent = ev
+        $scope.selEvent = null;
+        setTimeout(function() {
+            $scope.selEvent = ev
+            $scope.$apply();
+        }, 10)
     }
     
     $scope.advArea = function(area) {
@@ -466,36 +470,53 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
     $scope.engine.phase = "";
     $scope.godMode = false;
     
+    /*
     pocketciv.Engine.signals.eventPhasing.add(function(phase, ev) {
         console.log("event phasing "+phase)
         if (phase == "0")
         {
             var event = pocketciv.Engine.events[ev.name];
-            var ext = eventplay.extendSteps(event, pocketciv.Engine.advances, _.keys(pocketciv.Engine.advances));
-            var steps_order = ext[1];
-            var steps = ext[0];
-            $scope.currentEvent = {
-                event: event,
-                steps: steps,
-                sorder: steps_order,
-                info: ev,
-                step: phase
-            }
+            $scope.currentEvent = event;
+            $scope.currentStep = phase;
         }
         else if (phase == "-1")
         {
         }
         else
         {
-            $scope.currentEvent.step = phase;
-            $scope.currentEvent.context = ev;
+            $scope.currentStep = phase;
         }
     });
+    */
     pocketciv.Engine.signals.phaser.add(function(status, phase) {
         console.log(phase+": "+status);
         if (status == "end" && phase == "event")
+        {
             $scope.currentEvent = undefined;
+            $scope.currentStep = undefined;
+        }
     });
+    pocketciv.Engine.eventStepper = function(done, step, ctx) {
+        if ($scope.currentEvent == undefined && ctx && ctx.event)
+        {
+            $scope.currentEvent = ctx.engine.events[ctx.event.name];
+        }
+        console.log("event phase stepper "+step);
+        if ($scope.currentStep != step)
+        {
+            $scope.currentStep = step;
+            $(window).one("keypress", function() {
+                $scope.$apply(function() {
+                    done & done();
+                });
+            });
+        }
+        else
+            done & done();
+    };
+    $scope.$watch("currentStep", function(step) {
+        console.log("GLOBAL WATCH "+step)
+    })
     
     var map = new Object();
     
@@ -628,17 +649,17 @@ pocketcivApp.directive('pcEventView', function() {
             engine: "=engine",
         },
         templateUrl: 'partials/widgets/event.html',
-        link: function($scope) {
+        link: function($scope, tElem) {
             $scope.$watch('event', function (event) {
                 var ext = eventplay.extendSteps(event, $scope.engine.advances, _.keys($scope.engine.advances));
                 $scope.steps_order = ext[1];
                 $scope.steps = ext[0];
             });
-        }
+        },
       }
 })
 
-pocketcivApp.directive('pcEventStep', ['$sce', function($sce) {
+pocketcivApp.directive('pcEventStep', function($rootScope) {
     return {
         restrict: 'E',
         transclude: true,
@@ -647,43 +668,46 @@ pocketcivApp.directive('pcEventStep', ['$sce', function($sce) {
             step: "=step",
             event: "=event",
             engine: "=engine",
+            currentStep: "=currentStep",
         },
         link: function($scope, tElem, tAttr) {
-            var context = $scope.event.context || {};
-            var d = $scope.step.replace(/{%.*?%}/g, "");
-            d = d.replace(/{{ ([a-z_]+) }}/g, "{{{ $1 }}}")
-            
-            var adv_regex = /{{ adv:(.*?) }}/g;
-            var m = adv_regex.exec(d);
-            var stepcl = "";
-            if (m)
-            {
-                var adv = $scope.engine.advances[m[1]];
-                var acq = $scope.engine.acquired.indexOf(m[1]) > -1;
-                stepcl = stepcl + (acq ? "available " : "not_available ");
-                d = d.replace(adv_regex, adv.title);
-            }
-            var ctx = _.clone(context);
-            if (context.active_region)
-                ctx.active_region = "<span class='areaCode'>"+context.active_region.id+"</span>"
-            var rctx = _.extend(window, ctx);
-            rctx = _.extend(rctx, $scope.engine.advances);
-            if (d.indexOf("+") == 0)
-            {
-                stepcl = stepcl + "positive";
-                d = d.trim("+ ");
-            }
-            if (d.indexOf("-") == 0)
-            {
-                stepcl = stepcl + "negative";
-                d = d.trim("- ");
-            }
-            d = "<span class='stepdescr "+stepcl+"'>"+d+"</span>";
-            var final = mustache.render(d, rctx);
-            $(tElem).replaceWith(final);
+                var event = $scope.event;
+                var context = event.context || {};
+                var d = $scope.step.replace(/{%.*?%}/g, "");
+                d = d.replace(/{{ ([a-z_]+) }}/g, "{{{ $1 }}}")
+                
+                var adv_regex = /{{ adv:(.*?) }}/g;
+                var m = adv_regex.exec(d);
+                var stepcl = "";
+                if (m)
+                {
+                    var adv = $scope.engine.advances[m[1]];
+                    var acq = $scope.engine.acquired.indexOf(m[1]) > -1;
+                    stepcl = stepcl + (acq ? "available " : "not_available ");
+                    d = d.replace(adv_regex, adv.title);
+                }
+                
+                var ctx = _.clone(context);
+                if (context.active_region)
+                    ctx.active_region = "<span class='areaCode'>"+context.active_region.id+"</span>"
+                var rctx = _.extend(window, ctx);
+                rctx = _.extend(rctx, $scope.engine.advances);
+                if (d.indexOf("+") == 0)
+                {
+                    stepcl = stepcl + "positive";
+                    d = d.trim("+ ");
+                }
+                if (d.indexOf("-") == 0)
+                {
+                    stepcl = stepcl + "negative";
+                    d = d.trim("- ");
+                }
+                d = "<span class='stepdescr "+stepcl+"'>"+d+"</span>";
+                var final = mustache.render(d, rctx);
+                $(tElem).replaceWith(final);
         },
       }
-}])
+})
 
 pocketcivApp.filter('eventFormat', function() {
     return function(descr, context) {
