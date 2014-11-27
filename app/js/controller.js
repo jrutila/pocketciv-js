@@ -500,11 +500,12 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
         if ($scope.currentEvent == undefined && ctx && ctx.event)
         {
             $scope.currentEvent = ctx.engine.events[ctx.event.name];
+            $scope.currentStep = { 'step': undefined, 'ctx': {} };
         }
         console.log("event phase stepper "+step);
-        if ($scope.currentStep != step)
+        if ($scope.currentStep.step != step)
         {
-            $scope.currentStep = step;
+            $scope.currentStep = { 'step': step, 'ctx': ctx };
             $(window).one("keypress", function() {
                 $scope.$apply(function() {
                     done & done();
@@ -515,7 +516,7 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
             done & done();
     };
     $scope.$watch("currentStep", function(step) {
-        console.log("GLOBAL WATCH "+step)
+        console.log("GLOBAL WATCH "+step.step)
     })
     
     var map = new Object();
@@ -647,6 +648,7 @@ pocketcivApp.directive('pcEventView', function() {
         {
             event: "=event",
             engine: "=engine",
+            currentStep: "=step",
         },
         templateUrl: 'partials/widgets/event.html',
         link: function($scope, tElem) {
@@ -668,11 +670,13 @@ pocketcivApp.directive('pcEventStep', function($rootScope) {
             step: "=step",
             event: "=event",
             engine: "=engine",
-            currentStep: "=currentStep",
+            currentStep: "=cstep",
         },
         link: function($scope, tElem, tAttr) {
-                var event = $scope.event;
-                var context = event.context || {};
+            var event = $scope.event;
+            var finalElement = tElem;
+            var render = function(step) {
+                var context = (step && step.ctx) || {};
                 var d = $scope.step.replace(/{%.*?%}/g, "");
                 d = d.replace(/{{ ([a-z_]+) }}/g, "{{{ $1 }}}")
                 
@@ -704,7 +708,12 @@ pocketcivApp.directive('pcEventStep', function($rootScope) {
                 }
                 d = "<span class='stepdescr "+stepcl+"'>"+d+"</span>";
                 var final = mustache.render(d, rctx);
-                $(tElem).replaceWith(final);
+                fElem = $(final)[0];
+                $(finalElement).replaceWith(fElem);
+                finalElement = fElem;
+            };
+            render();
+            $scope.$watch("currentStep", render);
         },
       }
 })
