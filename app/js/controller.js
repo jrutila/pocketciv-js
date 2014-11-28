@@ -494,6 +494,7 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
         {
             $scope.currentEvent = undefined;
             $scope.currentStep = undefined;
+            clearRegions();
         }
     });
     pocketciv.Engine.eventStepper = function(done, step, ctx) {
@@ -505,20 +506,19 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
         console.log("event phase stepper "+step);
         if ($scope.currentStep.step != step)
         {
+            if (ctx.active_region)
+                selectRegion(ctx.active_region.id)
+
             $scope.currentStep = { 'step': step, 'ctx': ctx };
-            $(window).one("keypress", function() {
+            setTimeout(function() {
                 $scope.$apply(function() {
                     done & done();
                 });
-            });
+            }, 500);
         }
         else
             done & done();
     };
-    $scope.$watch("currentStep", function(step) {
-        console.log("GLOBAL WATCH "+step.step)
-    })
-    
     var map = new Object();
     
     var getCanvas = function(i) {
