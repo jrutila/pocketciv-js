@@ -12,14 +12,14 @@ module.exports = {
                     {% break_if(active_region.tribes == 0) %}",
             '2': "The amount of Tribes in the Active Region \
                 becomes the base Warring Tribes amount \
-                {% warring_tribes = active_region.tribes %}",
+                {% warring_tribes = active_region.tribes %} ({{ warring_tribes }})",
             '2.1': "Multiply the base Warring Tribes amount by 2.\
                 {% warring_tribes = warring_tribes * 2 %} \
                 ",
             '3.1': "Select two neighboring regions with tribes (if possible).\
-                {% neighbourCount = 2 %}",
+                {% neighbourCount = 2 %} {%; selectAreas() %}",
             '3.2': "Reduce Neighboring Tribes by the amount of \
-                    Warring Tribes {{ warring_tribes }} {%; selectAreas() %}",
+                    Warring Tribes {{ warring_tribes }}",
             '4': "Reduce Tribes in Active Region by 3.\
                  {% change({ 'tribes': '-3' }) %}"
     },

@@ -14,7 +14,7 @@ module.exports = {
       {% population_loss = card_value(event.expr) %} \
       the original Event card ({{ event.expr }}) calculate your Population loss ({{ population_loss }}).",
       '2.1': "Starting with the Active \
-      Region, and working your way through Neighboring \
+      Region {{ active_region }}, and working your way through Neighboring \
       Regions, Decimate Tribes equal to the amount of \
       Population Loss. Tribes in Regions must be fully \
       Decimated before moving on to a new Region.",
