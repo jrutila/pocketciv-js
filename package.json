@@ -2,9 +2,8 @@
   "name": "pocketciv",
   "version": "0.0.1",
   "scripts": {
-    "test": "make test",
-    "autotest": "make autotest",
-    "watch": "grunt default",
+    "test": "node test/test.js",
+    "watch": "grunt",
     "start": "node bin/www"
   },
   "dependencies": {
