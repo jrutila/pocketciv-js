@@ -4,6 +4,7 @@ var _ = require("underscore");
 module.exports = {
     name: "cartage",
     title: "Cartage",
+    description: "Cities upkeep requirements for farms are not confined to local Regions.",
     points: 2,
     cost: { 'tribes': 2 },
     resources: [ 'stone' ],

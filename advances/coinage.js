@@ -1,6 +1,8 @@
 module.exports = {
     name: "coinage",
     title: "Coinage",
+    description: "Do not Decimate Gold during upkeep. Effectively,\
+you can now store Gold for the entire game.",
     points: 3,
     cost: { 'tribes': 2, 'gold': 3 },
     resources: [ 'stone' ],

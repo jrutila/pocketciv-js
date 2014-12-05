@@ -14,6 +14,7 @@ var saveCities = function() {
 module.exports = {
     name: "engineering",
     title: "Engineering",
+    description: "The maximum AV of a City is 3, unless otherwise noted.",
     points: 5,
     cost: { 'tribes': 3 },
     resources: [ 'stone', 'wood' ],

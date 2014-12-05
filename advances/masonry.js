@@ -1,6 +1,8 @@
 module.exports = {
     name: "masonry",
     title: "Masonry",
+    description: "During Upkeep, you can increase one City AV by 1. \
+The maximum AV of a City is 2, unless otherwise noted.",
     points: 3,
     cost: { 'tribes': 2 },
     resources: [ 'stone' ],
