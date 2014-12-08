@@ -470,6 +470,10 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
     $scope.engine.phase = "";
     $scope.godMode = false;
     
+    $scope.toggleGod = function(gm) {
+        $scope.godMode = gm;
+    };
+    
     /*
     pocketciv.Engine.signals.eventPhasing.add(function(phase, ev) {
         console.log("event phasing "+phase)
