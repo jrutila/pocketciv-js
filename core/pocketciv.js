@@ -296,7 +296,8 @@ Engine.prototype = {
                 st = st[p];
                 p = pp.shift()
             }
-            en[p] = JSON.parse(JSON.stringify(st[p]));
+            if (st && st[p])
+                en[p] = JSON.parse(JSON.stringify(st[p]));
         }, this);
         return ret;
     },

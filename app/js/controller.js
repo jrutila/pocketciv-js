@@ -20,7 +20,8 @@ gameLog = {
     "deck": [],
     "reduce": [],
     "areas": [],
-    "advance": []
+    "advance": [],
+    "acquires": [],
 };
 };
 resetGameLog();
@@ -314,6 +315,7 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
     }
     var doAcquire = undefined;
     $scope.acquiring = false;
+
     pocketciv.Engine.advanceAcquirer = function(engine, done) {
         $scope.acquirer = new pocketciv.AdvanceAcquirer(engine);
         $scope.possibleAdvances = $scope.acquirer.possibleAdvances();
@@ -331,7 +333,12 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
     }
     
     $scope.acquireOk = function() {
-        doAcquire.call($scope.engine, $scope.acquirer.acquired)
+        doAcquire.call($scope.engine, $scope.acquirer.acquired);
+        gameLog.acquires.push(
+            _.object(_.map($scope.acquirer.acquired, function (advn, key) {
+                return [key, advn.name];
+            }))
+        );
         $scope.acquiring = false;
         $scope.possibleAdvances = undefined;
     }
@@ -620,7 +627,7 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
         console.log("Sending bug")
         var gLog = _.clone(gameLog)
         gLog.comment = $scope.bugDescr;
-        gLog.engine = $scope.engine;
+        //gLog.engine = $scope.engine;
         $http.post('gamelog/add', gLog).success(function(data) {
             $scope.bugSent = true;
             setTimeout(function() { $scope.bugSent = false; }, 3000);

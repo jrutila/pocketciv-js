@@ -6,7 +6,7 @@ router.post('/add', function(req, res) {
     req.body.at = new Date();
     db.collection('gameLogs').insert(req.body, function(err, items) {
         res.send(
-            (err === null) ? { msg: '' } : { msg: err }
+            (err === null) ? { items: items } : { msg: err }
             );
     })
 });

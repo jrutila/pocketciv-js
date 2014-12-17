@@ -20,14 +20,20 @@ function check(final, chk, path) {
 }
 
 try {
-    if (play.scenario)
-        play.engine = require(play.scenario)
+    if (typeof play.scenario === "string")
+        play.scenario = require(play.scenario)
     runplay.run(engine, play);
 }
 catch (e) {
     if (e == "END" || e == "Not implemented") {
-        console.log('ENDED -- Checking')
-        check(engine, play.check);
+        console.log("ENDED");
+        console.log(engine.map)
+        if (play.check)
+        {
+            console.log('-- Checking');
+            check(engine, play.check);
+            console.log('-- Checked!');
+        }
     }
     else throw e
 }
