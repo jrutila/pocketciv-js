@@ -18,8 +18,9 @@ module.exports = {
                 throw "END"
             }
             var a = { };
-            a[acq[1]] = engine.advances[acq[0]];
-            done(a)
+            done(_.object(_.map(acq, function (advn, key) {
+                return [key, engine.advances[advn]];
+            })));
         }
         engine.drawer = function(deck, done) {
             var id = play.deck.shift();

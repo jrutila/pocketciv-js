@@ -334,11 +334,14 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
     
     $scope.acquireOk = function() {
         doAcquire.call($scope.engine, $scope.acquirer.acquired);
-        gameLog.acquires.push(
-            _.object(_.map($scope.acquirer.acquired, function (advn, key) {
-                return [key, advn.name];
-            }))
-        );
+        if ($scope.acquirer.acquired)
+            gameLog.acquires.push(
+                _.object(_.map($scope.acquirer.acquired, function (advn, key) {
+                    return [key, advn.name];
+                }))
+            );
+        else
+            _.last(gameLog.advance).pop("acquire");
         $scope.acquiring = false;
         $scope.possibleAdvances = undefined;
     }

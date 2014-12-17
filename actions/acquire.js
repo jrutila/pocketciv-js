@@ -13,6 +13,8 @@ module.exports = {
             {
                 if (_.has(acquires[area].cost, 'tribes'))
                     changes[area] = { 'tribes': '-'+acquires[area].cost.tribes };
+                if (_.has(acquires[area].cost, 'gold'))
+                    changes['gold'] = '-'+acquires[area].cost.gold;
             }
             engine.areaChange(changes, function() {
                 _.each(_.values(acquires), function(a) {
