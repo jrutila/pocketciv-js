@@ -40,13 +40,10 @@ module.exports = {
         'tsunami': {
         }
     },
-    phases: {
-        'city_advance.pre': function(ctx) {
-            console.log('Engineering max city 3')
-            this.max_city = !this.max_city || this.max_city < 3 ? 3 : this.max_city;
-            ctx.done && ctx.done();
-        }
+    acquired: function() {
+        console.log('Engineering max city 3')
+        this.params.max_city = !this.params.max_city || this.params.max_city < 3 ? 3 : this.params.max_city;
     },
-    actions: {
-    }
+    phases: { },
+    actions: { }
 }

@@ -11,17 +11,14 @@ module.exports = {
     requires: [ ],
     required_by: [ ],
     events: { },
-    phases: {
-        'city_advance.pre': function(ctx) {
-            console.log('Basic tools reduce cost by 1')
-            if (this.round.city_advance_discount === undefined)
-                this.round.city_advance_discount = 1;
-            else
-                this.round.city_advance_discount++;
-            ctx.done && ctx.done();
-        },
-    },
+    phases: { },
     acquired: function() {
+        console.log('Simple tools reduce cost by 1')
+        if (this.params.city_advance_discount === undefined)
+            this.params.city_advance_discount = 1;
+        else
+            this.params.city_advance_discount++;
+            
         console.log("Acquired Simple tools, update advance costs");
         var advs = ["masonry", "engineering", "architecture", "cartage",
             "irrigation", "mining", "roadbuilding", "metal_working"];

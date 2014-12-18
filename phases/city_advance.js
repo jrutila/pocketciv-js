@@ -38,16 +38,16 @@ var CityAdvance = {
 
 module.exports = {
     run: function(ctx) {
-        console.log("Max city is " + this.max_city)
-        console.log("Max city advance is " + this.round.city_advance_limit)
-        console.log("City advance discount is " + this.round.city_advance_discount)
+        console.log("Max city is " + this.params.max_city)
+        console.log("Max city advance is " + this.params.city_advance_limit)
+        console.log("City advance discount is " + this.params.city_advance_discount)
         ctx.changes = {};
-        if (this.round.city_advance_limit && this.max_city > 1) {
+        if (this.params.city_advance_limit && this.params.max_city > 1) {
             var rdc = new reducer.Reducer(this);
             rdc.mode = reducer.Modes.Overall;
-            rdc.max_city = this.max_city
-            rdc.advance_discount = this.round.city_advance_discount;
-            rdc.startAmount = -1 * this.round.city_advance_limit;
+            rdc.max_city = this.params.max_city
+            rdc.advance_discount = this.params.city_advance_discount;
+            rdc.startAmount = -1 * this.params.city_advance_limit;
             rdc.areas = CityAdvance.areas
             rdc.reduce = CityAdvance.reduce
 

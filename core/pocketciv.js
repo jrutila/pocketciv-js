@@ -251,6 +251,7 @@ function Engine(map, deck) {
     this.actions = actions;
     this.gold = 0;
     this.round = {} // Will be emptied after upkeep!
+    this.params = {} // Will be emptied on init!
     this.era = 1;
     /** SIGNALS **/
     this.signals = {
@@ -290,6 +291,7 @@ Engine.prototype = {
             }
             en[p] = st && st[p] || _.clone(defaults[d]);
         }
+        this.params = {};
         for (var key in this.map.areas)
         {
             this.map.areas[key].id = parseInt(key);

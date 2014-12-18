@@ -8,15 +8,14 @@ module.exports = {
     requires: [ ],
     required_by: [ ],
     events: { },
-    phases: {
-        'city_advance.pre': function(ctx) {
+    phases: { },
+    acquired: function() {
             console.log('Basic tools reduce cost by 1')
-            if (this.round.city_advance_discount === undefined)
-                this.round.city_advance_discount = 1;
+            if (this.params.city_advance_discount === undefined)
+                this.params.city_advance_discount = 1;
             else
-                this.round.city_advance_discount++;
+                this.params.city_advance_discount++;
             ctx.done && ctx.done();
-        }
     },
     actions: { },
 }

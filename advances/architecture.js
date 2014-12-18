@@ -16,13 +16,10 @@ During Attacks, Reduce 8 Attacking Force for every 1 City AV",
             }
         }
     },
-    phases: {
-        'city_advance.pre': function(ctx) {
-            console.log('Architecture max city 4')
-            this.max_city = !this.max_city || this.max_city < 4 ? 4 : this.max_city;
-            ctx.done && ctx.done();
-        }
+    acquired: function() {
+        console.log('Architecture max city 4')
+        this.params.max_city = !this.params.max_city || this.params.max_city < 4 ? 4 : this.params.max_city;
     },
-    actions: {
-    }
+    phases: { },
+    actions: { }
 }
