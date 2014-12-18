@@ -7,7 +7,7 @@ The maximum AV of a City is 2, unless otherwise noted.",
     cost: { },
     resources: [ 'food' ],
     requires: [ ],
-    required_by: [ 'government' ],
+    required_by: [ ],
     events: {
         'anarchy': {
             'steps': {
