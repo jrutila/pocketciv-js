@@ -3,6 +3,7 @@ var pocketciv = require('../core/pocketciv')
 var reducer = require('../core/reducer')
 var event = require('../core/event')
 var _ = require('underscore')
+var CityAdvance = require('../phases/city_advance').CityAdvance;
 
 var engine = pocketciv.Engine
 
@@ -456,8 +457,8 @@ describe('Attack (worker)', function() {
 describe('City Advance (worker)', function() {
   beforeEach(function() {
     target = new reducer.Reducer(engine);
-    target.areas = reducer.CityAdvance.areas;
-    target.reduce = reducer.CityAdvance.reduce;
+    target.areas = CityAdvance.areas;
+    target.reduce = CityAdvance.reduce;
     target.mode = reducer.Modes.Overall;
   })
   describe("basic", function() {

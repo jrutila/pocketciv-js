@@ -41,6 +41,7 @@ var advances = {
     'slave_labor': require('../advances/slave_labor'),
     'coinage': require('../advances/coinage'),
     'government': require('../advances/government'),
+    'basic_tools': require('../advances/basic_tools'),
 }
 
 
@@ -486,30 +487,7 @@ Engine.prototype = {
         ctx.changes = changes;
         ctx.done && ctx.done();
     },
-    city_advance: function(ctx) {
-        console.log("Max city is " + this.max_city)
-        console.log("Max city advance is " + this.city_advance_limit)
-        ctx.changes = {};
-        if (this.round.city_advance_limit && this.max_city > 1) {
-            var rdc = new reducer.Reducer(this);
-            rdc.mode = reducer.Modes.Overall;
-            rdc.max_city = this.max_city
-            rdc.startAmount = -1 * this.round.city_advance_limit;
-            rdc.areas = reducer.CityAdvance.areas
-            rdc.reduce = reducer.CityAdvance.reduce
-
-            if (_.isEmpty(rdc.ok({}).areas)) {
-                ctx.done && ctx.done();
-            }
-            else {
-                this.reducer(rdc, function(chg) {
-                    ctx.changes = chg;
-                    ctx.done && ctx.done();
-                });
-            }
-        }
-        else ctx.done && ctx.done();
-    },
+    city_advance: require('../phases/city_advance').run,
     upkeep: function(ctx) {
         this.round = {};
         ctx.done && ctx.done();
