@@ -42,6 +42,7 @@ var advances = {
     'coinage': require('../advances/coinage'),
     'government': require('../advances/government'),
     'basic_tools': require('../advances/basic_tools'),
+    'simple_tools': require('../advances/simple_tools'),
 }
 
 
@@ -228,10 +229,23 @@ function Engine(map, deck) {
     this.deck = deck || theDeck;
     var eng = this;
     this.deck.noMoreCards = function() { eng.endOfEra(); };
-    this.phases = ["populate", "move", "event", "advance", "support", "gold_decimate", "city_advance", "city_support", "upkeep" ];
+    this.phases = [
+        "populate",
+        "move",
+        "event",
+        "advance",
+        "support",
+        "gold_decimate",
+        "city_advance",
+        "city_support",
+        "upkeep"
+        ];
     this.phase = "populate";
     this.events = events;
     this.advances = advances;
+    this.orig_adv_costs ={};
+    for (var a in advances)
+        this.orig_adv_costs[a] = _.clone(advances[a].cost);
     this.acquired = [];
     this.trading = [];
     this.actions = actions;
@@ -279,6 +293,10 @@ Engine.prototype = {
         for (var key in this.map.areas)
         {
             this.map.areas[key].id = parseInt(key);
+        }
+        for (var key in advances)
+        {
+            this.advances[key].cost = _.clone(this.orig_adv_costs[key]);
         }
         if (this.phase)
             this.runPhase(this.phase);
@@ -415,6 +433,10 @@ Engine.prototype = {
     },
     acquire: function(name, done) {
         this.acquired.push(name);
+        if (this.advances[name].acquired)
+        {
+            this.advances[name].acquired.call(this);
+        }
         console.log("Acquired "+name);
         done && done();
     },
