@@ -114,31 +114,51 @@ Map.prototype = {
     },
 }
 
+function _mergeNgh(ar, ngh) {
+    var n = this.map[ar]['neighbours'].slice(0)
+                .filter(function (e) { return typeof e != "string"; });
+    ngh = ngh.concat(n);
+    ngh = ngh.filter(function (e, p) { return ngh.indexOf(e) == p; })
+    ngh.indexOf(this.currentArea) > -1 && ngh.splice(ngh.indexOf(this.currentArea),1);
+    return ngh;
+}
+
+
 function TribeMover(map, moveLimit) {
     this.start = {};
     this.map = map;
     this.neighbours = {};
     this.neighbours2 = {};
+    moveLimit = moveLimit ? moveLimit : 1;
+    this.moveLimit = moveLimit;
     for (var key in this.map)
     {
-        var ngh = this.map[key]['neighbours'].slice(0);
-        ngh = ngh.filter(function (e) { return typeof e != "string"; })
-        this.neighbours[key] = ngh.slice(0);
-        var ngh2 = ngh.slice(0);
-        console.log(ngh)
-        for (var n in ngh2)
+        this.currentArea = parseInt(key);
+        console.log(key+":")
+        var ngh = [];
+        ngh = _mergeNgh.call(this, key, ngh);
+        for (var a = 1; a < moveLimit; a++)
         {
-            var n2 = this.map[ngh[n]]['neighbours'].slice(0);
-            n2 = n2.filter(function (e) { return typeof e != "string"; })
-            ngh2 = ngh2.concat(n2);
+            var lee = ngh.slice(0);
+            for (var l in lee)
+            {
+                ngh = _mergeNgh.call(this, lee[l], ngh);
+            }
         }
-        ngh2 = ngh2.filter(function (e, p) {
-            return ngh2.indexOf(e) == p;
-        })
-        ngh2.splice(ngh2.indexOf(parseInt(key)),1);
-        this.neighbours2[key] = ngh2;
+        console.log(ngh);
+        this.neighbours[key] = ngh.slice(0);
+
+        for (var a = 0; a < moveLimit; a++)
+        {
+            var lee = ngh.slice(0);
+            for (var l in lee)
+            {
+                ngh = _mergeNgh.call(this, lee[l], ngh);
+            }
+        }
+        console.log(ngh);
+        this.neighbours2[key] = ngh.slice(0);
     }
-    this.moveLimit = moveLimit;
 }
 
 function sum(arr) {

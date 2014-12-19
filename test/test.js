@@ -19,6 +19,7 @@ var failed = [];
 
 mocha.addFile('./test/pocketciv');
 mocha.addFile('./test/reducer');
+mocha.addFile('./test/mover');
 
 function addDir(dir) {
 // Here is an example:
