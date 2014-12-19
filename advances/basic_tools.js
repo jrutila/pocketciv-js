@@ -15,7 +15,6 @@ module.exports = {
                 this.params.city_advance_discount = 1;
             else
                 this.params.city_advance_discount++;
-            ctx.done && ctx.done();
     },
     actions: { },
 }

@@ -6,7 +6,7 @@ module.exports = {
     Advances: Masonry, Engineering, Architecture, Cartage, \
     Irrigation, Mining, Roadbuilding, Metal Working.",
     points: 4,
-    cost: { },
+    cost: { 'tribes': 4 },
     resources: [ 'stone', 'wood' ],
     requires: [ ],
     required_by: [ ],

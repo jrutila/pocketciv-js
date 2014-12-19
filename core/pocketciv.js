@@ -43,6 +43,7 @@ var advances = {
     'government': require('../advances/government'),
     'basic_tools': require('../advances/basic_tools'),
     'simple_tools': require('../advances/simple_tools'),
+    'roadbuilding': require('../advances/roadbuilding'),
 }
 
 
@@ -180,6 +181,7 @@ TribeMover.prototype = {
         this.ngh2 = this._2ngValue(start);
     },
     ok: function(situation) {
+        if (this.moveLimit == -1) return true;
         var ngh = this._nghValue(situation);
         /*
         console.log('--COMP--')
