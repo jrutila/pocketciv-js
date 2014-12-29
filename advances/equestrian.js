@@ -2,14 +2,14 @@ var reducer = require("../core/reducer");
 var _ = require("underscore");
 
 module.exports = {
-    name: "roadbuilding",
-    title: "Roadbuilding",
-    description: "Tribes may move across two borders",
-    points: 6,
-    cost: { 'tribes': 1 },
-    resources: [ 'stone', 'wood' ],
-    requires: [ 'cartage' ],
-    required_by: [ 'common_tongue' ],
+    name: "equestrian",
+    title: "Equestrian",
+    description: "You may move any Tribe to any Region.",
+    points: 8,
+    cost: { 'tribes': 6 },
+    resources: [ 'food', 'wood' ],
+    requires: [ ['agriculture', 'horticulture'] ],
+    required_by: [ 'cavalry' ],
     events: {
         'epidemic': {
             'steps': {
@@ -21,7 +21,6 @@ module.exports = {
     actions: { },
     phases: { },
     acquired: function() {
-        if (!this.params.moveLimit || this.params.moveLimit < 2)
-            this.params.moveLimit = 2;
+        this.params.moveLimit = 8;
     },
 }
