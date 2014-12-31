@@ -37,7 +37,10 @@ module.exports = {
             },
             saveCities: saveCities
         },
-        'tsunami': {
+        'flood': {
+            'steps': {
+                '3.3': "+ If you have {{ adv:engineering }}, 1 Wonder = 10 Damage.{% dmgWn = 10 %}"
+            }
         }
     },
     acquired: function() {

@@ -45,6 +45,7 @@ var advances = {
     'simple_tools': require('../advances/simple_tools'),
     'roadbuilding': require('../advances/roadbuilding'),
     'equestrian': require('../advances/equestrian'),
+    'civil_service': require('../advances/civil_service'),
 }
 
 

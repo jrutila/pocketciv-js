@@ -7,7 +7,21 @@ module.exports = {
     requires: [ 'literacy' ],
     required_by: [ ],
     events: {
-        'tsunami': {
+        'flood': {
+            'steps': {
+                '4': "+ If you have {{ adv:medicine }}, Create 2 Tribes in each \
+                        region affected by the Tsunami.",
+                '--': "{% healTribes() %}"
+            },
+            healTribes: function() {
+                console.log("Healing tribes")
+                _.forEach(this.changes, function(change, area) {
+                    var atrb= this.engine.map.areas[area].tribes;
+                    // TODO: Affected so also cities and wonders!
+                    if (atrb > 0 && parseInt(change.tribes) < 0)
+                        change.tribes = (atrb + parseInt(change.tribes) + 2).toString();
+                }, this)
+            }
         },
         'epidemic': {
         },
