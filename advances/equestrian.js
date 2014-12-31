@@ -14,7 +14,7 @@ module.exports = {
         'epidemic': {
             'steps': {
                     '2.2': "- If you have {{ adv:roadbuilding }} or {{ adv:equestrian }}\
-                    Epidemics continue through Regions with no Tribes."
+                    Epidemics continue through Regions with no Tribes. {% skipempty = true %}"
                 }
             }
         },

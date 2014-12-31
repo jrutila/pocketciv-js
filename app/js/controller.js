@@ -695,14 +695,17 @@ pocketcivApp.directive('pcEventStep', function($rootScope) {
                 d = d.replace(/{{ ([a-z_]+) }}/g, "{{{ $1 }}}")
                 
                 var adv_regex = /{{ adv:(.*?) }}/g;
-                var m = adv_regex.exec(d);
+                var m;
                 var stepcl = "";
-                if (m)
+                var cloned = d;
+
+                while(m = adv_regex.exec(cloned))
                 {
                     var adv = $scope.engine.advances[m[1]];
                     var acq = $scope.engine.acquired.indexOf(m[1]) > -1;
-                    stepcl = stepcl + (acq ? "available " : "not_available ");
-                    d = d.replace(adv_regex, adv.title);
+                    if (stepcl != "available")
+                        stepcl = acq ? "available " : "not_available ";
+                    d = d.replace(m[0], adv.title);
                 }
                 
                 var ctx = _.clone(context);
@@ -738,14 +741,15 @@ pocketcivApp.filter('eventFormat', function() {
         d = d.replace(/{{ ([a-z_]+) }}/g, "{{{ $1 }}}")
         
         var adv_regex = /{{ adv:(.*?) }}/g;
-        var m = adv_regex.exec(d);
         var stepcl = "";
-        if (m)
+        var m;
+        while (m = adv_regex.exec(d))
         {
             var adv = engine.advances[m[1]];
             var acq = engine.acquired.indexOf(m[1]) > -1;
-            stepcl = stepcl + (acq ? "available " : "not_available ");
-            d = d.replace(adv_regex, adv.title);
+            if (stepcl != "available")
+                stepcl = stepcl + (acq ? "available " : "not_available ");
+            d = d.replace(m[0], adv.title);
         }
         var ctx = _.clone(context);
         if (context.active_region)

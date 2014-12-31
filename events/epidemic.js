@@ -24,6 +24,7 @@ module.exports = {
       {%; reduce() %}"
     },
     reduce: function() {
+      if (typeof(skipempty) === 'undefined') skipempty = false;
       var rdc = new reducer.Reducer(this.engine)
       console.log('Current area '+this.active_region.id)
       rdc.startRegion = this.active_region
@@ -34,7 +35,7 @@ module.exports = {
       }
       console.log(rdc.initValues)
       rdc.reduce = function(area) {
-        if (area.tribes == 0)
+        if (area.tribes == 0 && !skipempty)
         {
           this.amount = 0;
           return;
@@ -57,7 +58,7 @@ module.exports = {
         _.each(this.engine.map.areas, function(area, key) {
           if (unvisitedngh.indexOf(parseInt(key)) > -1)
           {
-            if (area.tribes > 0)
+            if (area.tribes > 0 || skipempty)
               areas[key] = area;
           }
         });
