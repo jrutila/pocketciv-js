@@ -382,8 +382,9 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
     }
     
     $scope.doEvent = function(startEvent) {
+        console.log("Startin godMode event "+startEvent);
         try {
-        var ev = JSON.parse(startEvent)
+            var ev = JSON.parse(startEvent)
         } catch(e) {
             var ev = { name: startEvent };
         }
@@ -667,7 +668,7 @@ pocketcivApp.directive('pcEventView', function() {
         templateUrl: 'partials/widgets/event.html',
         link: function($scope, tElem) {
             $scope.$watch('event', function (event) {
-                var ext = eventplay.extendSteps(event, $scope.engine.advances, _.keys($scope.engine.advances));
+                var ext = eventplay.extendSteps(event, $scope.engine.advances, _.keys($scope.engine.advances), { 'engine': $scope.engine });
                 $scope.steps_order = ext[1];
                 $scope.steps = ext[0];
             });

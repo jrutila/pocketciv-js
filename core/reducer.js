@@ -126,78 +126,9 @@ Reducer.prototype = {
   }
 }
 
-var Attack = {
-  areas: function() {
-      var unvisitedngh = _.difference(this.currentArea.neighbours, this.visited)
-      var areas = {}
-      _.each(this.engine.map.areas, function(area, key) {
-        if (unvisitedngh.indexOf(parseInt(key)) > -1)
-          areas[key] = area;
-      });
-      var sorted = _.sortBy(_.values(areas), function(a) { return a.city ? -1*a.city : 0; })
-      sorted = _.sortBy(sorted, function(a) { return a.tribes || 0; })
-      var minTribes = 999;
-      var maxTribes = 0;
-      var maxCity = 0;
-      areas = {}
-      for(var s in sorted)
-      {
-        var tribes = sorted[s].tribes || 0;
-        var city = sorted[s].city || 0;
-        
-        if (tribes > 0 && tribes <= minTribes && (tribes > 0 || tribes == maxTribes)
-        &&
-        (city >= maxCity))
-        {
-          areas[sorted[s].id] = sorted[s]
-          minTribes = tribes
-          maxCity = city || maxCity
-        }
-        
-        maxTribes = tribes > maxTribes ? tribes : maxTribes;
-      }
-      if (minTribes === 0 && maxCity === 0 && maxTribes === 0)
-      {
-        return {};
-      }
-      return areas;
-  },
-  reduce: function(area) {
-      var rTrb = Math.min(area.tribes || 0, this.amount);
-      //if (this.engine.map.tribeCount - (this.original_amount - this.amount - rTrb) <= 2)
-      this.amount -= rTrb;
-      var RCITY = 5;
-      var RGOLD = 2;
-      var rCity = 0;
-      while (this.amount >= RCITY && area.city - rCity > 0)
-      {
-        rCity++;
-        this.amount -= RCITY;
-      }
-      // If there is not enough force to decimate all cities (3.3)
-      if (this.amount > 0 && area.city - rCity > 0)
-        this.amount = 0;
-      var chg =  {};
-      
-      if (rCity > 0)
-      {
-        if (!_.has(this.changes, 'gold')) this.changes['gold'] = '0';
-        this.changes['gold'] = (parseInt(this.changes['gold']) - RGOLD*rCity).toString()
-      }
-      
-      if (area.tribes && rTrb)
-        chg['tribes'] = (area.tribes - rTrb).toString()
-      if (area.city && rCity)
-        chg['city'] = (area.city - rCity).toString()
-        
-      return chg;
-  }
-}
-
 var Modes = { AreaWalker: 'AreaWalker', Overall: 'Overall', Selector: 'Selector' };
 
 module.exports = {
   Reducer: Reducer,
-  Attack: Attack,
   Modes: Modes,
 }

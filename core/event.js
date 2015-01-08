@@ -178,6 +178,13 @@ extendSteps = function(event, advances, limit, context)
             context && _.extend(context, adv.events[event.name])
         }
     }, this)
+    if (actual_steps['include'] != undefined) {
+        var extra = context.engine.events[actual_steps['include']];
+        var esteps = extendSteps(extra, advances, limit, context);
+        actual_steps = _.extend(actual_steps, esteps[0]);
+        context && _.extend(context, extra)
+        delete actual_steps['include'];
+    }
     
     var keys = _.sortBy(_.keys(actual_steps), function(s) {
         if (s.indexOf('-') >= 0) return 99999

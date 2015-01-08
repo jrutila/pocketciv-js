@@ -1,5 +1,6 @@
-var reducer = require('../core/reducer')
-var _ = require('underscore')
+var reducer = require('../core/reducer');
+var attack = require('./attack');
+var _ = require('underscore');
 
 module.exports = {
     name: 'visitation',
