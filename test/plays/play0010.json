@@ -1,0 +1,95 @@
+{
+  "scenario": {
+    "phase": "move",
+    "deck": {
+      "usedCards": [ 2, 6, 13, 7, 5, 4, 16, 10, 3 ]
+    },
+    "map": {
+      "areas": {
+        "3": {
+          "id": 3,
+          "tribes": 2,
+          "farm": true,
+          "neighbours": [ 4, 5, 6, 8, "sea" ]
+        },
+        "4": {
+          "id": 4,
+          "tribes": 2,
+          "mountain": true,
+          "forest": true,
+          "farm": true,
+          "neighbours": [ 3, 8, "sea", "frontier" ],
+          "city": 2
+        },
+        "5": {
+          "id": 5,
+          "tribes": 2,
+          "mountain": true,
+          "forest": false,
+          "neighbours": [ 3, 6, 8, "sea", "frontier" ],
+          "farm": true,
+          "city": 2
+        },
+        "6": {
+          "id": 6,
+          "tribes": 2,
+          "neighbours": [ 3, 5, 8 ],
+          "forest": false,
+          "volcano": true,
+          "farm": true
+        },
+        "8": {
+          "id": 8,
+          "neighbours": [ 3, 4, 5, 6, "frontier" ],
+          "desert": true,
+          "tribes": 0,
+          "city": 0,
+          "fault": true
+        }
+      }
+    },
+    "acquired": [
+      "basic_tools",
+      "slave_labor",
+      "simple_tools",
+      "cartage"
+    ],
+    "trading": [],
+    "era": 1,
+    "round": {}
+  },
+  "move": [
+    {
+      "3": 1,
+      "4": 1,
+      "5": 1,
+      "6": 5,
+      "8": 0
+    }
+  ],
+  "deck": [
+    10,
+    3
+  ],
+  "reduce": [ { "6": { "city": "+1" }}],
+  "areas": [
+    "6"
+  ],
+  "advance": [
+    [
+      "city"
+    ]
+  ],
+  "acquires": [],
+  "check": {
+      "map": {
+        "areas": {
+          "6": { "city": 2, "tribes": 3 }
+        }
+      }
+  },
+  "at": "2015-01-08T13:57:49.731Z",
+  "_id": {
+    "str": "54ae8cdecde6cdbf085f3d45"
+  }
+}

@@ -326,6 +326,10 @@ Engine.prototype = {
         {
             this.advances[key].cost = _.clone(this.orig_adv_costs[key]);
         }
+        this.acquired = [];
+        for (var a in state.acquired)
+            this.acquire(state.acquired[a]);
+            
         if (this.phase)
             this.runPhase(this.phase);
     },
@@ -613,7 +617,7 @@ function AdvanceAcquirer(engine) {
     this.advances = _.omit(_.clone(engine.advances), engine.acquired);
     this.acquired = _.clone(engine.round.acquired) || [];
     this.acquired_names = _.clone(engine.acquired)
-    this.amnt_of_acquird = engine.acquired.length;
+    this.amnt_of_acquird = _.union(_.map(engine.round.acquired, function(a) { return a.name; }), engine.acquired).length;
     this.areas = _.clone(engine.map.areas);
     this.areas = filterAreasWithoutCities(this.areas);
 }
@@ -644,7 +648,7 @@ AdvanceAcquirer.prototype = {
                 'areas': []
             };
 
-        if (_.reduce(this.areas, function(m, a) {return a.city ? m + a.city : m }, 0) > _.keys(this.acquired).length + this.amnt_of_acquird)
+        if (_.reduce(this.areas, function(m, a) {return a.city ? m + a.city : m }, 0) > this.amnt_of_acquird)
         {
             for (var a in _.omit(this.areas, _.keys(this.acquired))) {
                 // Check tribes

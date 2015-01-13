@@ -9,7 +9,7 @@ Decimate 2 Tribes to create a Farm.",
     resources: [ 'stone' ],
     requires: [ ],
     required_by: [ 'irrigation', 'equestrian' ],
-    events: { },
+    events: {},
     actions: {
         'farm': {
             'context': function(engine) {
