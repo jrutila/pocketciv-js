@@ -100,14 +100,24 @@ Context.prototype = {
         var s = this.card.square;
         return eval(expr);
     },
-
+    sub: function(ev) {
+        console.log("Running subevent "+ev)
+        if (ev == "attack")
+            console.log(attack_force)
+        
+        ev = { name: ev };
+        var event = this.engine.events[ev.name];
+        var ctx = this;
+        runEvent(this.engine, event, ev, ctx.done, ctx);
+    }
 };
 
 function contextEval(cmd, context, done, wait) {
         context.done = done;
         (new Function( "with(this) {"+cmd+"}")).call(context);
-        if (!wait)
+        if (!wait && !context.wait)
             done && done();
+        delete context.wait;
 }
 
 function StepsStack() {
@@ -159,7 +169,7 @@ var stepper = function(steps, ctx, done)
         {
             steps.break();
         }
-        console.log(steps.step+":")
+        console.log(steps.step+":"+cmd)
         console.log(cmd);
         ctx.engine.eventStepper(function() {
             stepper(steps, ctx, done);
@@ -200,22 +210,25 @@ extendSteps = function(event, advances, limit, context)
     return [actual_steps, keys];
 }
 
-runEvent = function(engine, event, ev, done)
+runEvent = function(engine, event, ev, done, ctx)
 {
-    console.log("Running event")
+    console.log("Running event:");
+    console.log(ev);
     if (!engine) throw "Engine should not be null"
     
-    var context = new Context();
+    var context = ctx || new Context();
     _.extend(context, event);
     context.engine = engine;
     context.event = ev;
     
+    console.log("event:"); console.log(event)
+    console.log("context:"); console.log(context)
     var ext = extendSteps(event, engine.advances, engine.acquired, context);
     var actual_steps = ext[0];
     var keys = ext[1];
     var steps_cmd = new StepsStack();
     
-    //console.log(actual_steps)
+    console.log(actual_steps)
     
     _.each(keys, function(key)
     {

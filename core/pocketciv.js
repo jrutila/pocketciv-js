@@ -19,6 +19,7 @@ var events = {
     'uprising': require('../events/uprising'),
     'bandits': require('../events/bandits'),
     'attack': require('../events/attack'),
+    'trade': require('../events/trade'),
 }
 
 var actions = {

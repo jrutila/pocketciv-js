@@ -86,12 +86,12 @@ module.exports = {
     name: 'attack',
     title: 'Attack',
     steps: {
-        '5': "Starting with the Active Region {{ active_region }}, Reduce \
+        '2': "Starting with the Active Region {{ active_region }}, Reduce \
             Attacking force as follows:",
-        '6': "Reduce 1 Attacking Force by reducing 1 Tribe. {% tribe_reduce = 1 %}",
-        '7': "Reduce 5 Attacking Force by reducing 1 City AV. {% city_reduce = 5 %}",
-        '7.1': "For every City AV reduced, decimate 2 gold from you common stock. {% gold_reduce = 2 %}",
-        '8': "If Attacking Force remains, move to Neighboring Region with the \
+        '3': "Reduce 1 Attacking Force by reducing 1 Tribe. {% tribe_reduce = 1 %}",
+        '4': "Reduce 5 Attacking Force by reducing 1 City AV. {% city_reduce = 5 %}",
+        '4.1': "For every City AV reduced, decimate 2 gold from you common stock. {% gold_reduce = 2 %}",
+        '5': "If Attacking Force remains, move to Neighboring Region with the \
              least amount of Tribes. In case of a tie then move to Neighboring \
              Region with highest City AV. Otherwise, you choose. \
              Attacking Forces do not move through empty Regions.\

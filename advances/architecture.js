@@ -17,7 +17,7 @@ During Attacks, Reduce 8 Attacking Force for every 1 City AV",
         },
         'attack': {
             'steps': {
-                '7.1': "+ If you have {{ adv:architecture }}, Reduce 8 Attacking Force for every 1 City AV."
+                '4.1': "+ If you have {{ adv:architecture }}, Reduce 8 Attacking Force for every 1 City AV."
             }
         }
     },

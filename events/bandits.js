@@ -17,7 +17,7 @@ Otherwise, disregard the Bandit Event. {% break_if(!is_there_desert())  %}",
                     on the ORIGINAL Event card ({{ event.expr }}) . The total value that this creates \
                     {% attack_force = card_value(evexpr) %} \
                     determines the Attacking Force {{ attack_force }}.",
-            'include': 'attack'
+            '-': "See {%; sub('attack') %}"
     },
     is_there_desert: function() {
         if (this.active_region.desert)

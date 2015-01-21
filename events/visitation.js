@@ -9,57 +9,36 @@ module.exports = {
     description: "",
     steps: {
             '1': "If you are a Trading Partner with the visiting \
-                Empire, go immediately to TRADE." ,
-            '-': "{%; run() %}",
+                Empire, go immediately to TRADE.\
+                {% if (trading(event.visitor)) trade() %}" ,
+            '2': "If you are not Trading Partner with this Empire, \
+                draw the next Event card and see if it has Handshake.\
+                {%; draw_card() %}",
+            '2.1': "If there is Handshake, empire is Trading with you. \
+                Go to TRADE. {% if (card.friendly) trade() %}",
+            '3': "If there is no Handshake, then the Empire is attacking you!",
+            '3.1': "Draw the next Event card {%; area_card() %}. Read square indicates the active region {{ active_region }}.",
+            '3.2': "If the active region does not neighbor the Sea or Frontier, then there is no attack.",
+            '3.3': "{% break_if(no_attack()) %}Draw the next Event card {%; draw_card() %}. Based on the symbols on the original \
+                    event card ({{ event.expr }}) {% attack_force = card_value(event.expr) %}calculate the Attacking Force {{ attack_force }}.",
+            '3.4': 'See {%; sub("attack") %}',
     },
-    run: function() {
-        console.log("Visitor: "+this.event.visitor)
-        var trade = this.trade;
-        var ctx = this;
-        if (this.event.visitor in this.engine.trading)
-            this.trade();
-        else    
-        {
-            this.engine.drawer(ctx.engine.deck, function(card) {
-                if (card.friendly)
-                    ctx.trade()
-                else
-                    ctx.attack()
-            });
-        }
+    trading: function(visitor) {
+        return this.event.visitor in this.engine.trading;
     },
     trade: function() {
+        console.log("Trading")
         var ctx = this;
-        this.engine.drawer(this.engine.deck, function(card) {
-            ctx.changes = { 'gold': '+'+card.circle };
-            ctx.done && ctx.done();
-        });
+        var oldDone = ctx.done;
+        ctx.done = function() {
+            ctx.break = true;
+            oldDone && oldDone();
+        };
+        ctx.sub("trade");
+        ctx.wait = true;
     },
-    attack: function() {
-        var ctx = this;
-        // Draw the active area
-        var oldDone = this.done;
-        this.done = function() {
-            ctx.done = oldDone;
-            console.log(this.active_region)
-            if (!this.active_region || !_.find(this.active_region.neighbours, function(a) { return typeof a === 'string'; }))
-            {
-              ctx.done && ctx.done({});
-              return
-            }
-            var rdc = new reducer.Reducer(ctx.engine);
-            rdc.areas = reducer.Attack.areas;
-            rdc.reduce = reducer.Attack.reduce;
-            rdc.startRegion = this.active_region;
-            ctx.engine.drawer(ctx.engine.deck, function(card) {
-              ctx.card = card;
-              rdc.startAmount = ctx.card_value(ctx.event.expr);
-              ctx.engine.reducer(rdc, function(chg) {
-                  ctx.changes = chg;
-                  ctx.done && ctx.done();
-              });
-            });
-        }
-        this.area_card()
+    no_attack: function() {
+        return (!this.active_region || !_.find(this.active_region.neighbours, function(a) { return typeof a === 'string'; }))
     },
+    
 }

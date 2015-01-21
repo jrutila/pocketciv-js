@@ -9,12 +9,14 @@ describe('Visitation', function() {
         runEvent = eventRunner.runEvent;
         event = require('../../events/visitation')
         engine = pocketciv.Engine;
-        engine.drawer = function(d, done) { done(deck.shift()) }
+        engine.drawer = function(d, done) { console.log("draw"+done); done(deck.shift()); }
     });
     describe('trade', function() {
         it('should go to trade if next card is friendly', function(done) {
             deck = [{ friendly: true }, { circle: 3 }]
+            console.log("TRADE TRADE TRADE")
             runEvent(engine, event, { visitor: 'nordic' }, function(chg) {
+                console.log("TRADE FINISH")
                 chg.should.deep.equal({
                     'gold': '+3',
                 })
@@ -22,6 +24,7 @@ describe('Visitation', function() {
             })
         });
     });
+    
     describe('attack', function() {
         beforeEach(function() {
             engine.map.areas = {

@@ -513,7 +513,7 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
         }
     });
     pocketciv.Engine.eventStepper = function(done, step, ctx) {
-        if ($scope.currentEvent == undefined && ctx && ctx.event)
+        if (ctx && ctx.event && ($scope.currentEvent == undefined || $scope.currentEvent.name != ctx.event.name))
         {
             $scope.currentEvent = ctx.engine.events[ctx.event.name];
             $scope.currentStep = { 'step': undefined, 'ctx': {} };
@@ -692,6 +692,7 @@ pocketcivApp.directive('pcEventStep', function($rootScope) {
             var finalElement = tElem;
             var render = function(step) {
                 var context = (step && step.ctx) || {};
+                if (!$scope.step)  return;
                 var d = $scope.step.replace(/{%.*?%}/g, "");
                 d = d.replace(/{{ ([a-z_]+) }}/g, "{{{ $1 }}}")
                 
