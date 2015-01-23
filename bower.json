@@ -25,6 +25,7 @@
     "ngstorage": "~0.3.0",
     "angular-snap": "~1.5.4",
     "angular-bootstrap": "~0.11.0",
-    "angular-sanitize": "~1.2.22"
+    "angular-sanitize": "~1.2.22",
+    "angular-hotkeys": "chieffancypants/angular-hotkeys#~1.4.5"
   }
 }
