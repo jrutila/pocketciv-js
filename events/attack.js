@@ -87,7 +87,7 @@ module.exports = {
     title: 'Attack',
     steps: {
         '2': "Starting with the Active Region {{ active_region }}, Reduce \
-            Attacking force as follows:",
+            Attacking force {{ attack_force }} as follows:",
         '3': "Reduce 1 Attacking Force by reducing 1 Tribe. {% tribe_reduce = 1 %}",
         '4': "Reduce 5 Attacking Force by reducing 1 City AV. {% city_reduce = 5 %}",
         '4.1': "For every City AV reduced, decimate 2 gold from you common stock. {% gold_reduce = 2 %}",

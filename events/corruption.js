@@ -34,11 +34,11 @@ module.exports = {
             }, this);
             if (_.isEmpty(areas)) this.amount = 0;
             return areas;
-        }
+        };
         rdc.reduce = function(chg, area) {
             this.amount += parseInt(chg.city);
-            return { 'city': chg.city }
-        }
+            return { 'city': chg.city };
+        };
         ctx.engine.reducer(rdc, function(chg) {
             ctx.changes = chg;
             ctx.done && ctx.done();

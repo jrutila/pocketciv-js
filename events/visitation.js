@@ -24,7 +24,7 @@ module.exports = {
             '3.4': 'See {%; sub("attack") %}',
     },
     trading: function(visitor) {
-        return this.event.visitor in this.engine.trading;
+        return this.engine.trading.indexOf(visitor) > -1;
     },
     trade: function() {
         console.log("Trading")

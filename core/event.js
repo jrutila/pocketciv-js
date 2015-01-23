@@ -164,13 +164,12 @@ var stepper = function(steps, ctx, done)
     }
     ctx.go = undefined;
     ctx.engine.signals.eventPhasing.dispatch(steps.step, ctx)
+    console.log(steps.step+":"+cmd)
     contextEval(cmd, ctx, function() {
         if (ctx.break)
         {
             steps.break();
         }
-        console.log(steps.step+":"+cmd)
-        console.log(cmd);
         ctx.engine.eventStepper(function() {
             stepper(steps, ctx, done);
         }, steps.step, ctx);

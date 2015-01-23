@@ -49,6 +49,7 @@ var advances = {
     'roadbuilding': require('../advances/roadbuilding'),
     'equestrian': require('../advances/equestrian'),
     'civil_service': require('../advances/civil_service'),
+    'diplomacy': require('../advances/diplomacy'),
 }
 
 
