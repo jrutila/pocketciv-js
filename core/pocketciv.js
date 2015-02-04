@@ -525,7 +525,7 @@ Engine.prototype = {
     },
     gold_decimate: function(ctx) {
         var engine = this;
-        if (!ctx.do_not_decimate)
+        if (engine.gold && !ctx.do_not_decimate)
             ctx.changes = { 'gold': '0' };
         ctx.done && ctx.done();
     },
