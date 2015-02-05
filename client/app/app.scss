@@ -1,0 +1,65 @@
+$icon-font-path: "/bower_components/bootstrap-sass-official/assets/fonts/bootstrap/";
+//$fa-font-path: "/bower_components/font-awesome/fonts";
+
+@import 'bootstrap-sass-official/assets/stylesheets/bootstrap';
+//@import 'font-awesome/scss/font-awesome';
+
+/**
+ * App-wide Styles
+ */
+
+.browsehappy {
+    margin: 0.2em 0;
+    background: #ccc;
+    color: #000;
+    padding: 0.2em 0;
+}
+
+$mapHeight: 700px;
+$mapWidth: 700px;
+
+$cardHeight: 260px;
+$cardWidth: 170px;
+
+$buttonHeight: 40px;
+$mapSymbolSize: 21px;
+$infoBarHeight: 35px;
+$actionElementTopicHeight: 35px;
+
+$smallWidth: $mapWidth + $cardWidth;
+$mediumWidth: $mapWidth + $cardWidth;
+$largeWidth: $mapWidth + 2 * $cardWidth;
+
+@mixin smaller-than-map {
+    @media (max-width : $smallWidth) {
+    		@content;
+	}    
+}
+
+@mixin bigger-than-map {
+    @media (min-width : $smallWidth) { // and (max-width: $largeWidth)  {
+    		@content;
+	}    
+}
+
+@mixin really-large {
+    @media (min-width : $largeWidth) {
+    		@content;
+	}    
+}
+
+// Component styles are injected through grunt
+// injector
+@import 'core/styles/Hexagon.scss';
+@import 'core/styles/_advancePhase.scss';
+@import 'core/styles/_advances.scss';
+@import 'core/styles/_colors.scss';
+@import 'core/styles/_deck.scss';
+@import 'core/styles/_icons.scss';
+@import 'core/styles/_map.scss';
+@import 'core/styles/_techTree.scss';
+@import 'core/styles/_welcome.scss';
+@import 'core/styles/ie.scss';
+@import 'core/styles/print.scss';
+@import 'core/styles/screen.scss';
+// endinjector

@@ -78,6 +78,8 @@ module.exports = {
         rdc.reduce = AttackReducer.reduce;
         rdc.startRegion = this.active_region;
         rdc.startAmount = attack_force;
+        rdc.city_reduce = city_reduce;
+        rdc.gold_reduce = gold_reduce;
         ctx.engine.reducer(rdc, function(chg) {
             ctx.changes = chg;
             ctx.done && ctx.done();
