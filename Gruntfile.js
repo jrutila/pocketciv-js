@@ -17,7 +17,8 @@ module.exports = function (grunt) {
     cdnify: 'grunt-google-cdn',
     protractor: 'grunt-protractor-runner',
     injector: 'grunt-asset-injector',
-    buildcontrol: 'grunt-build-control'
+    buildcontrol: 'grunt-build-control',
+    sprite: 'grunt-spritesmith'
   });
 
   // Time how long tasks take. Can help when optimizing build times
@@ -39,7 +40,7 @@ module.exports = function (grunt) {
       },
       dev: {
         options: {
-          script: 'bin/www',
+          script: 'server/app.js',
           debug: true
         }
       },
@@ -69,6 +70,12 @@ module.exports = function (grunt) {
           '<%= yeoman.client %>/{app,components}/**/*.css'
         ],
         tasks: ['injector:css']
+      },
+      sprite: {
+        files: [
+          '<%= yeoman.client %>/{app,components}/images/**/icons/*.png'
+        ],
+        tasks: ['sprite']
       },
       mochaTest: {
         files: ['server/**/*.spec.js'],
@@ -122,6 +129,13 @@ module.exports = function (grunt) {
           livereload: true,
           nospawn: true //Without this option specified express won't be reloaded
         }
+      }
+    },
+    sprite:{
+      all: {
+        src: 'client/images/modern/icons/*.png',
+        dest: '.tmp/sprite/spritesheet.png',
+        destCss: '.tmp/sprite/sprites.css'
       }
     },
 
@@ -563,6 +577,23 @@ module.exports = function (grunt) {
             return '<link rel="stylesheet" href="' + filePath + '">';
           },
           starttag: '<!-- injector:css -->',
+          endtag: '<!-- endinjector -->'
+        },
+        files: {
+          '<%= yeoman.client %>/index.html': [
+            '<%= yeoman.client %>/{app,components}/**/*.css'
+          ]
+        }
+      },
+      
+      sprite: {
+        options: {
+          transform: function(filePath) {
+            filePath = filePath.replace('/client/', '');
+            filePath = filePath.replace('/.tmp/', '');
+            return '<link rel="stylesheet" href="' + filePath + '">';
+          },
+          starttag: '<!-- injector:sprites -->',
           endtag: '<!-- endinjector -->'
         },
         files: {
