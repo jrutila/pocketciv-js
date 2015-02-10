@@ -660,6 +660,7 @@ module.exports = function (grunt) {
       'env:all',
       'injector:sass', 
       'browserify',
+      'sprite',
       'concurrent:server',
       'injector',
       'wiredep',

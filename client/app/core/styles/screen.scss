@@ -8,6 +8,10 @@
 
 $eventWidth: 750px;
 
+.icon {
+    text-indent: -9999px;
+}
+
 #eventRunner {
     z-index: 1000;
     position: fixed;
