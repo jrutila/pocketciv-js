@@ -100,7 +100,7 @@
         <span class="friendly">{{ card.friendly }}</span>
         <span class="gold">{{ card.gold }}</span>
         <span class="id">{{ card.id }}</span>
-        <ul>
+        <ul class="list-unstyled">
             <li class="event" ng-repeat="(era, e) in card.events">
                 <span class="era">{{ era }}</span>
                 <span class="name">{{ engine.events[e.name].title || e.name | sprintf:e }}</span>
@@ -354,7 +354,7 @@
     
     <div id="advancePhase" class="actionElement collapsible" ng-hide="engine.phase != 'advance'" >
         <h2>Advance</h2>
-        <ul class="actionContent">
+        <ul class="actionContent list-unstyled">
             <li ng-repeat="(a, act) in engine.actions">
                 <button ng-click="advance(a)">{{ act.title }}</button>
             </li>

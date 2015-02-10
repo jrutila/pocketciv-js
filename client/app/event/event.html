@@ -1,6 +1,6 @@
 <div class="event">
     <h2>{{ event.title }}</h2>
-    <ul>
+    <ul class="list-unstyled">
         <li ng-class="{ active: step == currentStep.step }" ng-repeat="step in steps_order">
             <span class="step">{{ step }}</span>
             <pc-event-step class="stepdescr" step="steps[step]" event="event" engine="engine" cstep="currentStep"></pc-event-step>
