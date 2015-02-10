@@ -222,4 +222,5 @@ HT.Hexagon.Static = {HEIGHT:91.14378277661477
 					, ORIENTATION:HT.Hexagon.Orientation.Normal
 					, DRAWSTATS: false};//hexagons will have 25 unit sides for now
 
+module.exports = HT;
 

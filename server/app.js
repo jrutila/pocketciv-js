@@ -24,6 +24,7 @@ var app = express();
 var db = mongo.db(process.env.MONGOHQ_URL || "mongodb://localhost:27017/pocketciv", { native_parser: true});
 
 app.use(express.static(__dirname+"/../client/"))
+app.use(express.static(__dirname+"/../.tmp/"))
 
 app.use(bodyParser.json());
 

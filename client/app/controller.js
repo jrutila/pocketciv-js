@@ -1,9 +1,10 @@
-var pocketciv = require("../../core/pocketciv");
+var pocketciv = require("../../src/core/pocketciv");
 var pocketcivApp = angular.module('pocketcivApp', ['ngStorage', 'snap', 'ui.bootstrap', 'ngSanitize']);
-var runplay = require("../../core/runplay");
-var eventplay = require("../../core/event");
+var runplay = require("../../src/core/runplay");
+var eventplay = require("../../src/core/event");
 var sprintf = require("sprintf");
 var mustache = require("mustache");
+var Map = require("./map")
 
 pp = pocketciv
 
@@ -27,8 +28,8 @@ gameLog = {
 resetGameLog();
 
 var scenarios = {
-    "1": require("../scenarios/scenario1"),
-    "2": require("../scenarios/scenario2"),
+    "1": require("../../src/scenarios/scenario1"),
+    "2": require("../../src/scenarios/scenario2"),
 }
 
 pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
@@ -665,7 +666,7 @@ pocketcivApp.directive('pcEventView', function() {
             engine: "=engine",
             currentStep: "=step",
         },
-        templateUrl: 'partials/widgets/event.html',
+        templateUrl: 'app/event/event.html',
         link: function($scope, tElem) {
             $scope.$watch('event', function (event) {
                 var ext = eventplay.extendSteps(event, $scope.engine.advances, _.keys($scope.engine.advances), { 'engine': $scope.engine });

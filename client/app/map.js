@@ -1,4 +1,5 @@
-var HT = HT || HexagonTools.HT || {}
+var HT = require("../components/HexagonTools/js/HexagonTools");
+HT.Grid = require("../components/HexagonTools/js/Grid");
 var Map = Map || {}
 var Region = Region || {}
 var Sea = Sea || {}
@@ -222,3 +223,5 @@ Map.prototype.getRegionAt = function(x, y) {
     var hex = this.grid.GetHexAt(p)
     return hex != undefined ? this.hex[hex.Id] : undefined;
 }
+
+module.exports = Map;

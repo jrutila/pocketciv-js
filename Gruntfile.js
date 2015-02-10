@@ -18,7 +18,8 @@ module.exports = function (grunt) {
     protractor: 'grunt-protractor-runner',
     injector: 'grunt-asset-injector',
     buildcontrol: 'grunt-build-control',
-    sprite: 'grunt-spritesmith'
+    sprite: 'grunt-spritesmith',
+    browserify: 'grunt-browserify'
   });
 
   // Time how long tasks take. Can help when optimizing build times
@@ -60,7 +61,7 @@ module.exports = function (grunt) {
         files: [
           '<%= yeoman.client %>/{app,components}/**/*.js',
           'src/**/*.js',
-          '!<%= yeoman.client %>/{app,components}/**/*.spec.js',
+          '!<%= yeoman.client %>/{apnp,components}/**/*.spec.js',
           '!<%= yeoman.client %>/{app,components}/**/*.mock.js',
           '!<%= yeoman.client %>/app/app.js'],
         tasks: ['injector:scripts']
@@ -76,6 +77,14 @@ module.exports = function (grunt) {
           '<%= yeoman.client %>/{app,components}/images/**/icons/*.png'
         ],
         tasks: ['sprite']
+      },
+      browserify: {
+        files: [
+          'src/**/*.js',
+          '<%= yeoman.client %>/{app,components}/**/*.js',
+        ],
+        tasks: ['browserify']
+        
       },
       mochaTest: {
         files: ['server/**/*.spec.js'],
@@ -138,7 +147,10 @@ module.exports = function (grunt) {
         destCss: '.tmp/sprite/sprites.css'
       }
     },
-
+    browserify: {
+        '.tmp/app/pocketciv.js': [ 'src/**/*.js'],
+        '.tmp/app/web.js': [ 'client/app/*.js', 'client/components/**/*.js' ]
+    },
     // Make sure code styles are up to par and there are no obvious mistakes
     jshint: {
       options: {
@@ -541,7 +553,11 @@ module.exports = function (grunt) {
         },
         files: {
           '<%= yeoman.client %>/index.html': [
-              ['{.tmp,<%= yeoman.client %>}/{app,components}/**/*.js',
+              [
+               //'{.tmp,<%= yeoman.client %>}/components/HexagonTools/js/HexagonTools.js',
+               //'{.tmp,<%= yeoman.client %>}/components/**/*.js',
+               '{.tmp,<%= yeoman.client %>}/{app,components}/**/pocketciv.js',
+               '{.tmp,<%= yeoman.client %>}/{app,components}/**/web.js',
                '!{.tmp,<%= yeoman.client %>}/app/app.js',
                '!{.tmp,<%= yeoman.client %>}/{app,components}/**/*.spec.js',
                '!{.tmp,<%= yeoman.client %>}/{app,components}/**/*.mock.js']
@@ -643,6 +659,7 @@ module.exports = function (grunt) {
       'clean:server',
       'env:all',
       'injector:sass', 
+      'browserify',
       'concurrent:server',
       'injector',
       'wiredep',

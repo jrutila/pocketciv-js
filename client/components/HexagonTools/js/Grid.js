@@ -1,8 +1,10 @@
+var HT = require("./HexagonTools");
+var Grid = {};
 /**
  * A Grid is the model of the playfield containing hexes
  * @constructor
  */
-HT.Grid = function(/*double*/ width, /*double*/ height) {
+Grid = function(/*double*/ width, /*double*/ height) {
 	
 	this.Hexes = [];
 	//setup a dictionary for use later for assigning the X or Y CoOrd (depending on Orientation)
@@ -73,9 +75,9 @@ HT.Grid = function(/*double*/ width, /*double*/ height) {
 	}
 };
 
-HT.Grid.Static = {Letters:'ABCDEFGHIJKLMNOPQRSTUVWXYZ'};
+Grid.Static = {Letters:'ABCDEFGHIJKLMNOPQRSTUVWXYZ'};
 
-HT.Grid.prototype.GetHexId = function(row, col) {
+Grid.prototype.GetHexId = function(row, col) {
 	var letterIndex = row;
 	var letters = "";
 	while(letterIndex > 25)
@@ -92,7 +94,7 @@ HT.Grid.prototype.GetHexId = function(row, col) {
  * @this {HT.Grid}
  * @return {HT.Hexagon}
  */
-HT.Grid.prototype.GetHexAt = function(/*Point*/ p) {
+Grid.prototype.GetHexAt = function(/*Point*/ p) {
 	//find the hex that contains this point
 	for (var h in this.Hexes)
 	{
@@ -110,7 +112,7 @@ HT.Grid.prototype.GetHexAt = function(/*Point*/ p) {
  * @this {HT.Grid}
  * @return {number}
  */
-HT.Grid.prototype.GetHexDistance = function(/*Hexagon*/ h1, /*Hexagon*/ h2) {
+Grid.prototype.GetHexDistance = function(/*Hexagon*/ h1, /*Hexagon*/ h2) {
 	//a good explanation of this calc can be found here:
 	//http://playtechs.blogspot.com/2007/04/hex-grids.html
 	var deltaX = h1.PathCoOrdX - h2.PathCoOrdX;
@@ -123,7 +125,7 @@ HT.Grid.prototype.GetHexDistance = function(/*Hexagon*/ h1, /*Hexagon*/ h2) {
  * @this {HT.Grid}
  * @return {HT.Hexagon}
  */
-HT.Grid.prototype.GetHexById = function(id) {
+Grid.prototype.GetHexById = function(id) {
 	for(var i in this.Hexes)
 	{
 		if(this.Hexes[i].Id == id)
@@ -133,3 +135,5 @@ HT.Grid.prototype.GetHexById = function(id) {
 	}
 	return null;
 };
+
+module.exports = Grid;
