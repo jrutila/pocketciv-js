@@ -141,11 +141,22 @@ module.exports = function (grunt) {
       }
     },
     sprite:{
-      all: {
+      css: {
         src: 'client/images/modern/icons/*.png',
         dest: '.tmp/sprite/spritesheet.png',
-        destCss: '.tmp/sprite/sprites.css'
-      }
+        destCss: '.tmp/sprite/sprites.css',
+        cssOpts: {
+          cssSelector: function(i) { return "."+i.name; }
+        }
+      },
+      scss: {
+        src: 'client/images/modern/icons/*.png',
+        dest: '.tmp/sprite/spritesheet.png',
+        destCss: '.tmp/sprite/sprites.scss',
+        cssOpts: {
+          cssSelector: function(i) { return "."+i.name; }
+        }
+      },
     },
     browserify: {
         '.tmp/app/pocketciv.js': [ 'src/**/*.js'],
@@ -526,7 +537,8 @@ module.exports = function (grunt) {
           loadPath: [
             '<%= yeoman.client %>/bower_components',
             '<%= yeoman.client %>/app',
-            '<%= yeoman.client %>/components'
+            '<%= yeoman.client %>/components',
+            '.tmp',
           ],
           compass: false
         },

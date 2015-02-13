@@ -1,9 +1,9 @@
 <div class="event">
     <h2>{{ event.title }}</h2>
-    <ul class="list-unstyled">
-        <li ng-class="{ active: step == currentStep.step }" ng-repeat="step in steps_order">
-            <span class="step">{{ step }}</span>
+    <dl class="dl-horizontal" >
+        <dt ng-class="{ active: step == currentStep.step }" ng-repeat-start="step in steps_order" class="step">{{ step }}</dt>
+        <dd ng-repeat-end>
             <pc-event-step class="stepdescr" step="steps[step]" event="event" engine="engine" cstep="currentStep"></pc-event-step>
-        </li>
-    </ul>
+        </dd>
+    </dl>
 </div>

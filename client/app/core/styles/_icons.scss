@@ -1,0 +1,32 @@
+@import "sprite/sprites.scss";
+
+.icon {
+    text-indent: -9999px;
+}
+
+.icon.tribes, .icon.city {
+    text-indent: 0px;
+}
+
+$iconZoom: 0.7;
+
+.icon.small {
+    width: $desert-width * $iconZoom;
+    height: $desert-height * $iconZoom;
+    background-size: $spritesheet-width * $iconZoom;
+}
+
+.icon.small.forest {
+    background-position-x: $forest-offset-x * $iconZoom;
+    background-position-y: $forest-offset-y * $iconZoom;
+}
+
+.icon.small.mountain {
+    background-position-x: $mountain-offset-x * $iconZoom;
+    background-position-y: $mountain-offset-y * $iconZoom;
+}
+
+.icon.small.farm {
+    background-position-x: $farm-offset-x * $iconZoom;
+    background-position-y: $farm-offset-y * $iconZoom;
+}

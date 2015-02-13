@@ -79,6 +79,12 @@ $cardsLeftColor: $color-primary-2;
         left: 79px;
     }
     
+    .gold, .friendly {
+        margin-top: 45px;
+        margin-left: 5px;
+        display: inline-block;
+    }
+    
     ul {
         top: $eventTop;
         left: 10px;

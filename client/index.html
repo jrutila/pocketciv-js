@@ -21,7 +21,7 @@
 
 </head>    
 <body ng-controller="MainGame">
-    <a id="github" target="_blank" href="https://github.com/jrutila/pocketciv-js"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
+    <!--<a id="github" target="_blank" href="https://github.com/jrutila/pocketciv-js"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>-->
     <nav snap-drawer>
         <accordion>
             <accordion-group>
@@ -124,12 +124,12 @@
             <img id="mapImage8" src="images/modern/land8.png"/>
             <div class="symbol tribes" id="tribes"></div>
             <div class="symbol city" id="city"></div>
-            <div class="icon icon-farm" id="farm"></div>
-            <div class="icon icon-forest" id="forest"></div>
-            <div class="icon icon-fault" id="fault"></div>
-            <div class="icon icon-mtn" id="mountain"></div>
-            <div class="icon icon-vol" id="volcano"></div>
-            <div class="icon icon-desert" id="desert"></div>
+            <div class="icon farm" id="farm"></div>
+            <div class="icon forest" id="forest"></div>
+            <div class="icon fault" id="fault"></div>
+            <div class="icon mountain" id="mountain"></div>
+            <div class="icon volcano" id="volcano"></div>
+            <div class="icon desert" id="desert"></div>
         </div>
         <div id="canvases">
             <canvas class="mapCanvas" id="mapCanvas-1" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
@@ -199,7 +199,7 @@
         <div class="ttcont">
         <button class="close" ng-click="toggleTechTree()">X</button>
         <div class="content">
-            <h2>Tech tree</h2>
+            <h1>Tech tree</h1>
             
     <div class="tt_main_table tt_layout_table">
         <div class="tt_layout_row">
@@ -209,33 +209,35 @@
                     <!-- LEFT CONTENT -->
 <div id="advanceinfo">
     <div class="advancereq">
-        <ul>
+        <ul class="list-inline">
             <li class="btn btn-default" ng-class="getAcquireClasses(r)" ng-click="selectAdv(engine.advances[r])" ng-repeat="r in _.flatten(selAdv.requires)">
                 {{ engine.advances[r].title || r }}
             </li>
         </ul>
     </div>
-    <h1 ng-class="getAcquireClasses(selAdv.name)" class="btn btn-primary">
+    <span ng-class="getAcquireClasses(selAdv.name)" class="btn btn-primary">
                     {{ selAdv.title }}
-                </h1>
+                </span>
     <div class="advancereqby">
-        <ul>
+        <ul class="list-inline">
             <li class="btn btn-default" ng-class="getAcquireClasses(r)" ng-click="selectAdv(engine.advances[r])" ng-repeat="r in selAdv.required_by">
                 {{ engine.advances[r].title || r }}
             </li>
         </ul>
     </div>
     <div class="advancecost">
-        <h2>Cost</h2>
-        <span>Tribes: <span class="tribes">{{ selAdv.cost.tribes }}</span></span>
-        <span>Gold: <span class="gold">{{ selAdv.cost.gold }}</span></span>
+        <h2>Cost:</h2>
+        <span>Tribes <span class="tribes" ng-if="selAdv.cost.tribes">{{ selAdv.cost.tribes }}</span></span>
+        <span>Gold <span class="gold" ng-if="selAdv.cost.gold">{{ selAdv.cost.gold }}</span></span>
     </div>
     <div class="advanceres">
-        <h2>Resources</h2>
-        <div class="icon small" ng-class="{ forest: res == 'wood', mountain: res == 'stone', farm: res == 'food' }" ng-repeat="res in selAdv.resources">{{ res }}</div>
+        <h2>Resources:</h2>
+        <ul class="list-inline">
+            <li class="icon small" ng-class="{ forest: res == 'wood', mountain: res == 'stone', farm: res == 'food' }" ng-repeat="res in selAdv.resources">{{ res }}</li>
+        </ul>
     </div>
     <div class="advanceareas">
-        <h2>Available on areas:</h2>
+        <h2>Areas:</h2>
             <button class="btn" ng-click="advArea(engine.map.areas[a])" ng-repeat="a in possibleAdvances[selAdv.name].areas">
                 {{ a }}
             </button>
@@ -276,9 +278,11 @@
                 <td><span class="tribes">{{ c.tribes }}</span>
                 </td>
                 <td>
-                    <div class="icon forest small" ng-if="c.forest"></div>
-                    <div class="icon mountain small" ng-if="c.mountain || c.volcano"></div>
-                    <div class="icon farm small" ng-if="c.farm"></div>
+                    <ul class="list-inline">
+                        <li class="icon forest small" ng-if="c.forest"></li>
+                        <li class="icon mountain small" ng-if="c.mountain || c.volcano"></li>
+                        <li class="icon farm small" ng-if="c.farm"></li>
+                    </ul>
                 </td>
             </tr>
         </tbody>
@@ -308,14 +312,19 @@
                 <td>{{ adv.title }}</td>
                 <td>{{ adv.points }}</td>
                 <td>
-                    <div ng-repeat="(k, v) in adv.cost" class="{{ k }}">{{ v }}</div>
+                    <ul class="list-inline">
+                        <li class="tribes" ng-if="adv.cost.tribes">{{ adv.cost.tribes }}</li>
+                        <li class="gold" ng-if="adv.cost.gold">{{ adv.cost.gold }}</li>
+                    </ul>
                 </td>
                 <td>
-                    <div class="icon small" ng-class="{ forest: res == 'wood', mountain: res == 'stone', farm: res == 'food' }" ng-repeat="res in adv.resources">{{ res }}</div>
+                    <ul class="list-inline">
+                        <li class="icon small" ng-class="{ forest: res == 'wood', mountain: res == 'stone', farm: res == 'food' }" ng-repeat="res in adv.resources">{{ res }}</li>
+                    </ul>
                 </td>
                 <td>
                     <div ng-repeat="r in adv.requires">
-                        {{ r.join(' or ') || r }}
+                        {{ advTitle(r) }}
                     </div>
                 </td>
                 <td>{{ possibleAdvances[key].areas }}</td>
@@ -335,9 +344,11 @@
     <div id="changePrompt" ng-hide="!areaChange">
         <div class="cover"></div>
         <div class="content">
-            <div class="areachange" ng-repeat="(a, c) in areaChange">
-                <span class="areaCode">{{ a }}</span>
-                <span ng-repeat="(k, v) in c" class="{{ k }}" data-val="{{ v }}">{{ v }}</span>
+            <div>
+                <ul class="list-inline" ng-repeat="(a, c) in areaChange">
+                    <li><span class="areaCode">{{ a }}</span></li>
+                    <li ng-repeat="(k, v) in c"><span class="icon {{ k }}" data-val="{{ v }}">{{ v }}</span></li>
+                </ul>
             </div>
             <button ng-click="areaChangeOk()">OK</button>
         </div>

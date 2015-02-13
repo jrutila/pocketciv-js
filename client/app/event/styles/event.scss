@@ -1,0 +1,74 @@
+$eventWidth: 750px;
+
+#eventRunner {
+    z-index: 1000;
+    position: fixed;
+    top: 72px;
+    left: 1200px;
+    max-width: $eventWidth;
+    margin-right: 10px;
+}
+
+div.event {
+    background-color: $color-secondary-2-0;
+    padding: 7px;
+    max-width: $eventWidth;
+    border-radius: 10px;
+    position: relative;
+    z-index: 900;
+    
+    dt {
+        margin-top: 9px;
+    }
+    
+    dt.indent, dd.indent {
+        margin-left: 10px;
+    }
+    
+    dd {
+        margin-top: 4px;
+        margin-left: 0px !important;
+    }
+    
+    h2 {
+        color: $color-secondary-2-3;
+        font-weight: bold;
+        margin-top: 5px;
+    }
+    .active.step {
+        background-color: $color-secondary-2-3;
+        color: $color-secondary-2-2;
+    }
+    .step {
+        float: left;
+        border: 3px solid $color-secondary-2-4;
+        border-radius: 1.5em;
+        width: 30px;
+        height: 30px;
+        background-color: $color-secondary-2-1;
+        color: $color-secondary-2-4;
+        font-weight: bold;
+        text-align: center;
+        padding-top: 4px;
+    }
+    
+    .stepdescr {
+        display: block;
+        margin-left: 40px;
+    }
+    
+    .positive {
+        color: blue;
+    }
+    .negative{
+        color: red;
+    }
+    .not_available {
+        text-decoration: line-through;
+    }
+    
+    li {
+        margin-bottom: 10px;
+        min-height: 30px;
+    }
+}

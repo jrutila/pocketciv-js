@@ -1,78 +1,9 @@
-@import "_colors";
-@import "_deck";
-@import "_advancePhase";
-@import "_map";
-@import "_advances";
-@import "_techTree";
-@import "_welcome";
-
-$eventWidth: 750px;
-
 body {
     line-height: 1;
 }
 
-.icon {
-    text-indent: -9999px;
-}
-
-#eventRunner {
-    z-index: 1000;
-    position: fixed;
-    top: 72px;
-    left: 1200px;
-    max-width: $eventWidth;
-    margin-right: 10px;
-}
-
-div.event {
-    background-color: $color-secondary-2-0;
-    padding: 7px;
-    max-width: $eventWidth;
-    border-radius: 10px;
-    position: relative;
-    z-index: 900;
-    
-    h2 {
-        color: $color-secondary-2-3;
-        font-weight: bold;
-    }
-    .active .step {
-        background-color: $color-secondary-2-3;
-        color: $color-secondary-2-2;
-    }
-    .step {
-        float: left;
-        border: 3px solid $color-secondary-2-4;
-        border-radius: 1.5em;
-        width: 30px;
-        height: 30px;
-        background-color: $color-secondary-2-1;
-        color: $color-secondary-2-4;
-        font-weight: bold;
-        text-align: center;
-        padding-top: 4px;
-    }
-    
-    .stepdescr {
-        display: block;
-        margin-left: 40px;
-    }
-    
-    .positive {
-        color: blue;
-    }
-    .negative{
-        color: red;
-    }
-    .not_available {
-        text-decoration: line-through;
-    }
-    
-    li {
-        margin-bottom: 10px;
-        min-height: 30px;
-    }
+#main {
+    overflow: hidden;
 }
 
 a {
@@ -235,6 +166,10 @@ a {
         background-color: rgba(white, .8);
         text-align: center;
         
+        > div {
+            display: inline-block;
+        }
+        
         button {
             display: block;
             text-align: center;
@@ -242,6 +177,21 @@ a {
             height: 30px;
             margin-left: auto;
             margin-right: auto;
+        }
+    }
+    
+    ul {
+        display: table-row;
+        
+        li {
+            display: table-cell;
+            vertical-align: middle;
+            padding-top: 5px;
+            padding-bottom: 5px;
+            
+            span {
+                display: inline-block;
+            }
         }
     }
     

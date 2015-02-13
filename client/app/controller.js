@@ -367,6 +367,15 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
             $scope.selArea = $scope.engine.map.areas[$scope.possibleAdvances[adv.name].areas[0]];
     }
     
+    $scope.advTitle = function(advances) {
+        if (!_.isArray(advances))
+            advances = [advances];
+        return _.map(advances, function (adv) {
+            var ad = $scope.engine.advances[adv];
+            return ad ? ad.title : adv;
+        }).join(" or ");
+    }
+    
     $scope.selectEvent = function(ev) {
         $scope.selEvent = null;
         setTimeout(function() {

@@ -49,8 +49,14 @@
         display: inline-block;
 }
 
+.gold {
+    background-color: $goldColor;
+    padding-left: 3px;
+    padding-right: 2px;
+}
+
 .tribes {
-    background-color: darksalmon;
+    background-color: $tribeColor;
     width: 25px;
     color: black;
     font-weight: bolder;

@@ -55,10 +55,12 @@ $largeWidth: $mapWidth + 2 * $cardWidth;
 @import 'core/styles/_advances.scss';
 @import 'core/styles/_colors.scss';
 @import 'core/styles/_deck.scss';
+@import 'core/styles/_icons.scss';
 @import 'core/styles/_map.scss';
-@import 'core/styles/_techTree.scss';
 @import 'core/styles/_welcome.scss';
 @import 'core/styles/ie.scss';
 @import 'core/styles/print.scss';
 @import 'core/styles/screen.scss';
+@import 'event/styles/event.scss';
+@import 'techtree/styles/_techTree.scss';
 // endinjector
