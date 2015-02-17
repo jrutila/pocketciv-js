@@ -27,6 +27,10 @@ The maximum AV of a City is 2, unless otherwise noted.",
             }
         },
         'bandits': {
+            'steps': {
+                '4.4': "- If you have {{ adv:slave_labor }}, increase the attacking force by one \
+                        blue hex. {{ attack_force += card_value('h') }}"
+            }
             
         }
     },
