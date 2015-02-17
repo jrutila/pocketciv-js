@@ -55,7 +55,6 @@ Map = function(map) {
 }
 
 function drawLand(ctx, region) {
-
     var land = Qt.createQmlObject('import QtQuick 2.0; Image { source: "image://res/modern/land'+region+'.png"; visible: false; }', parent)
     ctx.globalCompositeOperation = 'source-in';
     ctx.drawImage(land, 0, 0)
@@ -119,7 +118,7 @@ Map.prototype.paint = function(ctx) {
         var img = this.getImage(i);
         var ctx = hexCtxs[i];
         var region = regions[i]
-        ctx.drawImage(img, 0, 0);
+        img && ctx.drawImage(img, 0, 0);
         var commonPoints = {};
         for (var h in region) {
             var hex = region[h];

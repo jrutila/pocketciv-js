@@ -30,6 +30,7 @@ resetGameLog();
 var scenarios = {
     "1": require("../../src/scenarios/scenario1"),
     "2": require("../../src/scenarios/scenario2"),
+    "3": require("../../src/scenarios/scenario3"),
 }
 
 pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
@@ -552,7 +553,8 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
                 $('#activeCanvas'+i).get(0)];
     }
     var getImage = function(i) {
-        return $('#mapImage'+i)[0];
+        //if (i != -1) Uncomment to see the coordinates
+            return $('#mapImage'+i)[0];
     }
     
     $scope.resetUI = function() {
