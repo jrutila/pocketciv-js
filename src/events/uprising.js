@@ -9,6 +9,6 @@ module.exports = {
                     Reduce City AV in Active Region by 2.\
                     Decimate Tribes in the Active Region.\
                     Decimate Farms in Active Region.\
-                    {% change({ 'city': '-2', 'tribes': '0', 'farm': false })"
+                    {% change({ 'city': '-2', 'tribes': '0', 'farm': false }) %}"
     }
 }
