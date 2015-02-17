@@ -1,7 +1,7 @@
 var should = require('chai').should()
 require('mocha')
-var eventRunner = require('../../core/event')
-var pocketciv = require('../../core/pocketciv')
+var eventRunner = require('../../src/core/event')
+var pocketciv = require('../../src/core/pocketciv')
 var _ = require('underscore')
 
 describe('Corruption', function() {
@@ -9,7 +9,7 @@ describe('Corruption', function() {
         deck = [];
         reduces = [];
         runEvent = eventRunner.runEvent;
-        event = require('../../events/corruption')
+        event = require('../../src/events/corruption')
         engine = pocketciv.Engine;
         //           5
         //          / \
@@ -18,7 +18,7 @@ describe('Corruption', function() {
             6: { id: 6, tribes: 9, neighbours: [ 4, 5 ]},
             5: { id: 5, tribes: 2, neighbours: [ 4, 6 ]},
             4: { id: 4, tribes: 4, city: 8, fault: true, neighbours: [ 3, 5, 6 ]},
-            3: { id: 3, tribes: 0, neighbours: [ 4, 2 ] },
+            3: { id: 3, tribes:-1, neighbours: [ 4, 2 ] },
             2: { id: 2, tribes: 5, city: 2, fault: true, neighbours: [ 3 ] },
         }
         engine.drawer = function(d, done) { done(deck.shift()) }

@@ -1,12 +1,12 @@
 var should = require('chai').should()
 require('mocha')
-var eventRunner = require('../../core/event')
-var pocketciv = require('../../core/pocketciv')
+var eventRunner = require('../../src/core/event')
+var pocketciv = require('../../src/core/pocketciv')
 
 describe('Flood', function() {
     beforeEach(function() {
         runEvent = eventRunner.runEvent;
-        event = require('../../events/flood')
+        event = require('../../src/events/flood')
         engine = pocketciv.Engine;
         engine.map.areas = {
             5: { id: 5, neighbours: [ 4, 'sea' ]},

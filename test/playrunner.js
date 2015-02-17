@@ -1,9 +1,9 @@
-var pocketciv = require("../core/pocketciv")
+var pocketciv = require("../src/core/pocketciv")
 var playFile = process.argv[2];
 var play = require("./plays/" + playFile)
 var _ = require("underscore")
 var expect = require("chai").expect
-var runplay = require("../core/runplay")
+var runplay = require("../src/core/runplay")
 
 var engine = pocketciv.Engine;
 

@@ -1,6 +1,6 @@
 var should = require('chai').should()
-var cartage = require('../../advances/cartage')
-var pocketciv = require('../../core/pocketciv')
+var cartage = require('../../src/advances/cartage')
+var pocketciv = require('../../src/core/pocketciv')
 
 describe('Cartage', function() {
     describe('city_support.post', function() {

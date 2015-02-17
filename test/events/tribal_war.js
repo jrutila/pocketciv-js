@@ -1,14 +1,14 @@
 var should = require('chai').should()
 require('mocha')
-var eventRunner = require('../../core/event')
-var pocketciv = require('../../core/pocketciv')
+var eventRunner = require('../../src/core/event')
+var pocketciv = require('../../src/core/pocketciv')
 var _ = require('underscore')
 
 describe('Tribal War', function() {
     beforeEach(function() {
         deck = [];
         runEvent = eventRunner.runEvent;
-        event = require('../../events/tribal_war')
+        event = require('../../src/events/tribal_war')
         engine = pocketciv.Engine;
         //           5
         //          / \

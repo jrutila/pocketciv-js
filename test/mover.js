@@ -1,6 +1,6 @@
 var should = require('chai').should()
-var pocketciv = require('../core/pocketciv')
-var event = require('../core/event')
+var pocketciv = require('../src/core/pocketciv')
+var event = require('../src/core/event')
 
 describe('TribeMover', function() {
     describe('simple', function() {

@@ -1,7 +1,7 @@
 var should = require('chai').should()
 require('mocha')
-var eventRunner = require('../../core/event')
-var pocketciv = require('../../core/pocketciv')
+var eventRunner = require('../../src/core/event')
+var pocketciv = require('../../src/core/pocketciv')
 var _ = require('underscore')
 
 describe('Earthquake', function() {
@@ -9,7 +9,7 @@ describe('Earthquake', function() {
         deck = [];
         reduces = [];
         runEvent = eventRunner.runEvent;
-        event = require('../../events/earthquake')
+        event = require('../../src/events/earthquake')
         engine = pocketciv.Engine;
         //           5
         //          / \

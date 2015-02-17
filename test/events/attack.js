@@ -1,9 +1,9 @@
 var should = require('chai').should()
 require('mocha')
-var eventRunner = require('../../core/event')
-var pocketciv = require('../../core/pocketciv')
-var reducer = require('../../core/reducer')
-var attack = require('../../events/attack')
+var eventRunner = require('../../src/core/event')
+var pocketciv = require('../../src/core/pocketciv')
+var reducer = require('../../src/core/reducer')
+var attack = require('../../src/events/attack')
 var _ = require('underscore')
 
 describe('Attack (worker)', function() {
