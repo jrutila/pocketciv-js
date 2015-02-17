@@ -43,6 +43,7 @@ var advances = {
     'literacy': require('../advances/literacy'),
     'slave_labor': require('../advances/slave_labor'),
     'coinage': require('../advances/coinage'),
+    'banking': require('../advances/banking'),
     'government': require('../advances/government'),
     'basic_tools': require('../advances/basic_tools'),
     'simple_tools': require('../advances/simple_tools'),
@@ -265,6 +266,7 @@ function Engine(map, deck) {
         "support",
         "gold_decimate",
         "city_advance",
+        "gold_management",
         "city_support",
         "upkeep"
         ];
@@ -527,6 +529,9 @@ Engine.prototype = {
         var engine = this;
         if (engine.gold && !ctx.do_not_decimate)
             ctx.changes = { 'gold': '0' };
+        ctx.done && ctx.done();
+    },
+    gold_management: function(ctx) {
         ctx.done && ctx.done();
     },
     city_support: function(ctx) {
