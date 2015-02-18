@@ -53,6 +53,7 @@ var advances = {
     'diplomacy': require('../advances/diplomacy'),
     'navigation': require('../advances/navigation'),
     'magnetics': require('../advances/magnetics'),
+    'black_market': require('../advances/black_market'),
 }
 
 
@@ -463,6 +464,11 @@ Engine.prototype = {
         }, this)
         this.actions[name].run.call(this, ctx);
     },
+    draw: function(done) {
+        this.drawer(this.deck, function(c) {
+            done(c);
+        });
+    },
     runPhase: function(name, arg) {
         var ctx = {};
         var eng = this;
@@ -521,7 +527,8 @@ Engine.prototype = {
         this.acquired.push(name);
         if (this.advances[name].acquired)
         {
-            this.advances[name].acquired.call(this);
+            //                                      | is this during load?
+            this.advances[name].acquired.call(this, done == undefined);
         }
         console.log("Acquired "+name);
         done && done();
