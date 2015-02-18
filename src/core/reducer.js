@@ -61,7 +61,7 @@ Reducer.prototype = {
       case Modes.Overall:
         _.each(reduction, function(v, k) {
           var area = rdc.areas()[k];
-          if (area === undefined)
+          if (area === undefined && _.some(_.values(v), function(val) { return val != 0; }))
           {
             failed = true;
             return;
@@ -131,4 +131,5 @@ var Modes = { AreaWalker: 'AreaWalker', Overall: 'Overall', Selector: 'Selector'
 module.exports = {
   Reducer: Reducer,
   Modes: Modes,
+  isSea: function(n) { return typeof n == "string" && n != "frontier"; },
 }
