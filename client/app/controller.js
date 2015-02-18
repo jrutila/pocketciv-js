@@ -517,7 +517,7 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
     */
     pocketciv.Engine.signals.phaser.add(function(status, phase) {
         console.log(phase+": "+status);
-        if (status == "end" && phase == "event")
+        if (status == "end") // && phase == "event")
         {
             $scope.currentEvent = undefined;
             $scope.currentStep = undefined;

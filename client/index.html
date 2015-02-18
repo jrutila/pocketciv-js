@@ -346,8 +346,12 @@
         <div class="content">
             <div>
                 <ul class="list-inline" ng-repeat="(a, c) in areaChange">
-                    <li><span class="areaCode">{{ a }}</span></li>
-                    <li ng-repeat="(k, v) in c"><span class="icon {{ k }}" data-val="{{ v }}">{{ v }}</span></li>
+                    <li>
+                        <span ng-if="a > 0" class="areaCode">{{ a }}</span>
+                        <span ng-if="a == 'gold'">{{ a }}</span>
+                    </li>
+                    <li ng-if="a > 0" ng-repeat="(k, v) in c"><span class="icon {{ k }}" data-val="{{ v }}">{{ v }}</span></li>
+                    <li ng-if="a == 'gold'" class="gold">{{ c }}</li>
                 </ul>
             </div>
             <button ng-click="areaChangeOk()">OK</button>

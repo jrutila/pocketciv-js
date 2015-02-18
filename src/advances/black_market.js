@@ -23,10 +23,10 @@ module.exports = {
                 var engine = this;
                 var gold = 0;
                 var done = function() {
-                    if (gold) {
+                    if (gold > 0) {
                         ctx.changes = { 'gold': '+'+gold };
-                        ctx.done && ctx.done();
                     }
+                    ctx.done && ctx.done();
                 };
                 var drawing = function() {
                     engine.draw(function(card) {
@@ -35,8 +35,15 @@ module.exports = {
                             gold--;
                             console.log("gathered gold: "+gold);
                             if (engine.gold + gold < 0)
+                            {
                                 console.log("ANARCHY!")
-                            drawing();
+                                engine.doEvent({ name: 'anarchy' }, function(chg) {
+                                    ctx.changes = chg;
+                                    ctx.changes.gold = "0";
+                                    done();
+                                });
+                            } else
+                                drawing();
                         } else {
                             console.log("gathered gold: "+gold);
                             done();
