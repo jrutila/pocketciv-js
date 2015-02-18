@@ -52,6 +52,7 @@ var advances = {
     'civil_service': require('../advances/civil_service'),
     'diplomacy': require('../advances/diplomacy'),
     'navigation': require('../advances/navigation'),
+    'magnetics': require('../advances/magnetics'),
 }
 
 
