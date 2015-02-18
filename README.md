@@ -9,9 +9,7 @@ Development
 ========
 - Fork the repo
 - npm install
-- npm run test
-- npm run watch
-- npm run start (in another terminal)
+- grunt serve
 - Open http://localhost:3000 with your browser
 
 Architecture
