@@ -32,6 +32,13 @@ $cardsLeftColor: $color-primary-2;
             z-index: 2;
             color: $hexColor-text;
         }
+        .inner[data-val="10"] {
+            font-size: 19px;
+            text-indent: -5px;
+        }
+        .inner:after, .inner:before {
+            z-index: -1;
+        }
     }
     
     .circle.border {
