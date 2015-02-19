@@ -312,7 +312,7 @@ TribeMover.prototype = {
         
         if (valid.ok && bysea.length == 0 && byland.length != 0)
         {
-            valid.reduce = [[]];
+            valid.reduce = [];
             var bl = {};
             _.each(byland, function(b) {
                 var id = b[0];
@@ -320,17 +320,26 @@ TribeMover.prototype = {
                 bl[id].count++;
                 bl[id].relevance = Math.max(bl[id].relevance, b[1]);
             });
-            var find = _.sortBy(_.values(bl, function(b) { return b.count+b.relevance*5; }));
+            var find = _.sortBy(_.values(bl), function(b) { return b.count+b.relevance*5; });
             var maxrelevance = -2;
-            var ind = 0;
-            while (f = find.shift())
+            var ind = {};
+            var ii = -1;
+            console.log(find)
+            while (f = find.pop())
             {
                 if (situation[f.id] > 0)
                 {
-                    if (f.relevance == maxrelevance)
-                        valid.reduce[ind].push(f.id); 
-                    if (f.relevance > maxrelevance)
-                        valid.reduce[ind] = [f.id];
+                    if (f.relevance < maxrelevance)
+                        continue;
+                    var i = _.find(ind, function(val, key) {
+                        return _.contains(this.map[key].neighbours, f.id);
+                    });
+                    if (i === undefined || i < 0) {
+                        i = ++ii;
+                        valid.reduce[i] = [];
+                    }
+                    ind[f.id] = i;
+                    valid.reduce[i].push(f.id); 
                     maxrelevance = Math.max(f.relevance, maxrelevance);
                 }
             }
