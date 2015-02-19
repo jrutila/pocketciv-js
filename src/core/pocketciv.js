@@ -26,6 +26,7 @@ var actions = {
     'farm': require('../actions/farm'),
     'city': require('../actions/city'),
     'acquire': require('../actions/acquire'),
+    'expedition': require('../actions/expedition'),
 }
 
 var advances = {
@@ -54,6 +55,8 @@ var advances = {
     'navigation': require('../advances/navigation'),
     'magnetics': require('../advances/magnetics'),
     'black_market': require('../advances/black_market'),
+    'cavalry': require('../advances/cavalry'),
+    'sails_and_rigging': require('../advances/sails_and_rigging'),
 }
 
 
