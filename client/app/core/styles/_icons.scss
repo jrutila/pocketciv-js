@@ -19,14 +19,17 @@ $iconZoom: 0.7;
 .icon.small.forest {
     background-position-x: $forest-offset-x * $iconZoom;
     background-position-y: $forest-offset-y * $iconZoom;
+    background-position: $forest-offset-x * $iconZoom $forest-offset-y * $iconZoom;
 }
 
 .icon.small.mountain {
     background-position-x: $mountain-offset-x * $iconZoom;
     background-position-y: $mountain-offset-y * $iconZoom;
+    background-position: $mountain-offset-x * $iconZoom $mountain-offset-y * $iconZoom;
 }
 
 .icon.small.farm {
     background-position-x: $farm-offset-x * $iconZoom;
     background-position-y: $farm-offset-y * $iconZoom;
+    background-position: $farm-offset-x * $iconZoom $farm-offset-y * $iconZoom;
 }
