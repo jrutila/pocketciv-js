@@ -115,41 +115,59 @@ describe('TribeMover', function() {
             mover.ok({ 1: 6, 2: 6, 3: 6, 4: 3, 5: 3 }).should.be.false;
         });
     });
-    /*
-    describe('across the sea', function() {
+    describe.only('across the sea', function() {
         beforeEach(function() {
             //       1 - 2
-            //      SEA    
-            //
-            //         /---3----------
-            //        /   / \ FRONTIER
+            //         |     west
+            //  east   |
+            //         \---3----------
+            //          \-/ \ FRONTIER
             //       6 - 4 - 5 - 7
             map = {
-                1: { 'neighbours': [2, 'sea' ] },
-                2: { 'neighbours': [1, 'sea' ] },
-                3: { 'neighbours': [5, 4, 'sea', 'frontier'] },
-                4: { 'neighbours': [3, 5, 6, 'frontier'] },
+                1: { 'neighbours': [2, 'east' ] },
+                2: { 'neighbours': [1, 'west' ] },
+                3: { 'neighbours': [5, 4, 'west', 'frontier'] },
+                4: { 'neighbours': [3, 5, 6, 'east', 'frontier'] },
                 5: { 'neighbours': [3, 4, 7, 'frontier'] },
-                6: { 'neighbours': [4, 'sea', 'frontier'] },
+                6: { 'neighbours': [4, 'east'] },
                 7: { 'neighbours': [5, 'frontier'] },
             }
             mover = new pocketciv.TribeMover(map, 1, true);
         });
         it('case 1', function() {
             mover.init({ 1: 0, 2: 0, 3: 3, 4: 0, 5: 0, 6: 0, 7: 0 });
-            mover.ok({ 1: 0, 2: 3, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0 }).should.be.true;
-            mover.ok({ 1: 0, 2: 2, 3: 0, 4: 0, 5: 1, 6: 0, 7: 0 }).should.be.true;
+            mover.ok(  { 1: 0, 2: 3, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0 }).ok.should.be.true;
+            mover.ok(  { 1: 0, 2: 2, 3: 0, 4: 0, 5: 1, 6: 0, 7: 0 }).ok.should.be.true;
         });
-        it.only('case 2', function() {
+        it('case 2', function() {
             mover.init({ 1: 0, 2: 0, 3: 0, 4: 3, 5: 0, 6: 0, 7: 0 });
-            mover.ok({ 1: 0, 2: 3, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0 }).should.be.true;
+            mover.ok(  { 1: 0, 2: 3, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0 }).ok.should.be.false;
+            mover.ok(  { 1: 0, 2: 0, 3: 2, 4: 0, 5: 0, 6: 1, 7: 0 }).ok.should.be.true;
         });
         it('case 3', function() {
             mover.init({ 1: 3, 2: 3, 3: 0, 4: 3, 5: 0, 6: 0, 7: 0 });
-            mover.ok(  { 1: 1, 2: 1, 3: 3, 4: 1, 5: 0, 6: 3, 7: 0 }).should.be.true;
+            mover.ok(  { 1: 1, 2: 1, 3: 3, 4: 1, 5: 0, 6: 3, 7: 0 }).ok.should.be.true;
+        });
+        it('case 4', function() {
+            mover.init({ 1: 0, 2: 3, 3: 0, 4: 3, 5: 0, 6: 0, 7: 0 });
+            mover.ok(  { 1: 0, 2: 5, 3: 0, 4: 1, 5: 0, 6: 0, 7: 0 }).ok.should.be.false;
+        });
+        
+        it('changes by max', function() {
+            mover.init({ 1: 0, 2: 3, 3: 0, 4: 3, 5: 0, 6: 0, 7: 0 });
+            mover.ok(  { 1: 5, 2: 0, 3: 0, 4: 1, 5: 0, 6: 0, 7: 0 }).reduce
+                .should.deep.equal([[1]]);
+            mover.ok(  { 1: 0, 2: 0, 3: 6, 4: 0, 5: 0, 6: 0, 7: 0 }).reduce
+                .should.deep.equal([[3]]);
+        });
+        it('changes by rel 0', function() {
+            mover.init({ 1: 3, 2: 3, 3: 0, 4: 3, 5: 0, 6: 0, 7: 0 });
+            mover.ok(  { 1: 2, 2: 3, 3: 2, 4: 2, 5: 0, 6: 0, 7: 0 }).reduce
+                .should.deep.equal([[3,4]]);
+            mover.ok(  { 1: 2, 2: 3, 3: 0, 4: 2, 5: 0, 6: 2, 7: 0 }).reduce
+                .should.deep.equal([[4,6]]);
         });
     });
-    */
     describe('with undefined', function() {
         it('should work as they were 0', function() {
             map = { 1: { "id": 1, "neighbours": [ 2 ] },
