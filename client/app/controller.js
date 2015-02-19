@@ -50,7 +50,7 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
     $scope.moveTribes = function() {
         var mover = new pocketciv.TribeMover(pocketciv.Map.areas, $scope.godMode ? -1 : pocketciv.Engine.params.moveLimit);
         mover.init(getMovement(pocketciv.Map.areas));
-        if (mover.ok($scope.movement))
+        if (mover.ok($scope.movement).ok)
         {
             console.log("OK MOVE!");
             moveFunc.call(pocketciv.Engine, $scope.movement);
@@ -91,7 +91,9 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
                 mover.init(getMovement(pocketciv.Map.areas));
                 $scope.movement[moveFrom]--;
                 $scope.movement[region]++;
-                if (mover.ok($scope.movement))
+                var ok = mover.ok($scope.movement);
+                console.log(ok.reduce)
+                if (ok.ok)
                 {
                     drawElem("tribes", region, $scope.movement[region]);
                     drawElem("tribes", moveFrom, $scope.movement[moveFrom]);

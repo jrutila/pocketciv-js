@@ -138,10 +138,10 @@ function _mergeNgh(ngh, n, currentArea) {
 var areaNeighbour = function(n) { return typeof n != "string"; };
 
 function _seaUnion(area, sea) {
-    return _.filter(_.union(area, sea), areaNeighbour);
+    return _.filter(_.union(area, sea || []), areaNeighbour);
 }
 
-function TribeMover(map, moveLimit, moveSea) {
+function TribeMover(map, moveLimit, seaCost) {
     this.start = {};
     this.map = _.clone(map);
     this.neighbours = {};
@@ -150,39 +150,28 @@ function TribeMover(map, moveLimit, moveSea) {
     this.neighboursSea2 = {};
     moveLimit = moveLimit ? moveLimit : 1;
     this.moveLimit = moveLimit;
+    seaCost = seaCost === undefined ? -1 : seaCost;
+    this.seaCost = seaCost;
     
-    moveSea = moveSea ? true : false;
-    this.moveSea = moveSea;
-    var seas = _.object(_.map(this.map, function(area, n) {
-        var seas = _.filter(area.neighbours, function (e) { return typeof e == "string" && e != 'frontier'; });
+    var seas = {};
+    if (seaCost > -1)
+    seas = _.object(_.map(this.map, function(area, n) {
+        var ss = _.filter(area.neighbours, function (e) { return typeof e == "string" && e != 'frontier'; });
         var seangh = [];
         for (var a in this.map)
         {
-            if (a != n && _.intersection(this.map[a].neighbours, seas).length > 0)
+            if (a != n && _.intersection(this.map[a].neighbours, ss).length > 0)
                 seangh.push(parseInt(a));
         }
         return [parseInt(n), seangh];
-    }));
-    console.log(seas);
-    /*
-    var seangh = {}
-    if (this.moveSea)
-    {
-        for (var a in this.map)
-        {
-            seangh[a] = _.difference(seas[a], this.map[a].neighbours);
-            //this.map[a].neighbours = _.union(this.map[a].neighbours, seas[a]);
-        }
-    }
-    */
-    //console.log(this.map)
+    }, this));
+    
     for (var key in this.map)
     {
         this.currentArea = key = parseInt(key);
         var ngh = [key];
         var area = this.map[key];
         var sea = seas[key];
-        console.log(key+":")
         
         // Instant neighbours
         var n = _seaUnion(area.neighbours, seas[key]);
@@ -196,6 +185,7 @@ function TribeMover(map, moveLimit, moveSea) {
             }, this);
         }
         this.neighbours[key] = ngh.slice(0);
+        this.neighboursSea[key] = _.clone(this.neighbours[key]);
 
         // 2nd level neighbours
         for (var m = 0; m < moveLimit; m++)
@@ -207,13 +197,11 @@ function TribeMover(map, moveLimit, moveSea) {
             }, this);
         }
         this.neighbours2[key] = ngh.slice(0);
-        
-        
-        console.log(this.neighbours[key]);
-        console.log(this.neighbours2[key]);
+        this.neighboursSea2[key] = _.clone(this.neighbours2[key]);
     }
     
     this.seangh = {};
+    if (seaCost > -1)
     for (var key in this.map)
     {
         var area = this.map[key];
@@ -317,6 +305,9 @@ TribeMover.prototype = {
                 bysea.push([key, 0]);
             }
         }
+        // If sea movement is forbidden, don't allow bysea
+        if (this.seaCost == -1) bysea.push(-1);
+        
         var valid = { ok: byland.length == 0 || bysea.length == 0 };
         
         if (valid.ok && bysea.length == 0 && byland.length != 0)
@@ -329,7 +320,6 @@ TribeMover.prototype = {
                 bl[id].count++;
                 bl[id].relevance = Math.max(bl[id].relevance, b[1]);
             });
-            console.log(bl)
             var find = _.sortBy(_.values(bl, function(b) { return b.count+b.relevance*5; }));
             var maxrelevance = -2;
             var ind = 0;

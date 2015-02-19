@@ -14,22 +14,22 @@ describe('TribeMover', function() {
         });
         it('case 1', function() {
             mover.init({ 1: 1, 2: 1, 3: 1 });
-            mover.ok({ 1: 1, 2: 1, 3: 1 }).should.be.true;
+            mover.ok({ 1: 1, 2: 1, 3: 1 }).ok.should.be.true;
         });
         it('case 2', function() {
             mover.init({ 1: 1, 2: 1, 3: 0 });
-            mover.ok({ 1: 0, 2: 1, 3: 1 }).should.be.true;
+            mover.ok({ 1: 0, 2: 1, 3: 1 }).ok.should.be.true;
         });
         it('case 3', function() {
             mover.init({ 1: 2, 2: 0, 3: 0 });
-            mover.ok({ 1: 0, 2: 2, 3: 0 }).should.be.true;
-            mover.ok({ 1: 1, 2: 1, 3: 0 }).should.be.true;
-            mover.ok({ 1: 1, 2: 0, 3: 1 }).should.be.false;
+            mover.ok({ 1: 0, 2: 2, 3: 0 }).ok.should.be.true;
+            mover.ok({ 1: 1, 2: 1, 3: 0 }).ok.should.be.true;
+            mover.ok({ 1: 1, 2: 0, 3: 1 }).ok.should.be.false;
         });
         it('case 4 - neighbour limit', function() {
             mover.init({ 1: 2, 2: 0, 3: 0 });
-            mover.ok({ 1: 2, 2: 2, 3: 0 }).should.be.false;
-            mover.ok({ 1: 0, 2: 0, 3: 0 }).should.be.false;
+            mover.ok({ 1: 2, 2: 2, 3: 0 }).ok.should.be.false;
+            mover.ok({ 1: 0, 2: 0, 3: 0 }).ok.should.be.false;
         });
     });
     describe('complex', function() {
@@ -50,21 +50,21 @@ describe('TribeMover', function() {
         });
         it('case 1', function() {
             mover.init({ 1: 1, 2: 1, 3: 1, 4: 0, 5: 0 });
-            mover.ok({ 1: 1, 2: 1, 3: 1, 4: 0, 5: 0 }).should.be.true;
-            mover.ok({ 1: 0, 2: 1, 3: 1, 4: 1, 5: 0 }).should.be.true;
-            mover.ok({ 1: 0, 2: 2, 3: 1, 4: 0, 5: 0 }).should.be.true;
-            mover.ok({ 1: 0, 2: 3, 3: 0, 4: 0, 5: 0 }).should.be.true;
+            mover.ok({ 1: 1, 2: 1, 3: 1, 4: 0, 5: 0 }).ok.should.be.true;
+            mover.ok({ 1: 0, 2: 1, 3: 1, 4: 1, 5: 0 }).ok.should.be.true;
+            mover.ok({ 1: 0, 2: 2, 3: 1, 4: 0, 5: 0 }).ok.should.be.true;
+            mover.ok({ 1: 0, 2: 3, 3: 0, 4: 0, 5: 0 }).ok.should.be.true;
         });
         it('case 2', function() {
             mover.init({ 1: 0, 2: 0, 3: 0, 4: 1, 5: 1 });
-            mover.ok({ 1: 0, 2: 0, 3: 2, 4: 0, 5: 0 }).should.be.true;
-            mover.ok({ 1: 0, 2: 0, 3: 1, 4: 1, 5: 0 }).should.be.true;
-            mover.ok({ 1: 0, 2: 0, 3: 1, 4: 0, 5: 1 }).should.be.true;
-            mover.ok({ 1: 0, 2: 0, 3: 0, 4: 0, 5: 2 }).should.be.true;
+            mover.ok({ 1: 0, 2: 0, 3: 2, 4: 0, 5: 0 }).ok.should.be.true;
+            mover.ok({ 1: 0, 2: 0, 3: 1, 4: 1, 5: 0 }).ok.should.be.true;
+            mover.ok({ 1: 0, 2: 0, 3: 1, 4: 0, 5: 1 }).ok.should.be.true;
+            mover.ok({ 1: 0, 2: 0, 3: 0, 4: 0, 5: 2 }).ok.should.be.true;
         });
         it('case 3', function() {
             mover.init({ 1: 6, 2: 6, 3: 6, 4: 0, 5: 0 });
-            mover.ok({ 1: 6, 2: 6, 3: 6, 4: 3, 5: 3 }).should.be.false;
+            mover.ok({ 1: 6, 2: 6, 3: 6, 4: 3, 5: 3 }).ok.should.be.false;
         });
     });
     describe('big one', function() {
@@ -87,35 +87,39 @@ describe('TribeMover', function() {
         });
         it('case 1', function() {
             mover.init({ 1: 0, 2: 0, 3: 6, 4: 0, 5: 0, 6: 0, 7: 0 });
-            mover.ok({ 1: 1, 2: 1, 3: 0, 4: 1, 5: 1, 6: 1, 7: 1 }).should.be.true;
+            mover.ok({ 1: 1, 2: 1, 3: 0, 4: 1, 5: 1, 6: 1, 7: 1 }).ok.should.be.true;
         });
     });
     describe('with sea and frontier', function() {
         beforeEach(function() {
             //       1 - 2---------
             //      SEA / \
-            //         /   3
-            //        /   / \ FRONTIER
+            //          |  3
+            //          \ / \ FRONTIER
             //           4 - 5
             map = {
                 1: { 'neighbours': [2, 'sea'] },
                 2: { 'neighbours': [1, 3, 'sea', 'frontier'] },
                 3: { 'neighbours': [2, 5, 4, 'frontier'] },
-                4: { 'neighbours': [3, 5, 'frontier'] },
+                4: { 'neighbours': [3, 5, 'sea', 'frontier'] },
                 5: { 'neighbours': [3, 4, 'frontier'] },
             }
             mover = new pocketciv.TribeMover(map, 1);
         });
         it('case 1', function() {
             mover.init({ 1: 0, 2: 0, 3: 6, 4: 0, 5: 0 });
-            mover.ok({ 1: 0, 2: 3, 3: 0, 4: 2, 5: 1 }).should.be.true;
+            mover.ok({ 1: 0, 2: 3, 3: 0, 4: 2, 5: 1 }).ok.should.be.true;
         });
         it('case 2', function() {
             mover.init({ 1: 6, 2: 6, 3: 6, 4: 0, 5: 0 });
-            mover.ok({ 1: 6, 2: 6, 3: 6, 4: 3, 5: 3 }).should.be.false;
+            mover.ok({ 1: 6, 2: 6, 3: 6, 4: 3, 5: 3 }).ok.should.be.false;
+        });
+        it('cannot move across the sea', function() {
+            mover.init({ 1: 6, 2: 6, 3: 0, 4: 0, 5: 0 });
+            mover.ok({ 1: 3, 2: 6, 3: 0, 4: 3, 5: 0 }).ok.should.be.false;
         });
     });
-    describe.only('across the sea', function() {
+    describe('across the sea', function() {
         beforeEach(function() {
             //       1 - 2
             //         |     west
@@ -132,7 +136,7 @@ describe('TribeMover', function() {
                 6: { 'neighbours': [4, 'east'] },
                 7: { 'neighbours': [5, 'frontier'] },
             }
-            mover = new pocketciv.TribeMover(map, 1, true);
+            mover = new pocketciv.TribeMover(map, 1, 1);
         });
         it('case 1', function() {
             mover.init({ 1: 0, 2: 0, 3: 3, 4: 0, 5: 0, 6: 0, 7: 0 });
@@ -174,7 +178,7 @@ describe('TribeMover', function() {
                     2: { "id": 2, "neighbours": [ 1 ] }};
             mover = new pocketciv.TribeMover(map, 1)
             mover.init({ 1: undefined, 2: 1 })
-            mover.ok({ 1: 1, 2: undefined }).should.be.true;
+            mover.ok({ 1: 1, 2: undefined }).ok.should.be.true;
         })
     });
     describe('scenario 1', function() {
@@ -192,15 +196,15 @@ describe('TribeMover', function() {
         });
         it('first round', function() {
             mover.init({ 1: 0, 2: 0, 3: 0, 4: 0, 5: 2, 7: 0, 8: 0 });
-            mover.ok({ 1: 0, 2: 0, 3: 0, 4: 0, 5: 2, 7: 0, 8: 0 }).should.be.true;
-            mover.ok({ 1: 0, 2: 0, 3: 0, 4: 0, 5: 1, 7: 1, 8: 0 }).should.be.true;
-            mover.ok({ 1: 0, 2: 0, 3: 1, 4: 0, 5: 1, 7: 0, 8: 0 }).should.be.false;
+            mover.ok({ 1: 0, 2: 0, 3: 0, 4: 0, 5: 2, 7: 0, 8: 0 }).ok.should.be.true;
+            mover.ok({ 1: 0, 2: 0, 3: 0, 4: 0, 5: 1, 7: 1, 8: 0 }).ok.should.be.true;
+            mover.ok({ 1: 0, 2: 0, 3: 1, 4: 0, 5: 1, 7: 0, 8: 0 }).ok.should.be.false;
         });
         it('second round', function() {
             mover.init({ 1: 0, 2: 0, 3: 0, 4: 0, 5: 2, 7: 2, 8: 0 });
-            mover.ok({ 1: 0, 2: 0, 3: 0, 4: 0, 5: 2, 7: 2, 8: 0 }).should.be.true;
-            mover.ok({ 1: 0, 2: 1, 3: 0, 4: 0, 5: 1, 7: 1, 8: 1 }).should.be.true;
-            mover.ok({ 1: 0, 2: 0, 3: 1, 4: 0, 5: 1, 7: 1, 8: 1 }).should.be.false;
+            mover.ok({ 1: 0, 2: 0, 3: 0, 4: 0, 5: 2, 7: 2, 8: 0 }).ok.should.be.true;
+            mover.ok({ 1: 0, 2: 1, 3: 0, 4: 0, 5: 1, 7: 1, 8: 1 }).ok.should.be.true;
+            mover.ok({ 1: 0, 2: 0, 3: 1, 4: 0, 5: 1, 7: 1, 8: 1 }).ok.should.be.false;
         })
         
     });
@@ -217,24 +221,24 @@ describe('TribeMover', function() {
         });
         it('case 1', function() {
             mover.init({ 1: 1, 2: 1, 3: 1, 4: 1 });
-            mover.ok({ 1: 1, 2: 1, 3: 1, 4: 1 }).should.be.true;
+            mover.ok({ 1: 1, 2: 1, 3: 1, 4: 1 }).ok.should.be.true;
         });
         it('case 2', function() {
             mover.init({ 1: 1, 2: 1, 3: 0, 4: 0 });
-            mover.ok({ 1: 0, 2: 1, 3: 1, 4: 0 }).should.be.true;
-            mover.ok({ 1: 0, 2: 0, 3: 1, 4: 1 }).should.be.true;
-            mover.ok({ 1: 0, 2: 0, 3: 2, 4: 0 }).should.be.true;
+            mover.ok(  { 1: 0, 2: 1, 3: 1, 4: 0 }).ok.should.be.true;
+            mover.ok(  { 1: 0, 2: 0, 3: 1, 4: 1 }).ok.should.be.true;
+            mover.ok(  { 1: 0, 2: 0, 3: 2, 4: 0 }).ok.should.be.true;
         });
         it('case 3', function() {
             mover.init({ 1: 2, 2: 0, 3: 0, 4: 0 });
-            mover.ok({ 1: 0, 2: 2, 3: 0, 4: 0 }).should.be.true;
-            mover.ok({ 1: 1, 2: 1, 3: 0, 4: 0 }).should.be.true;
-            mover.ok({ 1: 1, 2: 0, 3: 0, 4: 1 }).should.be.false;
+            mover.ok({ 1: 0, 2: 2, 3: 0, 4: 0 }).ok.should.be.true;
+            mover.ok({ 1: 1, 2: 1, 3: 0, 4: 0 }).ok.should.be.true;
+            mover.ok({ 1: 1, 2: 0, 3: 0, 4: 1 }).ok.should.be.false;
         });
         it('case 4 - neighbour limit', function() {
             mover.init({ 1: 2, 2: 0, 3: 0, 4: 0 });
-            mover.ok({ 1: 2, 2: 2, 3: 0, 4: 0 }).should.be.false;
-            mover.ok({ 1: 0, 2: 0, 3: 0, 4: 0 }).should.be.false;
+            mover.ok({ 1: 2, 2: 2, 3: 0, 4: 0 }).ok.should.be.false;
+            mover.ok({ 1: 0, 2: 0, 3: 0, 4: 0 }).ok.should.be.false;
         });
     });
 });
