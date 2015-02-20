@@ -16,7 +16,7 @@ var CityAdvance = {
     }, this)
     return areas;
   },
-  reduce: function(r, area) {
+  oldreduce: function(r, area) {
     var c = area.city;
     var t = area.tribes;
     while (c < area.city + r.city) {
@@ -37,8 +37,30 @@ var CityAdvance = {
     }
     else
       return {}
+  },
+  current: function(chg, key, val) {
+    // Basic case
+    if (key == undefined) {
+      _.each(this.initial, function(i, ik) {
+        if (i.tribes > i.city)
+          this.current[ik] = i;
+      }, this);
+    }
+  },
+  check: function() {
+    return this.amount >= 0;
+  },
+  reduce: function(key, chg) {
+    var dcity = chg.city - this.initial[key].city;
+    var c = {};
+    if (dcity)
+    {
+      this.amount -= dcity;
+      chg.tribes = this.initial[key].tribes - chg.city;
+      return chg;
+    }
   }
-}
+};
 
 module.exports = {
     run: function(ctx) {

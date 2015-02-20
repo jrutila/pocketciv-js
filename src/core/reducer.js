@@ -132,6 +132,8 @@ var Modes = { AreaWalker: 'AreaWalker', Overall: 'Overall', Selector: 'Selector'
 var NewReducer = function(opts) {
   this.opts = opts;
   this.reduce = opts.reduce;
+  this.currentFunc = opts.current || this._defaultCurrent;
+  this.check = opts.check || this._defaultCheck;
 }
 
 NewReducer.prototype = {
@@ -148,12 +150,31 @@ NewReducer.prototype = {
       this.changes[key][k] = d;
     }, this);
   },
-  _defaultCurrent: function(current, key, val) {
-      //current[key] = _.extend(this.current[key], val)
-      delete current[key];
-  },
   _defaultCheck: function() {
     return this.amount == 0;
+  },
+  _defaultCurrent: function(chg, key, val) {
+      //current[key] = _.extend(this.current[key], val)
+      //delete current[key];
+      if (key == undefined)
+      {
+        this.current = _.clone(this.initial);
+        return;
+      }
+      this.current = {};
+      var curArea = this.map[key];
+      _.each(this.initial, function(i, ik) {
+        if (_.isArray(chg)) {
+          if (_.contains(curArea.neighbours, parseInt(ik)))
+          {
+            if (!_.has(chg, ik))
+              this.current[ik] = i;
+          }
+        } else {
+            if (!_.has(chg, ik))
+              this.current[ik] = i;
+        }
+      }, this);
   },
   ok: function(chg) {
     var opts = this.opts;
@@ -161,23 +182,37 @@ NewReducer.prototype = {
     this.map = _.clone(opts.map) || {};
     this.name = opts.name;
     this.initial = _.clone(opts.initial) || {};
-    this.current = _.clone(opts.initial) || {};
+    this.current = {};
     this.changes = {};
+    this.targets = {};
+    this.failed = [];
+    this.currentFunc.call(this, chg);
+    if (_.isArray(chg) && _.isArray(opts.pre))
+      chg = _.union(opts.pre, chg);
     _.each(chg, function(c, key) {
+      if (this.failed.length > 0)
+        return;
       if (_.isArray(chg))
         key = c;
-      this.current[key] = _.clone(this.initial[key]);
+      //this.current[key] = _.clone(this.initial[key]);
       var trg = this.reduce(key, c);
+      if (trg === false) {
+        this.failed.push('reduce failed');
+        this.current = _.clone(opts.initial);
+        return;
+      }
       var key = _.isArray(trg) ? trg[0] : key;
       var val = _.isArray(trg) ? trg[1] : trg;
       this._mergeChg(key, val);
-      this._defaultCurrent(this.current, key, val);
+      this.targets[key] = val;
+      this.currentFunc.call(this, chg, key, val);
     }, this);
     var ret = {
       changes: this.changes,
       current: this.current,
-      ok: this._defaultCheck(),
+      ok: this.check(),
       amount: this.amount,
+      failed: this.failed,
     }
     return ret;
   }
