@@ -173,7 +173,7 @@ describe('TribeMover', function() {
                     .should.deep.equal([[6,4]]);
             });
         });
-        describe.only('complex1', function() {
+        describe('complex1', function() {
             beforeEach(function() {
                 //       1 - 2
                 //              

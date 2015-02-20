@@ -128,8 +128,63 @@ Reducer.prototype = {
 
 var Modes = { AreaWalker: 'AreaWalker', Overall: 'Overall', Selector: 'Selector' };
 
+
+var NewReducer = function(opts) {
+  this.opts = opts;
+  this.reduce = opts.reduce;
+}
+
+NewReducer.prototype = {
+  _mergeChg: function(key, val) {
+    _.each(val, function(v, k) {
+      var d = v - this.initial[key][k];
+      if (d > 0)
+        d = "+"+d;
+      else if (d < 0)
+        d = d.toString();
+      else
+        return
+      this.changes[key] = this.changes[key] || {};
+      this.changes[key][k] = d;
+    }, this);
+  },
+  _defaultCurrent: function(current, key, val) {
+      //current[key] = _.extend(this.current[key], val)
+      delete current[key];
+  },
+  _defaultCheck: function() {
+    return this.amount == 0;
+  },
+  ok: function(chg) {
+    var opts = this.opts;
+    this.amount = opts.amount || 0;
+    this.map = _.clone(opts.map) || {};
+    this.name = opts.name;
+    this.initial = _.clone(opts.initial) || {};
+    this.current = _.clone(opts.initial) || {};
+    this.changes = {};
+    _.each(chg, function(c, key) {
+      if (_.isArray(chg))
+        key = c;
+      this.current[key] = _.clone(this.initial[key]);
+      var trg = this.reduce(key, c);
+      var key = _.isArray(trg) ? trg[0] : key;
+      var val = _.isArray(trg) ? trg[1] : trg;
+      this._mergeChg(key, val);
+      this._defaultCurrent(this.current, key, val);
+    }, this);
+    var ret = {
+      changes: this.changes,
+      current: this.current,
+      ok: this._defaultCheck(),
+      amount: this.amount,
+    }
+    return ret;
+  }
+}
+
 module.exports = {
-  Reducer: Reducer,
+  Reducer: NewReducer,
   Modes: Modes,
   isSea: function(n) { return typeof n == "string" && n != "frontier"; },
 }

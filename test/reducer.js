@@ -8,6 +8,99 @@ var CityAdvance = require('../src/phases/city_advance').CityAdvance;
 var engine = pocketciv.Engine
 
 describe('Reducer', function() {
+  describe.only('usage', function() {
+    it('selector style', function() {
+      var opts = {
+        amount: 10,
+        name: "test_reducer",
+        map: {
+          1: { neighbours: [2] },
+          2: { neighbours: [1,3] },
+          3: { neighbours: [2] },
+        },
+        initial: {
+          1: { 'tribes': 4 },
+          2: { 'tribes': 4 },
+          3: { 'tribes': 4 },
+        },
+        reduce: function(key, chg) {
+          // ignore chg
+          var val = Math.min(this.initial[key].tribes, this.amount);
+          this.amount -= val;
+          return { 'tribes': this.initial[key].tribes - val };
+        },
+      }
+      var target = new reducer.Reducer(opts);
+      
+      var ok = target.ok({});
+      ok.changes.should.deep.equal({});
+      ok.current.should.deep.equal(target.initial);
+      ok.ok.should.be.false;
+      ok.amount.should.equal(opts.amount);
+      
+      //ok = target.ok({ 1: null })
+      ok = target.ok([ 1 ])
+      ok.current.should.deep.equal(_.omit(opts.initial, '1'));
+      ok.changes.should.deep.equal({ 1: { 'tribes': (-1*opts.initial[1].tribes).toString() }});
+      ok.ok.should.be.false;
+      ok.amount.should.equal(opts.amount - 4);
+      
+      //ok = target.ok({ 1: null, 2: null })
+      ok = target.ok([ 1, 2 ])
+      ok.current.should.deep.equal(_.omit(opts.initial, '1', '2'));
+      ok.changes.should.deep.equal(
+        { 1: { 'tribes': (-1*opts.initial[1].tribes).toString() },
+          2: { 'tribes': (-1*opts.initial[2].tribes).toString() }}
+        );
+      ok.ok.should.be.false;
+      ok.amount.should.equal(opts.amount - 4*2);
+      
+      ok = target.ok([ 1, 2, 3 ])
+      ok.current.should.deep.equal({});
+      ok.changes.should.deep.equal(
+        { 1: { 'tribes': (-1*opts.initial[1].tribes).toString() },
+          2: { 'tribes': (-1*opts.initial[2].tribes).toString() },
+          3: { 'tribes': '-2' }}
+        );
+      ok.amount.should.equal(0);
+      ok.ok.should.be.true;
+    });
+    it('overall reducer style', function() {
+      var opts = {
+        amount: 0,
+        name: "test_reducer",
+        map: {
+          1: { neighbours: [2] },
+          2: { neighbours: [1,3] },
+          3: { neighbours: [2] },
+        },
+        initial: {
+          1: { 'tribes': 5, 'city': 2 },
+          2: { 'tribes': 5 },
+          3: { 'tribes': 5, 'city': 1 },
+        },
+        // Increase city at cost of three and only two of them separetely
+        reduce: function(key, chg) {
+          var dcity = chg.city - (this.initial[key].city || 0);
+          return { 'tribes': 0 };
+        },
+      }
+      var target = new reducer.Reducer(opts);
+      
+      var ok = target.ok({});
+      ok.changes.should.deep.equal({});
+      ok.current.should.deep.equal(target.initial);
+      ok.ok.should.be.true;
+      ok.amount.should.equal(opts.amount);
+      
+      ok = target.ok({ 1: { 'city': 3 }})
+      ok.current.should.deep.equal();
+      ok.changes.should.deep.equal({ 1: { 'tribes': (-1*opts.initial[1].tribes).toString() }});
+      ok.ok.should.be.false;
+      ok.amount.should.equal(opts.amount - 4);
+    });
+    
+  });
   describe('basic', function() {
     it('should have original_amoount', function() {
       var target = new reducer.Reducer(engine);
