@@ -2,6 +2,7 @@ var pocketciv = require("../../src/core/pocketciv");
 var pocketcivApp = angular.module('pocketcivApp', ['ngStorage', 'snap', 'ui.bootstrap', 'ngSanitize']);
 var runplay = require("../../src/core/runplay");
 var eventplay = require("../../src/core/event");
+var reducer = require("../../src/core/reducer");
 var sprintf = require("sprintf");
 var mustache = require("mustache");
 var Map = require("./map")
@@ -48,16 +49,48 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
     
     var moveFunc = undefined;
     $scope.moveTribes = function() {
-        var mover = new pocketciv.TribeMover(pocketciv.Map.areas, $scope.godMode ? -1 : pocketciv.Engine.params.moveLimit);
+        var mover = new pocketciv.TribeMover(pocketciv.Map.areas, $scope.godMode ? -1 : pocketciv.Engine.params.moveLimit, pocketciv.Engine.params.sea_cost);
         mover.init(getMovement(pocketciv.Map.areas));
-        if (mover.ok($scope.movement).ok)
+        var ok = mover.ok($scope.movement);
+        if (ok.ok)
         {
             console.log("OK MOVE!");
-            moveFunc.call(pocketciv.Engine, $scope.movement);
-            $scope.hideMover = true;
-            $scope.mapInfo = undefined;
-            mapClicked = oldClicked;
-            gameLog.move.push($scope.movement)
+            var done = function() {
+                moveFunc.call(pocketciv.Engine, $scope.movement);
+                $scope.hideMover = true;
+                $scope.mapInfo = undefined;
+                mapClicked = oldClicked;
+                gameLog.move.push($scope.movement)
+            };
+            if (ok.reduce)
+            {
+                var rdc = new reducer.Reducer($scope.engine);
+                rdc.startAmount = 1
+                rdc.mode = reducer.Modes.Overall;
+                rdc.areas = function() {
+                    var areas = {};
+                    _.each(this.engine.map.areas, function(a, key) {
+                        if (_.contains(_.flatten(ok.reduce), parseInt(key)))
+                            areas[key] = { 'tribes': $scope.movement[key], 'id': key };
+                    });
+                    return areas;
+                };
+                rdc.reduce = function(r, area) {
+                    if (r.tribes == -1)
+                    {
+                        this.amount--;
+                        return { 'tribes': '-1' };
+                    }
+                };
+                $scope.engine.reducer(rdc, function(chg) {
+                    for (var s in $scope.movement)
+                    {
+                        $scope.movement[s] += (chg[s] && parseInt(chg[s].tribes)) || 0;
+                    }
+                    done();
+                });
+            } else
+                done();
         } else {
             console.log("FAILED MOVE")
         }
@@ -71,7 +104,7 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
         $scope.movement = getMovement(situation);
         $scope.hideMover = false;
         moveFunc = move;
-        var mover = new pocketciv.TribeMover(pocketciv.Map.areas, pocketciv.Engine.params.moveLimit);
+        var mover = new pocketciv.TribeMover(pocketciv.Map.areas, pocketciv.Engine.params.moveLimit, pocketciv.Engine.params.sea_cost);
         
         // UI
         $scope.mapInfo = "Move tribes by clicking start region and then target region";
@@ -92,7 +125,7 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
                 $scope.movement[moveFrom]--;
                 $scope.movement[region]++;
                 var ok = mover.ok($scope.movement);
-                console.log(ok.reduce)
+                $scope.mapTitle = "MOVE "+(ok.reduce || "");
                 if (ok.ok)
                 {
                     drawElem("tribes", region, $scope.movement[region]);
@@ -184,7 +217,7 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
             $scope.mapInfo = "Select an area from areas "+_.keys($scope.reduceAreas)+". \
             Still left "+ok.amount;
         } else {
-            var subtr = reduceSubstr($scope.engine.map.areas, $scope.reduceObject);
+            var subtr = reduceSubstr($scope.reducer.areas(), $scope.reduceObject);
             var ok = $scope.reducer.ok(subtr);
             console.log("Substracted")
             console.log(subtr)
@@ -197,7 +230,7 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
         if ($scope.reducer.mode == 'AreaWalker')
             rdc = $scope.reduceArray;
         else
-            rdc = reduceSubstr($scope.engine.map.areas, $scope.reduceObject);
+            rdc = reduceSubstr($scope.reducer.areas(), $scope.reduceObject);
         var ok = $scope.reducer.ok(rdc);
         if (ok.ok != false)
         {

@@ -12,6 +12,7 @@ module.exports = {
     required_by: [ 'shipping', 'sails_and_rigging' ],
     events: { },
     phases: {
+        /*
         'move.post': function(ctx) {
             var rdc = new reducer.Reducer(this);
             rdc.mode = reducer.Modes.Overall;
@@ -90,9 +91,10 @@ module.exports = {
                 ctx.done && ctx.done();
             });
         }
+        */
     },
     acquired: function() {
-        this.params.sea_move_cost = 1;
+        this.params.sea_cost = 1;
         this.params.sea_expedition = true;
     },
     actions: { },

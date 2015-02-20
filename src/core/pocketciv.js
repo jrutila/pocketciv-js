@@ -333,7 +333,7 @@ TribeMover.prototype = {
                         continue;
                     var i = _.find(ind, function(val, key) {
                         return _.contains(this.map[key].neighbours, f.id);
-                    });
+                    }, this);
                     if (i === undefined || i < 0) {
                         i = ++ii;
                         valid.reduce[i] = [];
@@ -354,8 +354,6 @@ TribeMover.prototype = {
             nghVal[key] = situation[key];
             _.each(ngh, function(n) {
                 nghVal[key] += situation[n];
-                //if (this.seangh[key].indexOf(n) > -1 && situation[n] > 0)
-                    //nghVal[key]--;
             }, this);
         }
         return nghVal;

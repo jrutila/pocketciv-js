@@ -173,7 +173,7 @@ describe('TribeMover', function() {
                     .should.deep.equal([[6,4]]);
             });
         });
-        describe('complex1', function() {
+        describe.only('complex1', function() {
             beforeEach(function() {
                 //       1 - 2
                 //              
@@ -195,6 +195,14 @@ describe('TribeMover', function() {
                 mover.ok(  { 1: 0, 2: 3, 3: 2, 4: 0, 5: 0, 6: 2 }).ok.should.be.true;
                 mover.ok(  { 1: 0, 2: 3, 3: 2, 4: 0, 5: 0, 6: 2 }).reduce
                     .should.deep.equal([[6],[3]]);
+                mover.ok(  { 1: 0, 2: 3, 3: 2, 4: 0, 5: 2, 6: 0 }).reduce
+                    .should.deep.equal([[5],[3]]);
+            });
+            it('case neighbours because of move limit 1', function() {
+                mover.init({ 1: 2, 2: 5, 3: 0, 4: 0, 5: 0, 6: 0 });
+                mover.ok(  { 1: 0, 2: 3, 3: 2, 4: 2, 5: 0, 6: 0 }).ok.should.be.true;
+                mover.ok(  { 1: 0, 2: 3, 3: 2, 4: 2, 5: 0, 6: 0 }).reduce
+                    .should.deep.equal([[4],[3]]);
             });
         });
     });
