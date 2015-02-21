@@ -49,12 +49,6 @@ module.exports = {
           }, this);
           
         },
-        check: function() {
-          if (this._defaultCheck()) return true;
-          // DEFAULT??
-          if (_.size(this.current) == 0) return true;
-          return false;
-        }
       }
       var rdc = new reducer.Reducer(opts);
       var ctx = this;

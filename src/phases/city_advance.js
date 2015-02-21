@@ -40,12 +40,11 @@ var CityAdvance = {
   },
   current: function(chg, key, val) {
     // Basic case
-    if (key == undefined) {
-      _.each(this.initial, function(i, ik) {
-        if (i.tribes > i.city)
-          this.current[ik] = i;
-      }, this);
-    }
+    this.current = {};
+    _.each(this.initial, function(i, ik) {
+      if (i.tribes + (this.opts.discount || 0) > i.city && i.city > 0)
+        this.current[ik] = i;
+    }, this);
   },
   check: function() {
     return this.amount >= 0;
@@ -86,6 +85,8 @@ module.exports = {
             amount: this.params.city_advance_limit,
             discount: this.params.city_advance_discount,
             max_city: this.params.max_city,
+            shows: ['tribes', 'city'],
+            edits: ['city'],
             reduce: CityAdvance.reduce,
             check: CityAdvance.check,
             current: CityAdvance.current,

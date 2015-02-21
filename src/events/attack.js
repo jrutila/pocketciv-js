@@ -81,12 +81,16 @@ var AttackReducer = {
 module.exports = {
     attack: function() {
       var ctx = this;
+      var initial = _.clone(this.engine.map.areas);
+      initial.gold = this.engine.gold;
       var opts = {
         map: this.engine.map.areas,
-        initial: this.engine.map.areas,
+        initial: initial,
         pre: [this.active_region.id],
         city_reduce: city_reduce,
         gold_reduce: gold_reduce,
+        shows: ['tribes', 'city', 'gold'],
+        edits: [],
         amount: attack_force,
         current: AttackReducer.current,
         reduce: AttackReducer.reduce,

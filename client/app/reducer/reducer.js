@@ -11,8 +11,14 @@ pocketcivApp.directive('pcReducer', function() {
         templateUrl: 'app/reducer/reducer.html',
         link: function($scope, tElem) {
             $scope.reset = function() {
-                if ($scope.reducer.opts.edits && $scope.reducer.opts.edits.length > 0)
+                $scope.reduceObject = {};
+                var edits = $scope.reducer.opts.edits;
+                if (edits && edits.length > 0) {
+                    _.each($scope.reducer.opts.initial, function(i, ik) {
+                        $scope.reduceObject[ik] = _.pick(i, edits); //, function(e) { return [e,null]; });
+                    });
                     $scope.chg = {};
+                }
                 else
                     $scope.chg = [];
             };
@@ -21,8 +27,14 @@ pocketcivApp.directive('pcReducer', function() {
                 if (n != o && n != undefined)
                     $scope.reset();
             });
+            $scope.$watch('reduceObject', function(n, o) {
+                console.log("robje")
+                console.log($scope.reduceObject)
+                $scope.chg = _.pick($scope.reduceObject, _.keys($scope.ok.current));
+            },true);
             $scope.$watch("chg", function() {
-                console.log("Change chg "+$scope.chg)
+                console.log("Change chg ")
+                console.log($scope.chg)
                 if ($scope.reducer)
                     $scope.ok = $scope.reducer.ok($scope.chg);
                 else

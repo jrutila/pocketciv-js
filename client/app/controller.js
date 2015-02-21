@@ -531,7 +531,7 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
         map.getImage = getImage;
         
         $("#canvases .icon, #canvases .symbol").remove();
-        $('.areaCode').hide();
+        $('#map .areaCode').hide();
         map.paint();
         for (var reg in map.symbols)
         {

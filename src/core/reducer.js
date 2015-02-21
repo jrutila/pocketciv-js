@@ -162,7 +162,9 @@ NewReducer.prototype = {
       }, this);
   },
   _defaultCheck: function() {
-    return this.amount == 0;
+    if (this.amount == 0) return true;
+    if (_.size(this.current) == 0) return true;
+    return false;
   },
   _defaultCurrent: function(chg, key, val) {
       //current[key] = _.extend(this.current[key], val)
