@@ -5,42 +5,51 @@ module.exports = {
     title: "Expedition",
     run: function() {
         console.log("Running expedition")
-        var engine = this;
-        var rdc = new reducer.Reducer(this);
-        rdc.mode = reducer.Modes.Overall;
-        rdc.startAmount = 0;
-        rdc.expSea = engine.params.sea_expedition || false;
-        rdc.split = engine.params.expedition_split || 1;
-        rdc.sea_multi = engine.params.expedition_sea_force || 1;
-        rdc.frontier_multi = engine.params.expedition_frontier_force || 1;
-        rdc.initValues = { from: undefined };
-        
-        rdc.areas = function() {
-            var areas = {};
-            _.each(engine.map.areas, function(area, aid) {
-                if (area.neighbours.indexOf('frontier') > -1)
-                    areas[aid] = area;
-                else if (this.expSea && _.some(area.neighbours, reducer.isSea))
-                    areas[aid] = area;
-            }, this);
-            return areas;
-        }
-        
-        rdc.reduce = function(r, area) {
-            if (r.tribes > 0)
-                return false;
-            else if (r.tribes < 0)
+        var initial = {};
+        _.each(this.map.areas, function(a, key) {
+            if (a.tribes > 0)
             {
-                // No two areas to go to expedition
-                if (this.from)
-                    return false;
-                this.from = area;
-                this.amount += r.tribes;
-                return { 'tribes': r.tribes.toString() };
+                if (_.contains(a.neighbours, 'frontier'))
+                    initial[key] = a;
+                if (this.params.sea_expedition && _.some(a.neighbours, function(n) { return typeof n == "string"; }))
+                    initial[key] = a;
             }
-            return {};
+        }, this);
+        var opts = {
+            map: this.map.areas,
+            initial: initial,
+            shows: ['tribes'],
+            edits: ['tribes'],
+            amount: 0,
+            sea_multi: this.params.expedition_sea_force || 1,
+            frontier_multi: this.params.expedition_frontier_force || 1,
+            split: this.params.expedition_split || 1,
+            reduce: function(key, chg) {
+                var rTrb = this.initial[key].tribes - chg.tribes;
+                this.amount = rTrb;
+                if (_.some(this.map[key].neighbours, reducer.isSea))
+                    this.amount *= this.opts.sea_multi;
+                else if (_.contains(this.map[key].neighbours, 'frontier'))
+                    this.amount *= this.opts.frontier_multi;
+                
+                return { tribes: chg.tribes };
+            },
+            current: function(chg, key, val) {
+                if (key == undefined)
+                {
+                    this.current = _.clone(this.initial);
+                } else if (_.has(this.changes, key)) {
+                    this.current = {};
+                    this.current[key] = this.initial[key];
+                }
+            },
+            check: function() {
+                return this.amount >= 0;
+            }
         }
+        var rdc = new reducer.Reducer(opts);
         
+        var engine = this;
         engine.reducer(rdc, function(chg) {
             var expforce = 0;
             for (var a in chg)
@@ -53,12 +62,12 @@ module.exports = {
                     // Frontier expedition
                     if (engine.map.areas[a].neighbours.indexOf('frontier') > -1)
                     {
-                        fgold = expforce * rdc.frontier_multi - c.hexagon / rdc.split;
+                        fgold = expforce * opts.frontier_multi - c.hexagon / opts.split;
                     }
                     // Sea expedition
-                    if (rdc.expSea && _.some(engine.map.areas[a].neighbours, reducer.isSea))
+                    if (engine.params.sea_expedition && _.some(engine.map.areas[a].neighbours, reducer.isSea))
                     {
-                        sgold = expforce * rdc.sea_multi - c.square / rdc.split;
+                        sgold = expforce * opts.sea_multi - c.square / opts.split;
                         console.log("Sea gold: "+sgold);
                         console.log("Frontier gold: "+fgold);
                     }

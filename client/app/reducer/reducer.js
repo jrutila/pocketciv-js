@@ -21,6 +21,7 @@ pocketcivApp.directive('pcReducer', function() {
                 }
                 else
                     $scope.chg = [];
+                $scope.ok = $scope.reducer.ok($scope.chg);
             };
             $scope.$watch('reducer', function(n, o) {
                 console.log("PC REDUCER")
@@ -30,7 +31,8 @@ pocketcivApp.directive('pcReducer', function() {
             $scope.$watch('reduceObject', function(n, o) {
                 console.log("robje")
                 console.log($scope.reduceObject)
-                $scope.chg = _.pick($scope.reduceObject, _.keys($scope.ok.current));
+                if ($scope.ok)
+                    $scope.chg = _.pick($scope.reduceObject, _.keys($scope.ok.current));
             },true);
             $scope.$watch("chg", function() {
                 console.log("Change chg ")
