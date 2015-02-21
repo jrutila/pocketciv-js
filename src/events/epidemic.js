@@ -25,48 +25,22 @@ module.exports = {
     },
     reduce: function() {
       if (typeof(skipempty) === 'undefined') skipempty = false;
-      var rdc = new reducer.Reducer(this.engine)
-      console.log('Current area '+this.active_region.id)
-      rdc.startRegion = this.active_region
-      console.log('Population loss '+population_loss)
-      rdc.startAmount = population_loss
-      rdc.initValues = {
-        tribeCount: this.engine.map.tribeCount-2
-      }
-      console.log(rdc.initValues)
-      rdc.reduce = function(area) {
-        if (area.tribes == 0 && !skipempty)
-        {
-          this.amount = 0;
-          return;
+      var opts = {
+        initial: this.engine.map.areas,
+        map: this.engine.map.areas,
+        amount: Math.min(population_loss, this.engine.map.tribeCount-2),
+        pre: [this.active_region.id],
+        skip_empty: skipempty,
+        reduce: function(key) {
+          var r = Math.min(this.initial[key].tribes, this.amount);
+          this.amount -= r;
+          return { 'tribes': this.initial[key].tribes - r };
+        },
+        current: function(chg, key, val) {
+          this._defaultCurrent(chg, key, val);
         }
-        var rTrb = Math.min(area.tribes, this.amount, this.tribeCount);
-        this.tribeCount -= rTrb;
-        //if (this.engine.map.tribeCount - (this.original_amount - this.amount - rTrb) <= 2)
-        this.amount -= rTrb;
-        if (this.tribeCount === 0)
-        {
-          this.amount = 0;
-        }
-        console.log('Reduce area '+area.id+' with '+rTrb)
-        console.log('Loss left: '+this.amount)
-        return { 'tribes': (area.tribes - rTrb).toString() }
       }
-      rdc.areas = function() {
-        var unvisitedngh = _.difference(this.currentArea.neighbours, this.visited)
-        var areas = {}
-        _.each(this.engine.map.areas, function(area, key) {
-          if (unvisitedngh.indexOf(parseInt(key)) > -1)
-          {
-            if (area.tribes > 0 || skipempty)
-              areas[key] = area;
-          }
-        });
-        console.log('Possible ares to '+this.currentArea.id+' are ')
-        console.log(areas)
-        return areas;
-        //return this.engine.map.areas;
-      }
+      var rdc = new reducer.Reducer(opts);
       var ctx = this;
       ctx.engine.reducer(rdc, function(chg) {
           ctx.changes = chg;

@@ -23,13 +23,13 @@ describe('Epidemic', function() {
           done(areas[areaa.shift()]);
         }
         engine.reducer = function(rdc, done) {
-            rdc.startRegion.id.should.equal(5);
+            rdc.opts.pre.should.deep.equal([5]);
             done(rdc.ok(areaa).changes)
         }
         runEvent(engine, event, { expr: 's' }, function(chg) {
             chg.should.deep.equal({
-                5: {'tribes': '0' },
-                4: {'tribes': '0' },
+                5: {'tribes': '-2' },
+                4: {'tribes': '-3' },
             })
             done();
         })
@@ -43,8 +43,8 @@ describe('Epidemic', function() {
         }
         runEvent(engine, event, { expr: 's' }, function(chg) {
             chg.should.deep.equal({
-                5: {'tribes': '0' },
-                4: {'tribes': '1' },
+                5: {'tribes': '-2' },
+                4: {'tribes': '-2' },
             })
             done();
         })
@@ -58,8 +58,8 @@ describe('Epidemic', function() {
         }
         runEvent(engine, event, { expr: 's' }, function(chg) {
             chg.should.deep.equal({
-                5: {'tribes': '0' },
-                4: {'tribes': '0' },
+                5: {'tribes': '-2' },
+                4: {'tribes': '-3' },
             })
             done();
         })
@@ -73,14 +73,14 @@ describe('Epidemic', function() {
           done(areas[areaa.shift()]);
         }
         engine.reducer = function(rdc, done) {
-            rdc.startRegion.id.should.equal(5);
+            rdc.opts.pre.should.deep.equal([5]);
             done(rdc.ok(areaa).changes)
         }
         runEvent(engine, event, { expr: 's' }, function(chg) {
             chg.should.deep.equal({
-                5: {'tribes': '0' },
-                4: {'tribes': '0' },
-                3: {'tribes': '1' },
+                5: {'tribes': '-2' },
+                4: {'tribes': '-3' },
+                3: {'tribes': '-2' },
             })
             done();
         })
@@ -94,13 +94,13 @@ describe('Epidemic', function() {
           done(areas[areaa.shift()]);
         }
         engine.reducer = function(rdc, done) {
-            rdc.startRegion.id.should.equal(4);
+            rdc.opts.pre.should.deep.equal([4]);
             done(rdc.ok([ 5 ]).changes)
         }
         runEvent(engine, event, { expr: 's' }, function(chg) {
             chg.should.deep.equal({
-                5: {'tribes': '0' },
-                4: {'tribes': '0' },
+                5: {'tribes': '-2' },
+                4: {'tribes': '-3' },
             })
             done();
         })
@@ -113,13 +113,13 @@ describe('Epidemic', function() {
           done(areas[areaa.shift()]);
         }
         engine.reducer = function(rdc, done) {
-            rdc.startRegion.id.should.equal(4);
+            rdc.opts.pre.should.deep.equal([4]);
             done(rdc.ok([ 5 ]).changes)
         }
         runEvent(engine, event, { expr: 's' }, function(chg) {
             chg.should.deep.equal({
-                4: {'tribes': '0' },
-                5: {'tribes': '0' },
+                4: {'tribes': '-3' },
+                5: {'tribes': '-2' },
             })
             done();
         })
@@ -133,15 +133,15 @@ describe('Epidemic', function() {
           done(areas[areaa.shift()]);
         }
         engine.reducer = function(rdc, done) {
-            rdc.startRegion.id.should.equal(5);
+            rdc.opts.pre.should.deep.equal([5]);
             done(rdc.ok(areaa).changes)
         }
         runEvent(engine, event, { expr: 's' }, function(chg) {
             chg.should.deep.equal({
-                5: {'tribes': '0' },
-                4: {'tribes': '0' },
-                3: {'tribes': '0' },
-                2: {'tribes': '2' },
+                5: {'tribes': '-2' },
+                4: {'tribes': '-3' },
+                3: {'tribes': '-1' },
+                2: {'tribes': '-3' },
             })
             done();
         })
