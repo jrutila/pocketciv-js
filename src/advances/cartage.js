@@ -29,25 +29,22 @@ module.exports = {
             ctx.changes = {};
             if (farmCount < cityCount)
             {
-                var rdc = new reducer.Reducer();
-                rdc.mode = reducer.Modes.Overall;
-                rdc.startAmount = cityCount - farmCount;
-                rdc.areas = function() {
-                    return _.object(_.filter(_.map(areas, function(area, key) {
-                        if (area.city > 0)
-                            return [key, area];
-                    }), function(arr) { return arr !== undefined; }));
-                }
-                rdc.reduce = function(r, area) {
-                    console.log("reduce")
-                    console.log(this.changes)
-                    if (this.visited.indexOf(area.id) == -1 && r.city === -1)
-                    {
+                var initial = {};
+                _.each(this.map.areas, function(a, k) {
+                    if (a.city > 0)
+                        initial[k] = a;
+                });
+                
+                var opts = {
+                    map: this.map.areas,
+                    initial: initial,
+                    amount: cityCount - farmCount,
+                    reduce: function(key) {
                         this.amount--;
-                        return { 'city': '-1' };
+                        return { 'city': this.initial[key].city - 1 };
                     }
-                    return;
-                }
+                };
+                var rdc = new reducer.Reducer(opts);
                 this.reducer(rdc, function(chg) {
                     ctx.changes = chg;
                     ctx.done && ctx.done();
