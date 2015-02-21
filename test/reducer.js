@@ -241,7 +241,7 @@ describe('City Advance (worker)', function() {
       engine.map.areas = {
         4: { id: 4, 'tribes': 3, 'city': 1, 'neighbours': [ 3 ] },
         3: { id: 3, 'tribes': 2, 'city': 2, 'neighbours': [ 4, 2 ] },
-        2: { id: 2, 'tribes': 2, 'city': 1, 'neighbours': [ 3 ] },
+        2: { id: 2, 'tribes': 5, 'city': 1, 'neighbours': [ 3 ] },
       };
       opts = {
         map: engine.map.areas,
@@ -252,7 +252,7 @@ describe('City Advance (worker)', function() {
       };
       target = new reducer.Reducer(opts);
     })
-    it.only('basic case', function() {
+    it('basic case', function() {
       opts.amount = 1;
       opts.max_city = 2;
       
@@ -268,23 +268,54 @@ describe('City Advance (worker)', function() {
       });
     })
     it('should return false on too big city numbers', function() {
-      target.startAmount = -1;
-      target.max_city = 2;
-      target.ok({ 4: { city: 2 }}).should.equal(false);
-      target.ok({ 3: { city: 3 }}).should.equal(false);
+      opts.amount = 1;
+      opts.max_city = 3;
+      engine.map.areas[3].tribes = 3;
+      
+      ok = target.ok({});
+      ok.amount.should.equal(1);
+      _.keys(ok.current).should.deep.equal(['2', '3', '4']);
+      ok.ok.should.be.true;
+      
+      ok = target.ok({ 4: { city: 3 }});
+      ok.failed.length.should.equal(1);
     })
-    it('should increase the amount on too many additions', function() {
-      target.startAmount = -1;
-      target.max_city = 2;
-      target.ok({ 4: { city: 1 }, 2: { city: 1 }}).amount.should.equal(1);
+    it('should let only add by the amount', function() {
+      opts.amount = 1;
+      opts.max_city = 3;
+      engine.map.areas[3].tribes = 3;
+      
+      ok = target.ok({ 2: { city: 3 }});
+      // Because amount is only 1
+      ok.ok.should.be.false;
+      ok.failed.length.should.equal(0);
+      
+      ok = target.ok({ 2: { city: 2 }, 4: { city: 2 }});
+      // Because amount is only 1
+      ok.ok.should.be.false;
+      ok.failed.length.should.equal(0);
     })
     it('should not let increase over max_city', function() {
-      target.startAmount = -3;
-      target.max_city = 3;
+      opts.amount = 1;
+      opts.max_city = 2;
       engine.map.areas[3].tribes = 3;
-      _.keys(target.ok({}).areas).should.deep.equal([ '2', '3', '4' ]);
-      target.max_city = 2;
-      _.keys(target.ok({}).areas).should.deep.equal([ '2', '4' ]);
+      
+      _.keys(target.ok({}).current).should.deep.equal([ '2', '3', '4' ]);
+      
+      ok = target.ok({ 3: { city: 3 }});
+      ok.failed.length.should.equal(1);
+      //ok.ok.should.be.false;
+    })
+    it('should take the discount into account', function() {
+      opts.amount = 1;
+      opts.max_city = 2;
+      opts.discount = 1;
+      
+      ok = target.ok({ 4: { city: 2 }});
+      ok.ok.should.be.true;
+      ok.changes.should.deep.equal({
+        4: { tribes: '-1', city: '+1' }
+      });
     })
   })
 })

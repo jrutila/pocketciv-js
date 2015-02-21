@@ -52,11 +52,23 @@ var CityAdvance = {
   },
   reduce: function(key, chg) {
     var dcity = chg.city - this.initial[key].city;
-    var c = {};
+    if (chg.city > this.opts.max_city)
+      return false;
     if (dcity)
     {
-      this.amount -= dcity;
-      chg.tribes = this.initial[key].tribes - chg.city;
+      var c = this.initial[key].city;
+      var t = this.initial[key].tribes;
+      while (c < chg.city) {
+        // If there is not enough tribes
+        c++;
+        var tr = c - (this.opts.discount > 0 ? this.opts.discount : 0);
+        t -= tr > 0 ? tr : 0;
+        if (t < 0) return false;
+        this.amount--;
+      }
+      chg.tribes = t;
+      if (chg.tribes < 0)
+        return false;
       return chg;
     }
   }
@@ -67,27 +79,28 @@ module.exports = {
         console.log("Max city is " + this.params.max_city)
         console.log("Max city advance is " + this.params.city_advance_limit)
         console.log("City advance discount is " + this.params.city_advance_discount)
-        ctx.changes = {};
         if (this.params.city_advance_limit && this.params.max_city > 1) {
-            var rdc = new reducer.Reducer(this);
-            rdc.mode = reducer.Modes.Overall;
-            rdc.max_city = this.params.max_city
-            rdc.advance_discount = this.params.city_advance_discount;
-            rdc.startAmount = -1 * this.params.city_advance_limit;
-            rdc.areas = CityAdvance.areas
-            rdc.reduce = CityAdvance.reduce
-            
-            console.log(rdc.ok({}).areas)
-
-            if (_.isEmpty(rdc.ok({}).areas)) {
-                ctx.done && ctx.done();
-            }
-            else {
-                this.reducer(rdc, function(chg) {
-                    ctx.changes = chg;
-                    ctx.done && ctx.done();
-                });
-            }
+          var opts = {
+            map: this.map.areas,
+            initial: this.map.areas,
+            amount: this.params.city_advance_limit,
+            discount: this.params.city_advance_discount,
+            max_city: this.params.max_city,
+            reduce: CityAdvance.reduce,
+            check: CityAdvance.check,
+            current: CityAdvance.current,
+          }
+          var rdc = new reducer.Reducer(opts);
+          
+          if (_.isEmpty(rdc.ok({}).current)) {
+              ctx.done && ctx.done();
+          }
+          else {
+              this.reducer(rdc, function(chg) {
+                  ctx.changes = chg;
+                  ctx.done && ctx.done();
+              });
+          }
         }
         else ctx.done && ctx.done();
     },

@@ -137,18 +137,26 @@ var NewReducer = function(opts) {
 }
 
 NewReducer.prototype = {
+  _getChangeString: function(prev, now) {
+    var d = now-prev;
+    if (d > 0)
+      return "+"+d;
+    if (d < 0)
+      return d.toString();
+    return null;
+  },
   _mergeChg: function(key, val) {
-    _.each(val, function(v, k) {
-      var d = v - this.initial[key][k];
-      if (d > 0)
-        d = "+"+d;
-      else if (d < 0)
-        d = d.toString();
-      else
-        return
-      this.changes[key] = this.changes[key] || {};
-      this.changes[key][k] = d;
-    }, this);
+    if (!parseInt(key)) {
+      var d = this._getChangeString(this.initial[key], this.targets[key]);
+      if (d)
+        this.changes[key] = d;
+    } else
+      _.each(val, function(v, k) {
+        var d = this._getChangeString(this.initial[key][k], v)
+        if (!d) return;
+        this.changes[key] = this.changes[key] || {};
+        this.changes[key][k] = d;
+      }, this);
   },
   _defaultCheck: function() {
     return this.amount == 0;
@@ -184,11 +192,11 @@ NewReducer.prototype = {
     this.initial = _.clone(opts.initial) || {};
     this.current = {};
     this.changes = {};
-    this.targets = {};
+    this.targets = _.clone(opts.initial) || {};
     this.failed = [];
     this.currentFunc.call(this, chg);
     if (_.isArray(chg) && _.isArray(opts.pre))
-      chg = _.union(opts.pre, chg);
+      chg = (opts.pre || []).concat(chg);
     _.each(chg, function(c, key) {
       if (this.failed.length > 0)
         return;
@@ -203,10 +211,11 @@ NewReducer.prototype = {
       }
       var key = _.isArray(trg) ? trg[0] : key;
       var val = _.isArray(trg) ? trg[1] : trg;
-      this._mergeChg(key, val);
       this.targets[key] = val;
+      this._mergeChg(key, val);
       this.currentFunc.call(this, chg, key, val);
     }, this);
+    this._mergeChg('gold');
     var ret = {
       changes: this.changes,
       current: this.current,

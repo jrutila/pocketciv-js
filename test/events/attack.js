@@ -7,156 +7,212 @@ var attack = require('../../src/events/attack')
 var _ = require('underscore')
 
 describe('Attack (worker)', function() {
+  var target = null;
+  var opts = null;
+  var ok = null;
   beforeEach(function() {
-    target = new reducer.Reducer(engine);
-    target.areas = attack.reducer.areas;
-    target.reduce = attack.reducer.reduce;
-    target.city_reduce = 5;
-    target.gold_reduce = 2;
+    opts = {
+      city_reduce: 5,
+      gold_reduce: 2,
+      reduce: attack.reducer.reduce,
+      current: attack.reducer.current,
+    }
+    target = new reducer.Reducer(opts);
   });
   describe('basic', function() {
     beforeEach(function() {
-      engine.map.areas = {
+      opts.initial = opts.map = {
         4: { id: 4, 'tribes': 3, 'city': 1, 'neighbours': [ 3 ] },
         3: { id: 3, 'tribes': 2, 'neighbours': [ 4, 2 ] },
         2: { id: 2, 'tribes': 2, 'neighbours': [ 3 ] },
       }
     });
     it('should work in basic case', function() {
-      target.startAmount = 9;
-      target.startRegion = engine.map.areas[4];
+      opts.amount = 9;
+      opts.pre = [4];
+      opts.initial.gold = 7;
       target.ok([3]).changes.should.deep.equal({
-        4: { 'tribes': '0', 'city': '0' },
-        3: { 'tribes': '1' },
+        4: { 'tribes': '-3', 'city': '-1' },
+        3: { 'tribes': '-1' },
         'gold': '-2'
       });
     });
   });
   describe('automatic movement', function() {
     it('attack should go to lowest tribe', function() {
-      engine.map.areas = {
+      opts.initial = opts.map = {
         4: { id: 4, 'tribes': 3, 'neighbours': [ 3, 2 ] },
         3: { id: 3, 'tribes': 2, 'neighbours': [ 4, 2 ] },
         2: { id: 2, 'tribes': 1, 'neighbours': [ 3, 4 ] },
       }
-      target.startAmount = 4;
-      target.startRegion = engine.map.areas[4];
+      opts.amount = 4;
+      opts.pre = [4];
       target.ok([2]).changes.should.deep.equal({
-        4: { 'tribes': '0' },
-        2: { 'tribes': '0' },
+        4: { 'tribes': '-3' },
+        2: { 'tribes': '-1' },
       });
-      target.startAmount = 4;
-      target.startRegion = engine.map.areas[2];
+      opts.pre= [2];
       target.ok([3, 4]).changes.should.deep.equal({
-        4: { 'tribes': '2' },
-        3: { 'tribes': '0' },
-        2: { 'tribes': '0' },
+        4: { 'tribes': '-1' },
+        3: { 'tribes': '-2' },
+        2: { 'tribes': '-1' },
       });
-      target.ok([]).ok.should.equal(false)
-      _.keys(target.ok([]).areas).should.deep.equal([ '3' ])
-      _.keys(target.ok([3]).areas).should.deep.equal([ '4' ])
-      target.ok([4, 3]).should.equal(false)
+      ok = target.ok([]);
+      _.keys(ok.current).should.deep.equal(['3']);
+      ok.ok.should.be.false;
+      
+      ok = target.ok([4,3]);
+      ok.failed.length.should.equal(1);
+      
+      ok = target.ok([3]);
+      _.keys(ok.current).should.deep.equal([ '4' ])
+      ok.ok.should.be.false;
+      
+      ok = target.ok([3, 4]);
+      _.keys(ok.current).should.deep.equal([]);
+      ok.ok.should.be.true;
     });
     it('should not go to empty region', function() {
-      engine.map.areas = {
+      opts.initial = opts.map = {
         4: { id: 4, 'tribes': 3, 'neighbours': [ 3, 2 ] },
         3: { id: 3, 'tribes': 0, 'neighbours': [ 4, 2 ] },
         2: { id: 2, 'tribes': 1, 'neighbours': [ 3, 4 ] },
       }
-      target.startAmount = 4;
-      target.startRegion = engine.map.areas[4];
-      _.keys(target.ok([]).areas).should.deep.equal(['2'])
-      target.ok([3]).should.equal(false)
+      opts.amount = 4;
+      opts.pre = [4];
+      _.keys(target.ok([]).current).should.deep.equal(['2'])
+      target.ok([3]).failed.length.should.equal(1)
+      target.ok([2]).ok.should.be.true;
     });
     it('should be able to start from empty region', function() {
-      engine.map.areas = {
+      opts.initial = opts.map = {
         4: { id: 4, 'tribes': 3, 'neighbours': [ 3, 2 ] },
         3: { id: 3, 'neighbours': [ 4, 2 ] },
         2: { id: 2, 'tribes': 1, 'neighbours': [ 3, 4 ] },
       }
-      target.startAmount = 3;
-      target.startRegion = engine.map.areas[3];
-      _.keys(target.ok([]).areas).should.deep.equal(['2'])
-      _.keys(target.ok([2]).areas).should.deep.equal(['4'])
-      target.ok([3]).should.equal(false)
+      opts.amount = 3;
+      opts.pre = [3];
+      target.ok([3]).failed.length.should.equal(1);
+      _.keys(target.ok([]).current).should.deep.equal(['2'])
+      _.keys(target.ok([2]).current).should.deep.equal(['4'])
       target.ok([2, 4]).changes.should.deep.equal({
-        4: { 'tribes': '1' },
-        3: { },
-        2: { 'tribes': '0' },
+        4: { 'tribes': '-2' },
+        2: { 'tribes': '-1' },
         
       })
     });
     describe('attack should go to the highest city in tribe tie', function() {
       beforeEach(function() {
-        engine.map.areas = {
+        //       4
+        //      / \
+        // 3 - 2 - 5
+        opts.initial = opts.map = {
           5: { id: 5, 'tribes': 1, 'city': 5, 'neighbours': [ 4, 2 ] },
           4: { id: 4, 'tribes': 1, 'city': 3, 'neighbours': [ 2, 5 ] },
           3: { id: 3, 'tribes': 0, 'city': 4, 'neighbours': [ 2 ] },
           2: { id: 2, 'tribes': 1, 'neighbours': [ 3, 4, 5 ] },
+          gold: 14,
         }
       })
       it('case 1', function() {
-        target.startAmount = 33;
-        target.startRegion = engine.map.areas[4];
-        _.keys(target.ok([]).areas).should.deep.equal([ '5' ])
-        _.keys(target.ok([5]).areas).should.deep.equal([ '2' ])
+        opts.amount = 33;
+        opts.pre = [4];
+        _.keys(target.ok([]).current).should.deep.equal([ '5' ])
+        _.keys(target.ok([5]).current).should.deep.equal([ '2' ])
         target.ok([5]).ok.should.be.true;
         target.ok([5]).amount.should.equal(0);
         target.ok([5]).changes.should.deep.equal({
-          4: { 'city': '0', 'tribes': '0' },
-          5: { 'tribes': '0', 'city': '2' },
+          4: { 'city': '-3', 'tribes': '-1' },
+          5: { 'tribes': '-1', 'city': '-3' },
           'gold': '-12',
         })
       })
       it('case 2', function() {
-        target.startAmount = 27;
-        target.startRegion = engine.map.areas[3];
-        _.keys(target.ok([2]).areas).should.deep.equal([ '5' ])
+        opts.amount = 27;
+        opts.pre = [3];
+        _.keys(target.ok([2]).current).should.deep.equal([ '5' ])
         target.ok([2, 5]).changes.should.deep.equal({
-          3: { 'city': '0' },
-          2: { 'tribes': '0' },
-          5: { 'tribes': '0', 'city': '4' },
+          3: { 'city': '-4' },
+          2: { 'tribes': '-1' },
+          5: { 'tribes': '-1', 'city': '-1' },
           'gold': '-10',
         })
-        target.startAmount = 26;
+        opts.amount = 26;
         target.ok([2, 5]).changes.should.deep.equal({
-          3: { 'city': '0' },
-          2: { 'tribes': '0' },
-          5: { 'tribes': '0' },
+          3: { 'city': '-4' },
+          2: { 'tribes': '-1' },
+          5: { 'tribes': '-1' },
           'gold': '-8',
         })
       })
-    })
+    });
+    describe('attack should go to the highest city if there is no tribes', function() {
+      beforeEach(function() {
+        //       4
+        //      / \
+        //     2 - 5
+        //      \ /
+        //       3
+        opts.initial = opts.map = {
+          5: { id: 5, 'city': 5, 'neighbours': [ 3, 4, 2 ] },
+          4: { id: 4, 'city': 4, 'neighbours': [ 2, 5 ] },
+          3: { id: 3, 'tribes': 0, 'city': 3, 'neighbours': [ 2, 5 ] },
+          2: { id: 2, 'city': 2, 'neighbours': [ 3, 4, 5 ] },
+          gold: 14,
+        }
+      })
+      it('case 1', function() {
+        opts.amount = 33;
+        opts.pre = [4];
+        _.keys(target.ok([]).current).should.deep.equal([ '5' ])
+        _.keys(target.ok([5]).current).should.deep.equal([ '3' ])
+      })
+      it('case 2', function() {
+        opts.map[2].tribes = 1;
+        opts.amount = 33;
+        opts.pre = [4];
+        _.keys(target.ok([]).current).should.deep.equal([ '2' ])
+        _.keys(target.ok([2]).current).should.deep.equal([ '5' ])
+      })
+      
+    });
     describe('user should choose if there is a tie', function() {
       beforeEach(function() {
-        engine.map.areas = {
+        //       4
+        //      / \
+        // 3 - 2 - 5
+        opts.initial = opts.map = {
           5: { id: 5, 'tribes': 1, 'city': 3, 'neighbours': [ 4, 2 ] },
           4: { id: 4, 'tribes': 1, 'city': 3, 'neighbours': [ 2, 5 ] },
           3: { id: 3, 'tribes': 0, 'city': 4, 'neighbours': [ 2 ] },
           2: { id: 2, 'tribes': 1, 'neighbours': [ 3, 4, 5 ] },
+          gold: 7,
         }
       })
       it('case 1', function() {
-        target.startAmount = 26;
-        target.startRegion = engine.map.areas[3];
-        _.keys(target.ok([2]).areas).should.deep.equal([ '4', '5' ])
+        opts.amount = 26;
+        opts.pre = [3];
+        _.keys(target.ok([2]).current).should.deep.equal([ '4', '5' ])
         target.ok([2, 5]).changes.should.deep.equal({
-          3: { 'city': '0' },
-          2: { 'tribes': '0' },
-          5: { 'tribes': '0' },
-          'gold': '-8',
+          3: { 'city': '-4' },
+          2: { 'tribes': '-1' },
+          5: { 'tribes': '-1' },
+          'gold': '-7',
         })
         target.ok([2, 4]).changes.should.deep.equal({
-          3: { 'city': '0' },
-          2: { 'tribes': '0' },
-          4: { 'tribes': '0' },
-          'gold': '-8',
+          3: { 'city': '-4' },
+          2: { 'tribes': '-1' },
+          4: { 'tribes': '-1' },
+          'gold': '-7',
         })
       })
     })
     describe('attack should stop', function() {
       beforeEach(function() {
-        engine.map.areas = {
+        //       4
+        //      / \
+        // 2 - 3   5
+        opts.initial = opts.map = {
           5: { id: 5, 'tribes': 5, 'neighbours': [ 4 ] },
           4: { id: 4, 'tribes': 3, 'neighbours': [ 3, 5 ] },
           3: { id: 3, 'tribes': 0, 'neighbours': [ 4, 2 ] },
@@ -164,36 +220,37 @@ describe('Attack (worker)', function() {
         }
       })
       it('case 1', function() {
-        target.startAmount = 4;
-        target.startRegion = engine.map.areas[2];
-        target.ok([3, 4]).should.equal(false)
-        _.keys(target.ok([]).areas).should.deep.equal([ ])
-        target.ok([4, 3]).should.equal(false)
+        opts.amount = 4;
+        opts.pre = [2];
+        _.keys(target.ok([]).current).should.deep.equal([ ])
+        target.ok([3, 4]).failed.length.should.equal(1)
+        target.ok([4, 3]).failed.length.should.equal(1)
       })
       it('case 2', function() {
-        target.startAmount = 8;
-        target.startRegion = engine.map.areas[4];
-        _.keys(target.ok([]).areas).should.deep.equal([ '5' ])
+        opts.amount = 8;
+        opts.pre = [4];
+        _.keys(target.ok([]).current).should.deep.equal([ '5' ])
         target.ok([5]).changes.should.deep.equal({
-          4: { 'tribes': '0' },
-          5: { 'tribes': '0' },
+          4: { 'tribes': '-3' },
+          5: { 'tribes': '-5' },
         });
-        target.ok([2]).should.equal(false)
+        target.ok([2]).failed.length.should.equal(1);
       })
       it('case 3', function() {
-        target.startAmount = 9;
-        target.startRegion = engine.map.areas[5];
-        _.keys(target.ok([]).areas).should.deep.equal([ '4' ])
+        opts.amount = 9;
+        opts.pre = [5];
+        _.keys(target.ok([]).current).should.deep.equal([ '4' ])
         target.ok([4]).changes.should.deep.equal({
-          4: { 'tribes': '0' },
-          5: { 'tribes': '0' },
+          4: { 'tribes': '-3' },
+          5: { 'tribes': '-5' },
         });
-        target.ok([2]).should.equal(false)
-        target.ok([3]).should.equal(false)
-        target.ok([5]).should.equal(false)
+        target.ok([2]).failed.length.should.equal(1)
+        target.ok([3]).failed.length.should.equal(1)
+        target.ok([5]).failed.length.should.equal(1)
       })
       it('case 4', function() {
-        engine.map.areas = { //require("../app/scenarios/scenario1").map.areas;
+        //require("../app/scenarios/scenario1").map.areas;
+        opts.initial = opts.map = {
           2: { id: 2, 'neighbours': [ 3,8,5 ] },
           3: { id: 3, 'neighbours': [ 1,2,8 ] },
           8: { id: 8, 'tribes': 2, 'neighbours': [ 1,2,3,7 ] },
@@ -201,13 +258,12 @@ describe('Attack (worker)', function() {
           7: { id: 7, 'tribes': 1, 'neighbours': [ 5,8 ] },
           1: { id: 1, 'tribes': 1, 'neighbours': [ 3,8 ] },
         }
-        target.startAmount = 8;
-        target.startRegion = engine.map.areas[2];
-        _.keys(target.ok([]).areas).should.deep.equal([ '8' ])
+        opts.amount = 8;
+        opts.pre = [2];
+        _.keys(target.ok([]).current).should.deep.equal([ '8' ])
         target.ok([8, 7]).changes.should.deep.equal({
-          2: { },
-          8: { 'tribes': '0' },
-          7: { 'tribes': '0' },
+          8: { 'tribes': '-2' },
+          7: { 'tribes': '-1' },
         });
     });
     });

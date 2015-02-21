@@ -2,88 +2,100 @@ var reducer = require('../core/reducer');
 var _ = require('underscore');
 
 var AttackReducer = {
-  areas: function() {
-      var unvisitedngh = _.difference(this.currentArea.neighbours, this.visited)
-      var areas = {}
-      _.each(this.engine.map.areas, function(area, key) {
-        if (unvisitedngh.indexOf(parseInt(key)) > -1)
-          areas[key] = area;
-      });
-      var sorted = _.sortBy(_.values(areas), function(a) { return a.city ? -1*a.city : 0; })
-      sorted = _.sortBy(sorted, function(a) { return a.tribes || 0; })
-      var minTribes = 999;
-      var maxTribes = 0;
-      var maxCity = 0;
-      areas = {}
-      for(var s in sorted)
+  reduce: function(key) {
+    if (!_.has(this.current, key)) return false;
+    var area = this.initial[key];
+    
+    var rTrb = Math.min(area.tribes || 0, this.amount);
+    //if (this.engine.map.tribeCount - (this.original_amount - this.amount - rTrb) <= 2)
+    this.amount -= rTrb;
+    var RCITY = this.opts.city_reduce;
+    var RGOLD = this.opts.gold_reduce;
+    var rCity = 0;
+    while (this.amount >= RCITY && area.city - rCity > 0)
+    {
+      rCity++;
+      this.amount -= RCITY;
+    }
+    // If there is not enough force to decimate all cities (3.3)
+    if (this.amount > 0 && area.city - rCity > 0)
+      this.amount = 0;
+    var chg =  {};
+    
+    if (rCity > 0)
+    {
+      this.targets['gold'] -= RGOLD*rCity;
+      if (this.targets['gold'] < 0)
+        this.targets['gold'] = 0;
+    }
+    
+    if (area.tribes && rTrb)
+      chg['tribes'] = area.tribes - rTrb;
+    if (area.city && rCity)
+      chg['city'] = area.city - rCity;
+      
+    return chg;
+  
+  },
+  current: function(chg, key, val) {
+    this.current = {};
+    if (!key) { this.current = this.initial; return; }
+    var curArea = this.map[key];
+    var lowestTribe = 999;
+    var biggestCity = -1;
+    _.each(this.initial, function(i, ik) {
+      if (_.contains(curArea.neighbours, parseInt(ik)))
       {
-        var tribes = sorted[s].tribes || 0;
-        var city = sorted[s].city || 0;
+        if (_.has(this.changes, parseInt(ik))) return false;
         
-        if (tribes > 0 && tribes <= minTribes && (tribes > 0 || tribes == maxTribes)
-        &&
-        (city >= maxCity))
+        var itribes = i.tribes || 0;
+        var icity = i.city || 0;
+        
+        // Attack does not enter empty regions
+        if (itribes == 0 && icity == 0)
+          return;
+        
+        if (itribes > 0 && itribes < lowestTribe) this.current = {};
+        if (itribes > 0 && lowestTribe == 0)
         {
-          areas[sorted[s].id] = sorted[s]
-          minTribes = tribes
-          maxCity = city || maxCity
+          lowestTribe = 999;
+          this.current = {};
         }
         
-        maxTribes = tribes > maxTribes ? tribes : maxTribes;
+        if ((itribes > 0 && itribes <= lowestTribe) ||
+          (itribes == 0 && (lowestTribe == 0 || lowestTribe == 999) ))
+        {
+          if (icity > 0 && icity > biggestCity) this.current = {};
+          if ((icity || 0) >= biggestCity) {
+            this.current[ik] = i;
+            lowestTribe = itribes;
+            biggestCity = icity || 0;
+          }
+        }
       }
-      if (minTribes === 0 && maxCity === 0 && maxTribes === 0)
-      {
-        return {};
-      }
-      return areas;
-  },
-  reduce: function(area) {
-      var rTrb = Math.min(area.tribes || 0, this.amount);
-      //if (this.engine.map.tribeCount - (this.original_amount - this.amount - rTrb) <= 2)
-      this.amount -= rTrb;
-      var RCITY = this.city_reduce;
-      var RGOLD = this.gold_reduce;
-      var rCity = 0;
-      while (this.amount >= RCITY && area.city - rCity > 0)
-      {
-        rCity++;
-        this.amount -= RCITY;
-      }
-      // If there is not enough force to decimate all cities (3.3)
-      if (this.amount > 0 && area.city - rCity > 0)
-        this.amount = 0;
-      var chg =  {};
-      
-      if (rCity > 0)
-      {
-        if (!_.has(this.changes, 'gold')) this.changes['gold'] = '0';
-        this.changes['gold'] = (parseInt(this.changes['gold']) - RGOLD*rCity).toString()
-      }
-      
-      if (area.tribes && rTrb)
-        chg['tribes'] = (area.tribes - rTrb).toString()
-      if (area.city && rCity)
-        chg['city'] = (area.city - rCity).toString()
-        
-      return chg;
+    }, this);
   }
 };
 
 
 module.exports = {
     attack: function() {
-        var ctx = this;
-        var rdc = new reducer.Reducer(ctx.engine);
-        rdc.areas = AttackReducer.areas;
-        rdc.reduce = AttackReducer.reduce;
-        rdc.startRegion = this.active_region;
-        rdc.startAmount = attack_force;
-        rdc.city_reduce = city_reduce;
-        rdc.gold_reduce = gold_reduce;
-        ctx.engine.reducer(rdc, function(chg) {
-            ctx.changes = chg;
-            ctx.done && ctx.done();
-        });
+      var ctx = this;
+      var opts = {
+        map: this.map.areas,
+        initial: this.map.areas,
+        pre: [this.active_region],
+        city_reduce: city_reduce,
+        gold_reduce: gold_reduce,
+        amount: attack_force,
+        current: AttackReducer.current,
+        reduce: AttackReducer.reduce,
+      }
+      var rdc = new reducer.Reducer(opts);
+      ctx.engine.reducer(rdc, function(chg) {
+          ctx.changes = chg;
+          ctx.done && ctx.done();
+      });
     },
     name: 'attack',
     title: 'Attack',
