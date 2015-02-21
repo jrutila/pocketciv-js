@@ -44,25 +44,27 @@ long as you Decimate Tribes up to the described value.\
             return;
         }
         
-        var rdc = new reducer.Reducer(ctx.engine);
-        rdc.startAmount = 2;
-        rdc.areas = function() {
-            var areas = {};
-            if (this.visited.length == 2)
-                return areas;
-            var unvisitedngh = _.difference(ctx.active_region.neighbours, this.visited)
-            _.each(_.pick(this.engine.map.areas, unvisitedngh), function(area, key) {
-                if (!area.fault)
-                    areas[key] = area;
-            });
-            return areas;
+        var opts = {
+            initial: this.engine.map.areas,
+            map: this.engine.map.areas,
+            amount: 2,
+            area: this.active_region,
+            reduce: function(key) {
+                this.amount--;
+                return { 'fault': true }
+            },
+            current: function(chg, key, val) {
+                if (!key)
+                {
+                    var ngh = _.pick(this.initial, this.opts.area.neighbours);
+                    this.current = _.filter(ngh, function(n) { return !n.fault; });
+                }
+            }
         }
-        rdc.reduce = function(area) {
-            this.amount--;
-            return { 'fault': true }
-        }
+        
+        var rdc = new reducer.Reducer(opts);
         ctx.engine.reducer(rdc, function(chg) {
-            _.extend(ctx.changes, chg);
+            ctx.merge(chg);
             ctx.done && ctx.done();
         });
     },
@@ -73,39 +75,34 @@ long as you Decimate Tribes up to the described value.\
             ctx.done && ctx.done();
             return;
         }
+        var initial = {};
+        _.each(this.engine.map.areas, function(area, id) {
+            if (area.tribes && _.contains(this.active_region.neighbours, parseInt(id)))
+                initial[id] = { 'tribes': area.tribes }
+        },this);
+        if (this.active_region.tribes - 4 > 0)
+            initial[this.active_region.id] =
+             { 'tribes': this.active_region.tribes - 4 };
         
-        var rdc = new reducer.Reducer(ctx.engine);
-        rdc.startAmount = populationLoss;
-        rdc.mode = reducer.Modes.Overall;
-        rdc.areas = function() {
-            var areas = {};
-            var changes = this.changes;
-            var meneigh = _.union(ctx.active_region.id, ctx.active_region.neighbours)
-            _.each(_.pick(this.engine.map.areas, meneigh), function(area, key) {
-                var rdc = (changes && changes[area.id] && parseInt(changes[area.id].tribes))
-                            || 0;
-                            console.log(rdc)
-                if (area.id == ctx.active_region.id)
-                    rdc -= 4;
-                if (area.tribes && area.tribes > -1*rdc)
-                    areas[key] = area;
-            });
-            return areas;
+        var opts = {
+            initial: initial,
+            map: this.engine.map.areas,
+            amount: populationLoss,
+            area: this.active_region,
+            reduce: function(key, chg) {
+                this.amount -= this.initial[key].tribes - chg.tribes;
+                return { 'tribes': chg.tribes };
+            },
+            current: function(chg, key, val) {
+                if (!key)
+                {
+                }
+            }
         }
-        rdc.reduce = function(chg, area) {
-            this.amount += chg.tribes;
-            var tRdc = chg.tribes;
-            return { 'tribes': (tRdc).toString() }
-        }
+        
+        var rdc = new reducer.Reducer(opts);
         ctx.engine.reducer(rdc, function(chg) {
-            _.each(chg, function(val, key) {
-                if (_.has(ctx.changes, key))
-                    ctx.changes[key].tribes =
-                        (
-                        (parseInt(ctx.changes[key].tribes) || 0) + 
-                        parseInt(val.tribes)).toString()
-                else ctx.changes[key] = val;
-            })
+            ctx.merge(chg);
             ctx.done && ctx.done();
         });
         

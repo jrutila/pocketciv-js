@@ -12,6 +12,34 @@ var Context = function() {
     };
     
 Context.prototype = {
+    _getChangeString: function(val) {
+        if (val > 0)
+            return "+"+val;
+        if (val < 0)
+            return val.toString();
+        return "0";
+    },
+    _getMergedString: function(a, b) {
+        if(typeof b == "boolean")
+            return b;
+        a = parseInt(a) || 0;
+        b = parseInt(b) || 0;
+        if (a+b != 0)
+            return this._getChangeString(a+b);
+        return null;
+    },
+    merge: function(chg) {
+        _.each(chg, function(c, k) {
+            if (parseInt(k))
+            {
+                var kk = this.changes[k] || {};
+                _.each(c, function(cc, ck) {
+                    kk[ck] = this._getMergedString(kk[ck], cc);
+                },this)
+                this.changes[k] = kk;
+            }
+        },this);
+    },
     change: function(chg, area)
     {
         if (typeof chg === "string")

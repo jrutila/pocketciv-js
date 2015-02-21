@@ -152,8 +152,11 @@ NewReducer.prototype = {
         this.changes[key] = d;
     } else
       _.each(val, function(v, k) {
-        var d = this._getChangeString(this.initial[key][k], v)
-        if (!d) return;
+        var d = v;
+        if(!isNaN(parseInt(v))) {
+          d = this._getChangeString(this.initial[key][k], v)
+        }
+        if (d == null) return;
         this.changes[key] = this.changes[key] || {};
         this.changes[key][k] = d;
       }, this);

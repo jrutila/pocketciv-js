@@ -39,8 +39,8 @@ describe('Earthquake', function() {
     it('should ask for two more areas if there is fault', function(done) {
         deck = [{ circle: 4 }, { hexagon: 7 }]
         reduces = [[5,6], {
-            5: { 'tribes': -2 },
-            6: { 'tribes': -5 },
+            5: { 'tribes': 0 },
+            6: { 'tribes': 4 },
         }]
         
         runEvent(engine, event, { 'expr': 'h'}, function(chg) {
@@ -55,7 +55,7 @@ describe('Earthquake', function() {
     it('should only ask for one area if there is no more', function(done) {
         deck = [{ circle: 2 }, { hexagon: 7 }]
         reduces = [[3], {
-            2: { 'tribes': -1 },
+            2: { 'tribes': 0 },
         }]
         
         runEvent(engine, event, { 'expr': 'h'}, function(chg) {
@@ -72,8 +72,8 @@ describe('Earthquake', function() {
         engine.map.areas[3].fault = true;
         deck = [{ circle: 4 }, { hexagon: 7 }]
         reduces = [[], {
-            6: { 'tribes': -5 },
-            5: { 'tribes': -2 },
+            6: { 'tribes': 4 },
+            5: { 'tribes': 0 },
         }]
         
         runEvent(engine, event, { 'expr': 'h'}, function(chg) {
