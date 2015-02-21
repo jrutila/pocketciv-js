@@ -44,8 +44,8 @@ describe('Visitation', function() {
         it('should do the attack if next card is not friendly and area neighbours border', function(done) {
             deck = [{ friendly: false }, { circle: 5 }, { square: 3, hexagon: 6 }]
             engine.reducer = function(reducer, done) {
-                reducer.startRegion.id.should.equal(5)
-                reducer.startAmount.should.equal(9)
+                reducer.opts.pre.should.deep.equal([5])
+                reducer.opts.amount.should.equal(9)
                 done({
                 5: { 'tribes': '0' }, 4: { 'tribes': '1' }
                 });

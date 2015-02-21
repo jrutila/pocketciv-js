@@ -84,7 +84,7 @@ module.exports = {
       var opts = {
         map: this.engine.map.areas,
         initial: this.engine.map.areas,
-        pre: [this.active_region],
+        pre: [this.active_region.id],
         city_reduce: city_reduce,
         gold_reduce: gold_reduce,
         amount: attack_force,
