@@ -156,96 +156,11 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
         drawnFunc && drawnFunc.call(pocketciv.Engine, $scope.card);
     }
     
-    var reduceFunc = undefined;
-    $scope.hideReducer = true;
-    pocketciv.Engine.reducer = function(reducer, done) {
-        console.log("Show reducer")
-        $scope.hideReducer = false;
+   pocketciv.Engine.reducer = function(reducer, done) {
+        console.log("Show reducer "+reducer.opts)
         $scope.reducer = reducer;
-        if (reducer.mode == 'Overall')
-        {
-            var areas = $scope.reducer.areas();
-            var rdcObj = {};
-            _.each(areas, function(area) {
-                rdcObj[area.id] = {
-                    'tribes': area.tribes,
-                    'city': area.city }
-            }, this);
-            $scope.reduceObject= rdcObj;
-            $scope.mapDone = function() {
-                $scope.reduceReady();
-            }
-        }
-        else {
-            oldClicked = mapClicked;
-            $scope.reduceArray = [];
-            if (reducer.startRegion)
-                selectRegion(reducer.startRegion.id);
-            mapClicked = function(region) {
-                if (_.keys($scope.reduceAreas).indexOf(region.toString()) > -1) {
-                    $scope.reduceArray.push(region.toString())
-                    addRegion(region);
-                    checkReducer();
-                }
-            }
-            $scope.mapDone = function() {
-                $scope.reduceReady();
-            }
-        }
-        reduceFunc = done;
-        checkReducer();
+        $scope.reduceReady = done;
     }
-    var reduceSubstr = function(areas, rdcObj) {
-        var ret = {};
-        _.each(rdcObj, function(val, key) {
-            ret[key] = {
-                'tribes': val.tribes - (areas[key].tribes || 0),
-                'city': val.city - (areas[key].city || 0)
-            }
-        });
-        return ret;
-    }
-    var checkReducer = function() {
-        console.log('reduce array change')
-        console.log($scope.reduceArray)
-        if ($scope.hideReducer)
-            return;
-        if ($scope.reducer.mode == 'AreaWalker')
-        {
-            var ok = $scope.reducer.ok($scope.reduceArray);
-            $scope.reduceAreas = ok.areas;
-            $scope.mapInfo = "Select an area from areas "+_.keys($scope.reduceAreas)+". \
-            Still left "+ok.amount;
-        } else {
-            var subtr = reduceSubstr($scope.reducer.areas(), $scope.reduceObject);
-            var ok = $scope.reducer.ok(subtr);
-            console.log("Substracted")
-            console.log(subtr)
-            $scope.mapInfo = "Reduce from areas "+_.keys(ok.areas)+". \
-            Still left "+ok.amount;
-        }
-    };
-    $scope.reduceReady = function() {
-        var rdc = undefined;
-        if ($scope.reducer.mode == 'AreaWalker')
-            rdc = $scope.reduceArray;
-        else
-            rdc = reduceSubstr($scope.reducer.areas(), $scope.reduceObject);
-        var ok = $scope.reducer.ok(rdc);
-        if (ok.ok != false)
-        {
-            gameLog.reduce.push(rdc)
-            clearRegions();
-            $scope.hideReducer = true;
-            mapClicked = oldClicked;
-            $scope.mapInfo = undefined;
-            $scope.reduceArray = undefined;
-            $scope.reduceObject = undefined;
-            reduceFunc(ok.changes);
-        }
-    }
-    $scope.$watchCollection('reduceArray', checkReducer);
-    $scope.$watch('reduceObject', checkReducer, true);
     
     pocketciv.Engine.drawer = function(deck, drawn) {
         console.log("Show drawer")
@@ -526,7 +441,7 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
     
     $scope.engine = pocketciv.Engine;
     $scope.engine.phase = "";
-    $scope.godMode = false;
+    $scope.godMode = true;
     
     $scope.toggleGod = function(gm) {
         $scope.godMode = gm;

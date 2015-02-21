@@ -169,33 +169,46 @@ NewReducer.prototype = {
       //delete current[key];
       if (key == undefined)
       {
-        this.current = _.clone(this.initial);
+        this.current = this.initial;
         return;
       }
       this.current = {};
       var curArea = this.map[key];
       _.each(this.initial, function(i, ik) {
         if (_.isArray(chg)) {
-          if (_.contains(curArea.neighbours, parseInt(ik)))
-          {
+          //if (_.contains(curArea.neighbours, parseInt(ik)))
+          //{
             if (!_.has(chg, ik))
               this.current[ik] = i;
-          }
+          //}
         } else {
             if (!_.has(chg, ik))
               this.current[ik] = i;
         }
       }, this);
   },
+  _gotInitial: function(init) {
+    var ret = {};
+    var shows = this.opts.shows != undefined || this.opts.edits != undefined ?
+    _.union(this.opts.shows, this.opts.edits) : [];
+    _.each(init, function(val, a) {
+      if (_.contains(shows, a) || (isNaN(parseInt(a)) && shows.length == 0)) {
+        ret[a] = val;
+      } else if (_.isObject(val)) {
+        ret[a] = shows.length > 0 ? _.pick(val, shows) : _.clone(val);
+      }
+    });
+    return ret;
+  },
   ok: function(chg) {
     var opts = this.opts;
     this.amount = opts.amount || 0;
     this.map = _.clone(opts.map) || {};
     this.name = opts.name;
-    this.initial = _.clone(opts.initial) || {};
+    this.initial = this._gotInitial(opts.initial);
     this.current = {};
     this.changes = {};
-    this.targets = _.clone(opts.initial) || {};
+    this.targets = _.clone(this.initial);
     this.failed = [];
     this.currentFunc.call(this, chg);
     if (_.isArray(chg) && _.isArray(opts.pre))

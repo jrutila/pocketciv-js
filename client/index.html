@@ -170,18 +170,22 @@
                 class="mapCanvas" id="clickCanvas" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
         </div>
     </div>
-    <div id="mapinfo" class="actionElement collapsible" ng-hide="mapInfo == undefined">
+    
+    <div class="actionElement collapsible" ng-hide="mapInfo == undefined">
         <h2>{{ mapTitle }}</h2>
         <span class="actionContent">{{ mapInfo }}</span>
-        <ul ng-hide="reduceObject == undefined">
-            <li ng-repeat="(k,v) in reduceObject">
-                {{ k }}:
-                tribes: <input type="number" ng-model="reduceObject[k]['tribes']" />
-                city: <input type="number" ng-model="reduceObject[k]['city']" />
+        <ul ng-hide="reducer == undefined">
+            <li ng-repeat="(a,v) in reduceOk.current">
+                <span ng-if="a > 0" class="areaCode">{{ a }}</span>
+                <span ng-repeat="(key,value) in v">
+                    {{ key }}: {{ value }}
+                </span>
             </li>
         </ul>
         <button class="actionDone" ng-click="mapDone()">done</button>
     </div>
+    
+    <pc-reducer reducer="reducer" ready="reduceReady"></pc-reducer>
     
     <div id="advances">
         <h2>Acquired advances</h2>

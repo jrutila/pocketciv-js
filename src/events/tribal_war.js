@@ -34,6 +34,8 @@ module.exports = {
             initial: initial,
             map: this.engine.map.areas,
             amount: 2,
+            shows: ['tribes'],
+            edits: [],
             warring_tribes: warring_tribes,
             reduce: function(key) {
                 if (!_.has(this.initial, key))

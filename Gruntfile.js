@@ -160,7 +160,7 @@ module.exports = function (grunt) {
     },
     browserify: {
         '.tmp/app/pocketciv.js': [ 'src/**/*.js'],
-        '.tmp/app/web.js': [ 'client/app/*.js', 'client/components/**/*.js' ]
+        '.tmp/app/web.js': [ 'client/app/*.js', 'client/app/**/*.js', 'client/components/**/*.js' ]
     },
     // Make sure code styles are up to par and there are no obvious mistakes
     jshint: {

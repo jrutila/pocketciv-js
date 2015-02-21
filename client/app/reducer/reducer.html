@@ -1,0 +1,23 @@
+<div id="reducer" class="actionElement" ng-visible="reducer">
+    <h2>Reduce {{ ok.amount }}/{{ reducer.opts.amount }} {{ ok.ok }}</h2>
+    <div>
+        <ul class="list-inline" ng-repeat="(a, c) in ok.current">
+            <li>
+                <span ng-if="a > 0" class="areaCode" ng-click="selectArea(a)">{{ a }}</span>
+                <span ng-if="a == 'gold'">{{ a }}</span>
+            </li>
+            <li ng-if="a > 0" ng-repeat="(k, v) in c"><span class="icon {{ k }}" data-val="{{ v }}">{{ v }}</span></li>
+            <li ng-if="a == 'gold'" class="gold">{{ c }}</li>
+        </ul>
+        <ul class="list-inline" ng-repeat="(a, c) in ok.changes">
+            <li ng-click="selectChange(a)">
+                <span ng-if="a > 0" class="areaCode">{{ a }}</span>
+                <span ng-if="a == 'gold'">{{ a }}</span>
+            </li>
+            <li ng-click="selectChange(a)" ng-if="a > 0" ng-repeat="(k, v) in c"><span class="icon {{ k }}" data-val="{{ v }}">{{ v }}</span></li>
+            <li ng-click="selectChange(a)" ng-if="a == 'gold'" class="gold">{{ c }}</li>
+        </ul>
+    </div>
+    <button ng-visible="ok.ok" ng-click="done()">Done</button>
+    <button ng-visible="ok.changes" ng-click="reset()">Reset</button>
+</div>

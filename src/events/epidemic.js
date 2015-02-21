@@ -30,6 +30,8 @@ module.exports = {
         map: this.engine.map.areas,
         amount: Math.min(population_loss, this.engine.map.tribeCount-2),
         pre: [this.active_region.id],
+        shows: ['tribes'],
+        edits: [],
         skip_empty: skipempty,
         reduce: function(key) {
           var r = Math.min(this.initial[key].tribes, this.amount);
@@ -37,7 +39,21 @@ module.exports = {
           return { 'tribes': this.initial[key].tribes - r };
         },
         current: function(chg, key, val) {
-          this._defaultCurrent(chg, key, val);
+          this.current = {};
+          if (key == undefined) return;
+          _.each(this.initial, function(i, ik) {
+            ik = parseInt(ik);
+            if (_.contains(this.map[key].neighbours, ik))
+                if (i.tribes > 0 && !_.contains(chg, ik))
+                  this.current[ik] = i;
+          }, this);
+          
+        },
+        check: function() {
+          if (this._defaultCheck()) return true;
+          // DEFAULT??
+          if (_.size(this.current) == 0) return true;
+          return false;
         }
       }
       var rdc = new reducer.Reducer(opts);
