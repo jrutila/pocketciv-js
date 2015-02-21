@@ -25,22 +25,30 @@ module.exports = {
     },
     selectAreas: function() {
         var ctx = this;
-        var rdc = new reducer.Reducer(ctx.engine);
-        rdc.startAmount = warring_tribes;
-        rdc.areas = function() {
-            var areas = {};
-            if (this.visited.length == neighbourCount)
-                return areas;
-            var unvisitedngh = _.difference(ctx.active_region.neighbours, this.visited)
-            _.each(_.pick(this.engine.map.areas, unvisitedngh), function(area, key) {
-                if (area.tribes > 0)
-                    areas[key] = area;
-            });
-            return areas;
-        }
-        rdc.reduce = function(area) {
-            return { 'tribes': (-1*warring_tribes).toString() }
-        }
+        var initial = {};
+        _.each(_.pick(this.engine.map.areas, this.active_region.neighbours), function(a, k) {
+            if (a.tribes > 0)
+                initial[k] = a;
+        });
+        var opts = {
+            initial: initial,
+            map: this.engine.map.areas,
+            amount: 2,
+            warring_tribes: warring_tribes,
+            reduce: function(key) {
+                if (!_.has(this.initial, key))
+                    return false;
+                this.amount--;
+                var trg = Math.max(this.initial[key].tribes - this.opts.warring_tribes, 0);
+                return { 'tribes': trg };
+            },
+            check: function() {
+                return this._defaultCheck() ||
+                _.size(this.initial) == 0 ||
+                (_.size(this.initial) == 1 && this.amount == 1);
+            }
+        };
+        var rdc = new reducer.Reducer(opts);
         ctx.engine.reducer(rdc, function(chg) {
             ctx.changes = chg;
             ctx.done && ctx.done();

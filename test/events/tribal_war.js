@@ -33,14 +33,13 @@ describe('Tribal War', function() {
     it('should let choose 5 and 6 when starting from 4', function(done) {
         deck = [{ circle: 4 }]
         engine.reducer = function(rdc, done) {
-            rdc.startAmount.should.equal(8);
-            _.keys(rdc.ok([]).areas).should.deep.equal([ '5', '6' ])
+            _.keys(rdc.ok([]).current).should.deep.equal([ '5', '6' ])
             done(rdc.ok([5, 6]).changes)
         }
         runEvent(engine, event, {}, function(chg) {
             chg.should.deep.equal({
                 6: {'tribes': '-8' },
-                5: {'tribes': '-8' },
+                5: {'tribes': '-2' },
                 4: {'tribes': '-3' },
             })
             done();
@@ -50,14 +49,14 @@ describe('Tribal War', function() {
         engine.map.areas[3].tribes = 2;
         deck = [{ circle: 4 }]
         engine.reducer = function(rdc, done) {
-            rdc.startAmount.should.equal(8);
-            _.keys(rdc.ok([]).areas).should.deep.equal([ '3', '5', '6' ])
+            rdc.opts.warring_tribes.should.equal(8);
+            _.keys(rdc.ok([]).current).should.deep.equal([ '3', '5', '6' ])
             done(rdc.ok([3, 5]).changes)
         }
         runEvent(engine, event, {}, function(chg) {
             chg.should.deep.equal({
-                3: {'tribes': '-8' },
-                5: {'tribes': '-8' },
+                3: {'tribes': '-2' },
+                5: {'tribes': '-2' },
                 4: {'tribes': '-3' },
             })
             done();
@@ -67,16 +66,15 @@ describe('Tribal War', function() {
         deck = [{ circle: 4 }]
         engine.map.areas[3].tribes = 2;
         engine.reducer = function(rdc, done) {
-            rdc.startAmount.should.equal(8);
-            _.keys(rdc.ok([]).areas).should.deep.equal([ '3', '5', '6' ])
-            rdc.ok([ 2 ]).should.equal(false);
-            rdc.ok([ 3, 5, 6 ]).should.equal(false);
+            _.keys(rdc.ok([]).current).should.deep.equal([ '3', '5', '6' ])
+            rdc.ok([ 2 ]).failed.length.should.equal(1);
+            rdc.ok([ 3, 5, 6 ]).ok.should.be.false;
             done(rdc.ok([5, 6]).changes)
         }
         runEvent(engine, event, {}, function(chg) {
             chg.should.deep.equal({
                 6: {'tribes': '-8' },
-                5: {'tribes': '-8' },
+                5: {'tribes': '-2' },
                 4: {'tribes': '-3' },
             })
             done();
@@ -86,13 +84,14 @@ describe('Tribal War', function() {
         deck = [{ circle: 4 }]
         engine.map.areas[6].tribes = 0;
         engine.reducer = function(rdc, done) {
-            rdc.startAmount.should.equal(8);
-            _.keys(rdc.ok([]).areas).should.deep.equal([ '5' ])
-            done(rdc.ok([ 5 ]).changes)
+            _.keys(rdc.ok([]).current).should.deep.equal([ '5' ])
+            var ok = rdc.ok([5]);
+            ok.ok.should.be.true;
+            done(ok.changes)
         }
         runEvent(engine, event, {}, function(chg) {
             chg.should.deep.equal({
-                5: {'tribes': '-8' },
+                5: {'tribes': '-2' },
                 4: {'tribes': '-3' },
             })
             done();
