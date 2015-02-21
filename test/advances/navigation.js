@@ -2,6 +2,8 @@ var should = require('chai').should()
 var target = require('../../src/advances/navigation')
 var pocketciv = require('../../src/core/pocketciv')
 
+/*
+OBSOLETE (I Guess?)
 describe('Navigation', function() {
     describe('move.post', function() {
         beforeEach(function() {
@@ -99,3 +101,4 @@ describe('Navigation', function() {
         });
     })
 })
+*/
