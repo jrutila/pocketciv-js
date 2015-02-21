@@ -82,8 +82,8 @@ module.exports = {
     attack: function() {
       var ctx = this;
       var opts = {
-        map: this.map.areas,
-        initial: this.map.areas,
+        map: this.engine.map.areas,
+        initial: this.engine.map.areas,
         pre: [this.active_region],
         city_reduce: city_reduce,
         gold_reduce: gold_reduce,

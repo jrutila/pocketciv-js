@@ -22,23 +22,40 @@ module.exports = {
     },
     reduceCities: function() {
         var ctx = this;
-        var rdc = new reducer.Reducer(ctx.engine);
-        rdc.startAmount = corruption;
-        rdc.mode = reducer.Modes.Overall;
-        rdc.areas = function() {
-            var areas = {};
-            _.each(this.engine.map.areas, function(area, key) {
-                var ccity = _.has(this.changes, area.id) ? parseInt(this.changes[area.id].city) : 0;
-                if (area.city + ccity > 0)
-                    areas[key] = area;
-            }, this);
-            if (_.isEmpty(areas)) this.amount = 0;
-            return areas;
+        var opts = {
+            map: this.engine.map.areas,
+            initial: _.extend(_.clone(this.engine.map.areas), {'gold': this.engine.gold }),
+            amount: corruption,
+            name: 'corruption',
+            reduce: function(key, chg) {
+                this.amount -= this.initial[key].city - chg.city;
+                return { 'city': chg.city };
+            },
+            current: function(chg, key, val) {
+                if (!key)
+                {
+                    this.current = _.filter(this.initial, function(i) {
+                        return i.city > 0;
+                    });
+                }
+            },
+            check: function() {
+                if (this._defaultCheck())
+                    return true;
+                var noCities = true;
+                _.each(this.initial, function(i, ik) {
+                    var trg = i.city;
+                    if (this.targets[ik])
+                        trg = this.targets[ik].city;
+                    if (trg > 0)
+                    {
+                        noCities = false;
+                    }
+                },this);
+                return noCities;
+            }
         };
-        rdc.reduce = function(chg, area) {
-            this.amount += parseInt(chg.city);
-            return { 'city': chg.city };
-        };
+        var rdc = new reducer.Reducer(opts);
         ctx.engine.reducer(rdc, function(chg) {
             ctx.changes = chg;
             ctx.done && ctx.done();

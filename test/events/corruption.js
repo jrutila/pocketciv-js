@@ -31,7 +31,7 @@ describe('Corruption', function() {
     });
     it('should do basic city reduce', function(done) {
         deck = [{ circle: 6 }];
-        reduces = [{ 4: { 'city': '-6' }}];
+        reduces = [{ 4: { 'city': 2 }}]; // 8 - 6 = 2
         runEvent(engine, event, { expr: 'c' }, function(chg) {
             chg.should.deep.equal({
                 4: { 'city': '-6' },
@@ -43,7 +43,7 @@ describe('Corruption', function() {
     it('should settle for all cities', function(done) {
         engine.map.areas[4].city = 1;
         deck = [{ circle: 6 }];
-        reduces = [{ 4: { 'city': '-1' }, 2: { 'city': '-2'}}];
+        reduces = [{ 4: { 'city': 0 }, 2: { 'city': 0 }}];
         runEvent(engine, event, { expr: 'c' }, function(chg) {
             chg.should.deep.equal({
                 4: { 'city': '-1' },
