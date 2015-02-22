@@ -35,8 +35,10 @@ when you acquire Civil Service or Law.",
         }
     },
     acquired: function() {
-        this.phases.splice(this.phases.indexOf('gold_decimate')+1, 0, 'violent_profits')
-        console.log("Added violent_profits to phases "+this.phases)
+        if (this.phases.indexOf('violent_profits') == -1) {
+            this.phases.splice(this.phases.indexOf('gold_decimate')+1, 0, 'violent_profits')
+            console.log("Added violent_profits to phases "+this.phases)
+        }
     },
     actions: { },
 }

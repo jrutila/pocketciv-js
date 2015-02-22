@@ -605,7 +605,7 @@ Engine.prototype = {
         if (adv.actions)
         {
             _.each(adv.actions, function(act, key) {
-                this.actions[key] = act; 
+                this.actions[key] = this.actions[key] ? _.extend(this.actions[key], act) : act;
                 console.log("Added action "+key)
             }, this);
         }

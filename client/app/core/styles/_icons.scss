@@ -8,6 +8,10 @@
     text-indent: 0px;
 }
 
+.icon[data-val='false'] {
+    background-color: red;
+}
+
 $iconZoom: 0.7;
 
 .icon.small {

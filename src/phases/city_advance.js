@@ -42,7 +42,7 @@ var CityAdvance = {
     // Basic case
     this.current = {};
     _.each(this.initial, function(i, ik) {
-      if (i.tribes + (this.opts.discount || 0) > i.city && i.city > 0)
+      if (i.tribes + (this.opts.discount || 0) > i.city && i.city > 0 && i.city < this.opts.max_city)
         this.current[ik] = i;
     }, this);
   },

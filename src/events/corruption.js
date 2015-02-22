@@ -27,6 +27,8 @@ module.exports = {
             initial: _.extend(_.clone(this.engine.map.areas), {'gold': this.engine.gold }),
             amount: corruption,
             name: 'corruption',
+            shows: ['city'],
+            edits: ['city'],
             reduce: function(key, chg) {
                 this.amount -= this.initial[key].city - chg.city;
                 return { 'city': chg.city };
