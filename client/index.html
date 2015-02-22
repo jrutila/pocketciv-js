@@ -371,7 +371,7 @@
         <button ng-click="selectArea()">Select</button>
     </div>
     
-    <div id="advancePhase" class="actionElement collapsible" ng-hide="engine.phase != 'advance'" >
+    <div id="advancePhase" class="actionElement collapsible" ng-hide="engine.phase != 'advance' || reducer" >
         <h2>Advance</h2>
         <ul class="actionContent list-unstyled">
             <li ng-repeat="(a, act) in engine.actions">

@@ -25,6 +25,9 @@ module.exports = {
                 var done = function() {
                     if (gold > 0) {
                         ctx.changes = { 'gold': '+'+gold };
+                    } else if (gold < 0)
+                    {
+                        ctx.changes = { 'gold': gold.toString() };
                     }
                     ctx.done && ctx.done();
                 };
@@ -39,6 +42,7 @@ module.exports = {
                                 console.log("ANARCHY!")
                                 engine.doEvent({ name: 'anarchy' }, function(chg) {
                                     ctx.changes = chg;
+                                    gold = 0;
                                     ctx.changes.gold = "0";
                                     done();
                                 });

@@ -55,7 +55,10 @@ var AttackReducer = {
         if (itribes == 0 && icity == 0)
           return;
         
-        if (itribes > 0 && itribes < lowestTribe) this.current = {};
+        if (itribes > 0 && itribes < lowestTribe) {
+          this.current = {};
+          biggestCity = -1;
+        }
         if (itribes > 0 && lowestTribe == 0)
         {
           lowestTribe = 999;

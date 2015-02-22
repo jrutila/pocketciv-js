@@ -57,6 +57,7 @@ var advances = {
     'black_market': require('../advances/black_market'),
     'cavalry': require('../advances/cavalry'),
     'sails_and_rigging': require('../advances/sails_and_rigging'),
+    'culture_of_thievery': require('../advances/culture_of_thievery'),
 }
 
 
@@ -377,18 +378,7 @@ function Engine(map, deck) {
     this.deck = deck || theDeck;
     var eng = this;
     this.deck.noMoreCards = function() { eng.endOfEra(); };
-    this.phases = [
-        "populate",
-        "move",
-        "event",
-        "advance",
-        "support",
-        "gold_decimate",
-        "city_advance",
-        "gold_management",
-        "city_support",
-        "upkeep"
-        ];
+    this.phases = [ ];
     this.phase = "populate";
     this.events = events;
     this.advances = advances;
@@ -411,6 +401,18 @@ function Engine(map, deck) {
 
 var defaults= {
     'phase': "",
+    'phases': [
+        "populate",
+        "move",
+        "event",
+        "advance",
+        "support",
+        "gold_decimate",
+        "city_advance",
+        "gold_management",
+        "city_support",
+        "upkeep"
+        ],
     'deck.usedCards': [],
     'map.areas': undefined,
     'map.width': undefined,
@@ -440,6 +442,7 @@ Engine.prototype = {
             }
             en[p] = st && st[p] || _.clone(defaults[d]);
         }
+        this.actions = _.clone(actions);
         this.params = {};
         for (var key in this.map.areas)
         {
@@ -510,15 +513,6 @@ Engine.prototype = {
     advance: function(ctx, name) {
         if (!name)
         {
-            this.actions = actions;
-            var extra = {};
-            _.each(_.pick(this.advances, this.acquired), function(adv) {
-                _.each(adv.actions, function(act, key) {
-                    if (act.run)
-                        extra[key] = act;
-                })
-            });
-            _.extend(this.actions, extra);
             return;
         }
         console.log("Running advance "+name);
@@ -542,6 +536,7 @@ Engine.prototype = {
         var eng = this;
         var posts = [];
         var pres = [];
+        var thePhase = undefined;
         
         _.each(_.pick(this.advances, this.acquired), function(acq) {
             if (acq.phases && _.has(acq.phases, name+'.post'))
@@ -552,6 +547,8 @@ Engine.prototype = {
             {
                 pres.push(acq.phases[name+".pre"])
             }
+            if (acq.phases && _.has(acq.phases, name))
+                thePhase = acq.phases[name].run;
         }, this)
         
         var final = function() {
@@ -584,19 +581,33 @@ Engine.prototype = {
             }
         }
         
+        if (eng[name] != undefined && thePhase == undefined)
+            thePhase = eng[name];
+        
         ctx.done = function() {
             ctx.done = runpost;
-            eng[name](ctx, arg);
+            if (thePhase != undefined)
+                thePhase.call(eng, ctx, arg);
+            else
+                ctx.done();
         }
 
         runpre();
     },
     acquire: function(name, done) {
         this.acquired.push(name);
-        if (this.advances[name].acquired)
+        var adv = this.advances[name];
+        if (adv.acquired)
         {
             //                                      | is this during load?
-            this.advances[name].acquired.call(this, done == undefined);
+            adv.acquired.call(this, done == undefined);
+        }
+        if (adv.actions)
+        {
+            _.each(adv.actions, function(act, key) {
+                this.actions[key] = act; 
+                console.log("Added action "+key)
+            }, this);
         }
         console.log("Acquired "+name);
         done && done();
