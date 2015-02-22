@@ -58,6 +58,7 @@ var advances = {
     'cavalry': require('../advances/cavalry'),
     'sails_and_rigging': require('../advances/sails_and_rigging'),
     'culture_of_thievery': require('../advances/culture_of_thievery'),
+    'mining': require('../advances/mining'),
 }
 
 
@@ -526,10 +527,10 @@ Engine.prototype = {
         }, this)
         this.actions[name].run.call(this, ctx);
     },
-    draw: function(done) {
+    draw: function(done, canstop) {
         this.drawer(this.deck, function(c) {
             done(c);
-        });
+        }, canstop);
     },
     runPhase: function(name, arg) {
         var ctx = {};

@@ -85,7 +85,8 @@
     <div id="deck" ng-class="{ pushed: hideDrawer }">
         <span id="cardsLeft">{{ deck.cardsLeft }}</span>
         <div ng-hide="hideDrawer">
-            <button ng-click="drawCard()">draw</button>
+            <button class="draw" ng-click="drawCard()">draw</button>
+            <button class="stop" ng-click="drawCard(true)" ng-show="showStopper">stop</button>
         </div>
         <input type="text" ng-model="specificCard" ng-show="godMode" />
     </div>

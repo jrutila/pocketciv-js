@@ -173,10 +173,18 @@ $cardsLeftColor: $color-primary-2;
         position: absolute;
     }
     
-    button {
+    button.draw {
         position: absolute;
         width: 100%;
         height: 100%;
+        opacity: 0.2;
+    }
+    
+    button.stop {
+        position: absolute;
+        width: 100%;
+        height: 50px;
+        top: -50px;
         opacity: 0.2;
     }
     

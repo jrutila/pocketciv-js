@@ -146,14 +146,21 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
     
     var drawnFunc = undefined;
     $scope.hideDrawer = true;
-    $scope.drawCard = function() {
-        $scope.card = $scope.deck.draw();
-        if ($scope.specificCard)
-            $scope.card = pocketciv.EventDeck.specific($scope.specificCard);
+    $scope.drawCard = function(stop) {
+        if (stop != true) {
+            $scope.card = $scope.deck.draw();
+            if ($scope.specificCard)
+                $scope.card = pocketciv.EventDeck.specific($scope.specificCard);
+            gameLog.deck.push($scope.card.id)
+        } else {
+            
+        }
         $scope.specificCard = undefined;
         $scope.hideDrawer = true;
-        gameLog.deck.push($scope.card.id)
-        drawnFunc && drawnFunc.call(pocketciv.Engine, $scope.card);
+        if (stop != true)
+            drawnFunc && drawnFunc.call(pocketciv.Engine, $scope.card);
+        else
+            drawnFunc && drawnFunc.call(pocketciv.Engine, false);
     }
     
    pocketciv.Engine.reducer = function(reducer, done) {
@@ -162,10 +169,11 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
         $scope.reduceReady = done;
     }
     
-    pocketciv.Engine.drawer = function(deck, drawn) {
+    pocketciv.Engine.drawer = function(deck, drawn, canstop) {
         console.log("Show drawer")
         $scope.deck = deck;
         $scope.hideDrawer = false;
+        $scope.showStopper = (canstop == true);
         drawnFunc = drawn;
     }
 
