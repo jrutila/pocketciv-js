@@ -58,6 +58,7 @@ AdvanceAcquirer.prototype = {
                 var has_tribes = true;
                 var has_resources = true;
                 var has_gold = true;
+                var extra_ok = true;
                 
                 // Check tribes
                 if ('tribes' in this.advances[key].cost) {
@@ -83,8 +84,12 @@ AdvanceAcquirer.prototype = {
                     if (this.gold < total + this.advances[key].cost.gold)
                         has_gold = false;
                 }
+                
+                // Extra check
+                if (this.advances[key].can_acquire)
+                    extra_ok = this.advances[key].can_acquire(this.areas[a]);
 
-                if (has_tribes && has_resources && has_gold)
+                if (has_tribes && has_resources && has_gold && extra_ok)
                     adv[key].areas.push(a);
             }
         }

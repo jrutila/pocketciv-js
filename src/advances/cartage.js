@@ -15,23 +15,24 @@ module.exports = {
     phases: {
         'city_support.post': function(ctx) {
             var areas = this.map.areas;
-            var farmCount = _.reduce(_.values(areas), function(memo, area) {
+            ctx.supported = ctx.supported || [];
+            var farmCount = _.reduce(areas, function(memo, area, ak) {
                 if (area.farm)
                     return memo + 1;
                 return memo;
             }, 0);
-            var cityCount = _.reduce(_.values(areas), function(memo, area) {
-                if (area.city > 0)
+            var cityCount = _.reduce(areas, function(memo, area, ak) {
+                if (area.city > 0 && !_.contains(ctx.supported, ak))
                     return memo + 1;
                 return memo;
             }, 0);
-            console.log("There is total of "+farmCount+" farms and total of "+cityCount+" cities")
+            console.log("There is total of "+farmCount+" farms and total of "+cityCount+" unsupported cities")
             ctx.changes = {};
             if (farmCount < cityCount)
             {
                 var initial = {};
                 _.each(this.map.areas, function(a, k) {
-                    if (a.city > 0)
+                    if (a.city > 0 && !_.contains(ctx.supported, k))
                         initial[k] = a;
                 });
                 

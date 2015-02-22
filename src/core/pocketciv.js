@@ -59,6 +59,7 @@ var advances = {
     'sails_and_rigging': require('../advances/sails_and_rigging'),
     'culture_of_thievery': require('../advances/culture_of_thievery'),
     'mining': require('../advances/mining'),
+    'fishing': require('../advances/fishing'),
 }
 
 
@@ -675,9 +676,10 @@ Engine.prototype = {
         var engine = this;
         var areas = engine.map.areas;
         var changes = {};
+        ctx.supported = ctx.supported || [];
         for (var a in areas)
         {
-            if (areas[a].city && !areas[a].farm)
+            if (!_.contains(ctx.supported, a) && areas[a].city > 0 && !areas[a].farm)
             {
                 changes[a] = { 'city': '-1' };
             }
