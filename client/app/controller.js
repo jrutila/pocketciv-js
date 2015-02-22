@@ -6,6 +6,7 @@ var reducer = require("../../src/core/reducer");
 var sprintf = require("sprintf");
 var mustache = require("mustache");
 var Map = require("./map")
+var AdvanceAcquirer = require("../../src/actions/acquire").AdvanceAcquirer;
 
 pp = pocketciv
 
@@ -278,7 +279,7 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
     $scope.acquiring = false;
 
     pocketciv.Engine.advanceAcquirer = function(engine, done) {
-        $scope.acquirer = new pocketciv.AdvanceAcquirer(engine);
+        $scope.acquirer = new AdvanceAcquirer(engine);
         $scope.possibleAdvances = $scope.acquirer.possibleAdvances();
         $scope.acquiring = true;
         doAcquire = done;
@@ -313,7 +314,7 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
         $scope.showTT = !$scope.showTT;
         if (!$scope.showTT && $scope.acquiring)
             $scope.acquireOk()
-        $scope.acquirer = new pocketciv.AdvanceAcquirer($scope.engine);
+        $scope.acquirer = new AdvanceAcquirer($scope.engine);
         $scope.possibleAdvances = $scope.acquirer.possibleAdvances();
     }
     
