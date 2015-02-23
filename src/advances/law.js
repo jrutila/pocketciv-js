@@ -11,7 +11,8 @@ module.exports = {
     events: {
         'anarchy': {
             'steps': {
-                // TODO:
+                '1.3': " If you have Law , do not Reduce City AV. \
+Reduce Tribes by the City AV in each Region. {% hasLaw = true %}"
             }
         },
         'corruption': {
