@@ -65,24 +65,27 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
             };
             if (ok.reduce)
             {
-                var rdc = new reducer.Reducer($scope.engine);
-                rdc.startAmount = 1
-                rdc.mode = reducer.Modes.Overall;
-                rdc.areas = function() {
-                    var areas = {};
-                    _.each(this.engine.map.areas, function(a, key) {
-                        if (_.contains(_.flatten(ok.reduce), parseInt(key)))
-                            areas[key] = { 'tribes': $scope.movement[key], 'id': key };
-                    });
-                    return areas;
-                };
-                rdc.reduce = function(r, area) {
-                    if (r.tribes == -1)
-                    {
-                        this.amount--;
-                        return { 'tribes': '-1' };
+                console.log("USED SEA and must reduce "+ok.reduce)
+                var initial = {};
+                _.each(this.map.areas, function(area, ak) {
+                    ak = parseInt(ak);
+                    if (_.contains(_.flatten(ok.reduce), ak))
+                        initial[ak] = area;
+                },this);
+                var opts = {
+                    map: this.map.areas,
+                    initial: initial,
+                    shows: ['tribes'],
+                    edits: ['tribes'],
+                    original: ok.reduce,
+                    amount: ok.reduce.length,
+                    reduce: function(key, chg) {
+                        var rTrb = this.initial[key].tribes - chg.tribes;
+                        this.amount -= rTrb;
+                        return { 'tribes': chg.tribes };
                     }
-                };
+                }
+                var rdc = new reducer.Reducer(opts);
                 $scope.engine.reducer(rdc, function(chg) {
                     for (var s in $scope.movement)
                     {

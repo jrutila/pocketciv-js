@@ -3,14 +3,21 @@ var _ = require('underscore')
 
 var CityAdvance = {
   current: function(chg, key, val) {
-    if (!key)
+    if (!key) {
       this.city_amount = this.opts.city_amount;
-    // Basic case
-    this.current = {};
-    _.each(this.initial, function(i, ik) {
-      if (i.tribes > 0 || (i.city > 0 && i.city < this.opts.max_city))
-        this.current[ik] = i;
-    }, this);
+      
+      // Basic case
+      this.current = {};
+      var anyCity = false;
+      _.each(this.initial, function(i, ik) {
+        if (i.tribes > 0 || (i.city > 0 && i.city < this.opts.max_city))
+          this.current[ik] = i;
+        if (i.city > 0)
+          anyCity = true;
+      }, this);
+      if (!anyCity)
+        this.current = {};
+    }
   },
   check: function() {
     return this.amount == 0;
