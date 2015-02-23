@@ -14,7 +14,12 @@ module.exports = {
         },
         'superstition': {
             'steps': {
-                // TODO:
+                '1.2': "+ If yoy have {{ adv:meditation }}, you may, but are\
+                        not required to, stop discarding Event cards if\
+                        the Event deck has one card left."
+            },
+            canstop: function() {
+                return this.engine.deck.cardsLeft == 1;
             }
         }
     },

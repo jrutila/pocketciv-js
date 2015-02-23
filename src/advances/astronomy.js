@@ -10,7 +10,10 @@ result, and draw a new Event card in it's place.",
     required_by: [ 'sails_and_rigging' ],
     events: {
         'superstition': {
-            
+            'steps': {
+                '1.1': "- If you have {{ adv:astronomy }} add 2 to the discard\
+                        value. {% discard_amount += 2 %}"
+            }
         }
     },
     phases: {

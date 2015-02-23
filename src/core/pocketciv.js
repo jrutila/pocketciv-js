@@ -20,6 +20,7 @@ var events = {
     'bandits': require('../events/bandits'),
     'attack': require('../events/attack'),
     'trade': require('../events/trade'),
+    'superstition': require('../events/superstition'),
 }
 
 var actions = {
