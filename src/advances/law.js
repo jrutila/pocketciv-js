@@ -17,7 +17,8 @@ Reduce Tribes by the City AV in each Region. {% hasLaw = true %}"
         },
         'corruption': {
             'steps': {
-                // TODO:
+                '3.1': "+ If you have {{ adv:law }}, do not decimate gold. \
+                        {% change({'gold': null}, null) %}"
             }
         },
         'uprising': {

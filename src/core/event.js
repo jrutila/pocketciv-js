@@ -51,6 +51,10 @@ Context.prototype = {
         if (area === null)
         {
             _.extend(this.changes, chg);
+            _.each(chg, function(cc, ck) {
+                if (cc == null)
+                    delete this.changes[ck];
+            },this);
             return;
         }
         area = area ? area : this.active_region;
