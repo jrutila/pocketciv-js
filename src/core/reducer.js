@@ -180,7 +180,7 @@ NewReducer.prototype = {
         if (_.isArray(chg)) {
           //if (_.contains(curArea.neighbours, parseInt(ik)))
           //{
-            if (!_.has(chg, ik))
+            if (!_.contains(_.first(chg, chg.indexOf(key)+1), parseInt(ik)))
               this.current[ik] = i;
           //}
         } else {

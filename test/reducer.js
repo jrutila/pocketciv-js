@@ -40,7 +40,7 @@ describe('Reducer', function() {
       
       //ok = target.ok({ 1: null })
       ok = target.ok([ 1 ])
-      ok.current.should.deep.equal(_.omit(opts.initial, '1', '3'));
+      ok.current.should.deep.equal(_.omit(opts.initial, '1'));
       ok.changes.should.deep.equal({ 1: { 'tribes': (-1*opts.initial[1].tribes).toString() }});
       ok.ok.should.be.false;
       ok.amount.should.equal(opts.amount - 4);
@@ -153,6 +153,7 @@ describe('Reducer', function() {
         }),
         it('should tell if the given regions are ok', function() {
           var ok = target.ok([4, 3]);
+          ok.amount.should.equal(0);
           ok.changes.should.deep.equal({
             4: { 'tribes': '-3' },
             3: { 'tribes': '-1' }
@@ -171,7 +172,7 @@ describe('Reducer', function() {
           target.ok([2]).ok.should.be.false;
         });
         it('should return false if the phase is not applicable', function() {
-          var ok =  target.ok([2,4]);
+          var ok =  target.ok([2,2]);
           ok.failed.length.should.equal(1);
           ok.current.should.deep.equal(opts.initial)
         });
@@ -183,7 +184,7 @@ describe('Reducer', function() {
           var ok = target.ok([]);
           ok.amount.should.equal(opts.amount - 2);
           ok.current.should.deep.equal(
-            _.pick(engine.map.areas, 3)
+            _.pick(engine.map.areas, 3,4)
           );
           ok.changes.should.deep.equal({
             2: { 'tribes': '-2' },

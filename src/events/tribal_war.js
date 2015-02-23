@@ -41,6 +41,7 @@ module.exports = {
                 if (!_.has(this.initial, key))
                     return false;
                 this.amount--;
+                if (this.amount < 0) return false;
                 var trg = Math.max(this.initial[key].tribes - this.opts.warring_tribes, 0);
                 return { 'tribes': trg };
             },
