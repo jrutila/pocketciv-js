@@ -59,9 +59,14 @@ module.exports = {
         console.log("Max city advance is " + this.params.city_advance_limit)
         console.log("City advance discount is " + this.params.city_advance_discount)
         if (this.params.city_advance_limit && this.params.max_city > 1) {
+          var initial = {};
+          _.each(this.map.areas, function(area, ak) {
+            if (area.city > 0 && area.city < this.params.max_city)
+              initial[ak] = area;
+          },this);
           var opts = {
             map: this.map.areas,
-            initial: this.map.areas,
+            initial: initial,
             city_amount: this.params.city_advance_limit,
             amount: 0,
             discount: this.params.city_advance_discount,

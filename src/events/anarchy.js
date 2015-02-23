@@ -17,18 +17,19 @@ module.exports = {
         {
             var area = this.active_region[ar];
                 
-            // Law
-            if (typeof(hasLaw) != "undefined" && hasLaw)
-            {
-                this.change({'tribes': (-1*area.city).toString() }, ar)
-                continue;
-            }
-            
             var rTribes = area.tribes || 0;
             var rCity = area.city || 0;
             
             
             if (rTribes == 0 || rCity == 0) continue;
+            
+            // Law
+            if (typeof(hasLaw) != "undefined" && hasLaw)
+            {
+                if (rTribes > rCity)
+                    this.change({'tribes': (-1*area.city).toString() }, ar)
+                continue;
+            }
             
             while (rTribes > rCity && rCity > 0 && rTribes > 0) {
                 rTribes -= Math.min(tribeCount, rTribes);

@@ -184,7 +184,7 @@ NewReducer.prototype = {
               this.current[ik] = i;
           //}
         } else {
-            if (!_.has(chg, ik))
+            //if (!_.has(chg, ik))
               this.current[ik] = i;
         }
       }, this);
@@ -229,9 +229,12 @@ NewReducer.prototype = {
       }
       var key = _.isArray(trg) ? trg[0] : key;
       var val = _.isArray(trg) ? trg[1] : trg;
-      this.targets[key] = val;
-      this._mergeChg(key, val);
-      this.currentFunc.call(this, chg, key, val);
+      if (_.size(val) > 0)
+      {
+        this.targets[key] = val;
+        this._mergeChg(key, val);
+        this.currentFunc.call(this, chg, key, val);
+      }
     }, this);
     this._mergeChg('gold');
     var ret = {
@@ -255,10 +258,14 @@ module.exports = {
       var initial = {};
       _.each(ctx.engine.map.areas, function(area, ak) {
         _.each(properties, function(p) {
-          var pp = area[p] + 
-              parseInt(ctx.changes[ak] && ctx.changes[ak][p] || 0);
-          initial[ak] = initial[ak] || {};
-          initial[ak][p] = pp;
+          var pp = area[p];
+          if (ctx.changes[ak] && !isNaN(parseInt(ctx.changes[ak][p])))
+            pp += parseInt(ctx.changes[ak][p]) || 0;
+          if (pp > 0)
+          {
+            initial[ak] = initial[ak] || {};
+            initial[ak][p] = pp;
+          }
         });
       });
       return {
@@ -274,6 +281,15 @@ module.exports = {
             ret[p] = r;
           },this);
           return ret;
+        },
+        check: function() {
+          if (this._defaultCheck()) return true;
+          if (_.every(this.targets, function(val, key) {
+            return _.every(val, function(v) {
+              return v == 0;
+            });
+          })) return true;
+          return false;
         }
       }
     }

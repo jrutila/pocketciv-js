@@ -21,6 +21,13 @@ module.exports = {
             },
             reduceCities: function() {
                 var ctx = this;
+                if (typeof(hasLaw) != "undefined" && hasLaw)
+                {
+                    // Law cancels this affect
+                    ctx.done && ctx.done();
+                    return;
+                }
+                
                 var opts = reducer.Templates.basic(ctx, ['city']);
                 opts.amount = 2;
                 ctx.engine.reducer(new reducer.Reducer(opts), function(chg) {
