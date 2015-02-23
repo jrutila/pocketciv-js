@@ -24,6 +24,13 @@ module.exports = {
                     Region with Tribes. {% border_reduce = 2 %}"
             }
         },
+        'bandits': {
+            'steps': {
+                '3.3': "- If you have {{ adv:equestrian }}, increase the value of the \
+                        Attacking Force by one BLUE HEX \
+                        {% attack_force += card_value('h') %}"
+            }
+        },
     },
     actions: { },
     phases: { },

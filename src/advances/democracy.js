@@ -16,8 +16,10 @@ module.exports = {
         },
         'bandits': {
             'steps': {
-                // TODO:
-            },
+                '3.2': "+ If you have {{ adv:democracy }}, reduce the value of the \
+                        Attacking Force by one BLUE HEX \
+                        {% attack_force -= card_value('h') %}"
+            }
         },
     },
     actions: { },

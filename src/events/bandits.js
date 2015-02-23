@@ -11,11 +11,10 @@ module.exports = {
             '2': "If the Active Region, or a Neighboring Region, \
 contains a Desert, you are being Attacked by Bandits. \
 Otherwise, disregard the Bandit Event. {% break_if(!is_there_desert())  %}",
-            '3': "{% evexpr = event.expr %}\
-            Draw the next Event Card {%; draw_card() %}.",
-            '4': "Using the symbols shown \
-                    on the ORIGINAL Event card ({{ event.expr }}) . The total value that this creates \
-                    {% attack_force = card_value(evexpr) %} \
+            '3': "Draw the next Event Card {%; draw_card() %}. \
+            Using the symbols shown \
+            on the ORIGINAL Event card ({{ event.expr }}) . The total value that this creates \
+                    {% attack_force = card_value(event.expr) %} \
                     determines the Attacking Force {{ attack_force }}.",
             '-': "See {%; sub('attack') %}"
     },

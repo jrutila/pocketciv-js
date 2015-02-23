@@ -21,6 +21,13 @@ Reduce Tribes by the City AV in each Region. {% hasLaw = true %}"
                         {% change({'gold': null}, null) %}"
             }
         },
+        'bandits': {
+            'steps': {
+                '3.1': "+ If you have {{ adv:law }}, reduce the value of the \
+                        Attacking Force by one BLUE HEX \
+                        {% attack_force -= card_value('h') %}"
+            }
+        },
         'uprising': {
             'steps': {
                 // TODO:
