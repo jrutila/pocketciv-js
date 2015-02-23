@@ -63,6 +63,23 @@ var advances = {
     'astronomy': require('../advances/astronomy'),
     'metal_working': require('../advances/metal_working'),
     'military': require('../advances/military'),
+    'centralized_government': require('../advances/centralized_government'),
+    'democracy': require('../advances/democracy'),
+    'arts': require('../advances/arts'),
+    'theater': require('../advances/theater'),
+    'patronage': require('../advances/patronage'),
+    'story_telling': require('../advances/story_telling'),
+    'mythology': require('../advances/mythology'),
+    'meditation': require('../advances/meditation'),
+    'philosophy': require('../advances/philosophy'),
+    'org_religion': require('../advances/org_religion'),
+    'ministry': require('../advances/ministry'),
+    'law': require('../advances/law'),
+    'written_record': require('../advances/written_record'),
+    'surveying': require('../advances/surveying'),
+    'machining': require('../advances/machining'),
+    'common_tongue': require('../advances/common_tongue'),
+    'shipping': require('../advances/shipping'),
 }
 
 

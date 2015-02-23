@@ -15,7 +15,11 @@ module.exports = {
             this.areaChange({'gold': '+5'}, function() { })
         }
     },
-    phases: { },
+    phases: {
+        'gold_management': {
+            // TODO: Reduce 1 gold
+        }
+    },
     actions: {
         'black_market': {
             'title': 'Black Market',

@@ -20,6 +20,7 @@ module.exports = {
     acquired: function() {
         this.params.city_advance_limit++;
         console.log('Civil Service city advance limit is now '+this.params.city_advance_limit)
+        // TODO: Ask for discarding Thievery and Black Market
     },
     phases: { },
     actions: { },

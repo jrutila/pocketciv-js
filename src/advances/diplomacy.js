@@ -31,6 +31,7 @@ module.exports = {
                 this.engine.trading.push(visitor);
             },
             'make_offer': function() {
+                // TODO: Refactor!!
                 var rdc = new reducer.Reducer(this.engine);
                 rdc.mode = reducer.Modes.Overall;
                 rdc.areas = function() {
