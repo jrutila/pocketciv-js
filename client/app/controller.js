@@ -344,12 +344,15 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
     }
     
     $scope.advTitle = function(advances) {
-        if (!_.isArray(advances))
-            advances = [advances];
+            
         return _.map(advances, function (adv) {
-            var ad = $scope.engine.advances[adv];
-            return ad ? ad.title : adv;
-        }).join(" or ");
+            if (!_.isArray(adv))
+                adv = [adv];
+            return _.map(adv, function(ad) {
+                var a = $scope.engine.advances[ad];
+                return a ? a.title : ad;
+            }).join(" or ");
+        }).join(" and ");
     }
     
     $scope.selectEvent = function(ev) {
