@@ -1,3 +1,6 @@
+var reducer = require("../core/reducer");
+var _ = require('underscore')
+
 module.exports = {
     name: "slave_labor",
     title: "Slave Labor",
@@ -11,10 +14,19 @@ The maximum AV of a City is 2, unless otherwise noted.",
     events: {
         'anarchy': {
             'steps': {
-                '2': "- If you have {{ adv:slave_labor }}, Draw the next card {%; draw_card() %}. \
+                '3': "- If you have {{ adv:slave_labor }}, Draw the next card {%; draw_card() %}. \
                        Reduce Tribes throughout your Empire an \
                        additional amount as shown in the RED CIRCLE. \
-                       {%; reduce('tribes', card_value('c')) %}"
+                       {%; reduceTribes(card_value('c')) %}"
+            },
+            reduceTribes: function(amount) {
+                var ctx = this;
+                var opts = reducer.Templates.basic(ctx, ['tribes']);
+                opts.amount = amount;
+                ctx.engine.reducer(new reducer.Reducer(opts), function(chg) {
+                    ctx.merge(chg);
+                    ctx.done && ctx.done();
+                });
             }
         },
         'uprising': {

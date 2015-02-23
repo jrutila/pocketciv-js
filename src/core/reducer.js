@@ -250,4 +250,32 @@ module.exports = {
   Reducer: NewReducer,
   Modes: Modes,
   isSea: function(n) { return typeof n == "string" && n != "frontier"; },
+  Templates: {
+    'basic': function(ctx, properties, reduces) {
+      var initial = {};
+      _.each(ctx.engine.map.areas, function(area, ak) {
+        _.each(properties, function(p) {
+          var pp = area[p] + 
+              parseInt(ctx.changes[ak] && ctx.changes[ak][p] || 0);
+          initial[ak] = initial[ak] || {};
+          initial[ak][p] = pp;
+        });
+      });
+      return {
+        map: ctx.engine.map.areas,
+        initial: initial,
+        shows: properties,
+        edits: properties,
+        reduce: function(key, chg) {
+          var ret = {};
+          _.each(chg, function(r, p) {
+            var d = this.initial[key][p] - r;
+            this.amount -= d;
+            ret[p] = r;
+          },this);
+          return ret;
+        }
+      }
+    }
+  }
 }

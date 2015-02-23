@@ -1,4 +1,5 @@
-var reducer = require('../core/reducer')
+var reducer = require('../core/reducer');
+var _ = require('underscore');
 
 module.exports = {
     name: "org_religion",
@@ -40,9 +41,9 @@ effects of Anarchy. {%; selectRegions() %}"
                         this.amount--;
                     }
                 }
-                ctx.engine.reducer(new reducer.Reducer(opts), function(chg, ok) {
-                    console.log("Selected 4 areas: " + ok.chg)
-                    ctx.active_region =  _.pick(ctx.engine.map.areas, ok.chg);
+                ctx.engine.reducer(new reducer.Reducer(opts), function(changes, chg) {
+                    console.log("Selected 4 areas: " + chg)
+                    ctx.active_region =  _.pick(ctx.engine.map.areas, chg);
                     ctx.done && ctx.done();
                 });
             }

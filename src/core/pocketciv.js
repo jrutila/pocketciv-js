@@ -749,5 +749,6 @@ module.exports = {
     Map: theMap,
     TribeMover: TribeMover,
     Engine: new Engine(theMap, theDeck),
+    EngineBuild: Engine,
     Advances: advances,
 }

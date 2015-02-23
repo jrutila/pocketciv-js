@@ -70,17 +70,14 @@ Context.prototype = {
     },
     goto: function(phase)
     {
-        console.log("goingto "+phase)
         this.go = phase;
     },
     area_card: function()
     {
-        console.log("AREA CARD")
         var ctx = this;
         this.engine.drawer(this.engine.deck, function(c) {
             ctx.active_region = ctx.engine.map.areas[c.circle.toString()];
             if (!ctx.active_region) {
-                console.log("No such area!")
                 ctx.break = true;
             }
             ctx.done()
@@ -95,27 +92,29 @@ Context.prototype = {
     },
     reduce: function(t, amount, areas) {
         var ctx = this;
-        var rdc = new reducer.Reducer(this.engine);
-        rdc.mode = reducer.Modes.Overall;
-        var total = _.reduce(_.values(areas), function(memo, area){ return area[t] ?  memo + area[t]: memo }, 0)
-        rdc.startAmount = amount;
-        rdc.reduce = function(r) {
-            this.amount += r[t];
-            if (this.startAmount - this.amount == total)
-                this.amount = 0;
+        var opts = {
+            map: ctx.engine.map.areas,
+            initial: areas,
+            shows: [t],
+            edits: [t],
+            amount: amount,
+            reduce: function(key, chg) {
+                this.amount -= this.initial[key][t] - chg[t];
+            }
         };
-        rdc.areas = function() {
-            return _.omit(areas, _.map(this.visited, function(v) { return v.toString() }));
-        };
+        var rdc = new reducer.Reducer(opts);
         
-        this.engine.reducer(rdc, ctx.done);
+        this.engine.reducer(rdc, function(chg) {
+            ctx.merge(chg);
+            ctx.done && ctx.done();
+        });
     },
     active_regions: function(expr) {
-        var act = []
+        var act = {};
         for (var a in this.engine.map.areas)
         {
             if (expr(this.engine.map.areas[a]))
-                act.push(this.engine.map.areas[a]);
+                act[a] = this.engine.map.areas[a];
         }
         this.active_region = act;
     },
@@ -129,7 +128,6 @@ Context.prototype = {
         return eval(expr);
     },
     sub: function(ev) {
-        console.log("Running subevent "+ev)
         if (ev == "attack")
             console.log(attack_force)
         
@@ -192,7 +190,7 @@ var stepper = function(steps, ctx, done)
     }
     ctx.go = undefined;
     ctx.engine.signals.eventPhasing.dispatch(steps.step, ctx)
-    console.log(steps.step+":"+cmd)
+    //console.log(steps.step+":"+cmd)
     contextEval(cmd, ctx, function() {
         if (ctx.break)
         {
@@ -239,8 +237,6 @@ extendSteps = function(event, advances, limit, context)
 
 runEvent = function(engine, event, ev, done, ctx)
 {
-    console.log("Running event:");
-    console.log(ev);
     if (!engine) throw "Engine should not be null"
     
     var context = ctx || new Context();
@@ -250,14 +246,12 @@ runEvent = function(engine, event, ev, done, ctx)
     context.engine = engine;
     context.event = ev;
     
-    console.log("event:"); console.log(event)
-    console.log("context:"); console.log(context)
     var ext = extendSteps(event, engine.advances, engine.acquired, context);
     var actual_steps = ext[0];
     var keys = ext[1];
     var steps_cmd = new StepsStack();
     
-    console.log(actual_steps)
+    //console.log(actual_steps)
     
     _.each(keys, function(key)
     {

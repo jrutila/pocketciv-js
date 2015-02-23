@@ -1,3 +1,6 @@
+var reducer = require("../core/reducer");
+var _ = require('underscore')
+
 module.exports = {
     name: "machining",
     title: "Machining",
@@ -11,7 +14,19 @@ module.exports = {
     events: {
         'anarchy': {
             'steps': {
-                // TODO:
+                '4': "- If you have {{ adv:machining }}, Reduce an additional \
+                        2 City AV of your choice (these may be from the \
+                same, or different Cities). Law cancels this affect. \
+                       {%; reduceCities() %}",
+            },
+            reduceCities: function() {
+                var ctx = this;
+                var opts = reducer.Templates.basic(ctx, ['city']);
+                opts.amount = 2;
+                ctx.engine.reducer(new reducer.Reducer(opts), function(chg) {
+                    ctx.merge(chg);
+                    ctx.done && ctx.done();
+                });
             }
         },
         'uprising': {
