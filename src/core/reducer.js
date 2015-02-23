@@ -178,11 +178,8 @@ NewReducer.prototype = {
       var curArea = this.map[key];
       _.each(this.initial, function(i, ik) {
         if (_.isArray(chg)) {
-          //if (_.contains(curArea.neighbours, parseInt(ik)))
-          //{
-            if (!_.contains(_.first(chg, chg.indexOf(key)+1), parseInt(ik)))
+            if (!_.contains(_.first(chg, chg.indexOf(parseInt(key))+1), parseInt(ik)))
               this.current[ik] = i;
-          //}
         } else {
             //if (!_.has(chg, ik))
               this.current[ik] = i;
@@ -212,6 +209,7 @@ NewReducer.prototype = {
     this.changes = {};
     this.targets = _.clone(this.initial);
     this.failed = [];
+    this.values = {};
     this.currentFunc.call(this, chg);
     if (_.isArray(chg) && _.isArray(opts.pre))
       chg = (opts.pre || []).concat(chg);
@@ -229,12 +227,10 @@ NewReducer.prototype = {
       }
       var key = _.isArray(trg) ? trg[0] : key;
       var val = _.isArray(trg) ? trg[1] : trg;
-      if (_.size(val) > 0)
-      {
-        this.targets[key] = val;
-        this._mergeChg(key, val);
-        this.currentFunc.call(this, chg, key, val);
-      }
+      this.targets[key] = val;
+      this.values[key] = val;
+      this._mergeChg(key, val);
+      this.currentFunc.call(this, chg, key, val);
     }, this);
     this._mergeChg('gold');
     var ret = {

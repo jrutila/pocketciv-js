@@ -94,7 +94,7 @@ describe('Reducer', function() {
       ok.amount.should.equal(opts.amount);
       
       ok = target.ok({ 1: { 'city': 3 }})
-      ok.current.should.deep.equal(_.omit(opts.initial, '1'));
+      ok.current.should.deep.equal(opts.initial);
       ok.changes.should.deep.equal({ 1: { 'tribes': '-3', 'city': '+1' }});
       ok.ok.should.be.true;
       ok.amount.should.equal(0);
@@ -222,7 +222,7 @@ describe('Reducer', function() {
           target.ok({}).current.should.deep.equal(engine.map.areas)
           var ok = target.ok({ 3: { 'tribes': 1 } });
           ok.ok.should.equal(false);
-          _.keys(ok.current).should.deep.equal([ '4', '5' ]);
+          _.keys(ok.current).should.deep.equal([ '3', '4', '5' ]);
         })
         it('should have remaining amount', function() {
           target.ok({}).amount.should.equal(4)

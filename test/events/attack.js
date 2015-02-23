@@ -94,7 +94,9 @@ describe('Attack (worker)', function() {
       opts.pre = [3];
       target.ok([3]).failed.length.should.equal(1);
       _.keys(target.ok([]).current).should.deep.equal(['2'])
-      _.keys(target.ok([2]).current).should.deep.equal(['4'])
+      var ok = target.ok([2]);
+      ok.failed.length.should.equal(0);
+      _.keys(ok.current).should.deep.equal(['4'])
       target.ok([2, 4]).changes.should.deep.equal({
         4: { 'tribes': '-2' },
         2: { 'tribes': '-1' },
@@ -118,10 +120,11 @@ describe('Attack (worker)', function() {
         opts.amount = 33;
         opts.pre = [4];
         _.keys(target.ok([]).current).should.deep.equal([ '5' ])
-        _.keys(target.ok([5]).current).should.deep.equal([ '2' ])
-        target.ok([5]).ok.should.be.true;
-        target.ok([5]).amount.should.equal(0);
-        target.ok([5]).changes.should.deep.equal({
+        var ok = target.ok([5]);
+        _.keys(ok.current).should.deep.equal([  ])
+        ok.ok.should.be.true;
+        ok.amount.should.equal(0);
+        ok.changes.should.deep.equal({
           4: { 'city': '-3', 'tribes': '-1' },
           5: { 'tribes': '-1', 'city': '-3' },
           'gold': '-12',
@@ -165,14 +168,18 @@ describe('Attack (worker)', function() {
         opts.amount = 33;
         opts.pre = [4];
         _.keys(target.ok([]).current).should.deep.equal([ '5' ])
-        _.keys(target.ok([5]).current).should.deep.equal([ '3' ])
+        var ok = target.ok([5]);
+        ok.ok.should.be.true;
+        _.keys(ok.current).should.deep.equal([ ])
       })
       it('case 2', function() {
         opts.map[2].tribes = 1;
         opts.amount = 33;
         opts.pre = [4];
         _.keys(target.ok([]).current).should.deep.equal([ '2' ])
-        _.keys(target.ok([2]).current).should.deep.equal([ '5' ])
+        var ok = target.ok([2]);
+        ok.ok.should.be.true;
+        _.keys(ok.current).should.deep.equal([ ])
       })
       
     });

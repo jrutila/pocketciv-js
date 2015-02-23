@@ -3,6 +3,8 @@ var _ = require('underscore');
 
 var AttackReducer = {
   reduce: function(key) {
+    console.log(key)
+    console.log(this.current)
     if (!_.has(this.current, key)) return false;
     
     var RTRIBE = this.opts.tribe_reduce || 1;
@@ -54,9 +56,10 @@ var AttackReducer = {
     var lowestTribe = 999;
     var biggestCity = -1;
     _.each(this.initial, function(i, ik) {
-      if (_.contains(curArea.neighbours, parseInt(ik)))
+      ik = parseInt(ik);
+      if (_.contains(curArea.neighbours, ik))
       {
-        if (_.has(this.changes, parseInt(ik))) return false;
+        if (_.has(this.values, ik)) return false;
         
         var itribes = i.tribes || 0;
         var icity = i.city || 0;
