@@ -286,7 +286,8 @@ TribeMover.prototype = {
         
         var valid = { ok: byland.length == 0 || bysea.length == 0 };
         
-        if (valid.ok && bysea.length == 0 && byland.length != 0)
+        // If movement is free, don't calculate the cost areas
+        if (valid.ok && this.seaCost == 1 && bysea.length == 0 && byland.length != 0)
         {
             valid.reduce = [];
             var bl = {};
@@ -300,7 +301,6 @@ TribeMover.prototype = {
             var maxrelevance = -2;
             var ind = {};
             var ii = -1;
-            console.log(find)
             while (f = find.pop())
             {
                 if (situation[f.id] > 0)

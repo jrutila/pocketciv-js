@@ -16,7 +16,8 @@ module.exports = {
         'expedition.pre': function() { }
     },
     acquired: function() {
-        this.params.sea_move_cost = 0;
+        console.log("Sea cost now 0")
+        this.params.sea_cost = 0;
     },
     actions: { },
 }

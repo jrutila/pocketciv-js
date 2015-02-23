@@ -94,7 +94,8 @@ module.exports = {
         */
     },
     acquired: function() {
-        this.params.sea_cost = 1;
+        this.params.sea_move = true;
+        this.params.sea_cost = this.params.sea_cost == 0 ? 0 : 1;
         this.params.sea_expedition = true;
     },
     actions: { },

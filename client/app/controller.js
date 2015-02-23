@@ -50,7 +50,10 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
     
     var moveFunc = undefined;
     $scope.moveTribes = function() {
-        var mover = new pocketciv.TribeMover(pocketciv.Map.areas, $scope.godMode ? -1 : pocketciv.Engine.params.moveLimit, pocketciv.Engine.params.sea_cost);
+        var mover = new pocketciv.TribeMover(
+            pocketciv.Map.areas,
+            pocketciv.Engine.params.moveLimit,
+            pocketciv.Engine.params.sea_move ? pocketciv.Engine.params.sea_cost : undefined);
         mover.init(getMovement(pocketciv.Map.areas));
         var ok = mover.ok($scope.movement);
         if (ok.ok)
@@ -70,7 +73,7 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
                 _.each(this.map.areas, function(area, ak) {
                     ak = parseInt(ak);
                     if (_.contains(_.flatten(ok.reduce), ak))
-                        initial[ak] = area;
+                        initial[ak] = { tribes: $scope.movement[ak] };
                 },this);
                 var opts = {
                     map: this.map.areas,
@@ -83,6 +86,12 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
                         var rTrb = this.initial[key].tribes - chg.tribes;
                         this.amount -= rTrb;
                         return { 'tribes': chg.tribes };
+                    },
+                    current: function(chg, key, val) {
+                        if (!key)
+                        {
+                            this.current = this.initial;
+                        }
                     }
                 }
                 var rdc = new reducer.Reducer(opts);
@@ -108,7 +117,10 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
         $scope.movement = getMovement(situation);
         $scope.hideMover = false;
         moveFunc = move;
-        var mover = new pocketciv.TribeMover(pocketciv.Map.areas, pocketciv.Engine.params.moveLimit, pocketciv.Engine.params.sea_cost);
+        var mover = new pocketciv.TribeMover(
+            pocketciv.Map.areas,
+            pocketciv.Engine.params.moveLimit,
+            pocketciv.Engine.params.sea_move ? pocketciv.Engine.params.sea_cost : undefined);
         
         // UI
         $scope.mapInfo = "Move tribes by clicking start region and then target region";

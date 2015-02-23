@@ -235,6 +235,7 @@ NewReducer.prototype = {
     }, this);
     this._mergeChg('gold');
     var ret = {
+      chg: chg,
       changes: this.changes,
       current: this.current,
       ok: this.check(),

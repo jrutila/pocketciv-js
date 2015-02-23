@@ -1,6 +1,7 @@
-var should = require('chai').should()
-var pocketciv = require('../src/core/pocketciv')
-var event = require('../src/core/event')
+var should = require('chai').should();
+var expect = require('chai').expect;
+var pocketciv = require('../src/core/pocketciv');
+var event = require('../src/core/event');
 
 describe('TribeMover', function() {
     describe('simple', function() {
@@ -263,6 +264,12 @@ describe('TribeMover', function() {
             mover.ok({ 3: 0, 4: 2, 5: 0, 8: 0 }).reduce.should.deep.equal(
                 [[4]]
                 )
+        });
+        it('free sailing', function() {
+            mover = new pocketciv.TribeMover(map, 1, 0);
+            mover.init({ 3: 0, 4: 0, 5: 2, 8: 0 });
+            mover.ok({ 3: 0, 4: 2, 5: 0, 8: 0 }).ok.should.be.true;
+            expect(mover.ok({ 3: 0, 4: 2, 5: 0, 8: 0 }).reduce).to.be.undefined;
         });
     });
     describe('simple with two steps', function() {
