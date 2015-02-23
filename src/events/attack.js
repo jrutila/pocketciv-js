@@ -4,22 +4,29 @@ var _ = require('underscore');
 var AttackReducer = {
   reduce: function(key) {
     if (!_.has(this.current, key)) return false;
-    var area = this.initial[key];
     
-    var rTrb = Math.min(area.tribes || 0, this.amount);
-    //if (this.engine.map.tribeCount - (this.original_amount - this.amount - rTrb) <= 2)
-    this.amount -= rTrb;
+    var RTRIBE = this.opts.tribe_reduce || 1;
     var RCITY = this.opts.city_reduce;
     var RGOLD = this.opts.gold_reduce;
+    var area = this.initial[key];
+    
+    var rTrb = 0;
+    while (this.amount >= RTRIBE && area.tribes - rTrb > 0)
+    {
+      rTrb++;
+      this.amount -= RTRIBE;
+    }
     var rCity = 0;
     while (this.amount >= RCITY && area.city - rCity > 0)
     {
       rCity++;
       this.amount -= RCITY;
     }
-    // If there is not enough force to decimate all cities (3.3)
-    if (this.amount > 0 && area.city - rCity > 0)
-      this.amount = 0;
+    // If there is not enough force to decimate all cities and tribes (3.3)
+    if (this.amount > 0)
+      if (area.tribes - rTrb > 0 || area.city - rCity > 0)
+        this.amount = 0;
+        
     var chg =  {};
     
     if (rCity > 0)
@@ -40,6 +47,9 @@ var AttackReducer = {
   current: function(chg, key, val) {
     this.current = {};
     if (!key) { this.current = this.initial; return; }
+    var RTRIBE = this.opts.tribe_reduce || 1;
+    var RCITY = this.opts.city_reduce;
+    
     var curArea = this.map[key];
     var lowestTribe = 999;
     var biggestCity = -1;
@@ -70,7 +80,12 @@ var AttackReducer = {
         {
           if (icity > 0 && icity > biggestCity) this.current = {};
           if ((icity || 0) >= biggestCity) {
-            this.current[ik] = i;
+            // This is the area they are going to,
+            // can the attack force do any damage?
+            if (!(itribes >= 1 && this.amount < RTRIBE) && !(
+                itribes == 0 && icity >= 1 && this.amount < RCITY
+              ))
+              this.current[ik] = i;
             lowestTribe = itribes;
             biggestCity = icity || 0;
           }
@@ -90,6 +105,7 @@ module.exports = {
         map: this.engine.map.areas,
         initial: initial,
         pre: [this.active_region.id],
+        tribe_reduce: tribe_reduce,
         city_reduce: city_reduce,
         gold_reduce: gold_reduce,
         shows: ['tribes', 'city', 'gold'],

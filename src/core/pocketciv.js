@@ -62,6 +62,7 @@ var advances = {
     'fishing': require('../advances/fishing'),
     'astronomy': require('../advances/astronomy'),
     'metal_working': require('../advances/metal_working'),
+    'military': require('../advances/military'),
 }
 
 
