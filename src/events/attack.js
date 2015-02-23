@@ -104,6 +104,8 @@ module.exports = {
       var ctx = this;
       var initial = _.clone(this.engine.map.areas);
       initial.gold = this.engine.gold;
+      if (ctx.changes.gold)
+        initial.gold += parseInt(ctx.changes.gold.replace('+',''));
       var opts = {
         map: this.engine.map.areas,
         initial: initial,
@@ -119,7 +121,7 @@ module.exports = {
       }
       var rdc = new reducer.Reducer(opts);
       ctx.engine.reducer(rdc, function(chg) {
-          ctx.changes = chg;
+          ctx.merge(chg);
           ctx.done && ctx.done();
       });
     },

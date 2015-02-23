@@ -37,6 +37,8 @@ Context.prototype = {
                     kk[ck] = this._getMergedString(kk[ck], cc);
                 },this)
                 this.changes[k] = kk;
+            } else {
+                this.changes[k] = this._getMergedString(this.changes[k], c);
             }
         },this);
     },
