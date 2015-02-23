@@ -245,6 +245,8 @@ runEvent = function(engine, event, ev, done, ctx)
     
     var context = ctx || new Context();
     _.extend(context, event);
+    if (ev.skip)
+        context.skip = ev.skip;
     context.engine = engine;
     context.event = ev;
     

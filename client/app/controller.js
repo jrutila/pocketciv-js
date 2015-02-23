@@ -494,8 +494,15 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
         {
             if (ctx.active_region)
                 selectRegion(ctx.active_region.id)
-
+                
             $scope.currentStep = { 'step': step, 'ctx': ctx };
+            
+            if (ctx.skip)
+            {
+                $scope.currentStep.skip = ctx.skip;
+                console.log("This event is skippable")
+            }
+
             setTimeout(function() {
                 $scope.$apply(function() {
                     done & done();

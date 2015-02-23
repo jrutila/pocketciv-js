@@ -36,9 +36,11 @@ module.exports = {
             current: function(chg, key, val) {
                 if (!key)
                 {
-                    this.current = _.filter(this.initial, function(i) {
-                        return i.city > 0;
-                    });
+                    this.current = {};
+                    _.each(this.initial, function(i, ik) {
+                        if (i.city > 0)
+                            this.current[ik] = i;
+                    },this);
                 }
             },
             check: function() {

@@ -60,6 +60,7 @@ var advances = {
     'culture_of_thievery': require('../advances/culture_of_thievery'),
     'mining': require('../advances/mining'),
     'fishing': require('../advances/fishing'),
+    'astronomy': require('../advances/astronomy'),
 }
 
 
@@ -392,6 +393,7 @@ function Engine(map, deck) {
     this.actions = actions;
     this.gold = 0;
     this.round = {} // Will be emptied after upkeep!
+    this.round_era = {}; // Will be emptied on end of an era!
     this.params = {} // Will be emptied on init!
     this.era = 1;
     /** SIGNALS **/
@@ -425,6 +427,7 @@ var defaults= {
     'gold': 0,
     'era': 1,
     'round': {},
+    'round_era': {},
 }
 
 Engine.prototype = {
@@ -482,6 +485,7 @@ Engine.prototype = {
     },
     endOfEra: function() {
         console.log("End of era");
+        this.round_era = {};
         this.deck.shuffle();
         this.era++;
     },
@@ -618,11 +622,14 @@ Engine.prototype = {
         console.log("Drawing event card")
         // Take era before car draw if there is era change
         var era = this.era;
+        var may_skip = ctx.skip != undefined;
         this.drawer(this.deck, function(eventcard) {
             var eng = this;
             if (era in eventcard.events)
             {
-                var ev = eventcard.events[era];
+                var ev = _.clone(eventcard.events[era]);
+                if (may_skip)
+                    ev.skip = ctx.skip;
                 console.log("Drew event: "+ev.name);
                 eng.doEvent(ev, function(changes) {
                     console.log("Event ended: "+ev.name);
