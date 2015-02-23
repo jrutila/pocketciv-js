@@ -232,7 +232,7 @@ describe('Reducer', function() {
   });
 });
 
-describe.only('City Advance (worker)', function() {
+describe('City Advance (worker)', function() {
   describe("basic", function() {
     var target = null;
     var opts = null;

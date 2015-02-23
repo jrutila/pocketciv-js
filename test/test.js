@@ -37,7 +37,7 @@ fs.readdirSync(dir).filter(function(file){
 
 addDir('test/events')
 addDir('test/advances')
-
+addDir('test/actions')
 
 mocha.run(function(){
 
