@@ -10,7 +10,11 @@ var AttackReducer = {
     var RTRIBE = this.opts.tribe_reduce || 1;
     var RCITY = this.opts.city_reduce;
     var RGOLD = this.opts.gold_reduce;
+    var RBORDER = this.opts.border_reduce || 0;
     var area = this.initial[key];
+    
+    if (_.size(this.values) >= 1)
+      this.amount -= RBORDER;
     
     var rTrb = 0;
     while (this.amount >= RTRIBE && area.tribes - rTrb > 0)
@@ -51,6 +55,7 @@ var AttackReducer = {
     if (!key) { this.current = this.initial; return; }
     var RTRIBE = this.opts.tribe_reduce || 1;
     var RCITY = this.opts.city_reduce;
+    var RBORDER = this.opts.border_reduce || 0;
     
     var curArea = this.map[key];
     var lowestTribe = 999;
@@ -87,7 +92,7 @@ var AttackReducer = {
             // can the attack force do any damage?
             if (!(itribes >= 1 && this.amount < RTRIBE) && !(
                 itribes == 0 && icity >= 1 && this.amount < RCITY
-              ))
+              ) && !(this.amount <= RBORDER))
               this.current[ik] = i;
             lowestTribe = itribes;
             biggestCity = icity || 0;
@@ -111,6 +116,7 @@ module.exports = {
         initial: initial,
         pre: [this.active_region.id],
         tribe_reduce: tribe_reduce,
+        border_reduce: typeof border_reduce != "undefined" ? border_reduce : 0,
         city_reduce: city_reduce,
         gold_reduce: gold_reduce,
         shows: ['tribes', 'city', 'gold'],
@@ -136,8 +142,8 @@ module.exports = {
         '5': "If Attacking Force remains, move to Neighboring Region with the \
              least amount of Tribes. In case of a tie then move to Neighboring \
              Region with highest City AV. Otherwise, you choose. \
-             Attacking Forces do not move through empty Regions.\
-             {%; attack() %}"
+             Attacking Forces do not move through empty Regions.",
+        '-': "{%; attack() %}"
     },
     reducer: AttackReducer
 };

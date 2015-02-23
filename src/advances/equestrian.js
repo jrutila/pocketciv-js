@@ -15,9 +15,16 @@ module.exports = {
             'steps': {
                     '2.2': "- If you have {{ adv:roadbuilding }} or {{ adv:equestrian }}\
                     Epidemics continue through Regions with no Tribes. {% skipempty = true %}"
-                }
             }
         },
+        'attack': {
+            'steps': {
+                    '5.1': "+ If you have {{ adv:equestrian }} \
+                    Reduce strength of Attacking Force by 2 when entering a new \
+                    Region with Tribes. {% border_reduce = 2 %}"
+            }
+        },
+    },
     actions: { },
     phases: { },
     acquired: function() {
