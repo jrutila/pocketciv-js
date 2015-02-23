@@ -132,11 +132,13 @@ Map.prototype = {
     },
 }
 
-function _mergeNgh(ngh, n, currentArea) {
-    ngh = _.union(ngh, n);
-    ngh = _.uniq(ngh) //, function (e, p) { return ngh.indexOf(e) == p; })
-    //ngh.indexOf(this.currentArea) > -1 && ngh.splice(ngh.indexOf(this.currentArea),1);
-    return _.without(ngh, currentArea)
+function _mergeNgh(ngh, first, a) {
+    var to = _.reduce(ngh,
+        function(memo, n) {
+            return _.union(memo, first[n])
+        }, ngh);
+    to = _.without(to, parseInt(a));
+    return to;
 }
 
 var areaNeighbour = function(n) { return typeof n != "string"; };
@@ -157,76 +159,48 @@ function TribeMover(map, moveLimit, seaCost) {
     seaCost = seaCost === undefined ? -1 : seaCost;
     this.seaCost = seaCost;
     
-    var seas = {};
-    if (seaCost > -1)
-    seas = _.object(_.map(this.map, function(area, n) {
+    var seas = _.object(_.map(this.map, function(area, n) {
         var ss = _.filter(area.neighbours, function (e) { return typeof e == "string" && e != 'frontier'; });
         var seangh = [];
         for (var a in this.map)
         {
             if (a != n && _.intersection(this.map[a].neighbours, ss).length > 0)
+            {
                 seangh.push(parseInt(a));
+            }
         }
         return [parseInt(n), seangh];
     }, this));
     
-    for (var key in this.map)
-    {
-        this.currentArea = key = parseInt(key);
-        var ngh = [key];
-        var area = this.map[key];
-        var sea = seas[key];
-        
-        // Instant neighbours
-        var n = _seaUnion(area.neighbours, seas[key]);
-        ngh = _mergeNgh(ngh, n, key);
+    _.each(this.map, function(area, ak) {
+        this.neighbours[ak] = _.filter(area.neighbours, areaNeighbour);
+        this.neighboursSea[ak] = _.union(this.neighbours[ak], seas[ak]);
+    }, this);
+    
+    
+    var build = [[this.neighbours, this.neighbours2]]
+    if (this.seaCost > -1)
+        build.push([this.neighboursSea, this.neighboursSea2])
+    
+    _.each(build, function(b) {
+        var first = b[0];
+        var second = b[1];
+        // First level neighbours with moveLimit
         for (var m = 1; m < moveLimit; m++)
         {
-            _.each(ngh, function(ar) {
-                area = this.map[ar];
-                n = _seaUnion(area.neighbours, seas[ar]);
-                ngh = _mergeNgh(ngh, n, key);
-            }, this);
+            var nextFirst = {};
+            _.each(first, function(ngh, ak) {
+                nextFirst[ak] = _mergeNgh(ngh, first, ak);
+            });
+            _.each(first, function(ngh, ak) {
+                first[ak] = nextFirst[ak];
+            });
         }
-        this.neighbours[key] = ngh.slice(0);
-        this.neighboursSea[key] = _.clone(this.neighbours[key]);
-
-        // 2nd level neighbours
-        for (var m = 0; m < moveLimit; m++)
-        {
-            _.each(ngh, function(ar) {
-                area = this.map[ar];
-                n = _seaUnion(area.neighbours, seas[ar]);
-                ngh = _mergeNgh(ngh, n, key);
-            }, this);
-        }
-        this.neighbours2[key] = ngh.slice(0);
-        this.neighboursSea2[key] = _.clone(this.neighbours2[key]);
-    }
-    
-    this.seangh = {};
-    if (seaCost > -1)
-    for (var key in this.map)
-    {
-        var area = this.map[key];
-        // SEA MOVEMENT
-        this.seangh[key] = []
-        _.each(this.neighbours2[key], function(n) {
-            if (_.contains(area.neighbours, n))
-                return;
-            if (_.intersection(
-                _.filter(area.neighbours, areaNeighbour),
-                _.filter(this.map[n].neighbours, areaNeighbour)
-                ).length > 0)
-                return;
-            this.seangh[key].push(n);
-        }, this);
-        //this.neighbours[key] = ngh.slice(0);
-        this.neighboursSea[key] = _.clone(this.neighbours[key]);
-        this.neighbours[key] = _.difference(this.neighboursSea[key], this.seangh[key]);
-        this.neighboursSea2[key] = _.clone(this.neighbours2[key]);
-        this.neighbours2[key] = _.difference(this.neighboursSea2[key], this.seangh[key]);
-    }
+        // Second level neighbours
+        _.each(first, function(ngh, ak) {
+            second[ak] = _mergeNgh(ngh, first, ak);
+        },this)
+    },this);
 }
 
 function sum(arr) {
@@ -255,8 +229,6 @@ TribeMover.prototype = {
         var nghSea = this._nghValue(situation, this.neighboursSea);
         /*
         console.log('--COMP--')
-        console.log('this.seangh')
-        console.log(this.seangh)
         console.log('this.neighbours')
         console.log(this.neighbours)
         console.log('this.neighboursSea')

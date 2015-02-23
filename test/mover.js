@@ -5,6 +5,7 @@ var event = require('../src/core/event')
 describe('TribeMover', function() {
     describe('simple', function() {
         beforeEach(function() {
+            // 1 - 2 - 3
             map = {
                 1: { 'neighbours': [2] },
                 2: { 'neighbours': [1,3] },
@@ -239,8 +240,30 @@ describe('TribeMover', function() {
             mover.ok({ 1: 0, 2: 0, 3: 0, 4: 0, 5: 2, 7: 2, 8: 0 }).ok.should.be.true;
             mover.ok({ 1: 0, 2: 1, 3: 0, 4: 0, 5: 1, 7: 1, 8: 1 }).ok.should.be.true;
             mover.ok({ 1: 0, 2: 0, 3: 1, 4: 0, 5: 1, 7: 1, 8: 1 }).ok.should.be.false;
-        })
-        
+        });
+    });
+    describe('scenario 2', function() {
+        beforeEach(function() {
+            map = {
+            "3": { "id": 3, "tribes": 1, "farm": true, "neighbours": [ 4, 5, 6, 8, 'sea'], },
+            "4": { "id": 4, "tribes": 1, "mountain": true, "forest": true, "farm": true, "neighbours": [ 3, 8, 'sea', 'frontier'] },
+            "5": { "id": 5, "tribes": 1, "mountain": true, "forest": true, "neighbours": [ 3, 6, 8, 'sea', 'frontier'], "mountain": true },
+            "6": { "id": 6, "tribes": 1, "neighbours": [ 3, 5, 8 ], "forest": true },
+            "8": { "id": 8, "neighbours": [ 3, 4, 5, 6, 'frontier'], "desert": true }
+            }
+        });
+        it('over the sea?', function() {
+            mover = new pocketciv.TribeMover(map, 1);
+            mover.init({ 3: 0, 4: 0, 5: 2, 8: 0 });
+            mover.ok({ 3: 0, 4: 2, 5: 0, 8: 0 }).ok.should.be.false;
+        });
+        it('over the sea!', function() {
+            mover = new pocketciv.TribeMover(map, 1, 1);
+            mover.init({ 3: 0, 4: 0, 5: 2, 8: 0 });
+            mover.ok({ 3: 0, 4: 2, 5: 0, 8: 0 }).reduce.should.deep.equal(
+                [[4]]
+                )
+        });
     });
     describe('simple with two steps', function() {
         beforeEach(function() {
@@ -259,14 +282,15 @@ describe('TribeMover', function() {
         });
         it('case 2', function() {
             mover.init({ 1: 1, 2: 1, 3: 0, 4: 0 });
-            mover.ok(  { 1: 0, 2: 1, 3: 1, 4: 0 }).ok.should.be.true;
             mover.ok(  { 1: 0, 2: 0, 3: 1, 4: 1 }).ok.should.be.true;
+            mover.ok(  { 1: 0, 2: 1, 3: 1, 4: 0 }).ok.should.be.true;
             mover.ok(  { 1: 0, 2: 0, 3: 2, 4: 0 }).ok.should.be.true;
         });
         it('case 3', function() {
             mover.init({ 1: 2, 2: 0, 3: 0, 4: 0 });
             mover.ok({ 1: 0, 2: 2, 3: 0, 4: 0 }).ok.should.be.true;
             mover.ok({ 1: 1, 2: 1, 3: 0, 4: 0 }).ok.should.be.true;
+            mover.ok({ 1: 1, 2: 0, 3: 1, 4: 0 }).ok.should.be.true;
             mover.ok({ 1: 1, 2: 0, 3: 0, 4: 1 }).ok.should.be.false;
         });
         it('case 4 - neighbour limit', function() {
