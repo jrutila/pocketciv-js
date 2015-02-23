@@ -2,74 +2,47 @@ var reducer = require("../core/reducer");
 var _ = require('underscore')
 
 var CityAdvance = {
-  areas: function() {
-    var areas = {};
-    var max_city = this.max_city;
-    var discount = this.advance_discount ? this.advance_discount : 0;
-    _.each(this.engine.map.areas, function(a) {
-      if (a.city && a.tribes) {
-        var chg = this.changes[a.id] || {};
-        var t = chg.tribes ? eval(a.tribes + chg.tribes) : a.tribes;
-        var c = chg.city ? eval(a.city + chg.city) : a.city;
-        if (t + discount >= c + 1 && c + 1 <= max_city) areas[a.id] = a;
-      }
-    }, this)
-    return areas;
-  },
-  oldreduce: function(r, area) {
-    var c = area.city;
-    var t = area.tribes;
-    while (c < area.city + r.city) {
-      // If there is not enough tribes
-      c++;
-      t -= c - (this.advance_discount > 0 ? this.advance_discount : 0);
-      if (t < 0) return false;
-      this.amount++;
-    }
-    if (c - area.city > 0)
-    {
-      var ret = {
-        'city': '+' + (c - area.city),
-      }
-      if (t - area.tribes < 0)
-        ret['tribes'] = (t - area.tribes).toString()
-      return ret;
-    }
-    else
-      return {}
-  },
   current: function(chg, key, val) {
+    if (!key)
+      this.city_amount = this.opts.city_amount;
     // Basic case
     this.current = {};
     _.each(this.initial, function(i, ik) {
-      if (i.tribes + (this.opts.discount || 0) > i.city && i.city > 0 && i.city < this.opts.max_city)
+      if (i.tribes > 0 || (i.city > 0 && i.city < this.opts.max_city))
         this.current[ik] = i;
     }, this);
   },
   check: function() {
-    return this.amount >= 0;
+    return this.amount == 0;
   },
   reduce: function(key, chg) {
+    var ret = {};
     var dcity = chg.city - this.initial[key].city;
     if (chg.city > this.opts.max_city)
       return false;
+    var dtribes = chg.tribes - this.initial[key].tribes;
+    
+    if (dtribes > 0) return false;
+    if (dcity < 0) return false;
+    
     if (dcity)
     {
       var c = this.initial[key].city;
-      var t = this.initial[key].tribes;
       while (c < chg.city) {
         // If there is not enough tribes
         c++;
-        var tr = c - (this.opts.discount > 0 ? this.opts.discount : 0);
-        t -= tr > 0 ? tr : 0;
-        if (t < 0) return false;
-        this.amount--;
+        this.amount += c - (this.opts.discount > 0 ? this.opts.discount : 0);
+        this.city_amount--;
       }
-      chg.tribes = t;
-      if (chg.tribes < 0)
-        return false;
-      return chg;
+      ret.city = chg.city;
     }
+    if (this.city_amount < 0) return false;
+    if (dtribes) 
+    {
+      this.amount += dtribes;
+      ret.tribes = chg.tribes;
+    }
+    return ret;
   }
 };
 
@@ -82,11 +55,12 @@ module.exports = {
           var opts = {
             map: this.map.areas,
             initial: this.map.areas,
-            amount: this.params.city_advance_limit,
+            city_amount: this.params.city_advance_limit,
+            amount: 0,
             discount: this.params.city_advance_discount,
             max_city: this.params.max_city,
             shows: ['tribes', 'city'],
-            edits: ['city'],
+            edits: ['tribes', 'city'],
             reduce: CityAdvance.reduce,
             check: CityAdvance.check,
             current: CityAdvance.current,

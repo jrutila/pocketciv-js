@@ -499,7 +499,10 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
             
             if (ctx.skip)
             {
-                $scope.currentStep.skip = ctx.skip;
+                $scope.currentStep.skip = function() {
+                    $scope.currentStep = undefined;
+                    ctx.skip();
+                }
                 console.log("This event is skippable")
             }
 
