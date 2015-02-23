@@ -22,43 +22,8 @@ module.exports = {
     },
     reduceCities: function() {
         var ctx = this;
-        var opts = {
-            map: this.engine.map.areas,
-            initial: _.extend(_.clone(this.engine.map.areas), {'gold': this.engine.gold }),
-            amount: corruption,
-            name: 'corruption',
-            shows: ['city'],
-            edits: ['city'],
-            reduce: function(key, chg) {
-                this.amount -= this.initial[key].city - chg.city;
-                return { 'city': chg.city };
-            },
-            current: function(chg, key, val) {
-                if (!key)
-                {
-                    this.current = {};
-                    _.each(this.initial, function(i, ik) {
-                        if (i.city > 0)
-                            this.current[ik] = i;
-                    },this);
-                }
-            },
-            check: function() {
-                if (this._defaultCheck())
-                    return true;
-                var noCities = true;
-                _.each(this.initial, function(i, ik) {
-                    var trg = i.city;
-                    if (this.targets[ik])
-                        trg = this.targets[ik].city;
-                    if (trg > 0)
-                    {
-                        noCities = false;
-                    }
-                },this);
-                return noCities;
-            }
-        };
+        var opts = reducer.Templates.basic(ctx, ['city']);
+        opts.amount = corruption;
         var rdc = new reducer.Reducer(opts);
         ctx.engine.reducer(rdc, function(chg) {
             ctx.changes = chg;
