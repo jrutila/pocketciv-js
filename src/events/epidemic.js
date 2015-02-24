@@ -29,14 +29,20 @@ module.exports = {
         initial: this.engine.map.areas,
         map: this.engine.map.areas,
         amount: Math.min(population_loss, this.engine.map.tribeCount-2),
+        decimateCities: typeof decimate_empty_cities != "undefined",
         pre: [this.active_region.id],
-        shows: ['tribes'],
+        shows: ['tribes', 'city'],
         edits: [],
         skip_empty: skipempty,
         reduce: function(key) {
           var r = Math.min(this.initial[key].tribes, this.amount);
           this.amount -= r;
-          return { 'tribes': this.initial[key].tribes - r };
+          
+          var ret = { 'tribes': this.initial[key].tribes - r };
+          // If all tribes are decimated
+          if (this.initial[key].city > 0 && this.opts.decimateCities && this.initial[key].tribes == r)
+            ret.city = Math.max(this.initial[key].city-2, 0)
+          return ret;
         },
         current: function(chg, key, val) {
           this.current = {};

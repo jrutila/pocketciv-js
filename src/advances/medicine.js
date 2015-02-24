@@ -24,6 +24,11 @@ module.exports = {
             }
         },
         'epidemic': {
+            'steps': {
+                '2.3': "+ If you have {{ adv:medicine }}, the amount of \
+                Population Loss is divided by 2. You may round down fractions.\
+                {% population_loss = Math.floor(population_loss/2) %}"
+            }
         },
         'earthquake': {
             'steps': {
