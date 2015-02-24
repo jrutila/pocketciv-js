@@ -8,8 +8,15 @@ module.exports = {
     required_by: [ ],
     events: { },
     phases: {
-        'gold_management': {
-            // TODO: For every city you have over 4 collect 1 gold
+        'gold_management.post': function(ctx) {
+            var cities = _.size(_.pick(this.map.areas, function(area) { return area.city > 0; }));
+            if (cities > 4)
+            {
+                var gold = ctx.changes.gold ? parseInt(ctx.changes.gold.replace('+','')) : 0;
+                gold += cities-4;
+                ctx.changes = {'gold': '+'+gold};
+            }
+            ctx.done && ctx.done();
         }
     },
     actions: { }
