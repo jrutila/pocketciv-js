@@ -8,7 +8,7 @@
             <li ng-if="a == 'gold'">{{ a }}</li>
             </li>
             <li ng-if="a > 0" ng-repeat="(k, v) in c">
-                <span  ng-if="reducer.opts.edits.indexOf(k) == -1" class="icon {{ k }}" data-val="{{ v }}">{{ v }}</span>
+                <span  ng-if="reducer.opts.edits.indexOf(k) == -1" class="icon small {{ k }}" data-val="{{ v }}">{{ v }}</span>
                 <input ng-if="reducer.opts.edits.indexOf(k) > -1" class="{{ k }}" value="{{ v }}" type="number" ng-model="reduceObject[a][k]"/>
             </li>
             <li ng-if="a == 'gold'" class="gold">{{ c }}</li>
@@ -19,7 +19,7 @@
                 <span ng-if="a > 0" class="areaCode">{{ a }}</span>
                 <span ng-if="a == 'gold'">{{ a }}</span>
             </li>
-            <li ng-click="selectChange(a)" ng-if="a > 0" ng-repeat="(k, v) in c"><span class="icon {{ k }}" data-val="{{ v }}">{{ v }}</span></li>
+            <li ng-click="selectChange(a)" ng-if="a > 0" ng-repeat="(k, v) in c"><span class="icon small {{ k }}" data-val="{{ v }}">{{ v }}</span></li>
             <li ng-click="selectChange(a)" ng-if="a == 'gold'" class="gold">{{ c }}</li>
         </ul>
     </div>
