@@ -6,13 +6,30 @@ module.exports = {
         }
         console.log("Running advance "+name);
         var eng = this;
+        var pre = undefined;
         _.each(eng.acquired, function(key) {
-            if (name in eng.advances[key].actions &&
-            eng.advances[key].actions[name].context)
-            {
-                _.extend(ctx, eng.advances[key].actions[name].context(this));
+            var adv = eng.advances[key];
+            if (name in adv.actions) {
+                var action = adv.actions[name];
+                if (action.context)
+                {
+                    _.extend(ctx, eng.advances[key].actions[name].context(this));
+                }
+                if (action.pre)
+                {
+                    pre = action.pre;
+                }
             }
         }, this)
-        this.actions[name].run.call(this, ctx);
+        var prevDone = ctx.done;
+        ctx.done = function() {
+            ctx.done = prevDone;
+            eng.actions[name].run.call(eng, ctx);
+        }
+        
+        if (pre)
+        {
+            pre.call(eng, ctx);
+        } else ctx.done();
     }
 };

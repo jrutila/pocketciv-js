@@ -442,10 +442,6 @@ var theMap = new Map();
 var theDeck = new EventDeck();
 
 module.exports = {
-    example: function(a) {
-        return a + "--";
-    }
-    ,
     NoMoreCardsError: NoMoreCardsError,
     EventDeck: theDeck,
     Map: theMap,

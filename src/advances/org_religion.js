@@ -17,7 +17,7 @@ module.exports = {
         },
         'anarchy': {
             'steps': {
-                '1.2': "+  If you have Organized Religion , only a \
+                '1.2': "+  If you have {{ adv:org_religion }} , only a \
 maximum of 4 Regions are Affected. You select \
 the Regions. You may select Regions without \
 Cities. Regions with no Cities do not feel the \

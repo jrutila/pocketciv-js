@@ -16,8 +16,11 @@ module.exports = {
         }
     },
     phases: {
-        'gold_management': {
-            // TODO: Reduce 1 gold
+        'gold_decimate.post': function(ctx) {
+            console.log("Decimate one gold because of black market")
+            if (this.gold && (!ctx.changes || !ctx.changes['gold']))
+                ctx.changes = { 'gold': '-1' };
+            ctx.done && ctx.done();
         }
     },
     actions: {
