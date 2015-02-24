@@ -60,8 +60,13 @@ module.exports = {
         console.log("City advance discount is " + this.params.city_advance_discount)
         if (this.params.city_advance_limit && this.params.max_city > 1) {
           var initial = {};
+          var validCities = 0;
           _.each(this.map.areas, function(area, ak) {
-            if ((area.city > 0 && area.city < this.params.max_city) || area.tribes > 0)
+            if ((area.city > 0 && area.city < this.params.max_city)) {
+              initial[ak] = area;
+              validCities++;
+            }
+            if (area.tribes > 0)
               initial[ak] = area;
           },this);
           var opts = {
@@ -79,7 +84,7 @@ module.exports = {
           }
           var rdc = new reducer.Reducer(opts);
           
-          if (_.isEmpty(rdc.ok({}).current)) {
+          if (_.isEmpty(rdc.ok({}).current) || validCities == 0) {
               ctx.done && ctx.done();
           }
           else {
