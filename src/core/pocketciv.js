@@ -23,6 +23,12 @@ var events = {
     'superstition': require('../events/superstition'),
 }
 
+var phases = {
+    'city_advance': require('../phases/city_advance'),
+    'populate': require('../phases/populate'),
+    'tothree': require('../phases/tothree'),
+}
+
 var actions = {
     'farm': require('../actions/farm'),
     'city': require('../actions/city'),
@@ -377,6 +383,7 @@ function Engine(map, deck) {
     this.phase = "populate";
     this.events = events;
     this.advances = advances;
+    this.phaseImpl = phases;
     this.orig_adv_costs ={};
     for (var a in advances)
         this.orig_adv_costs[a] = _.clone(advances[a].cost);
@@ -399,6 +406,7 @@ var defaults= {
     'phase': "",
     'phases': [
         "populate",
+        "tothree",
         "move",
         "event",
         "advance",
@@ -487,17 +495,6 @@ Engine.prototype = {
         this.signals.phaser.dispatch("start", this.phase)
         console.log("Phase is now "+this.phase);
     },
-    populate: function(ctx) {
-        console.log("Populating areas");
-        var changes = {};
-        for (var key in this.map.areas)
-        {
-            if (this.map.areas[key].tribes > 0)
-                changes[key] = { 'tribes': '+1' };
-        }
-        ctx.changes = changes;
-        ctx.done && ctx.done();
-    },
     move: function(ctx) {
         console.log("Moving tribes with mover");
         this.mover(this.map.areas, function(end) {
@@ -579,8 +576,14 @@ Engine.prototype = {
             }
         }
         
-        if (eng[name] != undefined && thePhase == undefined)
-            thePhase = eng[name];
+        if (thePhase == undefined)
+        {
+            thePhase = this.phaseImpl[name] && this.phaseImpl[name].run;
+            if (thePhase == undefined)
+                thePhase = eng[name];
+            if (thePhase == undefined)
+                console.log("NO phase found: "+name);
+        }
         
         ctx.done = function() {
             ctx.done = runpost;
@@ -686,7 +689,6 @@ Engine.prototype = {
         ctx.changes = changes;
         ctx.done && ctx.done();
     },
-    city_advance: require('../phases/city_advance').run,
     upkeep: function(ctx) {
         this.round = {};
         ctx.done && ctx.done();
