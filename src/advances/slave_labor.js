@@ -35,7 +35,11 @@ The maximum AV of a City is 2, unless otherwise noted.",
                      {% reduceFarms() %}"
             },
             reduceFarms: function() {
-                
+                var ctx = this;
+                _.each(this.engine.map.areas, function(area, ak) {
+                    if (!area.city && area.farm)
+                        ctx.change({ 'farm': false }, parseInt(ak));
+                },this);
             }
         },
         'bandits': {
