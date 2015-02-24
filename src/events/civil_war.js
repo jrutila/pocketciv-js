@@ -12,9 +12,9 @@ module.exports = {
             '3': "{% cityReduce() %} Draw the next card. {%; draw_card() %}",
             '3.1': "The number in the BLUE HEX indicates\
                 your collateral damage. {% collateralDamage = card_value('h') %}",
-            '3.2': "Reduce total Tribes in the Affected Regions by the \
-                value of your Collateral Damage. \
-                {%; reduce('tribes', collateralDamage, areas) %}",
+            '4': "Reduce total Tribes in the Affected Regions by the \
+                value of your Collateral Damage {{ collateralDamage }}.",
+            '-': "{%; reduce('tribes', collateralDamage, areas) %}",
     },
     cityReduce: function() {
         var act = this.active_region

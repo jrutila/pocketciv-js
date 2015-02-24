@@ -16,7 +16,14 @@ module.exports = {
                 Reduce 3 Attacking Force by reducing 1 Tribe. \
                 {% if (has_mm) tribe_reduce = 3 %}"
             }
-        }
+        },
+        'civil_war': {
+            'steps': {
+                '2.1': "- If you have {{ adv:military }}, Reduce City AV in \
+                        Neighboring Regions by 3 instead of 2.\
+                        {% neighbourCityReduce = -3 %}"
+            }
+        },
     },
     acquired: function() { },
     phases: { },

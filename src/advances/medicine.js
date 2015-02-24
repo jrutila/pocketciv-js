@@ -67,6 +67,20 @@ Region that was affected by the Volcano. \
             }
         },
         'civil_war': {
+            'steps': {
+                '4.4': "+ If you have {{ adv:medicine }}, after applying \
+                        Collateral Damage create 1 Tribe in each affected \
+                        region.{% healTribes() %}"
+            },
+            healTribes: function() {
+                console.log("Healing tribes");
+                var affected = _.keys(areas).concat(this.active_region.id);
+                _.each(affected, function(a) {
+                    var c = {};
+                    c[a] = { 'tribes': '+1' };
+                    this.merge(c);
+                },this);
+            }
         }
     },
     phases: {

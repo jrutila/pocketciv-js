@@ -9,9 +9,11 @@ module.exports = {
     events: {
         'civil_war': {
             'steps': {
-                // TODO:
+                '2.2': "- If you have {{ adv:mythology }}, Reduce City AV in \
+                        Active Region by 3 instead of 2.\
+                        {% activeCityReduce = -3 %}"
             }
-        }
+        },
     },
     phases: { },
     actions: { }

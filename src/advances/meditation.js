@@ -9,7 +9,9 @@ module.exports = {
     events: {
         'civil_war': {
             'steps': {
-                // TODO:
+                '4.3': "+ If you have {{ adv:meditation }}, divide \
+                        Collateral Damage in half, round down.\
+                        {% collateralDamage = Math.floor(collateralDamage/2) %}"
             }
         },
         'superstition': {

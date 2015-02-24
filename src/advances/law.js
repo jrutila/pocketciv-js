@@ -35,7 +35,9 @@ Reduce Tribes by the City AV in each Region. {% hasLaw = true %}"
         },
         'civil_war': {
             'steps': {
-                // TODO:
+                '3.2': "+ If you have {{ adv:law }} the number in GREEN SQUARE \
+                        indicates the collateral damage.\
+                        {% collateralDamage = card_value('h') %}"
             }
         },
     },

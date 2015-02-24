@@ -9,7 +9,8 @@ module.exports = {
     events: {
         'civil_war': {
             'steps': {
-                // TODO:
+                '4.2': "+ If you have {{ adv:theater }}, subtract \
+                        2 from Collateral Damage.{% collateralDamage -= 2 %}"
             }
         }
     },

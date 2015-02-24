@@ -98,16 +98,9 @@ Context.prototype = {
     },
     reduce: function(t, amount, areas) {
         var ctx = this;
-        var opts = {
-            map: ctx.engine.map.areas,
-            initial: areas,
-            shows: [t],
-            edits: [t],
-            amount: amount,
-            reduce: function(key, chg) {
-                this.amount -= this.initial[key][t] - chg[t];
-            }
-        };
+        var opts = reducer.Templates.basic(ctx, [t]);
+        opts.amount = amount;
+        opts.initial = areas;
         var rdc = new reducer.Reducer(opts);
         
         this.engine.reducer(rdc, function(chg) {
