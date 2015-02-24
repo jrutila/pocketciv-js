@@ -38,7 +38,9 @@ module.exports = {
         },
         'uprising': {
             'steps': {
-                // TODO:
+                '2.3': "- If you have {{ adv:machining }}, Reduce City AV by 3 \
+                        instead of 2. Law cancels out this effect \
+                        of Machining.{% if(!has('law')) change({'city': '-3' }) %}"
             }
         },
     },

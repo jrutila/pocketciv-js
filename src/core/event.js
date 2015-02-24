@@ -126,6 +126,9 @@ Context.prototype = {
         var s = this.card.square;
         return eval(expr);
     },
+    has: function(adv) {
+        return _.contains(this.engine.acquired, adv);
+    },
     sub: function(ev) {
         if (ev == "attack")
             console.log(attack_force)

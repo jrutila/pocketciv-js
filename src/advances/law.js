@@ -30,7 +30,9 @@ Reduce Tribes by the City AV in each Region. {% hasLaw = true %}"
         },
         'uprising': {
             'steps': {
-                // TODO:
+                '2.2': "+ If you have {{ adv:law }}, Reduce City AV by 1 \
+                        instead of 2. Machining cancels out this effect \
+                        of Law.{% if(!has('machining')) change({'city': '-1' }) %}"
             }
         },
         'civil_war': {

@@ -12,7 +12,10 @@ module.exports = {
     events: {
         'uprising': {
             'steps': {
-                // TODO:
+                '2.4': "+ If you have {{ adv:org_religion }}, Reduce \
+                    Tribes by 2 instead of Decimating them.\
+                    {% tribeChange = -2 %}\
+                    {% change({ 'tribes': tribeChange.toString() }) %}"
             }
         },
         'anarchy': {
