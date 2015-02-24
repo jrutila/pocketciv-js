@@ -21,8 +21,7 @@ module.exports = {
             },
         'sandstorm': {
             'steps': {
-                '2.1': "+ If you have {{ adv:irrigation }}, do not Decimate Farms. {% change({ farm: undefined })  %}",
-                '3.1': "+ If you have {{ adv:irrigation }}, do not Decimate Farms. {% change({ farm: undefined })  %}",
+                '1.1': "+ If you have {{ adv:irrigation }}, do not Decimate Farms. {% reduceFarms = false %}",
             }
         },
     },
