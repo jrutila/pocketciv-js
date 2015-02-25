@@ -89,12 +89,12 @@ Context.prototype = {
             ctx.done()
         });
     },
-    draw_card: function() {
+    draw_card: function(canstop) {
         var ctx = this;
         this.engine.drawer(this.engine.deck, function(c) {
             ctx.card = c;
             ctx.done();
-        });
+        },canstop == true);
     },
     reduce: function(t, amount, areas) {
         var ctx = this;
