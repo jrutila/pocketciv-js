@@ -50,7 +50,7 @@ pocketcivApp.directive('pcReducer', function() {
                 {
                     $scope.reducer = undefined;
                     $scope.ok = undefined;
-                    $scope.ready(ok.changes, $scope.chg);
+                    $scope.ready(ok);
                 }
             }
             $scope.selectChange = function(a) {

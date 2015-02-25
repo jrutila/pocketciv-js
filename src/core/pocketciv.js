@@ -3,6 +3,8 @@ var _ = require("underscore");
 var eventRunner = require('./event');
 var reducer = require('../core/reducer');
 var signals = require('signals');
+var PhaseContext = require('./context').Context;
+var Ctx = require('./context');
 
 var events = {
     'famine': require('../events/famine'),
@@ -301,7 +303,7 @@ Engine.prototype = {
         }, canstop);
     },
     runPhase: function(name, arg) {
-        var ctx = {};
+        var ctx = new PhaseContext(this);
         var eng = this;
         var posts = [];
         var pres = [];
@@ -341,9 +343,11 @@ Engine.prototype = {
             var post = posts.pop();
             if (post) post.call(eng, ctx);
             else {
-                if (_.has(ctx, 'changes'))
+                console.log(ctx)
+                if (ctx.changes)
                 {
-                    eng.areaChange(ctx.changes, final);
+                    var str = Ctx.getString(ctx.changes);
+                    eng.areaChange(str, final);
                 } else {
                     final();
                 }
