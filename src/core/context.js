@@ -14,11 +14,18 @@ function PhaseContext(engine) {
 
 PhaseContext.prototype = {
     target: function(key, value) {
-        var ak = parseInt(key);
-        if (isNaN(ak))
-            this.targets[key] = value;
-        else
+        if (!isNaN(parseInt(key)))
             _.extend(this.targets[key], value);
+        else if (_.isString(key))
+            this.targets[key] = value;
+        else if (_.isObject(key)) {
+            value = key;
+            _.each(value, function(value, key) {
+                this.target(key, value);
+            },this);
+        } else {
+            throw "NotSupportedTargetKey";
+        }
     },
     change: function(key, value) {
         var ak = parseInt(key);

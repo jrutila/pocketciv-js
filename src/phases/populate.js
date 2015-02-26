@@ -1,13 +1,11 @@
+var _ = require('underscore');
 module.exports = {
     run: function(ctx) {
         console.log("Populating areas");
-        var changes = {};
-        for (var key in this.map.areas)
-        {
-            if (this.map.areas[key].tribes > 0)
-                changes[key] = { 'tribes': '+1' };
-        }
-        ctx.changes = changes;
+        _.each(this.map.areas, function(area, ak) {
+            if (area.tribes > 0)
+                ctx.change(ak, {tribes: 1});
+        });
         ctx.done && ctx.done();
     }
 };

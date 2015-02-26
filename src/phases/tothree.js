@@ -30,8 +30,8 @@ module.exports = {
                 return { 'tribes': chg.tribes };
             }
         }
-        this.reducer(new reducer.Reducer(opts), function(changes) {
-            ctx.changes = changes;
+        this.reducer(new reducer.Reducer(opts), function(rdc) {
+            ctx.target(rdc.target);
             ctx.done && ctx.done();
         });
     }
