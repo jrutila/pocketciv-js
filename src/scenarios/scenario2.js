@@ -36,8 +36,8 @@ module.exports = {
                 "desert": true
             }
         },
-        "width": 9,
-        "height": 9,
+        "width": 11,
+        "height": 11,
         "grid":[
         [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
         [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],

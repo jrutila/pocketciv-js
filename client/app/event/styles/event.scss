@@ -9,6 +9,26 @@ $eventWidth: 750px;
     margin-right: 10px;
 }
 
+@include smaller-than-map {
+    #eventRunner {
+        top: 42px;
+        left: 10px;
+
+        dl {
+            dt, dd {
+                display: none;
+            }
+            dt.active {
+                display: inline;
+            }
+        }
+
+        .event {
+            opacity: 0.8;
+        }
+    }
+}
+
 div.event {
     background-color: $color-secondary-2-0;
     padding: 7px;
