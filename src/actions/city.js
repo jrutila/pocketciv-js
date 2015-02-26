@@ -18,7 +18,7 @@ module.exports = {
         var opts = {
             map: engine.map.areas,
             initial: initial,
-            shows: ['tribes'],
+            shows: ['tribes', 'farm'],
             edits: [],
             amount: 0,
             reduce: function(key) {

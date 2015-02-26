@@ -88,8 +88,8 @@ module.exports = {
               ctx.done && ctx.done();
           }
           else {
-              this.reducer(rdc, function(chg) {
-                  ctx.changes = chg;
+              this.reducer(rdc, function(rdc) {
+                  ctx.target(rdc.target);
                   ctx.done && ctx.done();
               });
           }

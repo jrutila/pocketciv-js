@@ -1,3 +1,6 @@
+var reducer = require("../core/reducer");
+var _ = require('underscore');
+
 function _mergeNgh(ngh, first, a) {
     var to = _.reduce(ngh,
         function(memo, n) {
@@ -93,6 +96,31 @@ TribeMover.prototype = {
         if (this.moveLimit == -1) return { ok: true };
         var ngh = this._nghValue(situation, this.neighbours);
         var nghSea = this._nghValue(situation, this.neighboursSea);
+        var byland = [];
+        var bysea = [];
+        if (sum(this.start) != sum(situation))
+            return { ok: false };
+        for (var key in situation)
+        {
+            if ((situation[key] || 0) > this.max[key]) {
+                byland.push([key, 1]);
+            }
+            if ((situation[key] || 0) > this.maxSea[key]) {
+                bysea.push([key, 1]);
+            }
+            if (ngh[key] < this.start[key]) {
+                byland.push([key, -1]);
+            }
+            if (nghSea[key] < this.start[key]) {
+                bysea.push([key, -1]);
+            }
+            if (ngh[key] > this.ngh2[key]) {
+                byland.push([key, 0]);
+            }
+            if (nghSea[key] > this.ngh2Sea[key]) {
+                bysea.push([key, 0]);
+            }
+        }
         /*
         console.log('--COMP--')
         console.log('this.neighbours')
@@ -120,37 +148,20 @@ TribeMover.prototype = {
         console.log('curr - nghSea')
         console.log(nghSea)
         console.log(sum(this.start) + " != " + sum(situation))
+        console.log('byland')
+        console.log(byland)
+        console.log('bysea')
+        console.log(bysea)
         console.log('--XOMP--')
         */
-        var byland = [];
-        var bysea = [];
-        if (sum(this.start) != sum(situation))
-            return { ok: false };
-        for (var key in situation)
-        {
-            if ((situation[key] || 0) > this.max[key]) {
-                byland.push([key, 1]);
-            }
-            if ((situation[key] || 0) > this.maxSea[key]) {
-                bysea.push([key, 1]);
-            }
-            if (ngh[key] < this.start[key]) {
-                byland.push([key, -1]);
-            }
-            if (nghSea[key] < this.start[key]) {
-                bysea.push([key, -1]);
-            }
-            if (ngh[key] > this.ngh2[key]) {
-                byland.push([key, 0]);
-            }
-            if (nghSea[key] > this.ngh2Sea[key]) {
-                bysea.push([key, 0]);
-            }
-        }
         // If sea movement is forbidden, don't allow bysea
         if (this.seaCost == -1) bysea.push(-1);
         
-        var valid = { ok: byland.length == 0 || bysea.length == 0 };
+        var valid = {
+            ok: byland.length == 0 || bysea.length == 0,
+            target: situation,
+            initial: this.start,
+        };
         
         // If movement is free, don't calculate the cost areas
         if (valid.ok && this.seaCost == 1 && bysea.length == 0 && byland.length != 0)
@@ -212,12 +223,43 @@ TribeMover.prototype = {
 module.exports = {
     run: function(ctx) {
         console.log("Moving tribes with mover");
-        this.mover(this.map.areas, function(end) {
-            for (var key in this.map.areas)
-            {
-                this.map.areas[key].tribes = end[key];
-            }
-            ctx.done && ctx.done();
+        var engine = this;
+        this.mover(this.map.areas, function(ok) {
+            ctx.target(_.mapObject(ok.target, function(t) { return {tribes: t }}));
+            
+            if (ok.reduce) {
+                console.log("Used SEA, must pay tribes!")
+                var initial = {};
+                _.each(ctx.initial, function(area, ak) {
+                    ak = parseInt(ak);
+                    if (_.contains(_.flatten(ok.reduce), ak))
+                        initial[ak] = { tribes: ok.target[ak] };
+                });
+                var opts = {
+                    map: this.map.areas,
+                    initial: initial,
+                    shows: ['tribes'],
+                    edits: ['tribes'],
+                    original: ok.reduce,
+                    amount: ok.reduce.length,
+                    reduce: function(key, chg) {
+                        var rTrb = this.initial[key].tribes - chg.tribes;
+                        this.amount -= rTrb;
+                        return { 'tribes': chg.tribes };
+                    },
+                    current: function(chg, key, val) {
+                        if (!key)
+                        {
+                            this.current = this.initial;
+                        }
+                    }
+                }
+                engine.reducer(new reducer.Reducer(opts), function(rdc) {
+                    ctx.change(rdc.changes);
+                    ctx.done && ctx.done();
+                });
+            } else
+                ctx.done && ctx.done();
         });
     },
     TribeMover: TribeMover

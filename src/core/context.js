@@ -28,17 +28,29 @@ PhaseContext.prototype = {
         }
     },
     change: function(key, value) {
-        var ak = parseInt(key);
-        if (isNaN(ak)) 
-            this.targets[key] += value;
-        else {
+        if (!isNaN(parseInt(key))) 
+            this.targets[key] = this._chn(this.targets[key], value);
+        else if (_.isString(key))
+            this.targets[key] = this._chn(this.targets[key], value);
+        else if (_.isObject(key)) {
+            value = key;
             _.each(value, function(v,k) {
-                this.targets[key][k] = this.targets[key][k] || 0;
-                this.targets[key][k] += v;
-                if (this.targets[key][k] < 0)
-                    throw "InvalidTargetValue"
+                this.change(k,v);
             },this);
-        }
+        } else 
+            throw "NotSupportedChangeKey";
+    },
+    _chn: function(o, n) {
+        if (_.isNumber(o) && _.isNumber(n))
+            return o+n;
+        else if (_.isObject(n)) {
+            var ret = _.isObject(o) ? o : {};
+            _.each(n, function(nn, nk) {
+                ret[nk] = this._chn(o[nk], nn);
+            },this);
+            return ret;
+        } else
+            return n;
     },
     get changes() {
         return changes(this.initial, this.targets);

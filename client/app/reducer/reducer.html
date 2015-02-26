@@ -8,9 +8,10 @@
             <li ng-if="a == 'gold'">{{ a }}</li>
             </li>
             <li ng-if="a > 0" ng-repeat="(k, v) in c" ng-switch="getType(k)">
-                <span  ng-if="reducer.opts.edits.indexOf(k) == -1" class="icon small {{ k }}" data-val="{{ v }}">{{ v }}</span>
+                <span  ng-switch-when="number" ng-if="reducer.opts.edits.indexOf(k) == -1" class="icon small {{ k }}" data-val="{{ v }}">{{ v }}</span>
+                <span  ng-switch-when="boolean" ng-if="reducer.opts.edits.indexOf(k) == -1 && v" class="icon small {{ k }}" data-val="{{ v }}">{{ v }}</span>
                 <input ng-switch-when="number" ng-if="reducer.opts.edits.indexOf(k) > -1" class="{{ k }}" value="{{ v }}" type="number" ng-model="reduceObject[a][k]"/>
-                <input ng-switch-when="boolean" ng-if="reducer.opts.edits.indexOf(k) > -1" class="{{ k }}" value="{{ v }}" type="checkbox" ng-model="reduceObject[a][k]"/>
+                <input ng-switch-when="boolean" ng-if="reducer.opts.edits.indexOf(k) > -1 && v" class="{{ k }}" value="{{ v }}" type="checkbox" ng-model="reduceObject[a][k]"/>
             </li>
             <li ng-if="a == 'gold'" class="gold">{{ c }}</li>
         </ul>

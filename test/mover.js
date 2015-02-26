@@ -271,6 +271,13 @@ describe('TribeMover', function() {
             mover.ok({ 3: 0, 4: 2, 5: 0, 8: 0 }).ok.should.be.true;
             expect(mover.ok({ 3: 0, 4: 2, 5: 0, 8: 0 }).reduce).to.be.undefined;
         });
+        it('bypassing', function() {
+            mover = new pocketciv.TribeMover(map, 1, 1);
+            mover.init(       { 3: 0, 4: 4, 5: 3, 6: 0, 8: 0 });
+            var ok = mover.ok({ 3: 0, 4: 1, 5: 3, 6: 3, 8: 0 });
+            ok.ok.should.be.true;
+            ok.reduce.should.deep.equal([[4]]);
+        });
     });
     describe('simple with two steps', function() {
         beforeEach(function() {
