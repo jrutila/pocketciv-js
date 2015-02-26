@@ -391,14 +391,10 @@ Engine.prototype = {
         console.log("Acquired "+name);
         done && done();
     },
-    doEvent: function(ev, done) {
+    doEvent: function(ev, ctx) {
         var eng = this;
         var event = eng.events[ev.name];
-        eng.signals.eventPhasing.dispatch("0", ev);
-        eventRunner.runEvent(eng, event, ev, function(changes) {
-            eng.signals.eventPhasing.dispatch("-1", ev);
-            done && done(changes);
-        });
+        eventRunner.runEvent(eng, event, ev, ctx);
     },
     areaChange: function(changes, done) {
         this.areaChanger(changes, function() {

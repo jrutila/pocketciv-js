@@ -101,8 +101,8 @@ long as you Decimate Tribes up to the described value.\
         }
         
         var rdc = new reducer.Reducer(opts);
-        ctx.engine.reducer(rdc, function(chg) {
-            ctx.merge(chg);
+        ctx.engine.reducer(rdc, function(ok) {
+            ctx.merge(ok.changes);
             ctx.done && ctx.done();
         });
         

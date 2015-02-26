@@ -3,7 +3,8 @@ var reducer = require("./reducer")
 
 var patt = /{%(;? .*?) %}/g;
 
-var Context = function() {
+var Context = function(rootCtx) {
+    this.ctx = rootCtx;
     this.active_region = undefined;
     this.changes = {};
     this.break = false;
@@ -12,62 +13,38 @@ var Context = function() {
     };
     
 Context.prototype = {
-    _getChangeString: function(val) {
-        if (val > 0)
-            return "+"+val;
-        if (val < 0)
-            return val.toString();
-        return "0";
-    },
-    _getMergedString: function(a, b) {
-        if(typeof b == "boolean")
-            return b;
-        a = parseInt(a) || 0;
-        b = parseInt(b) || 0;
-        if (a+b != 0)
-            return this._getChangeString(a+b);
-        return null;
-    },
-    merge: function(chg) {
-        _.each(chg, function(c, k) {
-            if (parseInt(k))
-            {
-                var kk = this.changes[k] || {};
-                _.each(c, function(cc, ck) {
-                    kk[ck] = this._getMergedString(kk[ck], cc);
-                },this)
-                this.changes[k] = kk;
-            } else {
-                this.changes[k] = this._getMergedString(this.changes[k], c);
+    // Backwards compatibility
+    _fromOldValue: function(val) {
+        if (_.isString(val)) {
+            var a = parseInt(val);
+            if (isNaN(a)) {
+                a = parseInt(val.replace("+", ""));
+                if (isNaN(a))
+                    throw "CantDo"
             }
-        },this);
+            return a;
+        }
+        else
+            return val;
     },
     change: function(chg, area)
     {
-        if (typeof chg === "string")
-        {
-            ar = chg;
-            chg = area;
-            area = ar;
+        if (_.isObject(chg) && _.isNumber(parseInt(_.first(_.keys(chg)))) && area == undefined) {
+            // This is a full blown change with area ids and all
+            this.ctx.change(chg);
         }
-        if (area === null)
-        {
-            _.extend(this.changes, chg);
-            _.each(chg, function(cc, ck) {
-                if (cc == null)
-                    delete this.changes[ck];
-            },this);
-            return;
+        else if (_.isString(chg)) {
+            if (_.isString(area) && area.indexOf('+') == -1 && area.indexOf('-') == -1)
+                this.ctx.target(chg, this._fromOldValue(area));
+            else
+                this.ctx.change(chg, this._fromOldValue(area));
         }
-        area = area ? area : this.active_region;
-        if (typeof area === "object")
-            area = area.id
-        this.changes[area] || (this.changes[area] = {})
-        _.extend(this.changes[area], chg);
-        _.each(this.changes[area], function(v, k) {
-            if (v === undefined)
-                delete this.changes[area][k];
-        })
+        else {
+            area = area || this.active_region;
+            if (typeof area === "object")
+                area = area.id
+            this.ctx.change(area, chg);
+        }
     },
     break_if: function(expr)
     {
@@ -101,10 +78,9 @@ Context.prototype = {
         var opts = reducer.Templates.basic(ctx, [t]);
         opts.amount = amount;
         opts.initial = areas;
-        var rdc = new reducer.Reducer(opts);
         
-        this.engine.reducer(rdc, function(chg) {
-            ctx.merge(chg);
+        this.engine.reducer(new reducer.Reducer(opts), function(rdc) {
+            this.ctx.change(rdc.changes);
             ctx.done && ctx.done();
         });
     },
@@ -130,13 +106,12 @@ Context.prototype = {
         return _.contains(this.engine.acquired, adv);
     },
     sub: function(ev) {
-        if (ev == "attack")
-            console.log(attack_force)
-        
         ev = { name: ev };
         var event = this.engine.events[ev.name];
-        var ctx = this;
-        runEvent(this.engine, event, ev, ctx.done, ctx);
+        runEvent(event, ev, this);
+    },
+    done: function() {
+        this.ctx.done();
     }
 };
 
@@ -204,7 +179,7 @@ var stepper = function(steps, ctx, done)
     },cmd.indexOf(';') === 0);
 }
 
-extendSteps = function(event, advances, limit, context)
+function extendSteps(event, advances, limit, context)
 {
     if (!event || !event.steps) return [{}, []];
     var actual_steps = _.clone(event.steps);
@@ -237,18 +212,23 @@ extendSteps = function(event, advances, limit, context)
     return [actual_steps, keys];
 }
 
-runEvent = function(engine, event, ev, done, ctx)
-{
+function runEventExt(engine, event, ev, extCtx) {
     if (!engine) throw "Engine should not be null"
-    
-    var context = ctx || new Context();
-    _.extend(context, event);
-    if (ev.skip)
-        context.skip = ev.skip;
+    if (!extCtx) throw "Context should not be null";
+    var context = new Context(extCtx);
     context.engine = engine;
-    context.event = ev;
+    context.done = extCtx.done;
+    runEvent(event, ev, context);
+}
+
+function runEvent(event, ev, ctx)
+{
+    _.extend(ctx, event);
+    if (ev.skip)
+        ctx.skip = ev.skip;
+    ctx.event = ev;
     
-    var ext = extendSteps(event, engine.advances, engine.acquired, context);
+    var ext = extendSteps(event, ctx.engine.advances, ctx.engine.acquired, ctx);
     var actual_steps = ext[0];
     var keys = ext[1];
     var steps_cmd = new StepsStack();
@@ -274,13 +254,14 @@ runEvent = function(engine, event, ev, done, ctx)
         }
         steps_cmd.push(cmd);
     });
-    var final = function(ctx) {
-        done && done(ctx.changes);
+    var final = function(c) {
+        c.ctx && c.ctx.done && c.ctx.done();
     }
-    stepper(steps_cmd, context, final);
+    stepper(steps_cmd, ctx, final);
 }
 
 module.exports = {
-    runEvent: runEvent,
+    runEvent: runEventExt,
     extendSteps: extendSteps,
+    EventContext: Context,
 }

@@ -126,8 +126,8 @@ module.exports = {
         reduce: AttackReducer.reduce,
       }
       var rdc = new reducer.Reducer(opts);
-      ctx.engine.reducer(rdc, function(chg) {
-          ctx.merge(chg);
+      ctx.engine.reducer(rdc, function(ok) {
+          ctx.change(ok.changes);
           ctx.done && ctx.done();
       });
     },

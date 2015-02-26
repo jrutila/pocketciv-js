@@ -58,8 +58,8 @@ module.exports = {
       }
       var rdc = new reducer.Reducer(opts);
       var ctx = this;
-      ctx.engine.reducer(rdc, function(chg) {
-          ctx.changes = chg;
+      ctx.engine.reducer(rdc, function(ok) {
+          ctx.change(ok.changes);
           ctx.done && ctx.done();
       });
     }

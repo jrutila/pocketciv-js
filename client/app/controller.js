@@ -59,51 +59,11 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
         if (ok.ok)
         {
             console.log("OK MOVE!");
-            var done = function() {
-                moveFunc.call(pocketciv.Engine, $scope.movement);
-                $scope.hideMover = true;
-                $scope.mapInfo = undefined;
-                mapClicked = oldClicked;
-                gameLog.move.push($scope.movement)
-            };
-            if (ok.reduce)
-            {
-                console.log("USED SEA and must reduce "+ok.reduce)
-                var initial = {};
-                _.each(this.map.areas, function(area, ak) {
-                    ak = parseInt(ak);
-                    if (_.contains(_.flatten(ok.reduce), ak))
-                        initial[ak] = { tribes: $scope.movement[ak] };
-                },this);
-                var opts = {
-                    map: this.map.areas,
-                    initial: initial,
-                    shows: ['tribes'],
-                    edits: ['tribes'],
-                    original: ok.reduce,
-                    amount: ok.reduce.length,
-                    reduce: function(key, chg) {
-                        var rTrb = this.initial[key].tribes - chg.tribes;
-                        this.amount -= rTrb;
-                        return { 'tribes': chg.tribes };
-                    },
-                    current: function(chg, key, val) {
-                        if (!key)
-                        {
-                            this.current = this.initial;
-                        }
-                    }
-                }
-                var rdc = new reducer.Reducer(opts);
-                $scope.engine.reducer(rdc, function(chg) {
-                    for (var s in $scope.movement)
-                    {
-                        $scope.movement[s] += (chg[s] && parseInt(chg[s].tribes)) || 0;
-                    }
-                    done();
-                });
-            } else
-                done();
+            moveFunc(ok);
+            $scope.hideMover = true;
+            $scope.mapInfo = undefined;
+            mapClicked = oldClicked;
+            gameLog.move.push($scope.movement)
         } else {
             console.log("FAILED MOVE")
         }

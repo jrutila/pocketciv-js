@@ -46,8 +46,8 @@ module.exports = {
                     }
                 };
                 var rdc = new reducer.Reducer(opts);
-                this.reducer(rdc, function(chg) {
-                    ctx.changes = chg;
+                this.reducer(rdc, function(ok) {
+                    ctx.change(ok.changes);
                     ctx.done && ctx.done();
                 });
             } else 

@@ -1,6 +1,7 @@
 var should = require('chai').should()
 var cartage = require('../../src/advances/cartage')
 var pocketciv = require('../../src/core/pocketciv')
+var PhaseContext = require('../../src/core/context').Context;
 
 describe('Cartage', function() {
     describe('city_support.post', function() {
@@ -14,7 +15,7 @@ describe('Cartage', function() {
                 3: { farm: true, tribes: 2 }
             }
             
-            var ctx = Object();
+            var ctx = new PhaseContext(engine);
             ctx.changes = { 2: { 'city': '-1' } }
             cartage.phases["city_support.post"].call(engine, ctx);
             
@@ -28,12 +29,12 @@ describe('Cartage', function() {
             };
             
             engine.reducer = function(rdc, d) {
-                d(rdc.ok([1]).changes);
+                d(rdc.ok([1]));
             }
             
-            var ctx = Object();
+            var ctx = new PhaseContext(engine);
             ctx.done = function() {
-                ctx.changes.should.deep.equal({ 1: { 'city': '-1' }});
+                ctx.changes.should.deep.equal({ 1: { 'city': -1 }});
                 done();
             }
             cartage.phases["city_support.post"].call(engine, ctx);
