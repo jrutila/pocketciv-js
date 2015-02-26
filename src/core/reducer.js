@@ -29,7 +29,7 @@ NewReducer.prototype = {
             if (!_.contains(_.first(chg, chg.indexOf(parseInt(key))+1), parseInt(ik)))
               this.current[ik] = i;
         } else {
-            //if (!_.has(chg, ik))
+            if (!_.has(chg, ik) || !_.contains(this.opts.edits, 'id'))
               this.current[ik] = i;
         }
       }, this);
@@ -37,7 +37,7 @@ NewReducer.prototype = {
   _gotInitial: function(init) {
     var ret = {};
     var shows = this.opts.shows != undefined || this.opts.edits != undefined ?
-    _.union(this.opts.shows, this.opts.edits) : [];
+    _.union(this.opts.shows, _.without(this.opts.edits, 'id')) : [];
     _.each(init, function(val, a) {
       if (_.contains(shows, a) || (isNaN(parseInt(a)) && shows.length == 0)) {
         ret[a] = val;

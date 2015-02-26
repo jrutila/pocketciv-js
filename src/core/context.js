@@ -50,6 +50,9 @@ function changes(initial, target) {
                             //var vv = _getChangeString((initial[key][k] || 0), v);
                             var vv = v - (initial[key][k] || 0);
                             if (vv != 0) ret[key][k] = vv;
+                        } else if (_.isBoolean(v)) {
+                            var vv = v != (initial[key][k] || false);
+                            if (vv) ret[key][k] = v;
                         }
                     });
                 }
@@ -68,6 +71,8 @@ function changeString(chg) {
         });
     } else if (_.isNumber(chg)) {
         return chg > 0 ? "+"+chg.toString() : chg.toString();
+    } else {
+        return chg;
     }
     return ret;
     };

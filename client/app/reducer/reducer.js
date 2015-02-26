@@ -10,15 +10,21 @@ pocketcivApp.directive('pcReducer', function() {
         replace: true,
         templateUrl: 'app/reducer/reducer.html',
         link: function($scope, tElem) {
+            $scope.getType = function(key) {
+                if (key == 'tribes' || key == 'city')
+                    return "number";
+                return "boolean";
+            };
             $scope.reset = function() {
                 $scope.reduceObject = {};
                 var edits = $scope.reducer.opts.edits;
                 if (edits && edits.length > 0) {
                     _.each($scope.reducer.opts.initial, function(i, ik) {
-                        $scope.reduceObject[ik] = _.pick(i, edits); //, function(e) { return [e,null]; });
+                        $scope.reduceObject[ik] = _.pick(i, _.without(edits, 'id')); //, function(e) { return [e,null]; });
                     });
-                    $scope.chg = {};
                 }
+                if (edits && edits.length > 0 && !_.contains(edits, 'id'))
+                    $scope.chg = {};
                 else
                     $scope.chg = [];
                 $scope.ok = $scope.reducer.ok($scope.chg);
@@ -34,17 +40,29 @@ pocketcivApp.directive('pcReducer', function() {
                 if ($scope.ok && !_.isArray($scope.chg))
                     $scope.chg = _.pick($scope.reduceObject, _.keys($scope.ok.current));
             },true);
+            var getChg = function() {
+                if (!_.isArray($scope.chg) ||
+                    (_.isArray($scope.chg) && _.isEmpty($scope.reduceObject)))
+                        return $scope.chg;
+                else {
+                    var hybrid = {};
+                    _.each($scope.chg, function(c) {
+                        hybrid[c] = $scope.reduceObject[c] || {};
+                    })
+                    return hybrid;
+                }
+            }
             $scope.$watch("chg", function() {
                 console.log("Change chg ")
                 console.log($scope.chg)
-                if ($scope.reducer)
-                    $scope.ok = $scope.reducer.ok($scope.chg);
-                else
+                if ($scope.reducer) {
+                    $scope.ok = $scope.reducer.ok(getChg());
+                } else
                     $scope.ok = {};
                 console.log($scope.ok)
             }, true);
             $scope.done = function() {
-                var ok = $scope.reducer.ok($scope.chg);
+                var ok = $scope.reducer.ok(getChg());
                 console.log(ok)
                 if (ok.ok)
                 {

@@ -12,14 +12,19 @@ Decimate 2 Tribes to create a Farm.",
     events: {},
     actions: {
         'farm': {
-            'context': function(engine) {
-                return { 
-                    'forest_free': !engine.round.agriculture_farm_used,
-                    'forest_free_used': function() {
-                        console.log("Agriculture used for farm building!")
-                        engine.round.agriculture_farm_used = true;
-                        }
-                    }
+            'pre': function(ctx) {
+                var engine = this;
+                if (this.round.agriculture_farm_used)
+                {
+                    ctx.params.forest_free = false;
+                } else {
+                    ctx.params.forest_free = true;
+                }
+                ctx.done && ctx.done();
+            },
+            'post': function(ctx) {
+                // TODO: Check from ctx if forest free was used
+                console.log(ctx)
             }
         },
     }

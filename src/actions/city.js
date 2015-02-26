@@ -9,7 +9,6 @@ module.exports = {
     run: function(ctx) {
         var engine = this;
         
-        var possibleAreas = {};
         var city_cost = ctx.params.city_cost || 4;
         
         var initial = _.pick(ctx.initial, function(area) {
