@@ -27,7 +27,7 @@ module.exports = {
                 return memo;
             }, 0);
             console.log("There is total of "+farmCount+" farms and total of "+cityCount+" unsupported cities")
-            ctx.changes = {};
+            ctx.reset();
             if (farmCount < cityCount)
             {
                 var initial = {};
@@ -40,6 +40,8 @@ module.exports = {
                     map: this.map.areas,
                     initial: initial,
                     amount: cityCount - farmCount,
+                    shows: ['farm', 'city'],
+                    edits: [],
                     reduce: function(key) {
                         this.amount--;
                         return { 'city': this.initial[key].city - 1 };

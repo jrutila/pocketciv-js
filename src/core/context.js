@@ -1,18 +1,22 @@
 var _ = require("underscore");
 
 function PhaseContext(engine) {
-    this.initial = {};
-    this.targets = {};
-    _.each(engine.map.areas, function(area, ak) {
-        this.initial[ak] = _.clone(_.omit(area, 'neighbours'));
-        this.targets[ak] = _.clone(_.omit(area, 'neighbours'));
-    },this);
-    this.initial.gold = engine.gold;
-    this.targets.gold = engine.gold;
-    this.params = engine.params;
+    this.engine = engine;
+    this.reset();
 }
 
 PhaseContext.prototype = {
+    reset: function() {
+        this.initial = {};
+        this.targets = {};
+        _.each(this.engine.map.areas, function(area, ak) {
+            this.initial[ak] = _.clone(_.omit(area, 'neighbours'));
+            this.targets[ak] = _.clone(_.omit(area, 'neighbours'));
+        },this);
+        this.initial.gold = this.engine.gold;
+        this.targets.gold = this.engine.gold;
+        this.params = this.engine.params;
+    },
     target: function(key, value) {
         if (!isNaN(parseInt(key)))
             _.extend(this.targets[key], value);
