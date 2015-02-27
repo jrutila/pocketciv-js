@@ -5,11 +5,10 @@ module.exports = {
     description: "",
     steps: {
             '1': "Draw the next card.{%; area_card() %} Circle denotes the Active Region {{ active_region }}.",
-            '2.1': "In Active Region {{ active_region }},\
-                    Reduce City AV in Active Region by 2.\
-                    Decimate Tribes in the Active Region.\
-                    Decimate Farms in Active Region.\
-                    {% tribeChange = 0 %}\
-                    {% change({ 'city': '-2', 'tribes': tribeChange.toString(), 'farm': false }) %}"
+            '2.1': "In Active Region {{ active_region }}, \
+                    Reduce City AV in Active Region by 2. \
+                    Decimate Tribes in the Active Region. \
+                    Decimate Farms in Active Region. \
+                    {% change({ 'city': '-2', 'tribes': '0', 'farm': false }) %}"
     }
 }

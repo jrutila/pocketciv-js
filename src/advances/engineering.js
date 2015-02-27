@@ -1,14 +1,9 @@
+var _ = require('underscore')
+
 var saveCities = function() {
-                console.log("Saving cities")
-                _.forEach(this.changes, function(change, area) {
-                    var acity = this.engine.map.areas[area].city;
-                    if (
-                        acity > 0 && (
-                        acity + parseInt(change.city) <= 0
-                        ||
-                        change.city == "0"
-                        ))
-                        change.city = "1";
+                _.each(this.ctx.changes, function(change, area) {
+                    if (change.city < 0 && this.ctx.targets[area].city == 0)
+                        this.ctx.target(area, {city:1})
                 }, this)
             };
 module.exports = {

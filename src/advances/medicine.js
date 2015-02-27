@@ -1,3 +1,4 @@
+var _ = require('underscore')
 module.exports = {
     name: "medicine",
     title: "Medicine",
@@ -37,7 +38,6 @@ Affected Regions that had at least 1 Tribe \
 Decimated. {% healTribes() %}"
             },
             healTribes: function() {
-                console.log("Healing tribes")
                 _.forEach(this.changes, function(change, area) {
                     var atrb= this.engine.map.areas[area].tribes;
                     if (atrb> 0 && parseInt(change.tribes) < 0)
@@ -47,27 +47,14 @@ Decimated. {% healTribes() %}"
         },
         'volcano': {
             'steps': {
-                '3': "+ If you have {{ adv:medicine }}, Create 1 Tribe in each \
+                'f3': "+ If you have {{ adv:medicine }}, Create 1 Tribe in each \
 Region that was affected by the Volcano. \
 {% healTribes() %}"
             },
             healTribes: function() {
                 console.log("Healing tribes")
-                _.forEach(this.changes, function(change, area) {
-                    var atrb = this.engine.map.areas[area].tribes;
-                    if (atrb > 0)
-                    {
-                        if (change.tribes == "0")
-                            change.tribes = "1";
-                        else if (parseInt(change.tribes) < 0)
-                        {
-                            var trb = atrb + parseInt(change.tribes)
-                            if (trb <= 0)
-                                change.tribes = "1";
-                            else
-                                change.tribes = "-1";
-                        }
-                    }
+                _.each(this.ctx.changes, function(change, area) {
+                    this.ctx.change(area, {tribes: 1});
                 }, this)
             }
         },
