@@ -1,3 +1,6 @@
+var reducer = require('../core/reducer')
+var _ = require('underscore')
+
 module.exports = {
     name: 'flood',
     title: 'Flood',
@@ -35,27 +38,29 @@ module.exports = {
             '-': "{% tsunami() %}"
     },
     'tsunami': function() {
-        console.log("Running TSUNAMI!")
-        var ngh = this.active_region.neighbours.concat([this.active_region.id])
-        for (var a in ngh)
-        {
-            var area = this.engine.map.areas[ngh[a]];
-            if (area && area.neighbours.indexOf('sea') > -1)
-            {
-                var dmg = damage;
-                var tribes = Math.min(Math.ceil(dmg/dmgTr), Math.ceil(area.tribes/dmgTr))
-                dmg -= tribes*dmgTr;
-                //console.log(area.id+ ' ' +Math.ceil(dmg/dmgCt) +' '+ Math.ceil(area.city/dmgCt))
-                var city = Math.min(Math.ceil(dmg/dmgCt), Math.ceil(area.city/dmgCt))
-                dmg -= tribes*dmgCt;
-                // TODO: Wonders!
-                if (tribes || city)
-                {
-                    this.changes[area.id] = {}
-                    if (tribes) this.changes[area.id].tribes = (-1*tribes).toString();
-                    if (city) this.changes[area.id].city = (-1*city).toString();
-                }
-            }
-        }
+        var active = this.active_region;
+        var seas = _.filter(this.active_region.neighbours, reducer.isSea);
+        var ngh = _.pick(this.engine.map.areas, function(area, ak) {
+            return _.contains(active.neighbours, parseInt(ak)) &&
+                    _.size(_.intersection(
+                    _.filter(area.neighbours, reducer.isSea),
+                    seas)) > 0;
+        },this);
+        
+        // Also the actual active region
+        ngh[active.id] = this.active_region;
+        _.each(ngh, function(area) {
+            var dmg = damage;
+            var tribes = Math.min(Math.ceil(dmg/dmgTr), Math.ceil(area.tribes/dmgTr))
+            dmg -= tribes*dmgTr;
+            //console.log(area.id+ ' ' +Math.ceil(dmg/dmgCt) +' '+ Math.ceil(area.city/dmgCt))
+            var city = Math.min(Math.ceil(dmg/dmgCt), Math.ceil(area.city/dmgCt))
+            dmg -= city*dmgCt;
+            // TODO: Wonders!
+            if (tribes)
+                this.change({tribes:-1*tribes}, area);
+            if (city)
+                this.change({city:-1*city}, area);
+        },this);
     },
 }
