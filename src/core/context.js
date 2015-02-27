@@ -41,12 +41,12 @@ PhaseContext.prototype = {
             throw "NotSupportedChangeKey";
     },
     _chn: function(o, n) {
-        if (_.isNumber(o) && _.isNumber(n))
-            return o+n;
+        if ((_.isNumber(o) || _.isUndefined(o)) && _.isNumber(n))
+            return Math.max((o||0)+n, 0);
         else if (_.isObject(n)) {
             var ret = _.isObject(o) ? o : {};
             _.each(n, function(nn, nk) {
-                ret[nk] = this._chn(o[nk], nn);
+                ret[nk] = this._chn(_.isUndefined(o) ? o : o[nk], nn);
             },this);
             return ret;
         } else

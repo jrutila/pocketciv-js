@@ -30,21 +30,35 @@ Context.prototype = {
     },
     change: function(chg, area)
     {
-        if (_.isObject(chg) && _.isNumber(parseInt(_.first(_.keys(chg)))) && area == undefined) {
+        if (_.isObject(chg) && !isNaN(parseInt(_.first(_.keys(chg)))) && area == undefined) {
             // This is a full blown change with area ids and all
             this.ctx.change(chg);
         }
         else if (_.isString(chg)) {
             if (_.isString(area) && area.indexOf('+') == -1 && area.indexOf('-') == -1)
                 this.ctx.target(chg, this._fromOldValue(area));
-            else
+            else 
                 this.ctx.change(chg, this._fromOldValue(area));
         }
         else {
             area = area || this.active_region;
             if (typeof area === "object")
                 area = area.id
-            this.ctx.change(area, chg);
+            _.each(chg, function(v,k) {
+                var cc = {};
+                cc[k] = this._fromOldValue(v);
+                if (_.isString(v) && v.indexOf('+') == -1 && v.indexOf('-') == -1) {
+                    this.ctx.target(area, cc);
+                } else {
+                    if (_.isString(v) || v == undefined) {
+                        var ii = {};
+                        ii[k] = this.ctx.initial[area][k];
+                        this.ctx.target(area, ii);
+                    }
+                    if (cc[k] != undefined)
+                        this.ctx.change(area, cc);
+                }
+            },this);
         }
     },
     target: function(chg, area) {
