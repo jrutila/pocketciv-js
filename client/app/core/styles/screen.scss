@@ -6,6 +6,23 @@ body {
     overflow: hidden;
 }
 
+#map {
+    overflow: auto;
+    margin-left: auto;
+    margin-right: auto;
+    height: 100%;
+}
+
+@include smaller-than-map {
+    #map {
+        width: 100% !important;
+    }
+}
+@include bigger-than-map {
+    #map {
+    }
+}
+
 a {
     cursor: pointer;
 }
@@ -146,6 +163,7 @@ a {
     top: 0px;
     position: fixed;
     z-index: 200;
+    text-align: center;
     
     .navbar-toggle {
         margin: 0px;

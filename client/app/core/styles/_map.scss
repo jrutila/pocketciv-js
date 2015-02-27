@@ -1,12 +1,12 @@
-#map {
+/*#map {
     overflow: auto;
     height: 100%;
-}
+}*/
 
 #canvases {
     position: relative;
-    width: $mapWidth;
-    height: $mapHeight;
+    //width: $mapWidth;
+    //height: $mapHeight;
     
     top: -40px;
     left: -18px;

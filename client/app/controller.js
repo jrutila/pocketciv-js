@@ -522,7 +522,9 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
         $scope.engine.init(scen);
         
         map = new Map(pocketciv.Map);
-        $scope.mapArea = map;
+        $scope.mapArea = _.clone(map);
+        $scope.mapArea.width = Math.ceil($scope.mapArea.width - 80);
+        $scope.mapArea.height -= 40;
         $scope.$apply();
         map.getCanvas = getCanvas;
         map.getImage = getImage;
