@@ -53,7 +53,6 @@ module.exports = {
                 if (i.tribes > 0 && !_.contains(chg, ik))
                   this.current[ik] = i;
           }, this);
-          
         },
       }
       var rdc = new reducer.Reducer(opts);

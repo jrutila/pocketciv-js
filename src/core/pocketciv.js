@@ -172,10 +172,10 @@ Map.prototype = {
 }
 
 function Engine(map, deck) {
-    this.mover = function() { throw "Not implemented"; }
-    this.reducer = function() { throw "Not implemented"; }
-    this.drawer = function() { throw "Not implemented"; }
-    this.areaChanger = function() { throw "Not implemented"; }
+    this.mover = function() { throw "Not implemented mover"; }
+    this.reducer = function() { throw "Not implemented reducer"; }
+    this.drawer = function() { throw "Not implemented drawer"; }
+    this.areaChanger = function() { throw "Not implemented areaChanger"; }
     this.eventStepper = function(done) { done & done(); }
     this.map = map || theMap;
     this.deck = deck || theDeck;

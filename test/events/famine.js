@@ -62,7 +62,6 @@ describe('Famine', function() {
     });
     it('with irrigation should not decimate farm and city -1', function(d) {
         engine.map.areas = { 5: { id: 5, tribes: 3, farm: true, city: 2 } }
-        engine.advances = {'irrigation': require("../../src/advances/irrigation")};
         engine.acquired = ['irrigation'];
         done = function() {
             this.changes.should.deep.equal(
