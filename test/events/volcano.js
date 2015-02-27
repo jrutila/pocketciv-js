@@ -4,7 +4,7 @@ var eventRunner = require('../../src/core/event')
 var pocketciv = require('../../src/core/pocketciv')
 var PhaseContext = require('../../src/core/context').Context;
 
-describe.only('Volcano', function() {
+describe('Volcano', function() {
     var engine = pocketciv.Engine;
     var runEvent = eventRunner.runEvent;
     var done = function() { throw "Nomplemented"; };

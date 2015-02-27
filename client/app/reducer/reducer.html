@@ -1,5 +1,5 @@
 <div id="reducer" class="actionElement" ng-show="reducer">
-    <h2>Reduce {{ ok.amount }}/{{ reducer.opts.amount }} {{ ok.ok }}</h2>
+    <h2>{{ reducer.opts.name || "reducer" }} {{ ok.amount }}/{{ reducer.opts.amount }} {{ ok.ok }}</h2>
     <div>
         <ul class="list-inline" ng-repeat="(a, c) in ok.current">
             <li ng-if="a > 0" class="areaCode" ng-click="selectArea(a)">
