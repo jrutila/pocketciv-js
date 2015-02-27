@@ -10,6 +10,7 @@ var Context = function(rootCtx) {
     this.break = false;
     this.go = undefined;
     this.done = undefined;
+    this.initial = _.clone(rootCtx.targets);
     };
     
 Context.prototype = {
@@ -46,6 +47,18 @@ Context.prototype = {
             this.ctx.change(area, chg);
         }
     },
+    target: function(chg, area) {
+        if (_.isObject(chg) && _.isNumber(parseInt(_.first(_.keys(chg)))) && area == undefined) {
+            // This is a full blown change with area ids and all
+            this.ctx.target(chg);
+        }
+        else {
+            area = area || this.active_region;
+            if (typeof area === "object")
+                area = area.id
+            this.ctx.target(area, chg);
+        }
+    },
     break_if: function(expr)
     {
         if (expr)
@@ -80,7 +93,7 @@ Context.prototype = {
         opts.initial = areas;
         
         this.engine.reducer(new reducer.Reducer(opts), function(rdc) {
-            this.ctx.change(rdc.changes);
+            ctx.ctx.change(rdc.changes);
             ctx.done && ctx.done();
         });
     },

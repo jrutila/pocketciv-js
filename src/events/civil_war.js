@@ -17,20 +17,18 @@ module.exports = {
             '-': "{%; reduce('tribes', collateralDamage, areas) %}",
     },
     cityReduce: function() {
+        var ctx = this;
+        
         var act = this.active_region
-        if (act.city <= activeCityReduce)
-            this.changes[act.id] = { 'city': cityMin.toString() }
-        else
-            this.changes[act.id] = { 'city': activeCityReduce.toString()  }
+        var ak = act.id;
+        
+        if (act.city > 0)
+            ctx.target({city: Math.max(this.initial[ak].city + activeCityReduce, cityMin)},this.active_region);
          
-        areas = this.neighbours(act)
-        for (var ar in areas) {
-            var a = areas[ar]
-            if (a.city <= neighbourCityReduce)
-             this.changes[a.id] = { 'city': cityMin.toString() }
-            else
-             this.changes[a.id] = { 'city': neighbourCityReduce.toString() }
-            areas[act.id] = this.active_region;
-        }
+        areas = this.neighbours(this.active_region)
+        _.each(areas, function(area, ak) {
+            if (area.city > 0)
+                ctx.target({city:Math.max(this.initial[ak].city + neighbourCityReduce, cityMin)}, area);
+        });
     }
 }
