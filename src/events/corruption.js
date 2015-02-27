@@ -18,15 +18,15 @@ module.exports = {
             Cities to reduce. Any City Reduced to 0 AV is \
             Decimated. {%; reduceCities() %}",
             '3': "Decimate all Gold you currently have.\
-            {% change({'gold': '0'}, null) %}",
+            {% change('gold', '0') %}",
     },
     reduceCities: function() {
         var ctx = this;
         var opts = reducer.Templates.basic(ctx, ['city']);
         opts.amount = corruption;
         var rdc = new reducer.Reducer(opts);
-        ctx.engine.reducer(rdc, function(chg) {
-            ctx.changes = chg;
+        ctx.engine.reducer(rdc, function(ok) {
+            ctx.change(ok.changes);
             ctx.done && ctx.done();
         });
     }

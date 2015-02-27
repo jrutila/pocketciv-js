@@ -61,22 +61,26 @@ function changes(initial, target) {
         var keys = _.union(_.keys(initial), _.keys(target));
         _.each(keys, function(key) {
             var val = target[key];
-            if (val) {
-                if (_.isObject(val)) {
-                    ret[key] = {};
-                    _.each(val, function(v,k) {
-                        if (_.isNumber(v)) {
-                            //var vv = _getChangeString((initial[key][k] || 0), v);
-                            var vv = v - (initial[key][k] || 0);
-                            if (vv != 0) ret[key][k] = vv;
-                        } else if (_.isBoolean(v)) {
-                            var vv = v != (initial[key][k] || false);
-                            if (vv) ret[key][k] = v;
-                        }
-                    });
-                }
+            if (_.isObject(val)) {
+                ret[key] = {};
+                _.each(val, function(v,k) {
+                    if (_.isNumber(v)) {
+                        //var vv = _getChangeString((initial[key][k] || 0), v);
+                        var vv = v - (initial[key][k] || 0);
+                        if (vv != 0) ret[key][k] = vv;
+                    } else if (_.isBoolean(v)) {
+                        var vv = v != (initial[key][k] || false);
+                        if (vv) ret[key][k] = v;
+                    }
+                });
             }
-            if (_.isEmpty(ret[key]))
+            else if (_.isNumber(val))
+                ret[key] = val - initial[key];
+            else if (_.isBoolean(val))
+                ret[key] = val;
+                
+            if ((_.isNumber(ret[key]) && ret[key] == 0) ||
+                (!_.isNumber(ret[key]) && _.isEmpty(ret[key])))
                 delete ret[key];
         },this);
         return ret;
