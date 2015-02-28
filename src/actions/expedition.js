@@ -3,7 +3,7 @@ var reducer = require("../core/reducer");
 
 module.exports = {
     title: "Expedition",
-    run: function() {
+    run: function(ctx) {
         console.log("Running expedition")
         var initial = {};
         _.each(this.map.areas, function(a, key) {
@@ -50,10 +50,11 @@ module.exports = {
         var rdc = new reducer.Reducer(opts);
         
         var engine = this;
-        engine.reducer(rdc, function(chg) {
+        engine.reducer(rdc, function(ok) {
             var expforce = 0;
-            for (var a in chg)
-                expforce += -1*chg[a].tribes;
+            ctx.change(ok.changes);
+            for (var a in ok.changes)
+                expforce += -1*ok.changes[a].tribes;
             console.log("Expedition force: "+expforce);
             if (expforce > 0)
                 engine.draw(function(c) {
@@ -74,8 +75,8 @@ module.exports = {
                     var gold = Math.max(fgold, sgold);
                     console.log("Expedition gold: "+gold);
                     if (gold > 0)
-                        chg.gold = "+"+gold;
-                    engine.areaChange(chg);
+                        ctx.change('gold', gold);
+                    ctx.done && ctx.done();
                 })
         });
     }
