@@ -48,6 +48,8 @@ long as you Decimate Tribes up to the described value.\
             initial: this.engine.map.areas,
             map: this.engine.map.areas,
             amount: 2,
+            shows: [],
+            edits: [],
             area: this.active_region,
             reduce: function(key) {
                 this.amount--;
@@ -102,7 +104,7 @@ long as you Decimate Tribes up to the described value.\
         
         var rdc = new reducer.Reducer(opts);
         ctx.engine.reducer(rdc, function(ok) {
-            ctx.merge(ok.changes);
+            ctx.change(ok.changes);
             ctx.done && ctx.done();
         });
         

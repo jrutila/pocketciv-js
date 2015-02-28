@@ -137,7 +137,7 @@ describe("Engine", function() {
             pocketciv.Map.areas[1].tribes.should.equal(3);
             pocketciv.Map.areas[2].tribes.should.equal(2);
             pocketciv.Map.areas[3].tribes.should.equal(0);
-            engine.phase.should.equal("move");
+            engine.phase.should.equal("tothree");
             //engine.move();
             //engine.event();
             //engine.advance();
@@ -165,20 +165,6 @@ describe("Engine", function() {
                     }
             };
             engine.phase = "move";
-        });
-        it('should call mover', function() {
-            engine.mover = function(situation, move) {
-                situation[1].tribes.should.equal(2);
-                situation[2].tribes.should.equal(1);
-                move.call(engine, { 1: 1, 2: 2, 3: 0});
-            }
-            engine.phase.should.equal("move");
-            engine.move(function () {
-                pocketciv.Map.areas[1].tribes.should.equal(1);
-                pocketciv.Map.areas[2].tribes.should.equal(2);
-                pocketciv.Map.areas[3].tribes.should.equal(0);
-                engine.phase.should.equal("event");
-            });
         });
     });
 });

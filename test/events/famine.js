@@ -17,7 +17,7 @@ describe('Famine', function() {
     }
     beforeEach(function() {
         event = require('../../src/events/famine')
-        engine = pocketciv.Engine;
+        engine = new pocketciv.EngineBuild();
         engine.drawer = function(deck, done) { done({ 'circle': 5}) }
     })
     it('should cause tribes to zero, no farms', function(d) {

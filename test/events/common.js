@@ -12,7 +12,7 @@ var getContext = function(state) {
     engine = new pocketciv.EngineBuild();
     state && engine.init(state);
     
-    engine.drawer = function(dde, done) { done(deck.shift()) }
+    engine.drawer = function(dde, done) { console.log(deck); done(deck.shift()) }
     engine.reducer = function(rdc, done) {
         var r = reduce.shift();
         var ok = rdc.ok(r);

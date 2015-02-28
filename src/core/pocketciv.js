@@ -343,7 +343,6 @@ Engine.prototype = {
             var post = posts.pop();
             if (post) post.call(eng, ctx);
             else {
-                console.log(ctx)
                 if (ctx.changes)
                 {
                     var str = Ctx.getString(ctx.changes);
