@@ -41,7 +41,7 @@ describe('Reducer', function() {
       //ok = target.ok({ 1: null })
       ok = target.ok([ 1 ])
       ok.current.should.deep.equal(_.omit(opts.initial, '1'));
-      ok.changes.should.deep.equal({ 1: { 'tribes': (-1*opts.initial[1].tribes).toString() }});
+      ok.changes.should.deep.equal({ 1: { 'tribes': (-1*opts.initial[1].tribes) }});
       ok.ok.should.be.false;
       ok.amount.should.equal(opts.amount - 4);
       
@@ -49,8 +49,8 @@ describe('Reducer', function() {
       ok = target.ok([ 1, 2 ])
       ok.current.should.deep.equal(_.omit(opts.initial, '1', '2'));
       ok.changes.should.deep.equal(
-        { 1: { 'tribes': (-1*opts.initial[1].tribes).toString() },
-          2: { 'tribes': (-1*opts.initial[2].tribes).toString() }}
+        { 1: { 'tribes': (-1*opts.initial[1].tribes) },
+          2: { 'tribes': (-1*opts.initial[2].tribes) }}
         );
       ok.ok.should.be.false;
       ok.amount.should.equal(opts.amount - 4*2);
@@ -58,9 +58,9 @@ describe('Reducer', function() {
       ok = target.ok([ 1, 2, 3 ])
       ok.current.should.deep.equal({});
       ok.changes.should.deep.equal(
-        { 1: { 'tribes': (-1*opts.initial[1].tribes).toString() },
-          2: { 'tribes': (-1*opts.initial[2].tribes).toString() },
-          3: { 'tribes': '-2' }}
+        { 1: { 'tribes': (-1*opts.initial[1].tribes) },
+          2: { 'tribes': (-1*opts.initial[2].tribes) },
+          3: { 'tribes': -2 }}
         );
       ok.amount.should.equal(0);
       ok.ok.should.be.true;
@@ -95,7 +95,8 @@ describe('Reducer', function() {
       
       ok = target.ok({ 1: { 'city': 3 }})
       ok.current.should.deep.equal(opts.initial);
-      ok.changes.should.deep.equal({ 1: { 'tribes': '-3', 'city': '+1' }});
+      ok.changes.should.deep.equal({
+        1: { 'tribes': -3, 'city': 1 }});
       ok.ok.should.be.true;
       ok.amount.should.equal(0);
     });
@@ -155,15 +156,15 @@ describe('Reducer', function() {
           var ok = target.ok([4, 3]);
           ok.amount.should.equal(0);
           ok.changes.should.deep.equal({
-            4: { 'tribes': '-3' },
-            3: { 'tribes': '-1' }
+            4: { 'tribes': -3 },
+            3: { 'tribes': -1 }
             //        ----  -4
           });
           ok.ok.should.equal.true;
           ok = target.ok([3, 4]);
           ok.changes.should.deep.equal({
-            4: { 'tribes': '-2' },
-            3: { 'tribes': '-2' }
+            4: { 'tribes': -2 },
+            3: { 'tribes': -2 }
             //        ----  -4
           });
           ok.ok.should.equal.true;
@@ -187,7 +188,7 @@ describe('Reducer', function() {
             _.pick(engine.map.areas, 3,4)
           );
           ok.changes.should.deep.equal({
-            2: { 'tribes': '-2' },
+            2: { 'tribes': -2 },
           });
         });
       });
@@ -214,8 +215,8 @@ describe('Reducer', function() {
         it('should return changes', function() {
           var ok = target.ok({ 3: { 'tribes': 0 }, 4: { 'tribes': 1 } });
           ok.changes.should.deep.equal({
-            3: { 'tribes': '-2' },
-            4: { 'tribes': '-2' },
+            3: { 'tribes': -2 },
+            4: { 'tribes': -2 },
           });
         })
         it('should give possible areas', function() {
@@ -269,14 +270,14 @@ describe('City Advance (worker)', function() {
       ok = target.ok({ 4: { city: 2, tribes: 1 }});
       ok.amount.should.equal(0);
       ok.changes.should.deep.equal({
-        4: { tribes: '-2', city: '+1' }
+        4: { tribes: -2, city: 1}
       });
       ok = target.ok({ 4: { city: 2 }, 3: { tribes: 1 }, 2: { tribes: 4 }});
       ok.amount.should.equal(0);
       ok.changes.should.deep.equal({
-        4: { city: '+1' },
-        2: { tribes: '-1' },
-        3: { tribes: '-1' }
+        4: { city: +1 },
+        2: { tribes: -1 },
+        3: { tribes: -1 }
       });
     })
     it('should return false on too big city numbers', function() {
@@ -330,8 +331,8 @@ describe('City Advance (worker)', function() {
       ok = target.ok({ 4: { city: 2 }, 3: { tribes: 1 }});
       ok.ok.should.be.true;
       ok.changes.should.deep.equal({
-        4: { city: '+1' },
-        3: { tribes: '-1' }
+        4: { city: 1 },
+        3: { tribes: -1 }
       });
     })
   })

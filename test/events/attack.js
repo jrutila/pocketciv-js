@@ -134,10 +134,10 @@ describe('Attack (worker)', function() {
         opts.pre = [3];
         _.keys(target.ok([2]).current).should.deep.equal([ '5' ])
         target.ok([2, 5]).changes.should.deep.equal({
-          3: { 'city': '-4' },
-          2: { 'tribes': '-1' },
-          5: { 'tribes': '-1', 'city': '-1' },
-          'gold': '-10',
+          3: { 'city': -4 },
+          2: { 'tribes': -1 },
+          5: { 'tribes': -1, 'city': -1 },
+          'gold': -10,
         })
         opts.amount = 26;
         target.ok([2, 5]).changes.should.deep.equal({
