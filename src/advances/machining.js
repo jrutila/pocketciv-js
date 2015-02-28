@@ -29,9 +29,13 @@ module.exports = {
                 }
                 
                 var opts = reducer.Templates.basic(ctx, ['city']);
+                _.each(ctx.engine.map.areas, function(a,ik) {
+                    if (ctx.ctx.targets[ik] && opts.initial[ik])
+                        opts.initial[ik].city = ctx.ctx.targets[ik].city;
+                });
                 opts.amount = 2;
-                ctx.engine.reducer(new reducer.Reducer(opts), function(chg) {
-                    ctx.merge(chg);
+                ctx.engine.reducer(new reducer.Reducer(opts), function(ok) {
+                    ctx.change(ok.changes);
                     ctx.done && ctx.done();
                 });
             }

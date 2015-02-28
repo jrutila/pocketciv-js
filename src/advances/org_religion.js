@@ -44,9 +44,9 @@ effects of Anarchy. {%; selectRegions() %}"
                         this.amount--;
                     }
                 }
-                ctx.engine.reducer(new reducer.Reducer(opts), function(changes, chg) {
-                    console.log("Selected 4 areas: " + chg)
-                    ctx.active_region =  _.pick(ctx.engine.map.areas, chg);
+                ctx.engine.reducer(new reducer.Reducer(opts), function(ok) {
+                    console.log("Selected 4 areas: " + ok.chg)
+                    ctx.active_region =  _.pick(ctx.engine.map.areas, ok.chg);
                     ctx.done && ctx.done();
                 });
             }

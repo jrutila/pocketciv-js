@@ -20,11 +20,17 @@ The maximum AV of a City is 2, unless otherwise noted.",
                        {%; reduceTribes(card_value('c')) %}"
             },
             reduceTribes: function(amount) {
+                console.log("reduceTribes")
                 var ctx = this;
                 var opts = reducer.Templates.basic(ctx, ['tribes']);
+                _.each(opts.initial, function(i,ik) {
+                    if (ctx.ctx.targets[ik])
+                        i.tribes = ctx.ctx.targets[ik].tribes;
+                });
+                console.log(opts.initial)
                 opts.amount = amount;
-                ctx.engine.reducer(new reducer.Reducer(opts), function(chg) {
-                    ctx.merge(chg);
+                ctx.engine.reducer(new reducer.Reducer(opts), function(ok) {
+                    ctx.change(ok.changes);
                     ctx.done && ctx.done();
                 });
             }
