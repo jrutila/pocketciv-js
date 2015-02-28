@@ -18,7 +18,7 @@ $eventWidth: 750px;
             dt, dd {
                 display: none;
             }
-            dt.active {
+            dt.active, dt.active + dd {
                 display: inline;
             }
         }

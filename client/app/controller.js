@@ -164,7 +164,7 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
     pocketciv.Engine.areaChanger = function(changes, done) {
         $scope.areaChange = changes;
         areaChangeDone = done;
-        if (_.isEmpty(changes))
+        if (_.isEmpty(changes) || $scope.engine.phase == 'move')
             $scope.areaChangeOk();
         else {
             _.each(_.keys(changes), function(k) {

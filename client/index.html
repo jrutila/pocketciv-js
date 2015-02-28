@@ -76,9 +76,11 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
         </div>
+        <span ng-show="godMode" class="godmodeTitle">G</span>
         <span>ERA: {{ engine.era }}</span>
         <span>Gold: {{ engine.gold }}</span>
-        <span ng-show="godMode" class="godmodeTitle">GOD MODE</span>
+        <span>Glory: XX</span><br/>
+        <span>{{ engine.phase }}</span>
     </div>
     
     <!--BEGIN DECK AND CARD-->
