@@ -5,7 +5,7 @@ var pocketciv = require('../../src/core/pocketciv')
 var PhaseContext = require('../../src/core/context').Context;
 
 describe('Volcano', function() {
-    var engine = pocketciv.Engine;
+    var engine = new pocketciv.EngineBuild();
     var runEvent = eventRunner.runEvent;
     var done = function() { throw "Nomplemented"; };
     var getContext = function() {
