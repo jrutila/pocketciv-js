@@ -19,7 +19,7 @@ module.exports = {
                 var gold = 0;
                 var done = function() {
                     if (gold > 0) {
-                        ctx.changes['gold'] = '+'+gold;
+                        ctx.change('gold', gold);
                     }
                     ctx.done && ctx.done();
                 };
@@ -41,10 +41,10 @@ module.exports = {
                     }
                 }
                 var rdc = new reducer.Reducer(opts);
-                engine.reducer(rdc, function(chg) {
-                    if (_.size(chg) != 1) { done(); return; }
+                engine.reducer(rdc, function(ok) {
+                    if (_.size(ok.changes) != 1) { done(); return; }
                     
-                    ctx.changes = chg;
+                    ctx.change(ok.changes);
                     var drawing = function(canstop) {
                         engine.draw(function(card) {
                             if (card === false)
