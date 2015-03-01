@@ -1,34 +1,5 @@
 $eventWidth: 750px;
 
-#eventRunner {
-    z-index: 98;
-    position: fixed;
-    top: 72px;
-    left: 1200px;
-    max-width: $eventWidth;
-    margin-right: 10px;
-}
-
-@include smaller-than-map {
-    #eventRunner {
-        top: 42px;
-        left: 10px;
-
-        dl {
-            dt, dd {
-                display: none;
-            }
-            dt.active, dt.active + dd {
-                display: inline;
-            }
-        }
-
-        .event {
-            opacity: 0.8;
-        }
-    }
-}
-
 div.event {
     background-color: $color-secondary-2-0;
     padding: 7px;

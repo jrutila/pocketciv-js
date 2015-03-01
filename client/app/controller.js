@@ -559,6 +559,13 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
             $scope.$storage.current = val;
         }, true);
         
+        $scope.$watch('engine.actions', function(val) {
+            if (_.size(val) > 5)
+            {
+                $scope.manyActions = true;
+            }
+        }, true);
+        
         $scope.welcome = false;
     }
     

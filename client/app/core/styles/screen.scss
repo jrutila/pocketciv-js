@@ -6,22 +6,111 @@ body {
     overflow: hidden;
 }
 
-#map {
+/* BEGIN LEFT INFO */
+#leftInfo {
+    float: left;
+    display: block;
+    position: absolute;
+    z-index: 98;
+    overflow: auto;
+    height: 100%;
+
+    #eventRunner {
+        z-index: 98;
+        margin: 20px;
+        margin-top: 40px;
+    }
+    
+    @include smaller-than-map {
+        #eventRunner {
+            top: 42px;
+            left: 10px;
+    
+            dl {
+                dt, dd {
+                    display: none;
+                }
+                dt.active, dt.active + dd {
+                    display: inline;
+                }
+            }
+    
+            .event {
+                opacity: 0.8;
+            }
+        }
+    }
+    
+    /*
+    #startButton {
+        position: fixed;
+        left: 25%;
+        top: 25%;
+        z-index: 180;
+        width: 50%;
+        height: 50px;
+    }*/
+    
+    #startButton {
+        width: $mapWidth / 2;
+        left: $mapWidth / 4;
+    }
+    
+}
+/* END LEFT INFO */
+
+
+/* BEGIN CENTER MAP */
+#centerMap {
     overflow: auto;
     margin-left: auto;
     margin-right: auto;
     height: 100%;
-}
 
-@include smaller-than-map {
-    #map {
-        width: 100% !important;
+    @include smaller-than-map {
+        #map {
+            width: 100% !important;
+        }
+    }
+    @include bigger-than-map {
+        #map {
+        }
+    }
+
+}
+/* END CENTER MAP */
+
+/* BEGIN RIGHT ACTION */
+#rightAction {
+    float: right;
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    height: 100%;
+    z-index: 99;
+    
+    > div {
+        background-color: $color-primary-1;
+        margin: 20px;
+        margin-top: 45px;
+        z-index: 99;
+        border: 3px solid $color-primary-4;
+        
+        padding-left: 10px;
+        padding-right: 10px;
+        padding-bottom: 10px;
+        
+        h2 {
+            height: $actionElementTopicHeight;
+            background-color: $color-primary-3;
+            text-align: center;
+            margin-top: 10px;
+            font-weight: bold;
+        }
     }
 }
-@include bigger-than-map {
-    #map {
-    }
-}
+/* END RIGHT ACTION */
+
 
 a {
     cursor: pointer;
@@ -38,94 +127,6 @@ a {
 
 #advances { display: none; }
 
-@include really-large {
-#advances {
-    display: block;
-    position: absolute;
-    left: $mapWidth +  10;
-    top: 454px;
-}
-#showTechTree {
-    display: none;
-}
-}
-
-.actionElement {
-    position: fixed;
-    top: 50px;
-    z-index: 50;
-    
-    h2 {
-        height: $actionElementTopicHeight;
-        background-color: rgba(Yellow, .8);
-        text-align: center;
-    }
-    
-    .actionContent {
-        margin-top: 5px;
-        margin-bottom: 5px;
-        display: block;
-        text-align: center;
-    }
-    
-    .actionDone {
-        display: block;
-        width: 50%;
-        margin-left: auto;
-        margin-right: auto;
-        height: $actionElementTopicHeight;
-    }
-}
-
-.actionElement.away {
-    .actionContent, .actionDone {
-        display: none; 
-    }
-}
-
-@include smaller-than-map {
-.actionElement.away.temp {
-    z-index: 51;    
-    .actionDone {
-        display: block;
-    }
-}
-    
-.actionElement.away {
-    top: $infoBarHeight;
-    left: 0px;
-    width: 85px;
-}
-.actionElement.away.temp {
-    .actionDone {
-        width: 100%;
-    }
-}
-.actionElement {
-    width: 100%;
-    background-color: rgba(lightYellow, .8);
-}
-
-}
-
-@include bigger-than-map {
-    .actionElement {
-        left: $mapWidth;
-        right: 0px;
-    }
-    .actionElement.away.temp {
-        .actionContent, .actionDone {
-            display: block;
-        }
-    }
-}
-@include really-large {
-    .actionElement {
-        left: $mapWidth;
-        width: 300px;
-    }
-    
-}
 
 .cover {
     position: fixed;
@@ -135,24 +136,6 @@ a {
     left: 0px;
     z-index: 100;
     background:rgba(0,0,0,0.6);
-}
-
-
-
-#startButton {
-    position: fixed;
-    left: 25%;
-    top: 25%;
-    z-index: 180;
-    width: 50%;
-    height: 50px;
-}
-
-@include bigger-than-map {
-#startButton {
-    width: $mapWidth / 2;
-    left: $mapWidth / 4;
-}
 }
 
 #infobar {
@@ -217,13 +200,6 @@ a {
         padding-top: 2px;
         padding-bottom: 2px;
     }
-}
-@include really-large {
-#changePrompt {
-    .content {
-        width: $mapWidth;
-    }
-}
 }
         
 .godmodeTitle {
