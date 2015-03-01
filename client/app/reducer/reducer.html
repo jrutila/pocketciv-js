@@ -27,8 +27,6 @@
             <li ng-click="selectChange(a)" ng-if="a == 'gold'" class="gold">{{ c }}</li>
         </ul>
     </div>
-    <div>
-        <button class="btn btn-default" ng-visible="ok.ok" ng-click="done()">Done</button>
-        <button class="btn" ng-visible="ok.changes" ng-click="reset()">Reset</button>
-    </div>
+    <button class="done btn btn-primary col-xs-12 col-sm-6" ng-visible="ok.ok" ng-click="done()">Done</button>
+    <button class="btn btn-default col-xs-12 col-sm-6" ng-visible="ok.changes" ng-click="reset()">Reset</button>
 </div>

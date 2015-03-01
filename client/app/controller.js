@@ -576,25 +576,6 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
         setTimeout(function() { $scope.saved = false; }, 3000);
     }
     
-    $scope.$watch('engine.phase', function(val) {
-        if (val == 'advance')
-            $scope.actionStack.push("#advancePhase");
-    });
-
-    var actionStack = new Object();
-    var aStack =[];
-    actionStack.push = function(sel) {
-        $(_.last(aStack)).addClass('away');
-        aStack.push(sel);
-        $(sel).removeClass('away');
-    }
-    actionStack.pop = function() {
-        var sel = aStack.pop();
-        $(sel).removeClass('away');
-        $(_.last(aStack)).removeClass('away');
-    }
-    $scope.actionStack = actionStack;
-    
     $scope.bugDescr = undefined;
     $scope.sendBug = function() {
         console.log("Sending bug")
@@ -608,15 +589,10 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
     }
     
     $(document).ready(function() {
-        $(".collapsible h2").click(function() {
+        $("#rightAction").on("click", "> div > h2", function() {
             var $par = $(this).parent();
-            if ($par.is('.away.temp'))
-                $par.removeClass('away').removeClass('temp');
-            else if ($par.is('.away')) {}
-            else
-                $par.addClass('away').addClass('temp');
-        } )
-        
+            $par.toggleClass("away");
+        });
         
         $(".menu-arrow").height($("#welcome p:nth(1)").position().top)    
         $(window).resize(function() {
