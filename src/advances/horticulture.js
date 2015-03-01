@@ -1,3 +1,6 @@
+var reducer = require("../core/reducer");
+var _ = require("underscore");
+
 module.exports = {
     name: "horticulture",
     title: "Horticulture",
@@ -11,25 +14,30 @@ module.exports = {
     actions: {
         'forest': {
             'title': "Create a Forest",
-            'run': function(context) {
+            'run': function(ctx) {
                 var engine = this;
-                var possibleAreas = {};
-                for (var key in engine.map.areas)
-                {
-                    if (!engine.map.areas[key].forest &&
-                        engine.map.areas[key].tribes >= 4)
-                    {
-                        possibleAreas[key] = engine.map.areas[key];
+                
+                var initial = _.pick(ctx.initial, function(area) {
+                    return (area.tribes >= 4 && !area.forest);
+                },this);
+                
+                var opts = {
+                    map: engine.map.areas,
+                    initial: initial,
+                    shows: ['tribes'],
+                    edits: [],
+                    amount: 0,
+                    reduce: function(key) {
+                        return { forest: true, tribes: this.initial[key].tribes-4 };
+                    },
+                    check: function() {
+                        return true;
                     }
                 }
-                engine.areaSelector(possibleAreas, function(area) {
-                    var changes = {};
-                    changes[area.id] = {
-                        'tribes': '-4',
-                        'forest': true 
-                    };
-                    context.changes = changes;
-                    context.done && context.done();
+                
+                engine.reducer(new reducer.Reducer(opts), function(ok) {
+                    ctx.change(ok.changes);
+                    ctx.done && ctx.done();
                 });
             }
         },

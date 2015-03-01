@@ -103,7 +103,7 @@ body {
     right: 0px;
     top: 0px;
     //height: 100%;
-    z-index: 220;
+    z-index: 180;
     
     > div {
         background-color: $color-primary-1;
@@ -180,7 +180,7 @@ a {
     height: 100%;
     top: 0px;
     left: 0px;
-    z-index: 100;
+    z-index: 200;
     background:rgba(0,0,0,0.6);
 }
 
@@ -206,7 +206,7 @@ a {
 
 #changePrompt {
     .content {
-        z-index: 102;
+        z-index: 220;
         position: fixed;
         top: $mapWidth / 4;
         width: 100%;
