@@ -78,6 +78,7 @@ body {
     margin-left: auto;
     margin-right: auto;
     height: 100%;
+    position: relative;
 
     #mapWrapper {
         overflow: hidden;
@@ -178,7 +179,7 @@ a {
     position: fixed;
     width: 100%;
     height: 100%;
-    top: 0px;
+    top: $infoBarHeight;
     left: 0px;
     z-index: 200;
     background:rgba(0,0,0,0.6);
@@ -206,13 +207,25 @@ a {
 
 #changePrompt {
     .content {
-        z-index: 220;
-        position: fixed;
-        top: $mapWidth / 4;
+        z-index: 230;
         width: 100%;
         background-color: rgba(white, .8);
         text-align: center;
+        position: absolute;
+        left: 0px;
+        right: 0px;
+        top: 25%;
+        
+        @media (max-width: $screen-xs-max) {
+            position: fixed;
+        }
+        
+        .row {
+            margin-left: 0px;
+            margin-right: 0px;
+        }
     }
+    
     
     .changelist {
         display: inline-block;

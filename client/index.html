@@ -151,6 +151,28 @@
             <div class="icon desert" id="desert"></div>
         </div>
         
+        <div id="changePrompt" ng-hide="!areaChange">
+            <div class="cover"></div>
+            <div class="content">
+                <div class="row">
+                    <div class="changelist">
+                        <ul class="list-inline" ng-repeat="(a, c) in areaChange">
+                            <li>
+                                <span ng-if="a > 0" class="areaCode">{{ a }}</span>
+                                <span ng-if="a == 'gold'">{{ a }}</span>
+                            </li>
+                            <li ng-if="a > 0" ng-repeat="(k, v) in c"><span class="icon {{ k }}" data-val="{{ v }}">{{ v }}</span></li>
+                            <li ng-if="a == 'gold'" class="gold">{{ c }}</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="row">
+                    <button class="btn btn-primary col-xs-12" ng-click="areaChangeOk()">OK</button>
+                    <button class="btn btn-default col-xs-12" ng-show="currentStep.skip" ng-click="currentStep.skip()">skip</button>
+                </div>
+            </div>
+        </div>
+        
         <div id="mapWrapper" style="width: {{ mapArea.width - 18 }}px; height: {{ mapArea.height - 40 }}px">
             <div id="map" style="width: {{ mapArea.width - 18 }}px">
                 <div id="canvases">
@@ -194,28 +216,6 @@
             </div>
         </div>
         
-        <div id="changePrompt" ng-hide="!areaChange">
-            <div class="cover"></div>
-            <div class="content">
-                <div class="row">
-                    <div class="changelist">
-                        <ul class="list-inline" ng-repeat="(a, c) in areaChange">
-                            <li>
-                                <span ng-if="a > 0" class="areaCode">{{ a }}</span>
-                                <span ng-if="a == 'gold'">{{ a }}</span>
-                            </li>
-                            <li ng-if="a > 0" ng-repeat="(k, v) in c"><span class="icon {{ k }}" data-val="{{ v }}">{{ v }}</span></li>
-                            <li ng-if="a == 'gold'" class="gold">{{ c }}</li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="row">
-                    <button class="btn btn-primary col-xs-12" ng-click="areaChangeOk()">OK</button>
-                    <button class="btn btn-default col-xs-12" ng-show="currentStep.skip" ng-click="currentStep.skip()">skip</button>
-                    
-                </div>
-            </div>
-        </div>
     </div>
     <!-- END MAP -->
     
@@ -237,7 +237,7 @@
         
         <pc-reducer class="row" reducer="reducer" ready="reduceReady"></pc-reducer>
         
-        <div id="advancePhase" class="row" ng-hide="engine.phase != 'advance' || reducer" >
+        <div id="advancePhase" class="row" ng-hide="engine.phase != 'advance' || reducer || !hideDrawer" >
             <h2>Advance</h2>
             <ul class="list-unstyled">
                 <li ng-repeat="(a, act) in engine.actions">
