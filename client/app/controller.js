@@ -391,6 +391,7 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
             console.log("gameLog advance")
             gameLog.advance.push([]);
         }
+        $scope.currentEvent = undefined;
         $scope.mapInfo = undefined;
         $scope.hideDrawer = true;
         $scope.mapClicked = undefined;
@@ -479,6 +480,9 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
             {
                 $scope.currentStep.skip = function() {
                     $scope.currentStep = undefined;
+                    $scope.areaChange = undefined;
+                    $scope.currentEvent = undefined;
+                    $(".highlight").removeClass('highlight');
                     ctx.skip();
                 }
                 console.log("This event is skippable")

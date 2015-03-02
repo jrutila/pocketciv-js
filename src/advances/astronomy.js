@@ -28,7 +28,7 @@ result, and draw a new Event card in it's place.",
                     if (engine.era == era)
                         engine.round_era.skipped_event = true;
                     ctx.skip = undefined;
-                    engine.event(ctx);
+                    engine.runPhase('event');
                 };
             }
             ctx.done && ctx.done();
