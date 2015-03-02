@@ -21,6 +21,8 @@ $deckColor: $color-primary-4;
 $cardsLeftColor: $color-primary-2;
 
 #card {
+    background-color: $deckColor;
+    
     .hexagon.border {
         @include hex($cardSymbolSize, $hexColor-border, horizontal);
         .inner {
@@ -124,53 +126,11 @@ $cardsLeftColor: $color-primary-2;
     }
 }
 
-#card {
-    background-color: $deckColor;
-    position: fixed;
-    width: $cardWidth;
-    height: $cardHeight;
-    z-index: 100;
-    bottom: 3px;
-    right: $cardWidth + $deckRightMargin * 2;
-}
-
-@include bigger-than-map {
-#card.pushed {
-    right: $deckPeek + $deckRightMargin;
-}
-#card.shown {
-    bottom: 3px;
-}
-}
-
-@include smaller-than-map {
-#card.pushed {
-    right: $deckPeek + $deckRightMargin;
-    bottom: -1*($cardHeight - $eventTop);
-}
-#card.shown {
-    bottom: 0px;
-}
-}
-
 #deck {
     background-color: $deckColor;
-    position: fixed;
-    width: $cardWidth;
-    height: $cardHeight;
-    z-index: 100;
     
-    right: $deckRightMargin;
-    bottom: 3px;
-
     #cardsLeft {
         color: $cardsLeftColor;
-        font-size: 54px;
-        width: 100%;
-        display: block;
-        text-align: center;
-        top: 56px;
-        position: absolute;
     }
     
     button.draw {
@@ -185,7 +145,7 @@ $cardsLeftColor: $color-primary-2;
         width: 100%;
         height: 50px;
         top: -50px;
-        opacity: 0.2;
+        opacity: 0.8;
     }
     
     input {
@@ -194,31 +154,4 @@ $cardsLeftColor: $color-primary-2;
         left: $cardWidth / 4;
         width: 50%;
     }
-}
-
-@include bigger-than-map {
-#deck.pushed {
-    right: -1*($cardWidth - $deckPeek);
-    //top: $cardHeight + (2 * 20);
-    
-    #cardsLeft {
-        width: $deckPeek;
-        text-align: left;
-        font-size: 28px;
-    }
-}
-}
-
-@include smaller-than-map {
-#deck.pushed {
-    right: -1*($cardWidth - $deckPeek);
-    //top: $cardHeight + (2 * 20);
-    bottom: -1*($cardHeight / 2);
-    
-    #cardsLeft {
-        width: $deckPeek;
-        text-align: left;
-        font-size: 28px;
-    }
-}
 }

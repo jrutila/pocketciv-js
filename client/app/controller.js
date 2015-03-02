@@ -516,6 +516,7 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
         $scope.hideDrawer = true;
         $scope.mainMenu = false;
         $scope.card = undefined;
+        $scope.currentEvent = undefined;
     }
     
     $scope.mainMenu = true;

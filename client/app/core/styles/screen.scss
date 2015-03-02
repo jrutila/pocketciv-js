@@ -6,6 +6,67 @@ body {
     overflow: hidden;
 }
 
+/* BEGIN DECK */
+
+#card {
+    position: fixed;
+    width: $cardWidth;
+    height: $cardHeight;
+    z-index: 100;
+    bottom: 3px;
+    right: $cardWidth + $deckRightMargin * 2;
+}
+
+#deck {
+    position: fixed;
+    width: $cardWidth;
+    height: $cardHeight;
+    z-index: 100;
+    
+    right: $deckRightMargin;
+    bottom: 3px;
+
+    #cardsLeft {
+        font-size: 54px;
+        width: 100%;
+        display: block;
+        text-align: center;
+        top: 56px;
+        position: absolute;
+    }
+}
+
+@media (max-width: $screen-sm-max) {
+    #card.pushed {
+        right: $deckPeek + $deckRightMargin;
+    }
+    #deck.pushed {
+        right: -1*($cardWidth - $deckPeek);
+        
+        #cardsLeft {
+            width: $deckPeek;
+            text-align: left;
+            font-size: 28px;
+            margin-left: 15px;
+        }
+    }
+}
+
+@media (max-height: 700px) {
+    #card.pushed {
+        bottom: -1*($cardHeight - $eventTop);
+    }
+    #card.shown {
+        bottom: 0px;
+    }
+    #deck.pushed {
+        bottom: -1*($cardHeight / 2);
+    }
+}
+
+
+/* END DECK */
+
 /* BEGIN LEFT INFO */
 #leftInfo {
     float: left;
@@ -137,7 +198,7 @@ body {
         div.away {
             z-index: 225;
             padding: 0px;
-            margin-top: 16px;
+            margin-top: 40px;
             margin-left: auto;
             margin-right: auto;
             width: 50%;
@@ -214,7 +275,7 @@ a {
         position: absolute;
         left: 0px;
         right: 0px;
-        top: 25%;
+        bottom: 50%;
         
         @media (max-width: $screen-xs-max) {
             position: fixed;
