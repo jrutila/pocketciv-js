@@ -81,10 +81,9 @@ indicates the Active Region {{ active_region }}.{%; area_card() %}",
                     if (area && area.tribes > 0)
                     {
                         engine.draw(function(gc) {
-                            ctx.changes = {};
                             if (gc.gold > 0)
-                                ctx.changes['gold'] = '+'+gc.gold;
-                            ctx.changes[c.circle] = { 'tribes': '-1' };
+                                ctx.change('gold', gc.gold);
+                            ctx.change(c.circle, { 'tribes': -1 });
                             ctx.done && ctx.done();
                         });
                     } else
