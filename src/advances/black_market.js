@@ -8,11 +8,11 @@ module.exports = {
     requires: [ 'culture_of_thievery' ],
     required_by: [ ],
     events: { },
-    acquired: function(onload) {
-        if (!onload)
+    acquired: function(ctx) {
+        if (ctx)
         {
             console.log("Gain 5 gold from Black Market")
-            this.areaChange({'gold': '+5'}, function() { })
+            ctx.change('gold', 5);
         }
     },
     phases: {
@@ -30,38 +30,37 @@ module.exports = {
                 var engine = this;
                 var gold = 0;
                 var done = function() {
-                    if (gold > 0) {
-                        ctx.changes = { 'gold': '+'+gold };
-                    } else if (gold < 0)
-                    {
-                        ctx.changes = { 'gold': gold.toString() };
+                    if (gold != 0) {
+                        ctx.change('gold', gold);
                     }
                     ctx.done && ctx.done();
                 };
-                var drawing = function() {
+                var drawing = function(canstop) {
                     engine.draw(function(card) {
+                        if (card == false)
+                        {
+                            done();
+                            return;
+                        }
                         gold += card.gold;
                         if (card.friendly) {
                             gold--;
                             console.log("gathered gold: "+gold);
-                            if (engine.gold + gold < 0)
+                            if (ctx.initial.gold + gold < 0)
                             {
                                 console.log("ANARCHY!")
-                                engine.doEvent({ name: 'anarchy' }, function(chg) {
-                                    ctx.changes = chg;
-                                    gold = 0;
-                                    ctx.changes.gold = "0";
-                                    done();
-                                });
+                                ctx.target('gold', 0);
+                                engine.doEvent({ name: 'anarchy' }, ctx);
+                                return;
                             } else
                                 drawing();
                         } else {
-                            console.log("gathered gold: "+gold);
+                            console.log("finally gathered gold: "+gold);
                             done();
                         }
-                    });
+                    },canstop);
                 };
-                drawing();
+                drawing(true);
             }
         }
     },

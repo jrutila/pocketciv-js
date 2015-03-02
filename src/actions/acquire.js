@@ -120,7 +120,7 @@ AdvanceAcquirer.prototype = {
 
 module.exports = {
     title: "Acquire Advances",
-    run: function() {
+    run: function(ctx) {
         var engine = this;
         engine.round.acquired = engine.round.acquired || {};
         engine.advanceAcquirer(engine, function(acquires) {
@@ -130,17 +130,15 @@ module.exports = {
             acquires = _.omit(acquires, _.keys(engine.round.acquired));
             for (var area in acquires)
             {
+                var acq = acquires[area];
                 if (_.has(acquires[area].cost, 'tribes'))
-                    changes[area] = { 'tribes': '-'+acquires[area].cost.tribes };
+                    ctx.change(area, { tribes: -1*acq.cost.tribes});
                 if (_.has(acquires[area].cost, 'gold'))
-                    changes['gold'] = '-'+acquires[area].cost.gold;
+                    ctx.change('gold', -1*acq.cost.gold);
+                engine.acquire(acq.name, ctx);
             }
-            engine.areaChange(changes, function() {
-                _.each(_.values(acquires), function(a) {
-                    engine.acquire(a.name);
-                });
-                engine.round.acquired = _.extend(engine.round.acquired, acquires);
-            });
+            engine.round.acquired = _.extend(engine.round.acquired, acquires);
+            ctx.done && ctx.done();
         });
     },
     AdvanceAcquirer: AdvanceAcquirer

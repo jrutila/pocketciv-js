@@ -372,13 +372,13 @@ Engine.prototype = {
 
         runpre();
     },
-    acquire: function(name, done) {
+    acquire: function(name, ctx) {
         this.acquired.push(name);
         var adv = this.advances[name];
         if (adv.acquired)
         {
             //                                      | is this during load?
-            adv.acquired.call(this, done == undefined);
+            adv.acquired.call(this, ctx);
         }
         if (adv.actions)
         {
@@ -388,7 +388,7 @@ Engine.prototype = {
             }, this);
         }
         console.log("Acquired "+name);
-        done && done();
+        ctx && ctx.done && ctx.done();
     },
     doEvent: function(ev, ctx) {
         var eng = this;
