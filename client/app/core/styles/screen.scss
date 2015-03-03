@@ -100,9 +100,9 @@ body {
     }
 }
 
-@media (max-width: $screen-md-min) {
+@media (min-width: $screen-md-min) {
     #leftInfo {
-        //height: 100%;
+        height: 100%;
     }
 }
 

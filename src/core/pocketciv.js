@@ -171,14 +171,14 @@ Map.prototype = {
     },
 }
 
-function Engine(map, deck) {
-    this.mover = function() { throw "Not implemented mover"; }
-    this.reducer = function() { throw "Not implemented reducer"; }
-    this.drawer = function() { throw "Not implemented drawer"; }
-    this.areaChanger = function() { throw "Not implemented areaChanger"; }
-    this.eventStepper = function(done) { done & done(); }
-    this.map = map || theMap;
-    this.deck = deck || theDeck;
+function Engine(impl, map, deck) {
+    this.mover = impl.mover || function() { throw "Not implemented mover"; }
+    this.reducer = impl.reducer || function() { throw "Not implemented reducer"; }
+    this.drawer = impl.drawer || function() { throw "Not implemented drawer"; }
+    this.areaChanger = impl.areaChanger || function() { throw "Not implemented areaChanger"; }
+    this.eventStepper = impl.eventStepper || function(done) { done & done(); }
+    this.map = map || new Map();
+    this.deck = deck || new EventDeck();
     var eng = this;
     this.deck.noMoreCards = function() { eng.runPhase('end_of_era'); };
     this.phases = [ ];
@@ -491,6 +491,8 @@ module.exports = {
     NoMoreCardsError: NoMoreCardsError,
     EventDeck: theDeck,
     Map: theMap,
+    MapBuild: Map,
+    DeckBuild: EventDeck,
     TribeMover: phases.move.TribeMover,
     Engine: new Engine(theMap, theDeck),
     EngineBuild: Engine,

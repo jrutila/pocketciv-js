@@ -27,7 +27,7 @@
             <accordion-group>
                 <accordion-heading>New Game</accordion-heading>
                 <div class="button-group">
-                    <button class="btn btn-primary" ng-repeat="(k, s) in scenarios" ng-click="load(s)" snap-toggle>{{ s.title }}</button>
+                    <button class="btn btn-primary" ng-repeat="(k, s) in scenarios" ng-click="load(s,k)" snap-toggle>{{ s.title }}</button>
                 </div>
             </accordion-group>
             <accordion-group>

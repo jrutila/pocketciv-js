@@ -1,4 +1,5 @@
 module.exports = {
+    "name": "scenario2",
     "title": "The Gilded Land",
     "description": "This is another simple scenario. You will be required now \
     to create some gold at some point, in order to acquire \

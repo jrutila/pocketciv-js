@@ -4,7 +4,8 @@ module.exports = {
     "description": "You will need to go on Sea Expeditions now. Also, due to \
         the Desert in Region 4, you will need to build up enough Tribes to \
         sail to Region 4 and build the Monolith before upkeep occurs.",
-    "goal": "In Region 4, build a Huge Monolith of Impressiveness before the end of Era 5.",
+    "goal": "In Region 4, build a Huge Monolith of Impressiveness before the end of Era 5. \
+    (NOTE! Wonders not yet implemented!)",
     'end_of_era.post': function(ctx) {
         console.log("Check for winning conditions")
         var engine = this;

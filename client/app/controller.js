@@ -10,12 +10,6 @@ var AdvanceAcquirer = require("../../src/actions/acquire").AdvanceAcquirer;
 
 pp = pocketciv
 
-function getMovement(areas) {
-    return _.object(_.map(pocketciv.Map.areas, function (area, id) {
-        return [id, area.tribes ? area.tribes : 0 ];
-    }));
-}
-
 resetGameLog = function(scen){
 gameLog = {
     "scenario": scen,
@@ -37,24 +31,31 @@ var scenarios = {
 }
 
 pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
+    
+    var getMovement = function(areas) {
+        return _.object(_.map($scope.map.areas, function (area, id) {
+            return [id, area.tribes ? area.tribes : 0 ];
+        }));
+    }
+
     $scope.snapOpts = {
     }
     $scope._ = _;
     $scope.$storage = $localStorage;
     if (!$localStorage.saves)
         $localStorage.saves = {};
-    $scope.map = pocketciv.Map;
-    $scope.deck = pocketciv.EventDeck;
     $scope.scenarios = scenarios;
     $scope.welcome = true;
+    $scope.engine = {};
+    var pocketimpl = {};
     
     var moveFunc = undefined;
     $scope.moveTribes = function() {
         var mover = new pocketciv.TribeMover(
-            pocketciv.Map.areas,
-            pocketciv.Engine.params.moveLimit,
-            pocketciv.Engine.params.sea_move ? pocketciv.Engine.params.sea_cost : undefined);
-        mover.init(getMovement(pocketciv.Map.areas));
+            $scope.engine.map.areas,
+            $scope.engine.params.moveLimit,
+            $scope.engine.params.sea_move ? $scope.engine.params.sea_cost : undefined);
+        mover.init(getMovement($scope.engine.map.areas));
         var ok = mover.ok($scope.movement);
         if (ok.ok)
         {
@@ -82,7 +83,7 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
                 selectRegion(region);
             }
         } else {
-            $scope.mover.init(getMovement(pocketciv.Map.areas));
+            $scope.mover.init(getMovement($scope.map.areas));
             $scope.movement[moveFrom]--;
             $scope.movement[region]++;
             var ok = $scope.mover.ok($scope.movement);
@@ -101,16 +102,16 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
     });
     
     var moveFrom = 0;
-    pocketciv.Engine.mover = function(situation, move) {
+    pocketimpl.mover = function(situation, move) {
         console.log("Show mover")
         // Plain mover
         $scope.movement = getMovement(situation);
         $scope.hideMover = false;
         moveFunc = move;
         $scope.mover = new pocketciv.TribeMover(
-            pocketciv.Map.areas,
-            pocketciv.Engine.params.moveLimit,
-            pocketciv.Engine.params.sea_move ? pocketciv.Engine.params.sea_cost : undefined);
+            $scope.engine.map.areas,
+            $scope.engine.params.moveLimit,
+            $scope.engine.params.sea_move ? $scope.engine.params.sea_cost : undefined);
         
         // UI
         $scope.mapInfo = "Move tribes by clicking start region and then target region";
@@ -127,7 +128,7 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
         if (stop != true) {
             $scope.card = $scope.deck.draw();
             if ($scope.specificCard)
-                $scope.card = pocketciv.EventDeck.specific($scope.specificCard);
+                $scope.card = $scope.deck.specific($scope.specificCard);
             gameLog.deck.push($scope.card.id)
         } else {
             
@@ -135,12 +136,12 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
         $scope.specificCard = undefined;
         $scope.hideDrawer = true;
         if (stop != true)
-            drawnFunc && drawnFunc.call(pocketciv.Engine, $scope.card);
+            drawnFunc && drawnFunc.call($scope.engine, $scope.card);
         else
-            drawnFunc && drawnFunc.call(pocketciv.Engine, false);
+            drawnFunc && drawnFunc.call($scope.engine, false);
     }
     
-   pocketciv.Engine.reducer = function(reducer, done) {
+   pocketimpl.reducer = function(reducer, done) {
         console.log("Show reducer "+reducer.opts)
         $scope.reducer = reducer;
         $scope.reduceReady = function(ok) {
@@ -149,7 +150,7 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
         };
     }
     
-    pocketciv.Engine.drawer = function(deck, drawn, canstop) {
+    pocketimpl.drawer = function(deck, drawn, canstop) {
         console.log("Show drawer")
         $scope.deck = deck;
         $scope.hideDrawer = false;
@@ -165,7 +166,7 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
     }
     
     var areaChangeDone = undefined;
-    pocketciv.Engine.areaChanger = function(changes, done) {
+    pocketimpl.areaChanger = function(changes, done) {
         $scope.areaChange = changes;
         areaChangeDone = done;
         if (_.isEmpty(changes) || $scope.engine.phase == 'move')
@@ -192,7 +193,7 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
     }
     
     // End region functions
-    pocketciv.Engine.queryUser = function(type, message)
+    pocketimpl.queryUser = function(type, message)
     {
         return confirm(message);
     }
@@ -214,7 +215,7 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
     var doAcquire = undefined;
     $scope.acquiring = false;
 
-    pocketciv.Engine.advanceAcquirer = function(engine, done) {
+    pocketimpl.advanceAcquirer = function(engine, done) {
         $scope.acquirer = new AdvanceAcquirer(engine);
         $scope.possibleAdvances = $scope.acquirer.possibleAdvances();
         $scope.acquiring = true;
@@ -345,7 +346,7 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
         _.last(gameLog.advance).push(name);
     }
     
-    $scope.$watch(function(){ return pocketciv.Engine.phase; }, function(name) {
+    $scope.$watch(function(){ return $scope.engine.phase; }, function(name) {
         if (loading || !name) return;
         if (name == 'advance')
         {
@@ -356,7 +357,7 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
         $scope.mapInfo = undefined;
         $scope.hideDrawer = true;
         $scope.mapClicked = undefined;
-        pocketciv.Engine.runPhase(name);
+        $scope.engine.runPhase(name);
     })
     
     $scope.saveGamePlay = function() {
@@ -370,8 +371,8 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
         console.log("run: "+game)
         gameLog = JSON.parse(game);
         loading = true;
-        pocketciv.Engine.phase = "populate";
-        runplay.run(pocketciv.Engine, JSON.parse(game), function() { loading = false; })
+        $scope.engine.phase = "populate";
+        runplay.run($scope.engine, JSON.parse(game), function() { loading = false; })
     }
     
     var drawElem = function(prop, reg, val) {
@@ -388,7 +389,7 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
         else $elem.html(val).show()
     }
     
-    $scope.engine = pocketciv.Engine;
+    $scope.engine = new pocketciv.EngineBuild({});
     $scope.engine.phase = "";
     $scope.godMode = true;
     
@@ -413,7 +414,6 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
             $scope.currentStep = phase;
         }
     });
-    */
     pocketciv.Engine.signals.phaser.add(function(status, phase) {
         console.log(phase+": "+status);
         if (status == "end") // && phase == "event")
@@ -423,7 +423,8 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
             clearRegions();
         }
     });
-    pocketciv.Engine.eventStepper = function(done, step, ctx) {
+    */
+    pocketimpl.eventStepper = function(done, step, ctx) {
         if (ctx && ctx.event && ($scope.currentEvent == undefined || $scope.currentEvent.name != ctx.event.name))
         {
             $scope.currentEvent = ctx.engine.events[ctx.event.name];
@@ -481,20 +482,23 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
     }
     
     $scope.mainMenu = true;
-    $scope.load = function(scen) {
-        console.log("Loading "+scen.name);
+    $scope.load = function(scen, name) {
+        console.log("Loading "+name);
         $scope.resetUI();
         resetGameLog(scen);
-        if (_.has(scenarios, scen.name))
+        $scope.map = new  pocketciv.MapBuild();
+        $scope.deck = new pocketciv.DeckBuild();
+        $scope.engine = new pocketciv.EngineBuild(pocketimpl, $scope.map, $scope.deck);
+        if (_.has(scenarios, name))
         {
-            var scenario = scenarios[scen.name];
+            var scenario = scenarios[name];
             _.each(scenario, function(s, sk) {
                 if (!_.has(scen, sk)) scen[sk] = s;
             });
         }
         $scope.engine.init(scen);
         
-        map = new Map(pocketciv.Map);
+        map = new Map($scope.engine.map);
         $scope.mapArea = _.clone(map);
         $scope.mapArea.width = Math.ceil($scope.mapArea.width - 80);
         $scope.mapArea.height -= 40;
