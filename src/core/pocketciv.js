@@ -180,7 +180,7 @@ function Engine(map, deck) {
     this.map = map || theMap;
     this.deck = deck || theDeck;
     var eng = this;
-    this.deck.noMoreCards = function() { eng.endOfEra(); };
+    this.deck.noMoreCards = function() { eng.runPhase('end_of_era'); };
     this.phases = [ ];
     this.phase = "populate";
     this.events = events;
@@ -230,6 +230,7 @@ var defaults= {
     'era': 1,
     'round': {},
     'round_era': {},
+    'name': undefined,
 }
 
 Engine.prototype = {
@@ -249,6 +250,10 @@ Engine.prototype = {
             }
             en[p] = st && st[p] || _.clone(defaults[d]);
         }
+        _.each(state, function(st, stk) {
+            if (!_.has(this, stk))
+                this[stk] = st;
+        },this);
         this.actions = _.clone(actions);
         this.params = {};
         for (var key in this.map.areas)
@@ -285,11 +290,16 @@ Engine.prototype = {
         }, this);
         return ret;
     },
-    endOfEra: function() {
+    end_of_era: function(ctx) {
         console.log("End of era");
         this.round_era = {};
         this.deck.shuffle();
         this.era++;
+        ctx.done && ctx.done();
+    },
+    gameOver: function(resolution) {
+        this.resolution = resolution;
+        this.phase = "gameover";
     },
     nextPhase: function() {
         this.signals.phaser.dispatch("end", this.phase)
@@ -302,12 +312,21 @@ Engine.prototype = {
             done(c);
         }, canstop);
     },
+    checkLosing: function() {
+        return this.map.tribeCount == 0 && this.map.cityCount == 0;
+    },
     runPhase: function(name, arg) {
         var ctx = new PhaseContext(this);
         var eng = this;
         var posts = [];
         var pres = [];
         var thePhase = undefined;
+        
+        if (eng.checkLosing())
+        {
+            eng.gameOver(false, "notribesandcities");
+            return;
+        }
         
         _.each(_.pick(this.advances, this.acquired), function(acq) {
             if (acq.phases && _.has(acq.phases, name+'.post'))
@@ -321,10 +340,19 @@ Engine.prototype = {
             if (acq.phases && _.has(acq.phases, name))
                 thePhase = acq.phases[name].run;
         }, this)
+        if (this[name+".post"]) posts.push(this[name+".post"]);
+        if (this[name+".pre"]) pres.push(this[name+".pre"]);
         
         var final = function() {
                         ctx.confirm && ctx.confirm();
-                        if (name != "advance")
+                        
+                        if (eng.checkLosing())
+                        {
+                            eng.gameOver(false, "notribesandcities");
+                            return;
+                        }
+                        
+                        if (name != "advance" && eng.phase != "gameover")
                             eng.nextPhase();
                     };
         

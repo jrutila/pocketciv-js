@@ -120,9 +120,20 @@
             <pc-event-view event="currentEvent" engine="engine" step="currentStep"></pc-event-view>
         </div>
     
-        <div id="start" ng-hide="engine.phase">
-            <p>Try to advance your Emprire!</p>
-            <button id="startButton" class="btn" ng-click="engine.phase = 'populate'" ng-hide="engine.phase">Start!</button>
+        <div id="start" class="gameInfo" ng-hide="engine.phase">
+            <h2>{{ engine.title }}</h2>
+            <div class="">
+                <p>{{ engine.description }}</p>
+                <p class="goal">{{ engine.goal }}</p>
+                <p>Ads Here!</p>
+                <button id="startButton" class="btn btn-primary col-xs-12" ng-click="engine.phase = 'populate'" ng-hide="engine.phase">Start!</button>
+            </div>
+        </div>
+        
+        <div id="gameover" class="gameInfo" ng-show="engine.phase == 'gameover'">
+            <h2 ng-hide="engine.resolution">You lost!</h2>
+            <h2 ng-show="engine.resolution">Victory!</h2>
+            <p>Use the menu to start a new game.</p>
         </div>
         
     </div>

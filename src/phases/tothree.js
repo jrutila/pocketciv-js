@@ -19,6 +19,10 @@ module.exports = {
             return;
         }
         
+        _.each(initial, function(i) {
+            if (i.tribes == undefined) i.tribes = 0;
+        })
+        
         var opts = {
             map: this.map.areas,
             initial: initial,

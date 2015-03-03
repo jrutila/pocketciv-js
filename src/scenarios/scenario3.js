@@ -1,5 +1,20 @@
 module.exports = {
-    "title": "Scenario 3",
+    "name": "scenario3",
+    "title": "A Dedication to the Island Gods",
+    "description": "You will need to go on Sea Expeditions now. Also, due to \
+        the Desert in Region 4, you will need to build up enough Tribes to \
+        sail to Region 4 and build the Monolith before upkeep occurs.",
+    "goal": "In Region 4, build a Huge Monolith of Impressiveness before the end of Era 5.",
+    'end_of_era.post': function(ctx) {
+        console.log("Check for winning conditions")
+        var engine = this;
+        // End of era 5
+        if (engine.era == 6)
+        {
+            engine.gameOver(false, "Do you have the monolith?");
+            ctx.done && ctx.done();
+        }
+    },
     "map": {
         "areas": {
             "1": {

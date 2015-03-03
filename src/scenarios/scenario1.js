@@ -1,5 +1,26 @@
 module.exports = {
-    "title": "Scenario 1",
+    "name": "scenario1",
+    "title": "A New World",
+    "description": "This scenario is a simple layout, with a simple goal that can be \
+    played in a short amount of time to get the hang of how the \
+    game works. Many of the more advanced techniques, such as expeditions, and acquiring gold, \
+    are not needed.",
+    "goal": "Build a City in Region 4 before the end of Era 1. \
+The City must be standing at the end of a Round (after Upkeep).",
+    'end_of_era.post': function(ctx) {
+        console.log("Check for winning conditions")
+        var engine = this;
+        if (engine.era == 2)
+        {
+            if (engine.map.areas[4].city > 0)
+            {
+                engine.gameOver(true);
+            } else {
+                engine.gameOver(false, "You did not manage to build the city to area 4.");
+            }
+            ctx.done && ctx.done();
+        }
+    },
     "map": {
         "areas": {
             "1": {
@@ -40,7 +61,7 @@ module.exports = {
                 "mountain": true
             }
         },
-        "width": 9,
+        "width": 11,
         "height": 9,
         "grid":[
         [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],

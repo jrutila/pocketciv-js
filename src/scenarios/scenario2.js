@@ -1,5 +1,25 @@
 module.exports = {
-    "title": "Scenario 2",
+    "title": "The Gilded Land",
+    "description": "This is another simple scenario. You will be required now \
+    to create some gold at some point, in order to acquire \
+Architecture. This can be done through various ways, through other \
+Advances (such as Mining and Black Market) or through Expeditions",
+    "goal": "Acquire Architecture before the end of Era 3.",
+    'end_of_era.post': function(ctx) {
+        console.log("Check for winning conditions")
+        var engine = this;
+        // End of era 3
+        if (engine.era == 4)
+        {
+            if (engine.acquired.indexOf('architecture') != -1)
+            {
+                engine.gameOver(true);
+            } else {
+                engine.gameOver(false, "You did not manage to acquire Architecture.");
+            }
+            ctx.done && ctx.done();
+        }
+    },
     "map": {
         "areas": {
             "3": {

@@ -30,10 +30,10 @@ gameLog = {
 resetGameLog();
 
 var scenarios = {
-    "1": require("../../src/scenarios/scenario1"),
-    "2": require("../../src/scenarios/scenario2"),
-    "3": require("../../src/scenarios/scenario3"),
-    "8": require("../../src/scenarios/scenario8"),
+    "scenario1": require("../../src/scenarios/scenario1"),
+    "scenario2": require("../../src/scenarios/scenario2"),
+    "scenario3": require("../../src/scenarios/scenario3"),
+    "scenario8": require("../../src/scenarios/scenario8"),
 }
 
 pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
@@ -521,9 +521,16 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
     
     $scope.mainMenu = true;
     $scope.load = function(scen) {
-        console.log("Loading "+scen.title);
+        console.log("Loading "+scen.name);
         $scope.resetUI();
         resetGameLog(scen);
+        if (_.has(scenarios, scen.name))
+        {
+            var scenario = scenarios[scen.name];
+            _.each(scenario, function(s, sk) {
+                if (!_.has(scen, sk)) scen[sk] = s;
+            });
+        }
         $scope.engine.init(scen);
         
         map = new Map(pocketciv.Map);
