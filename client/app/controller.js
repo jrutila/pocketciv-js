@@ -22,7 +22,6 @@ gameLog = {
     "move": [],
     "deck": [],
     "reduce": [],
-    "areas": [],
     "advance": [],
     "acquires": [],
 };
@@ -142,7 +141,10 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
    pocketciv.Engine.reducer = function(reducer, done) {
         console.log("Show reducer "+reducer.opts)
         $scope.reducer = reducer;
-        $scope.reduceReady = done;
+        $scope.reduceReady = function(ok) {
+            gameLog.reduce.push(ok ? ok.changes : {});
+            done(ok);
+        };
     }
     
     pocketciv.Engine.drawer = function(deck, drawn, canstop) {
@@ -188,49 +190,6 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
     }
     
     // End region functions
-    
-    $scope.possibleAreas = []
-    $scope.selectedArea = undefined;
-    var areaSelect = undefined;
-    $scope.selectArea = function() {
-        $scope.possibleAreas = []
-        mapClicked = oldClicked;
-        $scope.mapInfo = undefined;
-        $scope.actionStack.pop();
-        if ($scope.selectedArea)
-        {
-            areaSelect(pocketciv.Engine.map.areas[$scope.selectedArea]);
-            gameLog.areas.push($scope.selectedArea)
-        }
-        clearRegions();
-        $scope.selectedArea = undefined;
-    }
-
-    var oldClicked = undefined;
-    pocketciv.Engine.areaSelector = function(possibleAreas, select)
-    {
-        console.log('Area select');
-        $scope.possibleAreas = _.keys(possibleAreas);
-        $scope.mapInfo = "Select an area from areas "+$scope.possibleAreas;
-        $scope.actionStack.push("#mapinfo");
-        oldClicked = mapClicked;
-        mapClicked = function(region) {
-            if ($scope.possibleAreas.indexOf(region.toString()) > -1)
-            {
-                $scope.selectedArea = region.toString();
-                selectRegion(region);
-            }
-        }
-        $scope.mapDone = function() {
-            $scope.selectArea();
-        }
-
-        console.log($scope.possibleAreas);
-        areaSelect = select;
-    }
-
-    pocketciv.Engine.selector = pocketciv.Engine.areaSelector;
-    
     pocketciv.Engine.queryUser = function(type, message)
     {
         return confirm(message);

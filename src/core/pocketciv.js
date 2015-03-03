@@ -227,6 +227,7 @@ var defaults= {
     'acquired': [],
     'trading': [],
     'gold': 0,
+    'glory': 0,
     'era': 1,
     'round': {},
     'round_era': {},
@@ -292,6 +293,21 @@ Engine.prototype = {
     },
     end_of_era: function(ctx) {
         console.log("End of era");
+        if (this.map.cityCount >= this.era)
+        {
+            // Can Gain glory!
+            var trbCount = this.map.tribeCount;
+            // Get tribeCount biggest advances
+            var sorted = _.last(_.sortBy(_.values(_.pick(this.advances, this.acquired)), 'points'), trbCount);
+            // And calc the glory addition
+            var glory = _.reduce(sorted, function(memo, s) {
+                return memo + s.points;
+            }, 0);
+            console.log("Gaining glory "+glory);
+            this.glory += glory;
+        } else {
+            console.log("No glory because not enough cities!")
+        }
         this.round_era = {};
         this.deck.shuffle();
         this.era++;
