@@ -61,13 +61,43 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
             moveFunc(ok);
             $scope.hideMover = true;
             $scope.mapInfo = undefined;
-            mapClicked = oldClicked;
+            $scope.movement = undefined;
+            $scope.mover = undefined;
             gameLog.move.push($scope.movement)
         } else {
             console.log("FAILED MOVE")
         }
     }
     $scope.hideMover = true;
+    
+    $scope.$on("mapClick", function(event, region) {
+        if (region < 1 || region > 8 || !$scope.movement)
+            return;
+        if (moveFrom == 0)
+        {
+            if ($scope.movement[region] > 0)
+            {
+                moveFrom = region;
+                selectRegion(region);
+            }
+        } else {
+            $scope.mover.init(getMovement(pocketciv.Map.areas));
+            $scope.movement[moveFrom]--;
+            $scope.movement[region]++;
+            var ok = $scope.mover.ok($scope.movement);
+            $scope.mapTitle = "MOVE "+(ok.reduce || "");
+            if (ok.ok)
+            {
+                drawElem("tribes", region, $scope.movement[region]);
+                drawElem("tribes", moveFrom, $scope.movement[moveFrom]);
+                moveFrom = 0;
+                clearRegions();
+            } else {
+                $scope.movement[moveFrom]++;
+                $scope.movement[region]--;
+            }
+        }
+    });
     
     var moveFrom = 0;
     pocketciv.Engine.mover = function(situation, move) {
@@ -76,7 +106,7 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
         $scope.movement = getMovement(situation);
         $scope.hideMover = false;
         moveFunc = move;
-        var mover = new pocketciv.TribeMover(
+        $scope.mover = new pocketciv.TribeMover(
             pocketciv.Map.areas,
             pocketciv.Engine.params.moveLimit,
             pocketciv.Engine.params.sea_move ? pocketciv.Engine.params.sea_cost : undefined);
@@ -84,35 +114,6 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
         // UI
         $scope.mapInfo = "Move tribes by clicking start region and then target region";
         $scope.mapTitle = "MOVE"
-        oldClicked = mapClicked;
-        mapClicked = function(region) {
-            if (region < 1 || region > 8)
-                return;
-            if (moveFrom == 0)
-            {
-                if ($scope.movement[region] > 0)
-                {
-                    moveFrom = region;
-                    selectRegion(region);
-                }
-            } else {
-                mover.init(getMovement(pocketciv.Map.areas));
-                $scope.movement[moveFrom]--;
-                $scope.movement[region]++;
-                var ok = mover.ok($scope.movement);
-                $scope.mapTitle = "MOVE "+(ok.reduce || "");
-                if (ok.ok)
-                {
-                    drawElem("tribes", region, $scope.movement[region]);
-                    drawElem("tribes", moveFrom, $scope.movement[moveFrom]);
-                    moveFrom = 0;
-                    clearRegions();
-                } else {
-                    $scope.movement[moveFrom]++;
-                    $scope.movement[region]--;
-                }
-            }
-        }
         $scope.mapDone = function() {
             $scope.moveTribes();
         }
@@ -322,7 +323,7 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
     }
     
     var mapClicked = function(region) {
-        console.log("Map clicked on region "+region);
+        $scope.$broadcast("mapClick", parseInt(region));
     }
     
     $scope.mapFocus= function(ev) {

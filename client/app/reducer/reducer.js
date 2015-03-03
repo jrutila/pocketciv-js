@@ -29,6 +29,9 @@ pocketcivApp.directive('pcReducer', function() {
                     $scope.chg = [];
                 $scope.ok = $scope.reducer.ok($scope.chg);
             };
+            $scope.$on("mapClick", function(event, region) {
+                $scope.selectArea(region);
+            });
             $scope.$watch('reducer', function(n, o) {
                 console.log("PC REDUCER")
                 if (n != o && n != undefined)
@@ -83,13 +86,14 @@ pocketcivApp.directive('pcReducer', function() {
             $scope.selectArea = function(a) {
                 a = parseInt(a);
                 console.log("Selected area "+a)
-                if (_.isArray($scope.chg))
-                {
-                    if (!_.contains($scope.chg, a))
-                        $scope.chg.push(a);
-                } else {
-                    console.log("no reason to select area. only UI")
-                }
+                if ($scope.ok && _.has($scope.ok.current, a))
+                    if (_.isArray($scope.chg))
+                    {
+                        if (!_.contains($scope.chg, a))
+                            $scope.chg.push(a);
+                    } else {
+                        console.log("no reason to select area. only UI")
+                    }
                 console.log($scope.chg)
             }
         }

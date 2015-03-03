@@ -84,7 +84,7 @@ NewReducer.prototype = {
       changes: ph.changes(this.initial, this.targets),
       target: this.targets,
       current: this.current,
-      ok: this.check(),
+      ok: this.check() && this.failed.length == 0,
       amount: this.amount,
       failed: this.failed,
     }
