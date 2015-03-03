@@ -177,6 +177,7 @@ function Engine(impl, map, deck) {
     this.drawer = impl.drawer || function() { throw "Not implemented drawer"; }
     this.areaChanger = impl.areaChanger || function() { throw "Not implemented areaChanger"; }
     this.eventStepper = impl.eventStepper || function(done) { done & done(); }
+    this.advanceAcquirer = impl.advanceAcquirer || function() { throw "Not implemented advaneAcquirer"; }
     this.map = map || new Map();
     this.deck = deck || new EventDeck();
     var eng = this;

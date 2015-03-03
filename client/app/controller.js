@@ -425,6 +425,15 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
     });
     */
     pocketimpl.eventStepper = function(done, step, ctx) {
+        if (step == "end")
+        {
+            console.log("Event ended")
+            $scope.currentEvent = undefined;
+            $scope.currentStep = undefined;
+            clearRegions();
+            done();
+            return;
+        }
         if (ctx && ctx.event && ($scope.currentEvent == undefined || $scope.currentEvent.name != ctx.event.name))
         {
             $scope.currentEvent = ctx.engine.events[ctx.event.name];

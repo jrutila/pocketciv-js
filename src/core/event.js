@@ -184,7 +184,10 @@ var stepper = function(steps, ctx, done)
 {
     if (steps.length === 0)
     {
-        return done && done(ctx);
+        ctx.engine.eventStepper(function() {
+            done && done(ctx);
+        }, "end", ctx);
+        return;
     }
     var cmd = steps.shift();
     if (ctx.go && ctx.go != steps.step)
