@@ -55,6 +55,8 @@ module.exports = {
                 this.params.city_advance_discount = 1;
             else
                 this.params.city_advance_discount++;
+            console.log("Substitute wood for stone")
+            this.params.replaceable_resources = ['wood', 'stone'];
     },
     actions: {
         'acquire': {

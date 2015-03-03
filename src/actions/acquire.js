@@ -18,6 +18,7 @@ function AdvanceAcquirer(engine) {
     this.acquired_names = _.clone(engine.acquired)
     this.amnt_of_acquird = _.union(_.map(engine.round.acquired, function(a) { return a.name; }), engine.acquired).length;
     this.areas = {};
+    this.replaceable_resources = engine.params.replaceable_resources || [];
     _.each(engine.map.areas, function(a, ak) {
         if (a.city > 0)
             this.areas[ak] = a;
@@ -69,11 +70,22 @@ AdvanceAcquirer.prototype = {
                 // Check resources
                 if ('resources' in this.advances[key]) {
                     var area_resources = getResources(this.areas[a]);
-                    if (!_.intersection(
-                            area_resources, this.advances[key].resources).length ==
-                        this.advances[key].resources.length) {
-                        has_resources = false;
+                    var satisfied = function(a, b) {
+                        return _.intersection(a,b).length == b.length;
                     }
+                    has_resources = false;
+                    
+                    if (satisfied(area_resources, this.advances[key].resources))
+                        has_resources = true;
+                    else
+                        _.each(this.replaceable_resources, function(r) {
+                            if (_.contains(area_resources, r)) {
+                                var repl = _.without(this.replaceable_resources, r);
+                                repl = _.union(repl, _.without(area_resources, r));
+                                if (satisfied(repl, this.advances[key].resources))
+                                    has_resources = true;
+                            }
+                        },this);
                 }
                 
                 // Check gold

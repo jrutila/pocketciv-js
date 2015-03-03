@@ -159,4 +159,42 @@ describe("AdvanceAcquirer", function() {
         });
         
     });
+    it('should return advances by multiple resources', function() {
+        engine.advances = {
+            'adv2': {
+                cost: {},
+                resources: [ 'wood', 'stone' ]
+            },
+        };
+        acquirer = new acquire.AdvanceAcquirer(engine);
+        acquirer.possibleAdvances().should.deep.equal({
+            'adv2': { 'areas': ["1"] },
+        });
+        
+    });
+    it('should enable possibility to replace resources', function() {
+        engine.advances = {
+            'adv1': {
+                cost: {},
+                resources: [ 'stone' ]
+            },
+            'adv2': {
+                cost: {},
+                resources: [ 'wood', 'stone' ]
+            },
+            'adv3': {
+                cost: {},
+                resources: [ 'food' ]
+            },
+        };
+        engine.params.replaceable_resources = ['wood', 'stone'];
+        engine.acquired = [];
+        acquirer = new acquire.AdvanceAcquirer(engine);
+        acquirer.possibleAdvances().should.deep.equal({
+            'adv1': { 'areas': ["1","3"] },
+            'adv2': { 'areas': ["1"] },
+            'adv3': { 'areas': ["1"] },
+        });
+        
+    });
 });

@@ -345,17 +345,15 @@
     <table class="table table-condensed table-bordered">
         <thead>
             <th>Area</th>
-            <th>AV</th>
             <th>Tribes</th>
+            <th>AV</th>
             <th>Resources</th>
         </thead>
         <tbody>
             <tr ng-click="advArea(c)" ng-class="{ areas: possibleAdvances[selAdv.name].areas.indexOf(c.id.toString()) > -1, selected: selArea == c }" ng-repeat="c in engine.map.areas | filter:city">
                 <td>{{ c.id }}</td>
-                <td><span class="city">{{ c.city }}</span>
-                </td>
-                <td><span class="tribes">{{ c.tribes }}</span>
-                </td>
+                <td><span class="tribes">{{ c.tribes }}</span></td>
+                <td><span class="city">{{ c.city }}</span></td>
                 <td>
                     <ul class="list-inline">
                         <li class="icon forest small" ng-if="c.forest"></li>

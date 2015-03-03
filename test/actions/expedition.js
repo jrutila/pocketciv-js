@@ -2,7 +2,7 @@ var should = require('chai').should()
 require('mocha')
 var common = require('./common');
 
-describe.only('Expedition', function() {
+describe('Expedition', function() {
     var deck = common.deck;
     var reduce = common.reduce;
     var done = common.done;
