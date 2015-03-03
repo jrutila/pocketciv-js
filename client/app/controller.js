@@ -32,6 +32,7 @@ var scenarios = {
     "scenario1": require("../../src/scenarios/scenario1"),
     "scenario2": require("../../src/scenarios/scenario2"),
     "scenario3": require("../../src/scenarios/scenario3"),
+    "scenario4": require("../../src/scenarios/scenario4"),
     "scenario8": require("../../src/scenarios/scenario8"),
 }
 
