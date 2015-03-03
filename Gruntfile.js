@@ -651,7 +651,13 @@ module.exports = function (grunt) {
 
   grunt.registerTask('serve', function (target) {
     if (target === 'dist') {
-      return grunt.task.run(['build', 'env:all', 'env:prod', 'express:prod',  'express-keepalive']);
+      return grunt.task.run([
+        'build',
+        'env:all',
+        'env:prod',
+        'express:prod',
+        'express-keepalive'
+        ]);
     }
 
     if (target === 'debug') {
@@ -731,23 +737,20 @@ module.exports = function (grunt) {
     ]);
   });
 
-  grunt.registerTask('build', [
-    'clean:dist',
-    'injector:sass', 
-    'concurrent:dist',
-    'injector',
-    'wiredep',
-    'useminPrepare',
-    'autoprefixer',
-    'ngtemplates',
-    'concat',
-    'ngAnnotate',
-    'copy:dist',
-    'cdnify',
-    'cssmin',
-    'uglify',
-    'rev',
-    'usemin'
+  grunt.registerTask('heroku', [
+      'clean:server',
+      'env:all',
+      'injector:sass', 
+      'browserify',
+      'sprite',
+      'concurrent:server',
+      'injector',
+      'wiredep',
+      'autoprefixer',
+      //'express:dev',
+      //'wait',
+      //'open',
+      //'watch'
   ]);
 
   grunt.registerTask('default', [
