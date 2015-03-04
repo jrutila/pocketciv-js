@@ -127,7 +127,13 @@
                 <p>{{ engine.description }}</p>
                 <p class="goal">{{ engine.goal }}</p>
                 <p>Ads Here!</p>
-                <button id="startButton" class="btn btn-primary col-xs-12" ng-click="engine.phase = 'populate'" ng-hide="engine.phase">Start!</button>
+                <button
+                    id="startButton"
+                    class="btn btn-primary col-xs-12"
+                    ng-click="engine.phase = 'populate'"
+                    ng-hide="engine.phase"
+                    analytics-on="click" analytics-event="startGame" analytics-label="{{ engine.name }}"
+                    >Start!</button>
             </div>
         </div>
         

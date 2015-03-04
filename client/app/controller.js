@@ -1,5 +1,11 @@
 var pocketciv = require("../../src/core/pocketciv");
-var pocketcivApp = angular.module('pocketcivApp', ['ngStorage', 'snap', 'ui.bootstrap', 'ngSanitize']);
+var pocketcivApp = angular.module('pocketcivApp', [
+        'ngStorage',
+        'snap',
+        'ui.bootstrap',
+        'ngSanitize',
+        'angulartics', 'angulartics.google.analytics'
+        ]);
 var runplay = require("../../src/core/runplay");
 var eventplay = require("../../src/core/event");
 var reducer = require("../../src/core/reducer");
