@@ -36,8 +36,7 @@ var scenarios = {
     "scenario8": require("../../src/scenarios/scenario8"),
 }
 
-pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage) {
-    
+pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $analytics) {
     var getMovement = function(areas) {
         return _.object(_.map($scope.map.areas, function (area, id) {
             return [id, area.tribes ? area.tribes : 0 ];

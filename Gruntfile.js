@@ -117,7 +117,7 @@ module.exports = function (grunt) {
       },
       html: {
         files: [
-          '<%= yeoman.client %>/index.html'],
+          '<%= yeoman.client %>/*.html'],
         tasks: ['preprocess', 'injector', 'wiredep']
       },
       gruntfile: {
