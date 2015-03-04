@@ -9,7 +9,7 @@
   "dependencies": {
     "node-static": "*",
     "browserify": "~4.2.3",
-    "underscore": "*",
+    "underscore": "~1.8.2",
     "jed": "*",
     "bower": "*",
     "grunt-contrib-clean": "~0.5.0",
