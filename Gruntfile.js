@@ -19,7 +19,8 @@ module.exports = function (grunt) {
     injector: 'grunt-asset-injector',
     buildcontrol: 'grunt-build-control',
     sprite: 'grunt-spritesmith',
-    browserify: 'grunt-browserify'
+    browserify: 'grunt-browserify',
+    bower: 'grunt-bower-task',
   });
 
   // Time how long tasks take. Can help when optimizing build times
@@ -178,6 +179,16 @@ module.exports = function (grunt) {
         }]
       },
       server: '.tmp'
+    },
+    
+    // Bower install
+    bower: {
+     install: {
+       //just run 'grunt bower:install' and you'll see files from your Bower packages in lib directory
+       options: {
+         targetDir: './client/bower_components/'
+       }
+      } 
     },
 
     // Add vendor prefixed styles
@@ -707,6 +718,7 @@ module.exports = function (grunt) {
   grunt.registerTask('heroku', [
       'clean:server',
       'env:all',
+      'bower',
       'injector:sass', 
       'browserify',
       'sprite',
