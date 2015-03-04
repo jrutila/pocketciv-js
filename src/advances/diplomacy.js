@@ -31,31 +31,33 @@ module.exports = {
                 this.engine.trading.push(visitor);
             },
             'make_offer': function() {
-                // TODO: Refactor!!
-                var rdc = new reducer.Reducer(this.engine);
-                rdc.mode = reducer.Modes.Overall;
-                rdc.areas = function() {
-                    var areas = {};
-                    _.each(this.engine.map.areas, function(area, key) {
-                        if (area.tribes)
-                            areas[key] = area;
-                    });
-                    return areas;
-                };
-                rdc.reduce = function(chg, area) {
-                    this.amount = 0;
-                    return { 'tribes': chg.tribes }
+                var initial = _.pick(engine.map.areas, function(a) {
+                    return a.tribes > 0;
+                })
+                initial.gold = engine.gold;
+                var opts = {
+                    map: engine.map.areas,
+                    initial: initial,
+                    shows: ['tribes', 'gold'],
+                    edits: ['tribes', 'gold'],
+                    amount: 0,
+                    reduce: function(key, chg) {
+                        if (key == 'gold')
+                            this.amount += this.initial.gold - chg;
+                        else
+                            this.amount += this.initial[key].tribes - chg.tribes;
+                        return chg;
+                    },
+                    check: function() {
+                        return this.amount >= 0;
+                    }
                 }
                 var ctx = this;
-                ctx.engine.reducer(rdc, function(chg) {
-                    console.log("Making offer!")
-                    diplomatic_offer = 0;
-                    _.each(chg, function(chg, area) {
-                        diplomatic_offer += -1*parseInt(chg.tribes);
-                    });
-                    console.log("of "+diplomatic_offer)
-                    if (diplomatic_offer > 0)
-                        ctx.engine.areaChanger(chg, ctx.done);
+                ctx.engine.reducer(new reducer.Reducer(opts), function(ok) {
+                    diplomatic_offer = ok.amount;
+                    console.log("Making offer of "+diplomatic_offer)
+                    ctx.change(ok.changes);
+                    ctx.done && ctx.done();
                 });
             }
         },

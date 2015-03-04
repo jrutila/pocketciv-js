@@ -13,7 +13,10 @@
                 <input ng-switch-when="number" ng-if="reducer.opts.edits.indexOf(k) > -1" class="{{ k }}" value="{{ v }}" type="number" ng-model="reduceObject[a][k]"/>
                 <input ng-switch-when="boolean" ng-if="reducer.opts.edits.indexOf(k) > -1" class="{{ k }}" value="{{ v }}" type="checkbox" ng-model="reduceObject[a][k]"/>
             </li>
-            <li ng-if="a == 'gold'" class="gold">{{ c }}</li>
+            <li ng-if="a == 'gold' && reducer.opts.edits.indexOf(a) == -1" class="gold">{{ c }}</li>
+            <li ng-if="a == 'gold' && reducer.opts.edits.indexOf(a) > -1">
+                <input type="number" ng-model="reduceObject[a]" class="gold" value="{{ c }}"/>
+            </li>
         </ul>
     </div><div>
         <ul class="list-inline" ng-repeat="(a, c) in ok.changes">

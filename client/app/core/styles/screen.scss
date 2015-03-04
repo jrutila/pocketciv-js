@@ -55,12 +55,14 @@ body {
 @media (max-height: 700px) {
     #card.pushed {
         bottom: -1*($cardHeight - $eventTop);
+        opacity: 0.9;
     }
     #card.shown {
         bottom: 0px;
     }
     #deck.pushed {
         bottom: -1*($cardHeight / 2);
+        opacity: 0.9;
     }
 }
 

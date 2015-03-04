@@ -20,7 +20,10 @@ pocketcivApp.directive('pcReducer', function() {
                 var edits = $scope.reducer.opts.edits;
                 if (edits && edits.length > 0) {
                     _.each($scope.reducer.opts.initial, function(i, ik) {
-                        $scope.reduceObject[ik] = _.pick(i, _.without(edits, 'id')); //, function(e) { return [e,null]; });
+                        if (!isNaN(parseInt(ik)))
+                            $scope.reduceObject[ik] = _.pick(i, _.without(edits, 'id')); //, function(e) { return [e,null]; });
+                        else
+                            $scope.reduceObject[ik] = i;
                     });
                 }
                 if (edits && edits.length > 0 && !_.contains(edits, 'id'))
