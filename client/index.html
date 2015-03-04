@@ -8,16 +8,14 @@
 
     <!-- build:css(client) app/vendor.css -->
       <!-- bower:css -->
-      <link rel="stylesheet" href="bower_components/angular-snap/angular-snap.css" />
-      <link rel="stylesheet" href="bower_components/angular-hotkeys/build/hotkeys.min.css" />
       <!-- endbower -->
     <!-- endbuild -->
     <!-- build:css({.tmp,client}) app/app.css -->
-      <link rel="stylesheet" href="app/app.css">
-      <link rel="stylesheet" href="sprite/sprites.css">
       <!-- injector:css -->
       <!-- endinjector -->
     <!-- endbuild -->
+    <!-- injector:sprites -->
+    <!-- endinjector -->
     <title>PocketCiv Online</title>
 
 </head>    
@@ -447,25 +445,16 @@
     
     <!-- build:js({client,node_modules}) app/vendor.js -->
       <!-- bower:js -->
-      <script src="bower_components/jquery/dist/jquery.js"></script>
-      <script src="bower_components/underscore/underscore.js"></script>
-      <script src="bower_components/angular/angular.js"></script>
-      <script src="bower_components/ngstorage/ngStorage.js"></script>
-      <script src="bower_components/snapjs/snap.js"></script>
-      <script src="bower_components/angular-snap/angular-snap.js"></script>
-      <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
-      <script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
-      <script src="bower_components/angular-hotkeys/build/hotkeys.min.js"></script>
-      <script src="bower_components/hammerjs/hammer.js"></script>
-      <script src="bower_components/jquery-overflowandroid/jquery.overflowandroid.min.js"></script>
       <!-- endbower -->
     <!-- endbuild -->
     
     <!-- build:js({.tmp,client}) app/app.js -->
       <!-- injector:js -->
-      <script src="app/pocketciv.js"></script>
-      <script src="app/web.js"></script>
       <!-- endinjector -->
     <!-- endbuild -->
+
+<!-- @if NODE_ENV='production' -->
+    <!-- @include google_analytics.html -->
+<!-- @endif -->
 </body>
 </html>

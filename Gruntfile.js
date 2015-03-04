@@ -21,6 +21,7 @@ module.exports = function (grunt) {
     sprite: 'grunt-spritesmith',
     browserify: 'grunt-browserify',
     bower: 'grunt-bower-task',
+    preprocess: 'grunt-preprocess',
   });
 
   // Time how long tasks take. Can help when optimizing build times
@@ -114,6 +115,11 @@ module.exports = function (grunt) {
           '<%= yeoman.client %>/{app,components}/**/*.jade'],
         tasks: ['jade']
       },
+      html: {
+        files: [
+          '<%= yeoman.client %>/index.html'],
+        tasks: ['preprocess', 'injector', 'wiredep']
+      },
       gruntfile: {
         files: ['Gruntfile.js']
       },
@@ -190,6 +196,18 @@ module.exports = function (grunt) {
        }
       } 
     },
+    
+    preprocess: {
+        options: {
+          context : {
+            DEBUG: true
+          }
+        },
+        html: {
+          src: 'client/index.html',
+          dest: '.tmp/index.html'
+        }
+    },
 
     // Add vendor prefixed styles
     autoprefixer: {
@@ -243,7 +261,7 @@ module.exports = function (grunt) {
     // Automatically inject Bower components into the app
     wiredep: {
       target: {
-        src: '<%= yeoman.client %>/index.html',
+        src: '.tmp/index.html',
         ignorePath: '<%= yeoman.client %>/',
         exclude: [/bootstrap-sass-official/, /bootstrap.js/, '/json3/', '/es5-shim/', /bootstrap.css/, /font-awesome.css/ ]
       }
@@ -542,7 +560,8 @@ module.exports = function (grunt) {
           endtag: '<!-- endinjector -->'
         },
         files: {
-          '<%= yeoman.client %>/index.html': [
+          //'<%= yeoman.client %>/index.html': [
+          '.tmp/index.html': [
               [
                //'{.tmp,<%= yeoman.client %>}/components/HexagonTools/js/HexagonTools.js',
                //'{.tmp,<%= yeoman.client %>}/components/**/*.js',
@@ -586,8 +605,10 @@ module.exports = function (grunt) {
           endtag: '<!-- endinjector -->'
         },
         files: {
-          '<%= yeoman.client %>/index.html': [
-            '<%= yeoman.client %>/{app,components}/**/*.css'
+          //'<%= yeoman.client %>/index.html': [
+          '.tmp/index.html': [
+            '<%= yeoman.client %>/{app,components}/**/*.css',
+            '.tmp/**/*.css'
           ]
         }
       },
@@ -603,7 +624,7 @@ module.exports = function (grunt) {
           endtag: '<!-- endinjector -->'
         },
         files: {
-          '<%= yeoman.client %>/index.html': [
+          '.tmp/index.html': [
             '<%= yeoman.client %>/{app,components}/**/*.css'
           ]
         }
@@ -642,18 +663,24 @@ module.exports = function (grunt) {
       return grunt.task.run([
         'clean:server',
         'env:all',
+        'preprocess',
         'injector:sass', 
+        'browserify',
+        'sprite',
+        'injector:sprite', 
+        'injector:scripts', 
+        'injector:css', 
         'concurrent:server',
         'injector',
         'wiredep',
         'autoprefixer',
-        'concurrent:debug'
       ]);
     }
 
     grunt.task.run([
       'clean:server',
       'env:all',
+      'preprocess',
       'injector:sass', 
       'browserify',
       'sprite',
@@ -717,11 +744,15 @@ module.exports = function (grunt) {
 
   grunt.registerTask('heroku', [
       'clean:server',
-      'env:all',
+      'env:prod',
       'bower',
+      'preprocess',
       'injector:sass', 
       'browserify',
       'sprite',
+      'injector:sprite', 
+      'injector:scripts', 
+      'injector:css', 
       'concurrent:server',
       'injector',
       'wiredep',

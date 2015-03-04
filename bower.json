@@ -28,6 +28,7 @@
     "angular-sanitize": "~1.2.22",
     "angular-hotkeys": "chieffancypants/angular-hotkeys#~1.4.5",
     "bootstrap-sass-official": "~3.3.3",
-    "jquery-overflowandroid": "~0.7.7"
+    "jquery-overflowandroid": "~0.7.7",
+    "angulartics": "~0.17.2"
   }
 }
