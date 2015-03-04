@@ -589,6 +589,7 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
         $(window).resize(function() {
             $(".menu-arrow").height($("#welcome p:nth(1)").position().top)    
         })
+        $("body").removeClass("initiating")
     })
 });
 

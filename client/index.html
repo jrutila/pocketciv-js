@@ -19,7 +19,8 @@
     <title>PocketCiv Online</title>
 
 </head>    
-<body ng-controller="MainGame">
+<body ng-controller="MainGame" class="initiating">
+    <p>loading...</p>
     <!--<a id="github" target="_blank" href="https://github.com/jrutila/pocketciv-js"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>-->
     <nav snap-drawer>
         <accordion>
@@ -71,6 +72,7 @@
         <script id='fbj19f7'>(function(i){var f,s=document.getElementById(i);f=document.createElement('iframe');f.src='//api.flattr.com/button/view/?uid=jrutila&button=compact&url=http%3A%2F%2Fpocketciv-js.herokuapp.com%2F';f.title='Flattr';f.height=20;f.width=110;f.style.borderWidth=0;s.parentNode.insertBefore(f,s);})('fbj19f7');</script>
     </nav>
     <div id="main" snap-content snap-options="snapOpts">
+        
     <div id="infobar" snap-dragger >
         <div id="mainmenu_toggle" class="navbar-toggle" snap-toggle="left">
             <span class="icon-bar"></span>
@@ -82,6 +84,27 @@
         <span>Gold: {{ engine.gold }}</span>
         <span>Glory: {{ engine.glory }}</span><br/>
         <span>{{ engine.phase }}</span>
+    </div>
+    
+    <div id="welcome" ng-show="welcome" style="z-index: 190">
+        <div class="menu-arrow"></div>
+        <h1>Welcome to play Pocket Civ</h1>
+        <p>
+            This is a Javascript implementation of the great PocketCiv print'n'play.
+            Original game files and rules can be found <a href="http://www.backglass.org/scotts/games/PocketCiv/html/index.htm">here</a>.
+        </p>
+        <p>
+            You can start playing using the menu. Please see the <a href="https://github.com/jrutila/pocketciv-js/issues">issues</a> for unimplemented features and bugs.
+        </p>
+        <p>
+            Please join the development of this implementation at <a href="https://github.com/jrutila/pocketciv-js">GitHub</a>.
+        </p>
+        <br/>
+        <script id='fbkhko4'>(function(i){var f,s=document.getElementById(i);f=document.createElement('iframe');f.src='//api.flattr.com/button/view/?uid=jrutila&url='+encodeURIComponent(document.URL);f.title='Flattr';f.height=62;f.width=55;f.style.borderWidth=0;s.parentNode.insertBefore(f,s);})('fbkhko4');</script>
+        <div class="cb-tip-button" data-content-location="" data-href="//www.coinbase.com/tip_buttons/show_tip" data-to-user-id="54c4ec6eb834ded0dc000096"></div>
+        <script>!function(d,s,id) {var js,cjs=d.getElementsByTagName(s)[0],e=d.getElementById(id);if(e){return;}js=d.createElement(s);js.id=id;js.src="https://www.coinbase.com/assets/tips.js";cjs.parentNode.insertBefore(js,cjs);}(document, 'script', 'coinbase-tips');</script>
+
+        <a target="_blank" href="https://github.com/jrutila/pocketciv-js"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
     </div>
     
     <!--BEGIN DECK AND CARD-->
@@ -428,27 +451,6 @@
         </div>
     </div>
     
-    
-    <div id="welcome" ng-show="welcome">
-        <div class="menu-arrow"></div>
-        <h1>Welcome to play Pocket Civ</h1>
-        <p>
-            This is a Javascript implementation of the great PocketCiv print'n'play.
-            Original game files and rules can be found <a href="http://www.backglass.org/scotts/games/PocketCiv/html/index.htm">here</a>.
-        </p>
-        <p>
-            You can start playing using the menu. Please see the <a href="https://github.com/jrutila/pocketciv-js/issues">issues</a> for unimplemented features and bugs.
-        </p>
-        <p>
-            Please join the development of this implementation at <a href="https://github.com/jrutila/pocketciv-js">GitHub</a>.
-        </p>
-        <br/>
-        <script id='fbkhko4'>(function(i){var f,s=document.getElementById(i);f=document.createElement('iframe');f.src='//api.flattr.com/button/view/?uid=jrutila&url='+encodeURIComponent(document.URL);f.title='Flattr';f.height=62;f.width=55;f.style.borderWidth=0;s.parentNode.insertBefore(f,s);})('fbkhko4');</script>
-        <div class="cb-tip-button" data-content-location="" data-href="//www.coinbase.com/tip_buttons/show_tip" data-to-user-id="54c4ec6eb834ded0dc000096"></div>
-        <script>!function(d,s,id) {var js,cjs=d.getElementsByTagName(s)[0],e=d.getElementById(id);if(e){return;}js=d.createElement(s);js.id=id;js.src="https://www.coinbase.com/assets/tips.js";cjs.parentNode.insertBefore(js,cjs);}(document, 'script', 'coinbase-tips');</script>
-
-        <a target="_blank" href="https://github.com/jrutila/pocketciv-js"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
-    </div>
     
     </div><!-- snap-content -->
     
