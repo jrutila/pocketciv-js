@@ -16,17 +16,6 @@ var AdvanceAcquirer = require("../../src/actions/acquire").AdvanceAcquirer;
 
 pp = pocketciv
 
-resetGameLog = function(scen){
-gameLog = {
-    "scenario": scen,
-    "move": [],
-    "deck": [],
-    "reduce": [],
-    "advance": [],
-    "acquires": [],
-};
-};
-resetGameLog();
 
 var scenarios = {
     "scenario1": require("../../src/scenarios/scenario1"),
@@ -42,6 +31,20 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
             return [id, area.tribes ? area.tribes : 0 ];
         }));
     }
+    
+    $scope.debug = {};
+    
+    var resetGameLog = function(scen){
+    $scope.debug.gameLog = {
+        "scenario": scen,
+        "move": [],
+        "deck": [],
+        "reduce": [],
+        "advance": [],
+        "acquires": [],
+    };
+    };
+    resetGameLog();
 
     $scope.snapOpts = {
     }
@@ -66,11 +69,11 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
         {
             console.log("OK MOVE!");
             moveFunc(ok);
+            $scope.debug.gameLog.move.push($scope.movement)
             $scope.hideMover = true;
             $scope.mapInfo = undefined;
             $scope.movement = undefined;
             $scope.mover = undefined;
-            gameLog.move.push($scope.movement)
         } else {
             console.log("FAILED MOVE")
         }
@@ -134,7 +137,7 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
             $scope.card = $scope.deck.draw();
             if ($scope.specificCard)
                 $scope.card = $scope.deck.specific($scope.specificCard);
-            gameLog.deck.push($scope.card.id)
+            $scope.debug.gameLog.deck.push($scope.card.id)
         } else {
             
         }
@@ -150,7 +153,7 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
         console.log("Show reducer "+reducer.opts)
         $scope.reducer = reducer;
         $scope.reduceReady = function(ok) {
-            gameLog.reduce.push(ok ? ok.changes : {});
+            $scope.debug.gameLog.reduce.push(ok ? ok.chg : {});
             done(ok);
         };
     }
@@ -239,13 +242,13 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
     $scope.acquireOk = function() {
         doAcquire.call($scope.engine, $scope.acquirer.acquired);
         if ($scope.acquirer.acquired)
-            gameLog.acquires.push(
+            $scope.debug.gameLog.acquires.push(
                 _.object(_.map($scope.acquirer.acquired, function (advn, key) {
                     return [key, advn.name];
                 }))
             );
         else
-            _.last(gameLog.advance).pop("acquire");
+            _.last($scope.debug.gameLog.advance).pop("acquire");
         $scope.acquiring = false;
         $scope.possibleAdvances = undefined;
     }
@@ -348,7 +351,7 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
     
     $scope.advance = function(name) {
         $scope.engine.runPhase('advance', name);
-        _.last(gameLog.advance).push(name);
+        _.last($scope.debug.gameLog.advance).push(name);
     }
     
     $scope.$watch(function(){ return $scope.engine.phase; }, function(name) {
@@ -356,7 +359,7 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
         if (name == 'advance')
         {
             console.log("gameLog advance")
-            gameLog.advance.push([]);
+            $scope.debug.gameLog.advance.push([]);
         }
         $scope.currentEvent = undefined;
         $scope.mapInfo = undefined;
@@ -367,14 +370,14 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
     
     $scope.saveGamePlay = function() {
         console.log("Saving game "+$scope.gameName)
-        $scope.$storage[$scope.gameName] = JSON.stringify(gameLog);
+        $scope.$storage[$scope.gameName] = JSON.stringify($scope.debug.gameLog);
     }
     
     var loading = false;
     $scope.loadGamePlay = function(name, game) {
         $scope.gameName = name;
         console.log("run: "+game)
-        gameLog = JSON.parse(game);
+        $scope.debug.gameLog = JSON.parse(game);
         loading = true;
         $scope.engine.phase = "populate";
         runplay.run($scope.engine, JSON.parse(game), function() { loading = false; })
@@ -570,7 +573,7 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
     $scope.bugDescr = undefined;
     $scope.sendBug = function() {
         console.log("Sending bug")
-        var gLog = _.clone(gameLog)
+        var gLog = _.clone($scope.debug.gameLog)
         gLog.comment = $scope.bugDescr;
         //gLog.engine = $scope.engine;
         $http.post('gamelog/add', gLog).success(function(data) {
