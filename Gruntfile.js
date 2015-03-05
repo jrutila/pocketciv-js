@@ -206,6 +206,10 @@ module.exports = function (grunt) {
         html: {
           src: 'client/index.html',
           dest: '.tmp/index.html'
+        },
+        js: {
+          src: '.tmp/app/web.js',
+          dest: '.tmp/app.web.js'
         }
     },
 
