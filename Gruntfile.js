@@ -413,6 +413,7 @@ module.exports = function (grunt) {
           dest: '.tmp',
           src: [
             '**/sprites.css',
+            'images/spritesheet.png', // 'destination': 'source'
           ]
         }]
       },
@@ -756,7 +757,6 @@ module.exports = function (grunt) {
       'rev',
       'injector', 
       'htmlmin',
-      'imagemin',
       
       
       /*
