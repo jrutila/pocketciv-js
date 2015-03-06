@@ -400,9 +400,9 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
     $scope.engine = new pocketciv.EngineBuild({});
     $scope.engine.phase = "";
     $scope.godMode = false;
-    // @exclude
+    //@exclude
     $scope.godMode = true;
-    // @endexclude
+    //@endexclude
     
     $scope.toggleGod = function(gm) {
         $scope.godMode = gm;

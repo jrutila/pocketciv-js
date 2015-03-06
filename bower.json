@@ -30,5 +30,13 @@
     "bootstrap-sass-official": "~3.3.3",
     "jquery-overflowandroid": "~0.7.7",
     "angulartics": "~0.17.2"
+  },
+  "exportsOverride": {
+    "bootstrap-sass-official": {
+      "": "assets/stylesheets/bootstrap/_variables.scss"
+    },
+    "requirejs": {
+      "js": "require.js"
+    }
   }
 }

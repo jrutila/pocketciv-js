@@ -25,6 +25,7 @@ var db = mongo.db(process.env.MONGOHQ_URL || "mongodb://localhost:27017/pocketci
 
 app.use(express.static(__dirname+"/../.tmp/"))
 app.use(express.static(__dirname+"/../client/"))
+app.use('/bower_components', express.static(__dirname+"/../bower_components/"))
 
 app.use(bodyParser.json());
 
