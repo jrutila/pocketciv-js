@@ -23,7 +23,7 @@ var gameLogRoutes = require('./routes/gameLog')
 var app = express();
 var db = mongo.db(process.env.MONGOHQ_URL || "mongodb://localhost:27017/pocketciv", { native_parser: true});
 
-app.use(express.static(__dirname+"/../.tmp/"))
+app.use(express.static(__dirname+"/../.build/"))
 app.use(express.static(__dirname+"/../client/"))
 app.use('/bower_components', express.static(__dirname+"/../bower_components/"))
 

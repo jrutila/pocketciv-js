@@ -183,6 +183,16 @@ module.exports = function (grunt) {
           ]
         }]
       },
+      onlymin: {
+        files: [
+          {src: [
+            '.build/js/*.js', '!.build/js/*.min.js'
+          ]},
+          {src: [
+            '.build/css/*.css', '!.build/css/*.min.css', '!.build/css/sprites.css'
+          ]}
+        ]
+      },
       server: '.tmp'
     },
     
@@ -278,8 +288,8 @@ module.exports = function (grunt) {
       dist: {
         files: {
           src: [
-            '.tmp/{,*/}*.js',
-            '.tmp/{,*/}*.css',
+            '.build/js/*.js',
+            '.build/css/*.css',
             //'.build/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}',
             //'<%= yeoman.dist %>/public/assets/fonts/*'
           ]
@@ -417,6 +427,20 @@ module.exports = function (grunt) {
           ]
         }]
       },
+      dev: {
+        files: [{
+          expand: true,
+          dot: true,
+          cwd: 'client',
+          dest: '.build',
+          src: [
+            '**/*.js',
+            '**/index.html',
+            'app/app.scss',
+          ]
+        }]
+        
+      }
     },
     
     buildcontrol: {
@@ -515,6 +539,7 @@ module.exports = function (grunt) {
             'bower_components',
             '.build/app',
             '.build/scss',
+            'client/app',
           ],
           compass: false
         },
@@ -532,7 +557,7 @@ module.exports = function (grunt) {
       },
       dist: {
         files: {
-          '.tmp/app.min.js': ['.build/js/*.js']
+          '.build/js/app.min.js': ['.build/js/*.js']
         }
       }
     },
@@ -543,7 +568,7 @@ module.exports = function (grunt) {
           expand: true,
           cwd: '.build/css',
           src: ['*.css', '!*.min.css', "!sprites.css"],
-          dest: '.tmp',
+          dest: '.build/css',
           ext: '.min.css'
         }]
       }
@@ -559,9 +584,9 @@ module.exports = function (grunt) {
           expand: true,
           cwd: '.build',
           src: ['app/**/*.html'],
-          dest: '.tmp',
+          dest: '.build',
         },{                                   // Dictionary of files
-          '.tmp/index.html': '.build/index.html',     // 'destination': 'source'
+          '.build/index.html': '.build/index.html',     // 'destination': 'source'
         }
         ]
       },
@@ -585,7 +610,7 @@ module.exports = function (grunt) {
         files: {
           //'<%= yeoman.client %>/index.html': [
           '.build/index.html': [
-              [ '.tmp/*.js' ]
+              [ '.build/js/*.js' ]
           ]
         }
       },
@@ -603,12 +628,12 @@ module.exports = function (grunt) {
         },
         files: {
           '.build/app/app.scss': [
-            '.build/app/**/*.{scss,sass}',
-            '!.build/app/app.scss'
+            'client/app/**/*.{scss,sass}',
+            '!client/app/app.scss'
           ]
         }
       },
-
+     
       // Inject component css into index.html
       css: {
         options: {
@@ -622,7 +647,7 @@ module.exports = function (grunt) {
         },
         files: {
           '.build/index.html': [
-            '.tmp/*.css', '.tmp/css/*.css'
+            '.build/css/*.css', 
           ]
         }
       },
@@ -656,35 +681,21 @@ module.exports = function (grunt) {
         ]);
     }
 
-    if (target === 'debug') {
-      return grunt.task.run([
-        'clean:server',
-        'env:all',
-        'preprocess',
-        'injector:sass', 
-        'browserify',
-        'sprite',
-        'injector:sprite', 
-        'injector:scripts', 
-        'injector:css', 
-        'concurrent:server',
-        'injector',
-        'wiredep',
-        'autoprefixer',
-      ]);
-    }
-
     grunt.task.run([
       'clean:server',
       'env:all',
+      'copy:dev',
       'injector:sass', 
       'browserify',
       'sprite',
-      'concurrent:server',
-      'injector',
+      'sass',
       'wiredep',
-      'preprocess',
-      'autoprefixer',
+      'injector',
+      
+      //'concurrent:server',
+      //'preprocess',
+      //'autoprefixer',
+      
       'express:dev',
       'wait',
       //'open',
@@ -697,47 +708,6 @@ module.exports = function (grunt) {
     grunt.task.run(['serve']);
   });
 
-  grunt.registerTask('test', function(target) {
-    if (target === 'server') {
-      return grunt.task.run([
-        'env:all',
-        'env:test',
-        'mochaTest'
-      ]);
-    }
-
-    else if (target === 'client') {
-      return grunt.task.run([
-        'clean:server',
-        'env:all',
-        'injector:sass', 
-        'concurrent:test',
-        'injector',
-        'autoprefixer',
-        'karma'
-      ]);
-    }
-
-    else if (target === 'e2e') {
-      return grunt.task.run([
-        'clean:server',
-        'env:all',
-        'env:test',
-        'injector:sass', 
-        'concurrent:test',
-        'injector',
-        'wiredep',
-        'autoprefixer',
-        'express:dev',
-        'protractor'
-      ]);
-    }
-
-    else grunt.task.run([
-      'test:server',
-      'test:client'
-    ]);
-  });
 
   grunt.registerTask('heroku', [
       'clean',
@@ -753,7 +723,7 @@ module.exports = function (grunt) {
       'uglify',
       'autoprefixer',
       'cssmin',
-      'copy:tmp',
+      'clean:onlymin',
       'rev',
       'injector', 
       'htmlmin',
