@@ -61,66 +61,30 @@ module.exports = function (grunt) {
       }
     },
     watch: {
-      injectJS: {
-        files: [
-          '<%= yeoman.client %>/{app,components}/**/*.js',
-          'src/**/*.js',
-          '!<%= yeoman.client %>/{apnp,components}/**/*.spec.js',
-          '!<%= yeoman.client %>/{app,components}/**/*.mock.js',
-          '!<%= yeoman.client %>/app/app.js'],
-        tasks: ['injector:scripts']
-      },
-      injectCss: {
-        files: [
-          '<%= yeoman.client %>/{app,components}/**/*.css'
-        ],
-        tasks: ['injector:css']
-      },
       sprite: {
         files: [
-          '<%= yeoman.client %>/{app,components}/images/**/icons/*.png'
+          'client/images/**/icons/*.png'
         ],
         tasks: ['sprite']
       },
       browserify: {
         files: [
           'src/**/*.js',
-          '<%= yeoman.client %>/{app,components}/**/*.js',
+          'client/**/*.js',
         ],
         tasks: ['browserify']
         
       },
-      mochaTest: {
-        files: ['server/**/*.spec.js'],
-        tasks: ['env:test', 'mochaTest']
-      },
-      jsTest: {
-        files: [
-          '<%= yeoman.client %>/{app,components}/**/*.spec.js',
-          '<%= yeoman.client %>/{app,components}/**/*.mock.js'
-        ],
-        tasks: ['newer:jshint:all', 'karma']
-      },
-      injectSass: {
-        files: [
-          '<%= yeoman.client %>/{app,components}/**/*.{scss,sass}'],
-        tasks: ['injector:sass']
-      },
       sass: {
         files: [
-          '<%= yeoman.client %>/{app,components}/**/*.{scss,sass}'],
+          'client/app/**/*.{scss,sass}',
+        ],
         tasks: ['sass', 'autoprefixer']
-      },
-      jade: {
-        files: [
-          '<%= yeoman.client %>/{app,components}/*',
-          '<%= yeoman.client %>/{app,components}/**/*.jade'],
-        tasks: ['jade']
       },
       html: {
         files: [
-          '<%= yeoman.client %>/*.html'],
-        tasks: ['injector', 'wiredep']
+          'client/index.html'],
+        tasks: ['copy:dev', 'wiredep', 'injector']
       },
       gruntfile: {
         files: ['Gruntfile.js']
