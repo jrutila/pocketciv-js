@@ -342,20 +342,109 @@ describe('City Advance (worker)', function() {
     var ok = null;
     beforeEach(function() {
       engine.map.areas = {
-        4: { id: 4, 'tribes': 3, 'city': 1, 'neighbours': [ 3, 1 ] },
-        3: { id: 3, 'tribes': 2, 'city': 2, 'neighbours': [ 4, 2 ] },
-        2: { id: 2, 'tribes': 5, 'city': 1, 'neighbours': [ 3 ] },
-        1: { id: 1, 'neighbours': [ 4 ] },
+        2: { id: 2, 'city': 4, 'tribes': 7, 'mountain': true, 'farm': false, 'neighbours': [ 1 ] },
+        1: { id: 1, 'city': 2, 'tribes': 1, 'forest': true, 'neighbours': [ 2 ] },
       };
       opts = {
         map: engine.map.areas,
         initial: engine.map.areas,
+        city_amount: 2,
+        max_city: 4,
+        capitol: true,
+        amount: 0,
         reduce: CityAdvance.reduce,
         current: CityAdvance.current,
         check: CityAdvance.check,
       };
       target = new reducer.Reducer(opts);
     })
-    
+    describe('in one area', function() {
+      it('should work on empty', function() {
+        ok = target.ok({});
+        ok.amount.should.equal(0);
+        ok.current.should.deep.equal(engine.map.areas);
+      })
+      it('should work with capitol from same area', function() {
+        ok = target.ok({ 2: { city: 5, tribes: 7 }});
+        ok.amount.should.equal(5);
+        ok = target.ok({ 2: { city: 5, tribes: 2 }});
+        ok.amount.should.equal(0);
+      })
+      it('should work without other area', function() {
+        ok = target.ok({ 2: { city: 5, tribes: 3 }});
+        ok.amount.should.equal(1);
+        ok.ok.should.be.false;
+        ok = target.ok({ 2: { city: 5, tribes: 3 }, 1: { tribes: 0 }});
+        ok.amount.should.equal(0);
+        ok.ok.should.be.false;
+      })
+      it('should work with double increase', function() {
+        engine.map.areas[1].city = 3;
+        engine.map.areas[1].tribes = 5;
+        ok = target.ok({ 1: { city: 5, tribes: 0 }});
+        ok.ok.should.be.false;
+        ok.amount.should.equal(4);
+        ok = target.ok({ 1: { city: 5, tribes: 0 }, 2: { tribes: 3 }});
+        ok.ok.should.be.false;
+        ok.amount.should.equal(0);
+        ok = target.ok({ 1: { city: 5, tribes: 0, forest: false }, 2: { tribes: 3 }});
+        ok.ok.should.be.true;
+        ok.amount.should.equal(0);
+      })
+    })
+    describe('in multiple areas', function() {
+      it('should work with other area', function() {
+        ok = target.ok({ 2: { city: 5, tribes: 2 }, 1: { tribes: 0, city: 3 }});
+        ok.amount.should.equal(2);
+        ok.ok.should.be.false;
+        ok = target.ok({ 2: { city: 5, tribes: 0 }, 1: { tribes: 0, city: 3 }});
+        ok.amount.should.equal(0);
+        ok.ok.should.be.false;
+      })
+    })
+    describe('requires decimated resource', function() {
+      it('in same area', function() {
+        ok = target.ok({ 2: { city: 5, tribes: 2, mountain: false }});
+        ok.amount.should.equal(0);
+        ok.ok.should.be.true;
+      })
+      it('in other area', function() {
+        ok = target.ok({ 2: { city: 5, tribes: 0 }, 1: { tribes: 0, city: 3, forest: false }});
+        ok.amount.should.equal(0);
+        ok.ok.should.be.true;
+      })
+      it('but does not allow multiple decimated resources', function() {
+        ok = target.ok({ 2: { city: 5, tribes: 0, mountain: false },
+                         1: { tribes: 0, city: 3, forest: false }});
+        ok.ok.should.be.false;
+      })
+    })
+    describe('should work', function() {
+      beforeEach(function() {
+        var areas =
+        { "3": { "id": 3, "city": 4, "mountain": true, "forest": true, "tribes": 7, "farm": true, "neighbours": [ 4, 5, 6, 8, "sea" ] },
+          "4": { "id": 4, "tribes": 3, "city": 2, "mountain": true, "forest": true, "farm": true, "neighbours": [ 3, 8, "sea", "frontier" ] },
+          "5": { "id": 5, "tribes": 2, "mountain": true, "forest": true, "neighbours": [ 3, 6, 8, "sea", "frontier" ] },
+          "6": { "id": 6, "tribes": 1, "neighbours": [ 3, 5, 8 ], "forest": true },
+          "8": { "id": 8, "neighbours": [ 3, 4, 5, 6, "frontier" ], "desert": true }
+        }
+        opts = {
+          map: areas,
+          initial: areas,
+          reduce: CityAdvance.reduce,
+          current: CityAdvance.current,
+          check: CityAdvance.check,
+        };
+        opts.amount = 0;
+        opts.max_city = 2;
+        opts.city_amount = 1;
+        opts.capitol = true;
+        target = new reducer.Reducer(opts);
+      })
+      it('case 1', function() {
+        ok = target.ok({3: { city: 5, tribes: 2, forest: false }});
+        ok.ok.should.be.true;
+      }) 
+    })
   })
 })

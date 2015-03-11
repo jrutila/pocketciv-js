@@ -68,8 +68,9 @@ NewReducer.prototype = {
         key = c;
       //this.current[key] = _.clone(this.initial[key]);
       var trg = this.reduce(key, c);
-      if (trg === false) {
-        this.failed.push('reduce failed');
+      if (trg === false || _.isString(trg)) {
+        this.failed.push(trg === false ? 'reduce failed' : trg);
+        // TODO: Maybe not this?
         this.current = _.clone(opts.initial);
         return;
       }

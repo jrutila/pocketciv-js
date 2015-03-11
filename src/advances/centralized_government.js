@@ -8,8 +8,7 @@ module.exports = {
     requires: [ 'military' ],
     required_by: [  ],
     events: { },
-    actions: {
-        // TODO: During upkeep, advance one city
-        // over 4 thus making it Capitol
+    acquired: function() {
+        this.params.capitol = true;
     },
 }
