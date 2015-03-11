@@ -370,7 +370,7 @@ Engine.prototype = {
                             return;
                         }
                         
-                        if (name != "advance" && eng.phase != "gameover")
+                        if (name != "advance" && name != "end_of_era" && eng.phase != "gameover")
                             eng.nextPhase();
                     };
         
