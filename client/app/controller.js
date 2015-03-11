@@ -33,6 +33,7 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
     }
     
     $scope.debug = {};
+    $scope.hideHelp = true;
     
     var resetGameLog = function(scen){
     $scope.debug.gameLog = {

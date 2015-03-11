@@ -96,6 +96,7 @@
         <span>Gold: {{ engine.gold }}</span>
         <span>Glory: {{ engine.glory }}</span><br/>
         <span>{{ engine.phase }}</span>
+        <div id="helpButton" ng-click="hideHelp = !hideHelp" ng-show="engine.phase && engine.phase != 'gameover'"><span class="glyphicon glyphicon-info-sign"></span></div>
     </div>
     
     <div id="welcome" ng-show="welcome" style="z-index: 190">
@@ -154,6 +155,26 @@
         
         <div id="eventRunner" ng-show="currentEvent">
             <pc-event-view event="currentEvent" engine="engine" step="currentStep"></pc-event-view>
+        </div>
+        
+        <div id="helpWrapper">
+            
+        <div id="help" ng-class="{ hidden: hideHelp }" ng-show="engine.phase && engine.phase != 'gameover'">
+            <h3>Goal</h3>
+            <p class="goal">{{ engine.goal }}</p>
+            <h3>Acquired advances</h3>
+            <table class="advances table table-condensed">
+                <tr ng-repeat="acq in engine.acquired">
+                    <td>
+                        {{ engine.advances[acq].title }}
+                    </td>
+                    <td>
+                        {{ engine.advances[acq].description }}
+                    </td>
+                </tr>
+            </table>
+        </div>
+        
         </div>
     
         <div id="start" class="gameInfo" ng-hide="engine.phase">
