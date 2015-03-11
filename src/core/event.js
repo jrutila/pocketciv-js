@@ -11,6 +11,7 @@ var Context = function(rootCtx) {
     this.go = undefined;
     this.done = undefined;
     this.initial = _.clone(rootCtx.targets);
+    rootCtx.ctx && _.extend(this, rootCtx.ctx);
     };
     
 Context.prototype = {

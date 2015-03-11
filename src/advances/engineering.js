@@ -34,7 +34,7 @@ module.exports = {
         },
         'flood': {
             'steps': {
-                '3.3': "+ If you have {{ adv:engineering }}, 1 Wonder = 10 Damage.{% dmgWn = 10 %}"
+                '3.2.1': "+ If you have {{ adv:engineering }}, 1 Wonder = 10 Damage.{% dmgWn = 10 %}"
             }
         }
     },

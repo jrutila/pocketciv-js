@@ -121,7 +121,7 @@ module.exports = {
         gold_reduce: gold_reduce,
         shows: ['tribes', 'city', 'gold'],
         edits: [],
-        amount: attack_force,
+        amount: attack_force || ctx.attack_force,
         current: AttackReducer.current,
         reduce: AttackReducer.reduce,
       }
