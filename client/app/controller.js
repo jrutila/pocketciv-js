@@ -14,7 +14,7 @@ var mustache = require("mustache");
 var Map = require("./map")
 var AdvanceAcquirer = require("../../src/actions/acquire").AdvanceAcquirer;
 
-pp = pocketciv
+engine = undefined;
 
 
 var scenarios = {
@@ -566,6 +566,7 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
         }, true);
         
         $scope.welcome = false;
+        engine = $scope.engine;
     }
     
     $scope.saveName = "";
