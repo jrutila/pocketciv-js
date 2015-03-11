@@ -336,4 +336,26 @@ describe('City Advance (worker)', function() {
       });
     })
   })
+  describe("capitol", function() {
+    var target = null;
+    var opts = null;
+    var ok = null;
+    beforeEach(function() {
+      engine.map.areas = {
+        4: { id: 4, 'tribes': 3, 'city': 1, 'neighbours': [ 3, 1 ] },
+        3: { id: 3, 'tribes': 2, 'city': 2, 'neighbours': [ 4, 2 ] },
+        2: { id: 2, 'tribes': 5, 'city': 1, 'neighbours': [ 3 ] },
+        1: { id: 1, 'neighbours': [ 4 ] },
+      };
+      opts = {
+        map: engine.map.areas,
+        initial: engine.map.areas,
+        reduce: CityAdvance.reduce,
+        current: CityAdvance.current,
+        check: CityAdvance.check,
+      };
+      target = new reducer.Reducer(opts);
+    })
+    
+  })
 })

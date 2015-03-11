@@ -172,13 +172,13 @@ Map.prototype = {
 }
 
 function Engine(impl, map, deck) {
-    this.mover = impl.mover || function() { throw "Not implemented mover"; }
-    this.reducer = impl.reducer || function() { throw "Not implemented reducer"; }
-    this.drawer = impl.drawer || function() { throw "Not implemented drawer"; }
-    this.areaChanger = impl.areaChanger || function() { throw "Not implemented areaChanger"; }
-    this.eventStepper = impl.eventStepper || function(done) { done & done(); }
-    this.advanceAcquirer = impl.advanceAcquirer || function() { throw "Not implemented advaneAcquirer"; }
-    this.queryUser = impl.queryUser || function() { throw "Not implemented queryUser"; }
+    this.mover = impl && impl.mover || function() { throw "Not implemented mover"; }
+    this.reducer = impl && impl.reducer || function() { throw "Not implemented reducer"; }
+    this.drawer = impl && impl.drawer || function() { throw "Not implemented drawer"; }
+    this.areaChanger = impl && impl.areaChanger || function() { throw "Not implemented areaChanger"; }
+    this.eventStepper = impl && impl.eventStepper || function(done) { done & done(); }
+    this.advanceAcquirer = impl && impl.advanceAcquirer || function() { throw "Not implemented advaneAcquirer"; }
+    this.queryUser = impl && impl.queryUser || function() { throw "Not implemented queryUser"; }
     this.map = map || new Map();
     this.deck = deck || new EventDeck();
     var eng = this;
