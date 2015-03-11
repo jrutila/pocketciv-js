@@ -148,6 +148,10 @@ body.initiating {
     #help {
         background-color: $color-secondary-1-1;
     }
+    
+    #help.pchidden {
+        display: none !important;
+    }
 }
 
 @media (min-width: $screen-md-min) {
