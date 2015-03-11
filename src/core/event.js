@@ -124,6 +124,9 @@ Context.prototype = {
     neighbours: function(area) {
         return _.pick(this.engine.map.areas, area.neighbours);
     },
+    hasSea: function(area) {
+        return _.any(area.neighbours, reducer.isSea);
+    },
     card_value: function(expr) {
         var h = this.card.hexagon;
         var c = this.card.circle;

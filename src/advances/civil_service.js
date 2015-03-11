@@ -12,7 +12,7 @@ module.exports = {
     events: {
         'flood': {
             'steps': {
-                '3.4': "+ If you have {{ adv:civil_service }}, 1 Tribe = 3 Damage and 1 City AV = 5 Damage.\
+                '3.2.2': "+ If you have {{ adv:civil_service }}, 1 Tribe = 3 Damage and 1 City AV = 5 Damage.\
                 {% dmgTr = 3; dmgCt = 5 %}"
             }
         },

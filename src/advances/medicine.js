@@ -10,9 +10,8 @@ module.exports = {
     events: {
         'flood': {
             'steps': {
-                '4': "+ If you have {{ adv:medicine }}, Create 2 Tribes in each \
-                        region affected by the Tsunami.",
-                '--': "{% healTribes() %}"
+                '3.4': "+ If you have {{ adv:medicine }}, Create 2 Tribes in each \
+                        region affected by the Tsunami. {% healTribes() %}",
             },
             healTribes: function() {
                 console.log("Healing tribes")
