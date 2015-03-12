@@ -235,6 +235,7 @@ var defaults= {
     'era': 1,
     'round': {},
     'round_era': {},
+    'goal': 'Try to advance to the end of the 8th era',
     'name': undefined,
 }
 
