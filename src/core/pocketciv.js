@@ -186,11 +186,13 @@ function Engine(impl, map, deck) {
     this.phases = [ ];
     this.phase = "populate";
     this.events = events;
-    this.advances = advances;
+    this.advances = {};
     this.phaseImpl = phases;
-    this.orig_adv_costs ={};
-    for (var a in advances)
-        this.orig_adv_costs[a] = _.clone(advances[a].cost);
+    this.orig_adv_costs = {};
+    for (var a in advances) {
+        this.advances[a] = _.clone(advances[a]);
+        this.advances[a].cost = _.clone(advances[a].cost);
+    }
     this.acquired = [];
     this.trading = [];
     this.actions = actions;
@@ -262,10 +264,6 @@ Engine.prototype = {
         for (var key in this.map.areas)
         {
             this.map.areas[key].id = parseInt(key);
-        }
-        for (var key in advances)
-        {
-            this.advances[key].cost = _.clone(this.orig_adv_costs[key]);
         }
         this.acquired = [];
         for (var a in state.acquired)
