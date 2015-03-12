@@ -38,6 +38,9 @@ module.exports = {
                     reduce: function(key) {
                         this.amount--;
                         return { 'tribes': this.initial[key].tribes - 3 };
+                    },
+                    check: function() {
+                        return this.amount == 0 || this.amount == 1;
                     }
                 }
                 var rdc = new reducer.Reducer(opts);
