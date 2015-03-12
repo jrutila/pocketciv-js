@@ -72,7 +72,7 @@ module.exports = function (grunt) {
           'src/**/*.js',
           'client/**/*.js',
         ],
-        tasks: ['browserify']
+        tasks: ['preprocess:js', 'browserify']
         
       },
       sass: {
