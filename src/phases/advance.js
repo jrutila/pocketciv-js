@@ -9,7 +9,7 @@ module.exports = {
         var pre = undefined;
         _.each(eng.acquired, function(key) {
             var adv = eng.advances[key];
-            if (name in adv.actions) {
+            if (adv.actions && name in adv.actions) {
                 var action = adv.actions[name];
                 if (action.context)
                 {
