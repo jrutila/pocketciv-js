@@ -75,3 +75,13 @@
     display: inline-block;
 }
 
+.city[data-val='5'],
+.city[data-val='6'],
+.city[data-val='7'],
+.city[data-val='8'],
+.city[data-val='9'],
+.city[data-val='10']
+{
+    border: 2px solid gold;
+}
+

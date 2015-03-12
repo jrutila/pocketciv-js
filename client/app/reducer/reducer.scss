@@ -8,6 +8,16 @@
     input[type=number] {
         width: 40px;
     }
-    .icon {
+    input[type=checkbox] {
+        display: none;
+    }
+    input[type=checkbox] + .icon {
+        background-color: #990000;
+    }
+    input[type=checkbox]:checked + label:not(.icon) {
+        background-color: #009900;
+    }
+    input[type=checkbox]:checked + .icon {
+        background-color: transparent;
     }
 }

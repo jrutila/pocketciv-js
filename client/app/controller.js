@@ -396,7 +396,10 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
             })
         }
         if ($elem.length > 0 && !val) $elem.remove()
-        else $elem.html(val).show()
+        else {
+            $elem.html(val).show();
+            $elem.attr("data-val", val);
+        }
     }
     
     $scope.engine = new pocketciv.EngineBuild({});

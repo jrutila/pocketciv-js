@@ -99,6 +99,9 @@ pocketcivApp.directive('pcReducer', function() {
                     }
                 console.log($scope.chg)
             }
+            $scope.isResource = function(key) {
+                return _.contains(['farm', 'forest', 'mountain', 'volcano'], key);
+            }
         }
     }
 });
