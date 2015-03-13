@@ -97,7 +97,9 @@ module.exports = {
   Reducer: NewReducer,
   isSea: function(n) { return typeof n == "string" && n != "frontier"; },
   Templates: {
-    'basic': function(ctx, properties, reduces) {
+    'basic': function(ctx, properties, opts) {
+      opts = opts || {};
+      if (!_.isArray(properties)) properties = [properties];
       var initial = {};
       _.each(ctx.engine.map.areas, function(area, ak) {
         _.each(properties, function(p) {
@@ -106,6 +108,10 @@ module.exports = {
             pp += parseInt(ctx.changes[ak][p]) || 0;
           if (pp > 0)
           {
+            if (opts.neighbours && !_.contains(ctx.active_region.neighbours, parseInt(ak))) {
+              if (!opts.active_region || ctx.active_region.id != parseInt(ak))
+                return;
+            }
             initial[ak] = initial[ak] || {};
             initial[ak][p] = pp;
           }

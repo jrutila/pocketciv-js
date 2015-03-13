@@ -39,3 +39,9 @@ $iconZoom: 0.7;
     background-position-y: $farm-offset-y * $iconZoom;
     background-position: $farm-offset-x * $iconZoom $farm-offset-y * $iconZoom;
 }
+
+.icon.small.fault {
+    background-position-x: $fault-offset-x * $iconZoom;
+    background-position-y: $fault-offset-y * $iconZoom;
+    background-position: $fault-offset-x * $iconZoom $fault-offset-y * $iconZoom;
+}
