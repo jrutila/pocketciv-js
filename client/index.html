@@ -182,6 +182,7 @@
             <div class="">
                 <p>{{ engine.description }}</p>
                 <p class="goal">{{ engine.goal }}</p>
+                <!-- @include ad_gamestart.html -->
                 <button
                     id="startButton"
                     class="btn btn-primary col-xs-12"
@@ -199,6 +200,7 @@
             <h2 ng-hide="engine.resolution">You lost!</h2>
             <h2 ng-show="engine.resolution">Victory!</h2>
             <p>Use the menu to start a new game.</p>
+            <!-- @include ad_gameend.html -->
         </div>
         
     </div>
