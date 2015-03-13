@@ -152,13 +152,12 @@
     
     <!-- BEGIN LEFT INFO ELEMENTS -->
     <div id="leftInfo" style="width: calc(50% - {{ (mapArea.width - 18) / 2 }}px)">
+      <div id="leftInfoWrapper">
         
         <div id="eventRunner" ng-show="currentEvent">
             <pc-event-view event="currentEvent" engine="engine" step="currentStep"></pc-event-view>
         </div>
         
-        <div id="helpWrapper">
-            
         <div id="help" ng-class="{ pchidden: hideHelp }" ng-show="engine.phase && engine.phase != 'gameover'">
             <h3>Goal</h3>
             <p class="goal">{{ engine.goal }}</p>
@@ -175,8 +174,6 @@
             </table>
         </div>
         
-        </div>
-    
         <div id="start" class="gameInfo" ng-hide="engine.phase">
             <h2>{{ engine.title }}</h2>
             <div class="">
@@ -203,6 +200,7 @@
             <!-- @include ad_gameend.html -->
         </div>
         
+      </div>
     </div>
     <!-- END LEFT INFO ELEMENTS -->
     
@@ -453,7 +451,7 @@
         </thead>
         <tbody>
             <tr ng-click="selectAdv(adv)" ng-class="getAcquireClasses(key)" ng-repeat="(key, adv) in engine.advances">
-                <td>{{ adv.title }}</td>
+                <td>{{ adv.title }}<button class="godMode" ng-show="godMode" ng-click="engine.acquire(key)">A</button></td>
                 <td>{{ adv.points }}</td>
                 <td>
                     <ul class="list-inline">

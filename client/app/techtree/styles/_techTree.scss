@@ -162,6 +162,10 @@ $infoDetailsWidth: 350px;
     
     .acquired {
         color: darkGreen;
+        
+        button.godMode {
+            display: none;
+        }
     }
     
     .selected {

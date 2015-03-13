@@ -87,11 +87,19 @@ body.initiating {
     position: absolute;
     z-index: 98;
     overflow: auto;
+    margin-top: $infoBarHeight;
 
     #eventRunner {
+        position: absolute;
         z-index: 98;
         margin: 20px;
-        margin-top: 40px;
+        margin-top: 20px;
+    }
+    
+    #leftInfoWrapper {
+        position: absolute;
+        height: 100%;
+        width: 100%;
     }
 }
 
@@ -124,6 +132,9 @@ body.initiating {
     #helpButton {
         display: none;
     }
+    #leftInfo {
+        height: 100%;
+    }
 }
 @media (max-width: $screen-sm-max) {
     #helpButton {
@@ -137,12 +148,18 @@ body.initiating {
         }
     }
     
-    #helpButton.hidden {
-        display: none;
+    #leftInfoWrapper > div {
+        position: fixed !important;
+        left: 0px;
+        right: 0px;
     }
     
-    #leftInfo {
-        margin-top: $infoBarHeight;
+    #help {
+        z-index: 300;
+    }
+    
+    #helpButton.hidden {
+        display: none;
     }
     
     #help {
@@ -151,12 +168,6 @@ body.initiating {
     
     #help.pchidden {
         display: none !important;
-    }
-}
-
-@media (min-width: $screen-md-min) {
-    #leftInfo {
-        height: 100%;
     }
 }
 
@@ -170,7 +181,6 @@ body.initiating {
         
         #eventRunner {
             top: 42px;
-            left: 10px;
     
             dl {
                 dt, dd {
