@@ -13,7 +13,10 @@ Mountains. If you have at least 1 Tribe or 1 City remain after the attack, you h
             var olddone = ctx.done;
             ctx.done = function() {
                 olddone();
-                engine.gameOver(true);
+                if (engine.map.tribeCount > 0 || engine.map.cityCount > 0)
+                    engine.gameOver(true);
+                else
+                    engine.gameOver(false);
             };
             ctx.ctx = {};
             ctx.ctx.active_region = engine.map.areas[2];

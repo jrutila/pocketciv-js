@@ -514,6 +514,7 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
         $scope.map = new  pocketciv.MapBuild();
         $scope.deck = new pocketciv.DeckBuild();
         $scope.engine = new pocketciv.EngineBuild(pocketimpl, $scope.map, $scope.deck);
+        name = name || scen.name || "";
         if (_.has(scenarios, name))
         {
             var scenario = scenarios[name];
