@@ -46,8 +46,8 @@ var CityAdvance = {
     var dtribes = chg.tribes - area.tribes;
     
     if (area.city == 0 && dcity > 0) return "musthavecity"; // Can't advance zero
-    if (dtribes > 0) return false;
-    if (dcity < 0) return false;
+    if (dtribes > 0 || chg.tribes < 0) return false;
+    if (dcity < 0 || chg.city < 0) return false;
     
     var fres = pickFalsedResources(chg, area);
     if (fres.length == 1)
@@ -108,7 +108,7 @@ module.exports = {
           var initial = {};
           var validCities = 0;
           _.each(this.map.areas, function(area, ak) {
-            if ((area.city > 0 && area.city < capitol ? 10 : this.params.max_city)) {
+            if ((area.city > 0 && area.city < (capitol ? 10 : this.params.max_city))) {
               initial[ak] = area;
               validCities++;
             }
