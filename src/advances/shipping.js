@@ -21,7 +21,7 @@ module.exports = {
                 if (ctx.card.friendly)
                 {
                     ctx.engine.draw(function(c) {
-                        ctx.merge({ 'gold': '+'+c.square });
+                        ctx.change({ 'gold': c.square });
                         ctx.done && ctx.done();
                     });
                 } else 

@@ -35,6 +35,10 @@ Context.prototype = {
             // This is a full blown change with area ids and all
             this.ctx.change(chg);
         }
+        if (_.isObject(chg) && _.has(chg, 'gold') && area == undefined) {
+            // Probably gold change
+            this.ctx.change(chg);
+        }
         else if (_.isString(chg)) {
             if (_.isString(area) && area.indexOf('+') == -1 && area.indexOf('-') == -1)
                 this.ctx.target(chg, this._fromOldValue(area));
