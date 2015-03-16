@@ -327,16 +327,21 @@
     </div>
     <!-- END RIGHT ACTION ELEMENTS -->
     
-    <div id="advances">
-        <h2>Acquired advances</h2>
-        <ul>
-            <li ng-repeat="(key, adv) in _.pick(engine.advances, engine.acquired)">
-                <span>{{ adv.title }}</span>
-            </li>
-        </ul>
-        <a ng-click="toggleTechTree()">Open tech tree</a>
-    </div>
-    <a id="showTechTree" ng-click="toggleTechTree()"></a>
+    <a id="showTechTree" ng-click="toggleTechTree()">
+        <div class="img"></div>
+        <div class="tt_info">
+            <div class="tt_name">{{ selAdv.title }}</div>
+            <div class="advancecost">
+                <span class="tribes" ng-if="selAdv.cost.tribes">{{ selAdv.cost.tribes }}</span>
+                <span class="gold" ng-if="selAdv.cost.gold">{{ selAdv.cost.gold }}</span>
+            </div>
+            <div class="advanceres">
+                <ul class="list-inline">
+                    <li class="icon small" ng-class="{ forest: res == 'wood', mountain: res == 'stone', farm: res == 'food' }" ng-repeat="res in selAdv.resources">{{ res }}</li>
+                </ul>
+            </div>
+        </div>
+    </a>
     
     <div id="techtree" ng-hide="!showTT">
         <div class="cover"></div>

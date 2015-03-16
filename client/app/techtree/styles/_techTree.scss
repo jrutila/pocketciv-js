@@ -160,6 +160,12 @@ $infoDetailsWidth: 350px;
         color: lightGreen;
     }
     
+@media (max-height: $heightLimit) {
+    #cityinfo tbody tr:not(.areas) {
+        display: none;
+    }
+}
+    
     .acquired {
         color: darkGreen;
         

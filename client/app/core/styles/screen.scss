@@ -1,4 +1,5 @@
 $leftInfoMarginSides: 30px;
+$heightLimit: 700px;
 
 body {
     line-height: 1;
@@ -63,7 +64,7 @@ body.initiating {
     }
 }
 
-@media (max-height: 700px) {
+@media (max-height: $heightLimit) {
     #card.pushed {
         bottom: -1*($cardHeight - $eventTop);
         opacity: 0.9;
@@ -405,6 +406,8 @@ a {
     z-index: 201 !important;
 }
 
+$ttInfoWidth: 90px;
+$ttToggleSize: 70px;
 
 #showTechTree {
     z-index: 256;
@@ -412,12 +415,29 @@ a {
     bottom: 3px;
     left: 3px;
     padding: 2px;
-    background-image: url("/images/modern/techtree.svg");
-    background-size: 100% 100%;
     opacity: 0.9;
+    width: $ttToggleSize + $ttInfoWidth;
     cursor: pointer;
-    height: 70px;
-    width: 70px;
+    div.img {
+        height: $ttToggleSize;
+        width: $ttToggleSize;
+        background-image: url("/images/modern/techtree.svg");
+        background-size: 100% 100%;
+    }
+    div.tt_info {
+        position: absolute;
+        width: $ttInfoWidth;
+        background-color: aliceblue;
+        height: $ttToggleSize;
+        top: 0px; right: 0px;
+        padding-left: 4px;
+        div {
+            margin-top: 2px;
+            ul {
+                margin-left: 0px;
+            }
+        }
+    }
 }
 
 #main {
