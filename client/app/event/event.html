@@ -1,5 +1,7 @@
 <div class="event">
-    <h2>{{ event.title }}</h2><button class="btn btn-default skip" ng-show="currentStep.skip" ng-click="currentStep.skip()">skip</button>
+    <h2 ng-click="close()">{{ event.title }}</h2>
+    <button class="btn btn-default skip" ng-show="currentStep.skip" ng-click="currentStep.skip()">skip</button>
+    <button class="close" ng-click="close()">X</button>
     <dl class="dl-horizontal" >
         <dt ng-class="{ active: step == currentStep.step }" ng-repeat-start="step in steps_order" class="step">{{ step }}</dt>
         <dd ng-repeat-end>

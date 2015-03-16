@@ -289,10 +289,11 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
     
     $scope.selectEvent = function(ev) {
         $scope.selEvent = null;
-        setTimeout(function() {
-            $scope.selEvent = ev
-            $scope.$apply();
-        }, 10)
+        if (ev)
+            setTimeout(function() {
+                $scope.selEvent = ev
+                $scope.$apply();
+            }, 10)
     }
     
     $scope.advArea = function(area) {
@@ -614,6 +615,7 @@ pocketcivApp.directive('pcEventView', function() {
             event: "=event",
             engine: "=engine",
             currentStep: "=step",
+            close: "&close",
         },
         templateUrl: 'app/event/event.html',
         link: function($scope, tElem) {

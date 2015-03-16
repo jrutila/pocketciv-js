@@ -396,8 +396,8 @@
             <a ng-class="{ 'disabled': selEvent == engine.events[e]}" ng-repeat="(e,s) in selAdv.events" href="#" class="btn btn-default" ng-click="selectEvent(engine.events[e])">{{ engine.events[e].title }}</a>
         </div>
     </div>
-    <div id="advanceinfo_event_details">
-        <pc-event-view ui-if="selEvent" event="selEvent" engine="engine"></pc-event-view>
+    <div id="advanceinfo_event_details" ng-show="selEvent">
+        <pc-event-view ui-if="selEvent" event="selEvent" engine="engine" close="selEvent = undefined"></pc-event-view>
     </div>
 </div>
                     <!-- END LEFT CONTENT -->

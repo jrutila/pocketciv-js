@@ -86,8 +86,8 @@ body.initiating {
     display: block;
     position: absolute;
     z-index: 98;
-    overflow: auto;
     margin-top: $infoBarHeight;
+    height: 100%;
 
     #eventRunner {
         position: absolute;
@@ -100,6 +100,7 @@ body.initiating {
         position: absolute;
         height: 100%;
         width: 100%;
+        overflow: auto;
     }
 }
 
@@ -132,9 +133,7 @@ body.initiating {
     #helpButton {
         display: none;
     }
-    #leftInfo {
-        height: 100%;
-    }
+
 }
 @media (max-width: $screen-sm-max) {
     #helpButton {
@@ -147,7 +146,23 @@ body.initiating {
             font-size: $infoBarHeight;
         }
     }
+}
     
+@media (max-width: $screen-sm-max) {
+    #leftInfo {
+        pointer-events: none;
+        z-index: 250;
+        position: fixed;
+        top: 0px;
+        bottom: 0px;
+        left: 0px;
+        right: 0px;
+        width: 100% !important;
+        
+        #leftInfoWrapper > div {
+            pointer-events: all;
+        }
+    }
     #leftInfoWrapper > div {
         position: fixed !important;
         left: 0px;
@@ -155,6 +170,14 @@ body.initiating {
     }
     
     #help {
+        top: $infoBarHeight;
+        overflow: auto;
+        bottom: 0px;
+        margin-left: 0px;
+        margin-right: 0px;
+        margin-bottom: 0px;
+        padding-left: $leftInfoMarginSides;
+        padding-right: $leftInfoMarginSides;
         z-index: 300;
     }
     
@@ -166,34 +189,27 @@ body.initiating {
         background-color: $color-secondary-1-1;
     }
     
-    #help.pchidden {
+    .pchidden {
         display: none !important;
     }
+
 }
 
 @media (max-width: $screen-sm-max) {
-    #leftInfo {
-        float: left;
-        display: block;
-        z-index: 70;
-        overflow: auto;
-        width: 100% !important;
-        
-        #eventRunner {
-            top: 42px;
-    
-            dl {
-                dt, dd {
-                    display: none;
-                }
-                dt.active, dt.active + dd {
-                    display: inline;
-                }
+    #eventRunner {
+        top: 42px;
+
+        dl {
+            dt, dd {
+                display: none;
             }
-    
-            .event {
-                opacity: 0.8;
+            dt.active, dt.active + dd {
+                display: inline;
             }
+        }
+
+        .event {
+            opacity: 0.8;
         }
     }
 }
@@ -296,7 +312,7 @@ a {
     width: 100%;
     height: 100%;
     background-color: $color-primary-0;
-    z-index: 190;
+    z-index: 254;
     top: 0px;
 }
 
@@ -320,7 +336,7 @@ a {
     font-weight: bold;
     top: 0px;
     position: fixed;
-    z-index: 200;
+    z-index: 260;
     text-align: center;
     
     .navbar-toggle {

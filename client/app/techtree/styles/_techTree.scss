@@ -64,33 +64,33 @@ $infoDetailsWidth: 350px;
         margin-left: $infoWidth;
         padding-left: 10px;
         padding-right: 10px;
+        max-width: $infoDetailsWidth;
     }
     
     #advanceinfo_event_details {
-        position: absolute;
-        margin-right: 213px;
+        position: fixed;
         display: block;
-        margin-top: 10px;
-        padding-left: 10px;
-        padding-right: 10px;
-    }
-    
-@include smaller-than-map {
-    #advanceinfo_event_details {
-        left: 0px;
-        margin-right: 140px;
-    }
-    
-    #advanceinfo_details {
-        margin-left: 0px;
-    }
-}    
-@include really-large {
-    #advanceinfo_event_details {
-        left: $infoWidth + $infoDetailsWidth;
+        
         top: 10px;
+        right: 10px;
+        bottom: 10px;
+        overflow-y: auto;
+        z-index: 130;
     }
-}    
+
+@media (max-width: $screen-sm-max) {
+    #advanceinfo_event_details {
+        //margin-left: $infoWidth + $infoDetailsWidth + 10px;
+        left: 10px;
+    }
+}
+
+@media (min-width: $screen-md-min) {
+    #advanceinfo_event_details {
+        //margin-left: $infoWidth + $infoDetailsWidth + 10px;
+        right: 30px;
+    }
+}
     
     #advanceinfo_description {
         max-width: $infoDetailsWidth;
