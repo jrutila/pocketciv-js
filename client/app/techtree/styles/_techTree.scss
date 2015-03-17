@@ -11,14 +11,6 @@ $infoDetailsWidth: 350px;
     ul {
         margin-bottom: 0px;
     }
-    .ttcont {
-        position: fixed;
-        top:  $infoBarHeight + 2px;
-        left: 25px;
-        right: 25px;
-        bottom: 25px;
-        z-index: 250;
-    }
     
     .content > h2 {
         font-size: $titleHeight;
@@ -37,10 +29,11 @@ $infoDetailsWidth: 350px;
         float: left;
         width: $infoWidth;
         margin-top: 20px;
+        min-width: 200px;
         
         > span {
-            display: inline-block;
-            margin-left: $infoWidth / 3;
+            display: table;
+            margin: 0 auto;
         }
         .advancereq, .advancereqby {
             display: table;
@@ -67,11 +60,20 @@ $infoDetailsWidth: 350px;
         max-width: $infoDetailsWidth;
     }
     
+@media (max-width: $screen-xs-max) {
+    #advanceinfo_details {
+        margin-left: 0px;
+    }
+    #advanceinfo {
+        width: 100%;
+    }
+}
+
     #advanceinfo_event_details {
         position: fixed;
         display: block;
         
-        top: 10px;
+        top: $infoBarHeight + 10px;
         right: 10px;
         bottom: 10px;
         overflow-y: auto;
@@ -111,6 +113,7 @@ $infoDetailsWidth: 350px;
         top: 0px;
         left: 0px;
         right: 0px;
+        white-space: nowrap;
     }
     
     
@@ -119,6 +122,7 @@ $infoDetailsWidth: 350px;
         background-color: white;
         height: 100%;
         width: 100%;
+        overflow: hidden;
         
         .tt_layout_table {
             display: table;

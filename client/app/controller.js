@@ -497,6 +497,10 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
             return $('#mapImage'+i)[0];
     }
     
+    $scope.hideEvent = function() {
+        $("#eventRunner").toggleClass("pushed");
+    }
+
     $scope.resetUI = function() {
         $scope.mapInfo = undefined;
         $scope.mapTitle = undefined;

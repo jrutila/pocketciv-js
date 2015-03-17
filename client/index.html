@@ -101,7 +101,7 @@
         <div id="helpButton" ng-click="hideHelp = !hideHelp" ng-show="engine.phase && engine.phase != 'gameover'"><span class="glyphicon glyphicon-info-sign"></span></div>
     </div>
     
-    <div id="welcome" ng-show="welcome" style="z-index: 190">
+    <div id="welcome" ng-show="welcome">
         <div class="menu-arrow"></div>
         <h1>Welcome to play Pocket Civ</h1>
         <p>
@@ -155,7 +155,7 @@
       <div id="leftInfoWrapper">
         
         <div id="eventRunner" ng-show="currentEvent">
-            <pc-event-view event="currentEvent" engine="engine" step="currentStep"></pc-event-view>
+            <pc-event-view event="currentEvent" engine="engine" step="currentStep" close="hideEvent()"></pc-event-view>
         </div>
         
         <div id="help" ng-class="{ pchidden: hideHelp }" ng-show="engine.phase && engine.phase != 'gameover'">
@@ -329,7 +329,7 @@
     
     <a id="showTechTree" ng-click="toggleTechTree()">
         <div class="img"></div>
-        <div class="tt_info">
+        <div class="tt_info" ng-show="selAdv">
             <div class="tt_name">{{ selAdv.title }}</div>
             <div class="advancecost">
                 <span class="tribes" ng-if="selAdv.cost.tribes">{{ selAdv.cost.tribes }}</span>

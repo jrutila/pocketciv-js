@@ -1,5 +1,7 @@
 $leftInfoMarginSides: 30px;
 $heightLimit: 700px;
+$ttInfoWidth: 90px;
+$ttToggleSize: 70px;
 
 body {
     line-height: 1;
@@ -200,17 +202,31 @@ body.initiating {
     #eventRunner {
         top: 42px;
 
+        .event {
+            opacity: 0.85;
+            padding-bottom: $ttToggleSize;
+        }
+
+        bottom: 0px;
+        overflow: auto;
+    }
+
+    #eventRunner.pushed {
         dl {
             dt, dd {
-                display: none;
+                display: none
             }
-            dt.active, dt.active + dd {
+            dt.active {
                 display: inline;
             }
         }
+        pointer-events: none !important;
 
         .event {
-            opacity: 0.8;
+            position: fixed;
+            bottom: 100px;
+            pointer-events: all;
+            padding-bottom: 0px;
         }
     }
 }
@@ -406,9 +422,6 @@ a {
     z-index: 201 !important;
 }
 
-$ttInfoWidth: 90px;
-$ttToggleSize: 70px;
-
 #showTechTree {
     z-index: 256;
     position: fixed;
@@ -437,6 +450,42 @@ $ttToggleSize: 70px;
                 margin-left: 0px;
             }
         }
+    }
+}
+
+.ttcont {
+    position: fixed;
+    top:  $infoBarHeight+4px;
+    left: 25px;
+    right: 25px;
+    bottom: 25px;
+    z-index: 255;
+}
+@media (max-width: $screen-xs-max) {
+    .ttcont {
+        position: fixed;
+        top:  $infoBarHeight;
+        left: 0px;
+        right: 0px;
+        bottom: 0px;
+    }
+}
+@media (max-width: $screen-sm-max) {
+    pc-event-view {
+        .event {
+            padding-bottom: $ttToggleSize;
+        }
+    }
+}
+
+#advancelist {
+    padding-bottom: $ttToggleSize;
+}
+
+#advanceinfo_event_details {
+    bottom: 20px;
+    .event {
+        padding-bottom: $ttToggleSize;
     }
 }
 
