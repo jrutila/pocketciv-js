@@ -1,15 +1,17 @@
 var pocketcivApp = angular.module('pocketcivApp');
+var AdvanceAcquirer = require("../../../src/actions/acquire").AdvanceAcquirer;
 
 pocketcivApp.directive('pcTechtree', function() {
     return {
         restrict: 'E',
         scope: {
             //'selAdv': "=",
-            'advances': "=",
-            'acquired': "=",
+            //'advances': "=",
+            //'acquired': "=",
             'engine': "=",
             'acquirer': "=",
-            'areas': "=",
+            'acquiring': "=",
+            //'areas': "=",
         },
         //replace: true,
         templateUrl: 'app/techtree/techtree.html',
@@ -25,9 +27,10 @@ pocketcivApp.directive('pcTechtree', function() {
             });
             $scope.getAcquireClasses = function(key) {
                 var ret = [];
-                if (($scope.acquired && $scope.acquired.indexOf(key) > -1) ||
-                    ($scope.acquirer && $scope.acquirer.acquired[key]))
+                if ($scope.acquirer && _.contains($scope.acquirer.acquired, key))
                     ret.push("acquired");
+                if ($scope.acquirer && _.any($scope.acquirer.nowacquired, function(acq) { return acq.name == key }))
+                    ret.push("now");
                 if ($scope.possibleAdvances && _.has($scope.possibleAdvances, key))
                 {
                     if ($scope.possibleAdvances[key].areas.length)
@@ -44,10 +47,18 @@ pocketcivApp.directive('pcTechtree', function() {
                     if (!_.isArray(adv))
                         adv = [adv];
                     return _.map(adv, function(ad) {
-                        var a = $scope.engine.advances[ad];
+                        var a = $scope.acquirer.advances[ad];
                         return a ? a.title : ad;
                     }).join(" or ");
                 }).join(" and ");
+            }
+            $scope.resetAcquires = function() {
+                $scope.acquirer = new AdvanceAcquirer($scope.engine);
+            }
+            $scope.nowAcquired = function() {
+                return $scope.acquirer ? 
+                    _.map($scope.acquirer.nowacquired, function(a,k) { return [k,a.title]})
+                    : "Not acquiring";
             }
             $scope.selectAdv = function(adv) {
                 $scope.selAdv = adv;
@@ -57,10 +68,16 @@ pocketcivApp.directive('pcTechtree', function() {
                 if ($scope.possibleAdvances) {
                     if (!$scope.possibleAdvances[adv.name]) return;
                     if ($scope.possibleAdvances[adv.name].areas.length == 1)
-                        $scope.selArea = $scope.engine.map.areas[$scope.possibleAdvances[adv.name].areas[0]];
+                        $scope.selArea = $scope.acquirer.areas[$scope.possibleAdvances[adv.name].areas[0]];
                 }
             }
-            $scope.totalCity = function() { return _.reduce($scope.areas, function(memo, a) { return a.city ? memo + a.city : memo; }, 0); };
+            
+            $scope.advArea = function(area) {
+                if (
+                    $scope.selAdv && 
+                    $scope.possibleAdvances[$scope.selAdv.name].areas.indexOf(area.id.toString()) > -1)
+                    $scope.selArea = area;
+            }
     
             $scope.selectEvent = function(ev) {
                 $scope.selEvent = null;
@@ -69,6 +86,11 @@ pocketcivApp.directive('pcTechtree', function() {
                         $scope.selEvent = ev
                         $scope.$apply();
                     }, 10)
+            }
+            
+            $scope.acquire = function() {
+                $scope.acquirer.acquire($scope.selAdv.name, $scope.selArea.id);
+                $scope.possibleAdvances = $scope.acquirer.possibleAdvances;
             }
         }
     }

@@ -12,29 +12,30 @@ function getResources(area) {
 }
 
 function AdvanceAcquirer(engine) {
-    this.advances = _.omit(_.clone(engine.advances), engine.acquired);
-    this.acquired = _.clone(engine.round.acquired) || {};
+    this.advances = _.clone(engine.advances);
+    this.acquired = _.clone(engine.acquired) || [];
     this.nowacquired = {};
-    this.acquired_names = _.clone(engine.acquired)
-    this.amnt_of_acquird = _.union(_.map(engine.round.acquired, function(a) { return a.name; }), engine.acquired).length;
+    this.round_acquired = _.clone(engine.round.acquired) || {};
     this.areas = {};
     this.replaceable_resources = engine.params.replaceable_resources || [];
     _.each(engine.map.areas, function(a, ak) {
-        if (a.city > 0)
-            this.areas[ak] = a;
+        //if (a.city > 0)
+            this.areas[ak] = _.clone(a);
     },this);
     this.gold = engine.gold;
-    this.acquiring = false;
 }
 
 AdvanceAcquirer.prototype = {
+    get totalCity() {
+        return _.reduce(this.areas, function(memo, a) { return a.city ? memo + a.city : memo; }, 0);
+    },
     get possibleAdvances() {
         var adv = {};
-        for (var key in _.omit(this.advances, this.acquired_names)) {
+        for (var key in _.omit(this.advances, this.acquired)) {
             // Check requirements
             if (_.has(this.advances[key], 'requires') && this.advances[key].requires) {
                 var kk = _.keys(this.advances);
-                var aq = this.acquired_names;
+                var aq = this.acquired;
                 var re = _.clone(this.advances[key].requires);
 
                 // First, check optional requirements (either one must be required)
@@ -53,82 +54,71 @@ AdvanceAcquirer.prototype = {
                 'areas': []
             };
 
-        if (_.reduce(this.areas, function(m, a) {return a.city ? m + a.city : m }, 0) > this.amnt_of_acquird)
-        {
-            for (var a in _.omit(this.areas, _.keys(this.acquired))) {
-                // Check tribes
-                var has_tribes = true;
-                var has_resources = true;
-                var has_gold = true;
-                var extra_ok = true;
-                
-                // Check tribes
-                if ('tribes' in this.advances[key].cost) {
-                    if (!(this.areas[a].tribes >= this.advances[key].cost.tribes))
-                        has_tribes = false;
-                }
-
-                // Check resources
-                if ('resources' in this.advances[key]) {
-                    var area_resources = getResources(this.areas[a]);
-                    var satisfied = function(a, b) {
-                        return _.intersection(a,b).length == b.length;
-                    }
-                    has_resources = false;
+            // If there is still room for acquirements
+            if (this.totalCity > _.size(this.acquired))
+            {
+                for (var a in _.omit(_.pick(this.areas, function(ar) {return ar.city > 0;}), _.union(_.keys(this.round_acquired), _.keys(this.nowacquired)))) {
+                    // Check tribes
+                    var has_tribes = true;
+                    var has_resources = true;
+                    var has_gold = true;
+                    var extra_ok = true;
                     
-                    if (satisfied(area_resources, this.advances[key].resources))
-                        has_resources = true;
-                    else
-                        _.each(this.replaceable_resources, function(r) {
-                            if (_.contains(area_resources, r)) {
-                                var repl = _.without(this.replaceable_resources, r);
-                                repl = _.union(repl, _.without(area_resources, r));
-                                if (satisfied(repl, this.advances[key].resources))
-                                    has_resources = true;
-                            }
-                        },this);
+                    // Check tribes
+                    if ('tribes' in this.advances[key].cost) {
+                        if (!(this.areas[a].tribes >= this.advances[key].cost.tribes))
+                            has_tribes = false;
+                    }
+    
+                    // Check resources
+                    if ('resources' in this.advances[key]) {
+                        var area_resources = getResources(this.areas[a]);
+                        var satisfied = function(a, b) {
+                            return _.intersection(a,b).length == b.length;
+                        }
+                        has_resources = false;
+                        
+                        if (satisfied(area_resources, this.advances[key].resources))
+                            has_resources = true;
+                        else
+                            _.each(this.replaceable_resources, function(r) {
+                                if (_.contains(area_resources, r)) {
+                                    var repl = _.without(this.replaceable_resources, r);
+                                    repl = _.union(repl, _.without(area_resources, r));
+                                    if (satisfied(repl, this.advances[key].resources))
+                                        has_resources = true;
+                                }
+                            },this);
+                    }
+                    
+                    // Check gold
+                    if ('gold' in this.advances[key].cost) {
+                        /*
+                        var total = _.reduce(this.nowacquired, function(memo, adva) {
+                            return memo + (adva.cost.gold || 0)
+                        }, 0);*/
+                        //if (this.gold < total + this.advances[key].cost.gold)
+                        if (this.gold < this.advances[key].cost.gold)
+                            has_gold = false;
+                    }
+                    
+                    // Extra check
+                    if (this.advances[key].can_acquire)
+                        extra_ok = this.advances[key].can_acquire(this.areas[a]);
+    
+                    if (has_tribes && has_resources && has_gold && extra_ok)
+                        adv[key].areas.push(a);
                 }
-                
-                // Check gold
-                if ('gold' in this.advances[key].cost) {
-                    var total = _.reduce(this.nowacquired, function(memo, adva) {
-                        return memo + (adva.cost.gold || 0)
-                    }, 0);
-                    if (this.gold < total + this.advances[key].cost.gold)
-                        has_gold = false;
-                }
-                
-                // Extra check
-                if (this.advances[key].can_acquire)
-                    extra_ok = this.advances[key].can_acquire(this.areas[a]);
-
-                if (has_tribes && has_resources && has_gold && extra_ok)
-                    adv[key].areas.push(a);
             }
-        }
         }
         return adv;
     },
     acquire: function(name, area) {
-        this.acquired[area] = this.advances[name];
+        this.acquired.push(name);
         this.nowacquired[area] = this.advances[name];
-        this.acquired_names.push(name);
+        this.areas[area].tribes -= this.advances[name].cost.tribes || 0;
+        this.gold -= this.advances[name].cost.gold || 0;
     },
-    deacquire: function(name) {
-        for (var a in this.acquired)
-        {
-            if (this.acquired[a] == this.advances[name])
-            {
-                delete this.acquired[a];
-            }
-            if (this.nowacquired[a] == this.advances[name])
-            {
-                delete this.nowacquired[a];
-                break;
-            }
-        }
-        this.acquired_names.pop(name);
-    }
 }
 
 module.exports = {
@@ -149,8 +139,8 @@ module.exports = {
                 if (_.has(acquires[area].cost, 'gold'))
                     ctx.change('gold', -1*acq.cost.gold);
                 engine.acquire(acq.name, ctx);
+                engine.round.acquired[area] = acq.name;
             }
-            engine.round.acquired = _.extend(engine.round.acquired, acquires);
             ctx.done && ctx.done();
         });
     },

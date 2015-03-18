@@ -208,62 +208,40 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
         return confirm(message);
     }
     
-    $scope.acquire = {
+    var resetAcquire = {
         selectedAdv: {},
+        done: undefined,
+        acquiring: false,
     };
+    $scope.acquire = resetAcquire;
     $scope.showTT = false;
 
     pocketimpl.advanceAcquirer = function(engine, done) {
         $scope.acquire.acquirer = new AdvanceAcquirer(engine);
-        $scope.acquire.acquirer.acquiring = true;
+        $scope.acquire.acquiring = true;
         $scope.toggleTechTree();
+        $scope.acquire.done = done;
     }
     
     $scope.toggleTechTree = function() {
         $scope.showTT = !$scope.showTT;
-        $scope.acquirer = new AdvanceAcquirer($scope.engine);
-    }
-    
-    $scope.acquireGo = function() {
-        $scope.acquirer.acquire($scope.selAdv.name, $scope.selArea.id);
-        $scope.possibleAdvances = $scope.acquirer.possibleAdvances();
-        $scope.acquired = _.map($scope.acquirer.acquired, function(v) {
-            return v.title;
-        });
-    }
-    
-    $scope.acquireOk = function() {
-        doAcquire.call($scope.engine, $scope.acquirer.acquired);
-        if ($scope.acquirer.acquired)
-            $scope.debug.gameLog.acquires.push(
-                _.object(_.map($scope.acquirer.acquired, function (advn, key) {
-                    return [key, advn.name];
-                }))
-            );
-        else
-            _.last($scope.debug.gameLog.advance).pop("acquire");
-        $scope.acquiring = false;
-        $scope.possibleAdvances = undefined;
+        if ($scope.acquire.done && !$scope.showTT) {
+            var acquirer = $scope.acquire.acquirer;
+            $scope.acquire.done.call($scope.engine, acquirer.nowacquired);
+            if (acquirer.nowacquired)
+                $scope.debug.gameLog.acquires.push(
+                    _.object(_.map(acquirer.nowacquired, function (advn, key) {
+                        return [key, advn.name];
+                    }))
+                );
+            else
+                _.last($scope.debug.gameLog.advance).pop("acquire");
+            $scope.acquire = resetAcquire;
+        } else
+            $scope.acquire.acquirer = new AdvanceAcquirer($scope.engine);
     }
     
     $scope.selEvent = undefined;
-    
-    $scope.totalCity = function() { return _.reduce($scope.engine.map.areas, function(memo, a) { return a.city ? memo + a.city : memo; }, 0); };
-    $scope.selectEvent = function(ev) {
-        $scope.selEvent = null;
-        if (ev)
-            setTimeout(function() {
-                $scope.selEvent = ev
-                $scope.$apply();
-            }, 10)
-    }
-    
-    $scope.advArea = function(area) {
-        if (
-            $scope.selAdv && 
-            $scope.possibleAdvances[$scope.selAdv.name].areas.indexOf(area.id.toString()) > -1)
-            $scope.selArea = area;
-    }
     
     $scope.doEvent = function(startEvent) {
         console.log("Startin godMode event "+startEvent);

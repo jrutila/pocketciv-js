@@ -4,18 +4,22 @@
         <button class="close" ng-click="toggleTechTree()">X</button>
         <div class="content">
             <h1>Tech tree</h1>
+    <span ng-show="acquirer">{{ _.size(acquirer.acquired) }} / {{ acquirer.totalCity }}</span>
+    <span ng-show="acquiring">{{ nowAcquired() }}
+    <button class="btn" ng-if="nowAcquired().length > 0" ng-click="resetAcquires()">Reset</button>
+    </span>
             
     <div class="tt_main_table tt_layout_table">
         <div class="tt_layout_row">
-            <div class="tt_layout_table">
+            <div class="tt_top tt_layout_table">
                 <div class="tt_layout_left tt_layout_cell">
                     <div class="tt_layout_left_content">
                     <!-- LEFT CONTENT -->
-<div id="advanceinfo">
+<div id="advanceinfo_tree">
     <div class="advancereq">
         <ul class="list-inline">
-            <li class="btn btn-default" ng-class="getAcquireClasses(r)" ng-click="selectAdv(engine.advances[r])" ng-repeat="r in _.flatten(selAdv.requires)">
-                {{ advances[r].title || r }}
+            <li class="btn btn-default" ng-class="getAcquireClasses(r)" ng-click="selectAdv(acquirer.advances[r])" ng-repeat="r in _.flatten(selAdv.requires)">
+                {{ acquirer.advances[r].title || r }}
             </li>
         </ul>
     </div>
@@ -24,29 +28,24 @@
                 </span>
     <div class="advancereqby">
         <ul class="list-inline">
-            <li class="btn btn-default" ng-class="getAcquireClasses(r)" ng-click="selectAdv(engine.advances[r])" ng-repeat="r in selAdv.required_by">
-                {{ advances[r].title || r }}
+            <li class="btn btn-default" ng-class="getAcquireClasses(r)" ng-click="selectAdv(acquirer.advances[r])" ng-repeat="r in selAdv.required_by">
+                {{ acquirer.advances[r].title || r }}
             </li>
         </ul>
     </div>
+</div>
+<div id="advanceinfo_cost">
     <div class="advancecost">
-        <h2>Cost:</h2>
+        <strong>Cost:</strong>
         <span>Tribes <span class="tribes" ng-if="selAdv.cost.tribes">{{ selAdv.cost.tribes }}</span></span>
         <span>Gold <span class="gold" ng-if="selAdv.cost.gold">{{ selAdv.cost.gold }}</span></span>
     </div>
     <div class="advanceres">
-        <h2>Resources:</h2>
+        <strong>Resources:</strong>
         <ul class="list-inline">
             <li class="icon small" ng-class="{ forest: res == 'wood', mountain: res == 'stone', farm: res == 'food' }" ng-repeat="res in selAdv.resources">{{ res }}</li>
         </ul>
     </div>
-    <div class="advanceareas">
-        <h2>Areas:</h2>
-            <button class="btn" ng-click="advArea(engine.map.areas[a])" ng-repeat="a in possibleAdvances[selAdv.name].areas">
-                {{ a }}
-            </button>
-    </div>
-    <button ng-click="acquireGo()" class="btn btn-primary" ng-show="engine.phase == 'advance' && possibleAdvances[selAdv.name].areas.length > 0 && selArea && acquiring">Acquire</button>
 </div>
 <div id="advanceinfo_details">
     <div id="advanceinfo_description">{{ selAdv.description }}</div>
@@ -56,9 +55,12 @@
             <a ng-class="{ 'disabled': selEvent == engine.events[e]}" ng-repeat="(e,s) in selAdv.events" href="#" class="btn btn-default" ng-click="selectEvent(engine.events[e])">{{ engine.events[e].title }}</a>
         </div>
     </div>
-    <div id="advanceinfo_event_details" ng-show="selEvent">
-        <pc-event-view ui-if="selEvent" event="selEvent" engine="engine" close="selEvent = undefined"></pc-event-view>
-    </div>
+</div>
+<div id="advanceinfo_event_details" ng-show="selEvent">
+    <pc-event-view ui-if="selEvent" event="selEvent" engine="engine" close="selEvent = undefined"></pc-event-view>
+</div>
+<div id="advanceinfo_acquire" ng-show="acquiring">
+    <button ng-click="acquire()" class="btn btn-lg btn-primary" ng-disabled="possibleAdvances[selAdv.name].areas.length == 0 || !selArea">Acquire</button>
 </div>
                     <!-- END LEFT CONTENT -->
                     </div>
@@ -75,7 +77,7 @@
             <th>Resources</th>
         </thead>
         <tbody>
-            <tr ng-click="advArea(c)" ng-class="{ areas: possibleAdvances[selAdv.name].areas.indexOf(c.id.toString()) > -1, selected: selArea == c }" ng-repeat="c in areas">
+            <tr ng-click="advArea(c)" ng-class="{ areas: possibleAdvances[selAdv.name].areas.indexOf(c.id.toString()) > -1, selected: selArea == c }" ng-repeat="c in acquirer.areas">
                 <td>{{ c.id }}</td>
                 <td><span class="tribes">{{ c.tribes }}</span></td>
                 <td><span class="city">{{ c.city }}</span></td>
@@ -89,7 +91,6 @@
             </tr>
         </tbody>
     </table>
-    <div>{{ engine.acquired.length }} / {{ totalCity() }}</div>
 </div>
                     <!-- END RIGHT CONTENT -->
                     </div>
@@ -110,7 +111,7 @@
             <th>Requires</th>
         </thead>
         <tbody>
-            <tr ng-click="selectAdv(adv)" ng-class="getAcquireClasses(key)" ng-repeat="(key, adv) in advances">
+            <tr ng-click="selectAdv(adv)" ng-class="getAcquireClasses(key)" ng-repeat="(key, adv) in acquirer.advances">
                 <td>{{ adv.title }}<button class="godMode" ng-show="godMode" ng-click="engine.acquire(key)">A</button></td>
                 <td>{{ adv.points }}</td>
                 <td>
