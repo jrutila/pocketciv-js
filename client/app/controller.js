@@ -208,29 +208,20 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
         return confirm(message);
     }
     
-    $scope.getAcquireClasses = function(key) {
-        var ret = [];
-        if (($scope.engine.acquired && $scope.engine.acquired.indexOf(key) > -1) || ($scope.acquired && $scope.acquirer.acquired[key]))
-            ret.push("acquired");
-        if ($scope.possibleAdvances && _.has($scope.possibleAdvances, key))
-        {
-            if ($scope.possibleAdvances[key].areas.length)
-                ret.push("areas");
-            ret.push("available");
-        }
-        if ($scope.selAdv && $scope.selAdv.name == key)
-            ret.push("selected");
-        return ret;
-    }
-    var doAcquire = undefined;
-    $scope.acquiring = false;
+    $scope.acquire = {
+        selectedAdv: {},
+    };
+    $scope.showTT = false;
 
     pocketimpl.advanceAcquirer = function(engine, done) {
-        $scope.acquirer = new AdvanceAcquirer(engine);
-        $scope.possibleAdvances = $scope.acquirer.possibleAdvances();
-        $scope.acquiring = true;
-        doAcquire = done;
+        $scope.acquire.acquirer = new AdvanceAcquirer(engine);
+        $scope.acquire.acquirer.acquiring = true;
         $scope.toggleTechTree();
+    }
+    
+    $scope.toggleTechTree = function() {
+        $scope.showTT = !$scope.showTT;
+        $scope.acquirer = new AdvanceAcquirer($scope.engine);
     }
     
     $scope.acquireGo = function() {
@@ -255,38 +246,9 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
         $scope.possibleAdvances = undefined;
     }
     
-    $scope.selAdv = undefined;
     $scope.selEvent = undefined;
-    $scope.toggleTechTree = function() {
-        $scope.showTT = !$scope.showTT;
-        if (!$scope.showTT && $scope.acquiring)
-            $scope.acquireOk()
-        $scope.acquirer = new AdvanceAcquirer($scope.engine);
-        $scope.possibleAdvances = $scope.acquirer.possibleAdvances();
-    }
     
     $scope.totalCity = function() { return _.reduce($scope.engine.map.areas, function(memo, a) { return a.city ? memo + a.city : memo; }, 0); };
-    $scope.selectAdv = function(adv) {
-        $scope.selAdv = adv;
-        $scope.selArea = undefined;
-        $scope.selEvent = undefined;
-        if (!$scope.possibleAdvances[adv.name]) return;
-        if ($scope.possibleAdvances[adv.name].areas.length == 1)
-            $scope.selArea = $scope.engine.map.areas[$scope.possibleAdvances[adv.name].areas[0]];
-    }
-    
-    $scope.advTitle = function(advances) {
-            
-        return _.map(advances, function (adv) {
-            if (!_.isArray(adv))
-                adv = [adv];
-            return _.map(adv, function(ad) {
-                var a = $scope.engine.advances[ad];
-                return a ? a.title : ad;
-            }).join(" or ");
-        }).join(" and ");
-    }
-    
     $scope.selectEvent = function(ev) {
         $scope.selEvent = null;
         if (ev)

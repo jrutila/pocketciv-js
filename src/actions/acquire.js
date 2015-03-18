@@ -24,10 +24,11 @@ function AdvanceAcquirer(engine) {
             this.areas[ak] = a;
     },this);
     this.gold = engine.gold;
+    this.acquiring = false;
 }
 
 AdvanceAcquirer.prototype = {
-    possibleAdvances: function() {
+    get possibleAdvances() {
         var adv = {};
         for (var key in _.omit(this.advances, this.acquired_names)) {
             // Check requirements

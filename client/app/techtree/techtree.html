@@ -1,0 +1,144 @@
+    <div id="techtree">
+        <div class="cover"></div>
+        <div class="ttcont">
+        <button class="close" ng-click="toggleTechTree()">X</button>
+        <div class="content">
+            <h1>Tech tree</h1>
+            
+    <div class="tt_main_table tt_layout_table">
+        <div class="tt_layout_row">
+            <div class="tt_layout_table">
+                <div class="tt_layout_left tt_layout_cell">
+                    <div class="tt_layout_left_content">
+                    <!-- LEFT CONTENT -->
+<div id="advanceinfo">
+    <div class="advancereq">
+        <ul class="list-inline">
+            <li class="btn btn-default" ng-class="getAcquireClasses(r)" ng-click="selectAdv(engine.advances[r])" ng-repeat="r in _.flatten(selAdv.requires)">
+                {{ advances[r].title || r }}
+            </li>
+        </ul>
+    </div>
+    <span ng-class="getAcquireClasses(selAdv.name)" class="btn btn-primary">
+                    {{ selAdv.title }}
+                </span>
+    <div class="advancereqby">
+        <ul class="list-inline">
+            <li class="btn btn-default" ng-class="getAcquireClasses(r)" ng-click="selectAdv(engine.advances[r])" ng-repeat="r in selAdv.required_by">
+                {{ advances[r].title || r }}
+            </li>
+        </ul>
+    </div>
+    <div class="advancecost">
+        <h2>Cost:</h2>
+        <span>Tribes <span class="tribes" ng-if="selAdv.cost.tribes">{{ selAdv.cost.tribes }}</span></span>
+        <span>Gold <span class="gold" ng-if="selAdv.cost.gold">{{ selAdv.cost.gold }}</span></span>
+    </div>
+    <div class="advanceres">
+        <h2>Resources:</h2>
+        <ul class="list-inline">
+            <li class="icon small" ng-class="{ forest: res == 'wood', mountain: res == 'stone', farm: res == 'food' }" ng-repeat="res in selAdv.resources">{{ res }}</li>
+        </ul>
+    </div>
+    <div class="advanceareas">
+        <h2>Areas:</h2>
+            <button class="btn" ng-click="advArea(engine.map.areas[a])" ng-repeat="a in possibleAdvances[selAdv.name].areas">
+                {{ a }}
+            </button>
+    </div>
+    <button ng-click="acquireGo()" class="btn btn-primary" ng-show="engine.phase == 'advance' && possibleAdvances[selAdv.name].areas.length > 0 && selArea && acquiring">Acquire</button>
+</div>
+<div id="advanceinfo_details">
+    <div id="advanceinfo_description">{{ selAdv.description }}</div>
+    <div id="advanceinfo_events" ng-if="_.size(selAdv.events) > 0">
+        <div>Affects following events:</div>
+        <div class="btn-group">
+            <a ng-class="{ 'disabled': selEvent == engine.events[e]}" ng-repeat="(e,s) in selAdv.events" href="#" class="btn btn-default" ng-click="selectEvent(engine.events[e])">{{ engine.events[e].title }}</a>
+        </div>
+    </div>
+    <div id="advanceinfo_event_details" ng-show="selEvent">
+        <pc-event-view ui-if="selEvent" event="selEvent" engine="engine" close="selEvent = undefined"></pc-event-view>
+    </div>
+</div>
+                    <!-- END LEFT CONTENT -->
+                    </div>
+                </div>
+                <div class="tt_layout_right tt_layout_cell">
+                    <div class="tt_layout_right_content">
+                    <!-- RIGHT CONTENT -->
+<div id="cityinfo">
+    <table class="table table-condensed table-bordered">
+        <thead>
+            <th>Area</th>
+            <th>Tribes</th>
+            <th>AV</th>
+            <th>Resources</th>
+        </thead>
+        <tbody>
+            <tr ng-click="advArea(c)" ng-class="{ areas: possibleAdvances[selAdv.name].areas.indexOf(c.id.toString()) > -1, selected: selArea == c }" ng-repeat="c in areas">
+                <td>{{ c.id }}</td>
+                <td><span class="tribes">{{ c.tribes }}</span></td>
+                <td><span class="city">{{ c.city }}</span></td>
+                <td>
+                    <ul class="list-inline">
+                        <li class="icon forest small" ng-if="c.forest"></li>
+                        <li class="icon mountain small" ng-if="c.mountain || c.volcano"></li>
+                        <li class="icon farm small" ng-if="c.farm"></li>
+                    </ul>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <div>{{ engine.acquired.length }} / {{ totalCity() }}</div>
+</div>
+                    <!-- END RIGHT CONTENT -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="tt_bottom tt_layout_row">
+            <div class="tt_layout_relative">
+                <div class="tt_layout_bottom_content">
+                    <!-- BOTTOM CONTENT -->
+<div id="advancelist">
+    <table class="table table-condensed table-hover">
+        <thead>
+            <th>Name</th>
+            <th>VP</th>
+            <th>Cost</th>
+            <th>Resources</th>
+            <th>Requires</th>
+        </thead>
+        <tbody>
+            <tr ng-click="selectAdv(adv)" ng-class="getAcquireClasses(key)" ng-repeat="(key, adv) in advances">
+                <td>{{ adv.title }}<button class="godMode" ng-show="godMode" ng-click="engine.acquire(key)">A</button></td>
+                <td>{{ adv.points }}</td>
+                <td>
+                    <ul class="list-inline">
+                        <li class="tribes" ng-if="adv.cost.tribes">{{ adv.cost.tribes }}</li>
+                        <li class="gold" ng-if="adv.cost.gold">{{ adv.cost.gold }}</li>
+                    </ul>
+                </td>
+                <td>
+                    <ul class="list-inline">
+                        <li class="icon small" ng-class="{ forest: res == 'wood', mountain: res == 'stone', farm: res == 'food' }" ng-repeat="res in adv.resources">{{ res }}</li>
+                    </ul>
+                </td>
+                <td>
+                    <div>
+                        {{ advTitle(adv.requires) }}
+                    </div>
+                </td>
+                <td>{{ possibleAdvances[key].areas }}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+                    <!-- END BOTTOM CONTENT -->
+                </div>
+            </div>
+        </div>
+    </div>
+        </div>
+        </div>
+    </div> <!-- #techtree -->

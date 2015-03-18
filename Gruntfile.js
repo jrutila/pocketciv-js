@@ -72,8 +72,7 @@ module.exports = function (grunt) {
           'src/**/*.js',
           'client/**/*.js',
         ],
-        tasks: ['preprocess:js', 'browserify']
-        
+        tasks: ['copy:js','preprocess:js', 'browserify']
       },
       sass: {
         files: [
@@ -378,6 +377,15 @@ module.exports = function (grunt) {
             '**/*.scss',
           ]
         }]
+      },
+      js: {
+          expand: true,
+          dot: true,
+          cwd: 'client',
+          dest: '.build',
+          src: [
+            '**/*.js',
+          ]
       },
       tmp: {
         files: [{
