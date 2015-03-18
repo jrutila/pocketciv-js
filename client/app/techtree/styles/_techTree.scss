@@ -9,6 +9,7 @@ $acquiredColor: $color-complement-0;
 $nowAcquiredColor: $color-complement-3;
 $availableColor: $color-complement-4;
 $selectedColor: $color-complement-2;
+$acquiredBg: $color-complement-4;
 
 #techtree {
     h1 {
@@ -192,6 +193,15 @@ $selectedColor: $color-complement-2;
         }
     }
     
+@media (max-height: $heightLimit) {
+    #cityinfo tbody tr:not(.areas) {
+        display: none;
+    }
+}
+    .selected {
+        color: black;
+    }
+    
     .available {
     }
     
@@ -199,14 +209,9 @@ $selectedColor: $color-complement-2;
         color: $availableColor;
     }
     
-@media (max-height: $heightLimit) {
-    #cityinfo tbody tr:not(.areas) {
-        display: none;
-    }
-}
-    
     .acquired {
         color: $acquiredColor;
+        background-color: $acquiredBg;
         
         button.godMode {
             display: none;
@@ -216,4 +221,5 @@ $selectedColor: $color-complement-2;
     .selected {
         background-color: $selectedColor;
     }
+    
 }

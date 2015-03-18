@@ -5,7 +5,7 @@ pocketcivApp.directive('pcTechtree', function() {
     return {
         restrict: 'E',
         scope: {
-            //'selAdv': "=",
+            'selected': "=",
             //'advances': "=",
             //'acquired': "=",
             'engine': "=",
@@ -23,6 +23,7 @@ pocketcivApp.directive('pcTechtree', function() {
                     console.log("Update possible advances to")
                     $scope.possibleAdvances = acq.possibleAdvances;
                     console.log($scope.possibleAdvances);
+                    $scope.selected.advance && $scope.autoSelectArea($scope.selected.advance);
                 }
             });
             $scope.getAcquireClasses = function(key) {
@@ -60,16 +61,19 @@ pocketcivApp.directive('pcTechtree', function() {
                     _.map($scope.acquirer.nowacquired, function(a,k) { return [k,a.title]})
                     : "Not acquiring";
             }
-            $scope.selectAdv = function(adv) {
-                $scope.selAdv = adv;
-                $scope.selArea = undefined;
-                $scope.selEvent = undefined;
-                console.log(adv)
+            $scope.autoSelectArea = function(adv) {
                 if ($scope.possibleAdvances) {
                     if (!$scope.possibleAdvances[adv.name]) return;
                     if ($scope.possibleAdvances[adv.name].areas.length == 1)
                         $scope.selArea = $scope.acquirer.areas[$scope.possibleAdvances[adv.name].areas[0]];
                 }
+            }
+            $scope.selectAdv = function(adv) {
+                $scope.selAdv = adv;
+                $scope.selected.advance = adv;
+                $scope.selArea = undefined;
+                $scope.selEvent = undefined;
+                $scope.autoSelectArea(adv);
             }
             
             $scope.advArea = function(area) {

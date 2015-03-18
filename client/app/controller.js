@@ -209,7 +209,7 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
     }
     
     var resetAcquire = {
-        selectedAdv: {},
+        selected: {},
         done: undefined,
         acquiring: false,
     };
