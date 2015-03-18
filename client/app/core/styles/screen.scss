@@ -235,14 +235,13 @@ body.initiating {
 
 /* BEGIN CENTER MAP */
 #centerMap {
-    overflow: auto;
     margin-left: auto;
     margin-right: auto;
     height: 100%;
     position: relative;
 
     #mapWrapper {
-        overflow: hidden;
+        overflow: auto;
         margin-right: auto;
         margin-left: auto;
         height: 100%;
