@@ -4,6 +4,12 @@ $infoDetailsWidth: 400px;
 $treeWidth: 200px;
 $treeHeight: 100px;
 
+$backgroundColor: $color-complement-1;
+$acquiredColor: $color-complement-0;
+$nowAcquiredColor: $color-complement-3;
+$availableColor: $color-complement-4;
+$selectedColor: $color-complement-2;
+
 #techtree {
     h1 {
         margin-top: 5px;
@@ -148,7 +154,7 @@ $treeHeight: 100px;
     
     .content {
         position: absolute;
-        background-color: white;
+        background-color: $backgroundColor;
         height: 100%;
         width: 100%;
         overflow: hidden;
@@ -190,7 +196,7 @@ $treeHeight: 100px;
     }
     
     .areas {
-        color: lightGreen;
+        color: $availableColor;
     }
     
 @media (max-height: $heightLimit) {
@@ -200,7 +206,7 @@ $treeHeight: 100px;
 }
     
     .acquired {
-        color: darkGreen;
+        color: $acquiredColor;
         
         button.godMode {
             display: none;
@@ -208,6 +214,6 @@ $treeHeight: 100px;
     }
     
     .selected {
-        background-color: lightBlue;
+        background-color: $selectedColor;
     }
 }

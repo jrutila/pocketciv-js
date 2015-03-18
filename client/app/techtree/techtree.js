@@ -95,3 +95,12 @@ pocketcivApp.directive('pcTechtree', function() {
         }
     }
 })
+pocketcivApp.filter("orderAdvances", function() {
+    return function(input,poss,acquired) {
+        return _.sortBy(_.sortBy(input, 'name'), function(i) {
+            if (_.has(poss, i.name)) return poss[i.name].areas.length || 9;
+            if (_.contains(acquired, i.name)) return 11;
+            return 10;
+        });
+    }
+})

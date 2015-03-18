@@ -111,8 +111,8 @@
             <th>Requires</th>
         </thead>
         <tbody>
-            <tr ng-click="selectAdv(adv)" ng-class="getAcquireClasses(key)" ng-repeat="(key, adv) in acquirer.advances">
-                <td>{{ adv.title }}<button class="godMode" ng-show="godMode" ng-click="engine.acquire(key)">A</button></td>
+            <tr ng-click="selectAdv(adv)" ng-class="getAcquireClasses(adv.name)" ng-repeat="adv in acquirer.advances | orderAdvances:possibleAdvances:acquirer.acquired">
+                <td>{{ adv.title }}<button class="godMode" ng-show="godMode" ng-click="engine.acquire(adv.name)">A</button></td>
                 <td>{{ adv.points }}</td>
                 <td>
                     <ul class="list-inline">
@@ -130,7 +130,7 @@
                         {{ advTitle(adv.requires) }}
                     </div>
                 </td>
-                <td>{{ possibleAdvances[key].areas }}</td>
+                <td>{{ possibleAdvances[adv.name].areas }}</td>
             </tr>
         </tbody>
     </table>
