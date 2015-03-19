@@ -28,7 +28,7 @@ PhaseContext.prototype = {
                 this.target(key, value);
             },this);
         } else {
-            throw "NotSupportedTargetKey";
+            throw new Error("NotSupportedTargetKey "+key);
         }
     },
     change: function(key, value) {
@@ -41,8 +41,9 @@ PhaseContext.prototype = {
             _.each(value, function(v,k) {
                 this.change(k,v);
             },this);
-        } else 
-            throw "NotSupportedChangeKey";
+        } else {
+            throw new Error("NotSupportedChangeKey "+key);
+        }
     },
     _chn: function(o, n) {
         if ((_.isNumber(o) || _.isUndefined(o)) && _.isNumber(n))

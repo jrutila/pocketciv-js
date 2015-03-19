@@ -18,7 +18,7 @@ module.exports = {
             Cities to reduce. Any City Reduced to 0 AV is \
             Decimated. {%; reduceCities() %}",
             '3': "Decimate all Gold you currently have.\
-            {% change('gold', '0') %}",
+            {% target('gold', 0) %}",
     },
     reduceCities: function() {
         var ctx = this;
@@ -26,6 +26,7 @@ module.exports = {
         opts.amount = corruption;
         var rdc = new reducer.Reducer(opts);
         ctx.engine.reducer(rdc, function(ok) {
+            console.log(ok.changes)
             ctx.change(ok.changes);
             ctx.done && ctx.done();
         });

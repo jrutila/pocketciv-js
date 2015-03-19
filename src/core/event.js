@@ -35,7 +35,7 @@ Context.prototype = {
             // This is a full blown change with area ids and all
             this.ctx.change(chg);
         }
-        if (_.isObject(chg) && _.has(chg, 'gold') && area == undefined) {
+        else if (_.isObject(chg) && _.has(chg, 'gold') && area == undefined) {
             // Probably gold change
             this.ctx.change(chg);
         }
@@ -70,6 +70,9 @@ Context.prototype = {
         if (_.isObject(chg) && _.isNumber(parseInt(_.first(_.keys(chg)))) && area == undefined) {
             // This is a full blown change with area ids and all
             this.ctx.target(chg);
+        }
+        else if (_.isString(chg)) {
+            this.ctx.target(chg, this._fromOldValue(area));
         }
         else {
             area = area || this.active_region;

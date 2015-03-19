@@ -31,7 +31,7 @@ describe("AdvanceAcquirer", function() {
         };
         acquirer = new acquire.AdvanceAcquirer(engine);
         
-        acquirer.possibleAdvances().should.deep.equal({
+        acquirer.possibleAdvances.should.deep.equal({
             'adv2': { 'areas': [] }
         });
     });
@@ -46,7 +46,7 @@ describe("AdvanceAcquirer", function() {
             }
         };
         acquirer = new acquire.AdvanceAcquirer(engine);
-        acquirer.possibleAdvances().should.deep.equal({
+        acquirer.possibleAdvances.should.deep.equal({
             'adv2': { 'areas': ["1"] },
             'adv3': { 'areas': [] },
         });
@@ -62,7 +62,7 @@ describe("AdvanceAcquirer", function() {
             }
         };
         acquirer = new acquire.AdvanceAcquirer(engine);
-        acquirer.possibleAdvances().should.deep.equal({
+        acquirer.possibleAdvances.should.deep.equal({
             'adv2': { 'areas': ["1"] },
             'adv3': { 'areas': ["1", "3"] },
         });
@@ -78,19 +78,21 @@ describe("AdvanceAcquirer", function() {
             }
         };
         acquirer = new acquire.AdvanceAcquirer(engine);
-        acquirer.possibleAdvances().should.deep.equal({
+        acquirer.possibleAdvances.should.deep.equal({
             'adv2': { 'areas': ["1"] },
             'adv3': { 'areas': ["1", "3"] },
         });
         acquirer.acquire('adv2', 1);
-        acquirer.possibleAdvances().should.deep.equal({
+        acquirer.possibleAdvances.should.deep.equal({
             'adv3': { 'areas': ["3"] },
         });
+        /*
         acquirer.deacquire('adv2');
-        acquirer.possibleAdvances().should.deep.equal({
+        acquirer.possibleAdvances.should.deep.equal({
             'adv2': { 'areas': ["1"] },
             'adv3': { 'areas': ["1", "3"] },
         });
+        */
     });
     it('should follow the requirement tree', function() {
         engine.advances = {
@@ -109,11 +111,11 @@ describe("AdvanceAcquirer", function() {
             }
         };
         acquirer = new acquire.AdvanceAcquirer(engine);
-        acquirer.possibleAdvances().should.deep.equal({
+        acquirer.possibleAdvances.should.deep.equal({
             'adv2': { 'areas': ["1"] },
         });
         acquirer.acquire('adv2', 1);
-        acquirer.possibleAdvances().should.deep.equal({
+        acquirer.possibleAdvances.should.deep.equal({
             'adv3': { 'areas': ["3"] },
         });
     });
@@ -135,7 +137,7 @@ describe("AdvanceAcquirer", function() {
         };
         engine.acquired.push('adv3')
         acquirer = new acquire.AdvanceAcquirer(engine);
-        acquirer.possibleAdvances().should.deep.equal({
+        acquirer.possibleAdvances.should.deep.equal({
             'adv2': { 'areas': ["1"] },
             'adv4': { 'areas': ["1","3"] },
         });
@@ -153,7 +155,7 @@ describe("AdvanceAcquirer", function() {
             }
         };
         acquirer = new acquire.AdvanceAcquirer(engine);
-        acquirer.possibleAdvances().should.deep.equal({
+        acquirer.possibleAdvances.should.deep.equal({
             'adv2': { 'areas': ["1"] },
             'adv3': { 'areas': ["1"] },
         });
@@ -167,7 +169,7 @@ describe("AdvanceAcquirer", function() {
             },
         };
         acquirer = new acquire.AdvanceAcquirer(engine);
-        acquirer.possibleAdvances().should.deep.equal({
+        acquirer.possibleAdvances.should.deep.equal({
             'adv2': { 'areas': ["1"] },
         });
         
@@ -190,7 +192,7 @@ describe("AdvanceAcquirer", function() {
         engine.params.replaceable_resources = ['wood', 'stone'];
         engine.acquired = [];
         acquirer = new acquire.AdvanceAcquirer(engine);
-        acquirer.possibleAdvances().should.deep.equal({
+        acquirer.possibleAdvances.should.deep.equal({
             'adv1': { 'areas': ["1","3"] },
             'adv2': { 'areas': ["1"] },
             'adv3': { 'areas': ["1"] },
