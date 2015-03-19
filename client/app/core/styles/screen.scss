@@ -12,11 +12,14 @@ body {
 }
 
 body.initiating {
-    > div, > nav {
+    #main > *, > nav {
         display: none;
     }
-    #welcome {
-        display: block;
+    #welcome, #infobar {
+        display: block !important;
+    }
+    #infobar > span {
+        display: none;
     }
 }
 

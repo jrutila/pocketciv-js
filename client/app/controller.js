@@ -552,13 +552,13 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
             $par.toggleClass("away");
         });
         
+        $("body").removeClass("initiating")
         setTimeout(function() {
-            $(".menu-arrow").height($("#welcome p:nth(1)").position().top)
+            $(".menu-arrow").height($("#welcome p:nth(1)").position().top);
         }, 1500);
         $(window).resize(function() {
             $(".menu-arrow").height($("#welcome p:nth(1)").position().top)    
         })
-        $("body").removeClass("initiating")
     })
 });
 
