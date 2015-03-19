@@ -23,6 +23,7 @@ var scenarios = {
     "scenario3": require("../../src/scenarios/scenario3"),
     "scenario4": require("../../src/scenarios/scenario4"),
     "scenario5": require("../../src/scenarios/scenario5"),
+    "scenario6": require("../../src/scenarios/scenario6"),
     "scenario8": require("../../src/scenarios/scenario8"),
 }
 
@@ -208,37 +209,45 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
         return confirm(message);
     }
     
-    var resetAcquire = {
+    var resetAcquire = function() { return {
         selected: {},
         done: undefined,
         acquiring: false,
-    };
-    $scope.acquire = resetAcquire;
+        acquirer: undefined,
+    }; };
+    $scope.acquire = resetAcquire();
     $scope.showTT = false;
 
     pocketimpl.advanceAcquirer = function(engine, done) {
         $scope.acquire.acquirer = new AdvanceAcquirer(engine);
         $scope.acquire.acquiring = true;
-        $scope.toggleTechTree();
         $scope.acquire.done = done;
+        $scope.toggleTechTree();
     }
     
     $scope.toggleTechTree = function() {
         $scope.showTT = !$scope.showTT;
-        if ($scope.acquire.done && !$scope.showTT) {
-            var acquirer = $scope.acquire.acquirer;
-            $scope.acquire.done.call($scope.engine, acquirer.nowacquired);
-            if (acquirer.nowacquired)
-                $scope.debug.gameLog.acquires.push(
-                    _.object(_.map(acquirer.nowacquired, function (advn, key) {
-                        return [key, advn.name];
-                    }))
-                );
-            else
-                _.last($scope.debug.gameLog.advance).pop("acquire");
-            $scope.acquire = resetAcquire;
-        } else
+        if ($scope.acquire.acquiring) {
+            if (!$scope.showTT) {
+                console.log("ACQUIRE")
+                var acquirer = $scope.acquire.acquirer;
+                $scope.acquire.done.call($scope.engine, acquirer.nowacquired);
+                if (acquirer.nowacquired)
+                    $scope.debug.gameLog.acquires.push(
+                        _.object(_.map(acquirer.nowacquired, function (advn, key) {
+                            return [key, advn.name];
+                        }))
+                    );
+                else
+                    _.last($scope.debug.gameLog.advance).pop("acquire");
+                    
+                $scope.acquire.acquiring = false;
+                $scope.acquire.done = undefined;
+                $scope.acquire.acquirer = new AdvanceAcquirer($scope.engine);
+            }
+        } else {
             $scope.acquire.acquirer = new AdvanceAcquirer($scope.engine);
+        }
     }
     
     $scope.selEvent = undefined;
