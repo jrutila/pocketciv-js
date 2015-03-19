@@ -26,6 +26,14 @@ module.exports = {
             ctx.done && ctx.done();
         }
     },
+    'upkeep.post': function(ctx) {
+        var engine = this;
+        if (engine.map.areas[1].city > 2 && engine.map.areas[6].city > 2)
+        {
+            engine.gameOver(true);
+        }
+        ctx.done && ctx.done();
+    },
     "map": {
         "areas": {
             "1": {

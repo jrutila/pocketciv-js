@@ -297,7 +297,7 @@ Engine.prototype = {
     },
     end_of_era: function(ctx) {
         console.log("End of era");
-        if (this.map.cityCount >= this.era)
+        if (this.map.cityCount >= this.era || this.era >= 8)
         {
             // Can Gain glory!
             var trbCount = this.map.tribeCount;
@@ -320,12 +320,12 @@ Engine.prototype = {
     gameOver: function(resolution) {
         this.resolution = resolution;
         this.phase = "gameover";
+        this.signals.phaser.dispatch("gameover", this.resolution)
     },
     nextPhase: function() {
         this.signals.phaser.dispatch("end", this.phase)
         this.phase = this.phases[this.phases.indexOf(this.phase)+1] || this.phases[0];
         this.signals.phaser.dispatch("start", this.phase)
-        console.log("Phase is now "+this.phase);
     },
     draw: function(done, canstop) {
         this.drawer(this.deck, function(c) {
