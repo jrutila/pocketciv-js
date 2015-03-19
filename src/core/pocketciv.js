@@ -166,8 +166,11 @@ Map.prototype = {
     get tribeCount() {
       return _.reduce(_.values(this.areas), function(memo, area){ return area.tribes ?  memo + area.tribes: memo }, 0)
     },
-    get cityCount() {
+    get cityAV() {
       return _.reduce(_.values(this.areas), function(memo, area){ return area.city ?  memo + area.city: memo }, 0)
+    },
+    get cityCount() {
+      return _.reduce(_.values(this.areas), function(memo, area){ return area.city ?  memo + 1: memo }, 0)
     },
 }
 
