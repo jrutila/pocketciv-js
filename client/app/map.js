@@ -29,7 +29,8 @@ function findHexWithWidthAndHeight(width, height)
 Map = function(map) {
     findHexWithWidthAndHeight(80, 80)
 	HT.Hexagon.Static.DRAWSTATS = true;
-	map.height = Math.min(map.height, 9);
+	// The images are only 768px in height
+	map.height = Math.min(map.height, 10);
 
     this.width = Math.ceil(map.width/2)*HT.Hexagon.Static.WIDTH + Math.floor(map.width/2)*HT.Hexagon.Static.SIDE;
     this.height = map.height*HT.Hexagon.Static.HEIGHT;
