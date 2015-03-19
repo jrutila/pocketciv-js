@@ -162,7 +162,11 @@ body.initiating {
         right: 0px;
         width: 100% !important;
         
-        #leftInfoWrapper > div {
+        #leftInfoWrapper > div:not(#eventRunner) {
+            pointer-events: all;
+        }
+        
+        .event {
             pointer-events: all;
         }
     }
