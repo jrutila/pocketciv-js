@@ -18,6 +18,13 @@ module.exports = {
             ctx.done && ctx.done();
         }
     },
+    'upkeep.post': function(ctx) {
+            if (this.map.areas[1].city > 0)
+            {
+                this.gameOver(true);
+            }
+            ctx.done && ctx.done();
+    },
     "map": {
         "areas": {
             "1": {

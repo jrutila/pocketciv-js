@@ -21,6 +21,13 @@ Advances (such as Mining and Black Market) or through Expeditions",
             ctx.done && ctx.done();
         }
     },
+    "advance.post": function(ctx) {
+        var engine = this;
+        if (engine.acquired.indexOf('architecture') != -1)
+        {
+            engine.gameOver(true);
+        }
+    },
     "map": {
         "areas": {
             "3": {

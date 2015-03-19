@@ -21,6 +21,13 @@ The City must be standing at the end of a Round (after Upkeep).",
             ctx.done && ctx.done();
         }
     },
+    'upkeep.post': function(ctx) {
+            if (this.map.areas[4].city > 0)
+            {
+                this.gameOver(true);
+            }
+            ctx.done && ctx.done();
+    },
     "map": {
         "areas": {
             "1": {
