@@ -176,21 +176,19 @@
         
         <div id="start" class="gameInfo" ng-hide="engine.phase">
             <h2>{{ engine.title }}</h2>
-            <div class="">
-                <p>{{ engine.description }}</p>
-                <p class="goal">{{ engine.goal }}</p>
-                <!-- @include ad_gamestart.html -->
-                <button
-                    id="startButton"
-                    class="btn btn-primary col-xs-12"
-                    ng-click="engine.phase = 'populate'"
-                    ng-hide="engine.phase"
-                    analytics-on="click"
-                    analytics-category="game"
-                    analytics-event="start"
-                    analytics-label="{{ engine.name }}"
-                    >Start!</button>
-            </div>
+            <p>{{ engine.description }}</p>
+            <p class="goal">{{ engine.goal }}</p>
+            <!-- @include ad_gamestart.html -->
+            <button
+                id="startButton"
+                class="btn btn-primary col-xs-12"
+                ng-click="engine.phase = 'populate'"
+                ng-hide="engine.phase"
+                analytics-on="click"
+                analytics-category="game"
+                analytics-event="start"
+                analytics-label="{{ engine.name }}"
+                >Start!</button>
         </div>
         
         <div id="gameover" class="gameInfo" ng-show="engine.phase == 'gameover'">
