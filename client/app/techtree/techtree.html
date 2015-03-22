@@ -1,10 +1,33 @@
-    <div id="techtree">
-        <div class="cover"></div>
-        <div class="ttcont">
-        <button class="close" ng-click="toggleTechTree()">X</button>
-        <div class="content">
-            <h1>Tech tree</h1>
-    <span ng-show="acquirer">{{ _.size(acquirer.acquired) }} / {{ acquirer.totalCity }}</span>
+<div id="techtree">
+    <div class="cover"></div>
+    <div class="ttcont">
+    <button class="close" ng-click="toggleTechTree()">X</button>
+    <div class="content">
+        
+        <!-- nav tabs -->
+        <!--
+        <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active">
+                <a href="#advancestab" role="tab" data-toggle="tab">
+                    Tech tree
+                    <span ng-show="acquirer">{{ _.size(acquirer.acquired) }} / {{ acquirer.totalCity }}</span>
+                </a>
+            </li>
+            <li>
+                <a href="#wonderstab" role="tab" data-toggle="tab">
+                    Wonders
+                </a>
+            </li>
+        </ul>
+        -->
+            
+    <!-- tab panes -->
+<tabset>
+    
+<tab> <!-- advances -->
+    <tab-heading>
+        Advances <span ng-show="acquirer">{{ _.size(acquirer.acquired) }} / {{ acquirer.totalCity }}</span>
+    </tab-heading>
     <span ng-show="acquiring">{{ nowAcquired() }}
     <button class="btn" ng-if="nowAcquired().length > 0" ng-click="resetAcquires()">Reset</button>
     </span>
@@ -140,6 +163,15 @@
             </div>
         </div>
     </div>
-        </div>
-        </div>
-    </div> <!-- #techtree -->
+    
+</tab>
+        
+<tab heading="Wonders">
+    WONDERS!
+</tab>
+
+</tabset>
+
+    </div> <!-- .content tabpanel -->
+    </div> <!-- .ttcont -->
+</div> <!-- #techtree -->

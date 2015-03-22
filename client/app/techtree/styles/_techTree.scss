@@ -18,6 +18,11 @@ $acquiredBg: $color-complement-4;
         margin-bottom: 10px;
         display: inline-block;
     }
+    .tab-pane {
+        position: absolute;
+        bottom: 0px;
+        top: 40px; // Tab height
+    }
     ul {
         margin-bottom: 0px;
     }
