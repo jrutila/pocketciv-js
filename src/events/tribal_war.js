@@ -17,9 +17,9 @@ module.exports = {
                 {% warring_tribes = warring_tribes * 2 %} \
                 ",
             '3.1': "Select two neighboring regions with tribes (if possible).\
-                {% neighbourCount = 2 %} {%; selectAreas() %}",
+                {% neighbourCount = 2 %}",
             '3.2': "Reduce Neighboring Tribes by the amount of \
-                    Warring Tribes {{ warring_tribes }}",
+                    Warring Tribes {{ warring_tribes }}{%; selectAreas() %}",
             '4': "Reduce Tribes in Active Region by 3.\
                  {% change({ 'tribes': '-3' }) %}"
     },
@@ -33,7 +33,7 @@ module.exports = {
         var opts = {
             initial: initial,
             map: this.engine.map.areas,
-            amount: 2,
+            amount: neighbourCount,
             shows: ['tribes'],
             edits: [],
             warring_tribes: warring_tribes,
