@@ -10,6 +10,7 @@ $nowAcquiredColor: $color-complement-3;
 $availableColor: $color-complement-4;
 $selectedColor: $color-complement-2;
 $acquiredBg: $color-complement-4;
+$usedColor: gray;
 
 #techtree {
     h1 {
@@ -199,7 +200,7 @@ $acquiredBg: $color-complement-4;
     }
     
 @media (max-height: $heightLimit) {
-    #cityinfo tbody tr:not(.areas) {
+    #cityinfo tbody tr:not(.areas):not(.used) {
         display: none;
     }
 }
@@ -212,6 +213,10 @@ $acquiredBg: $color-complement-4;
     
     .areas {
         color: $availableColor;
+    }
+    
+    .used {
+        background-color: $acquiredBg;
     }
     
     .acquired {
