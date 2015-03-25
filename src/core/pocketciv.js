@@ -44,6 +44,7 @@ var actions = {
     'city': require('../actions/city'),
     'acquire': require('../actions/acquire'),
     'expedition': require('../actions/expedition'),
+    'build': require('../actions/build'),
 }
 
 var advances = {
@@ -97,6 +98,19 @@ var advances = {
     'machining': require('../advances/machining'),
     'common_tongue': require('../advances/common_tongue'),
     'shipping': require('../advances/shipping'),
+}
+
+var wonders = {
+    'amphitheater': require('../wonders/amphitheater'),
+    'atlantis': require('../wonders/atlantis'),
+    'citadel': require('../wonders/citadel'),
+    'coliseum': require('../wonders/coliseum'),
+    'gardens': require('../wonders/gardens'),
+    'giant_statue': require('../wonders/giant_statue'),
+    'justice': require('../wonders/justice'),
+    'monolith': require('../wonders/monolith'),
+    'palace': require('../wonders/palace'),
+    'wall': require('../wonders/wall'),
 }
 
 
@@ -181,6 +195,7 @@ function Engine(impl, map, deck) {
     this.areaChanger = impl && impl.areaChanger || function() { throw "Not implemented areaChanger"; }
     this.eventStepper = impl && impl.eventStepper || function(done) { done & done(); }
     this.advanceAcquirer = impl && impl.advanceAcquirer || function() { throw "Not implemented advaneAcquirer"; }
+    this.wonderBuilder = impl && impl.wonderBuilder || function() { throw "Not implemented wonderBuilder"; }
     this.queryUser = impl && impl.queryUser || function() { throw "Not implemented queryUser"; }
     this.map = map || new Map();
     this.deck = deck || new EventDeck();
@@ -196,7 +211,9 @@ function Engine(impl, map, deck) {
         this.advances[a] = _.clone(advances[a]);
         this.advances[a].cost = _.clone(advances[a].cost);
     }
+    this.wonders = _.clone(wonders);
     this.acquired = [];
+    this.built = {};
     this.trading = [];
     this.actions = actions;
     this.gold = 0;
@@ -232,6 +249,7 @@ var defaults= {
     'map.height': undefined,
     'map.grid': undefined,
     'acquired': [],
+    'built': {},
     'trading': [],
     'gold': 0,
     'glory': 0,
@@ -436,7 +454,24 @@ Engine.prototype = {
             }, this);
         }
         console.log("Acquired "+name);
-        ctx && ctx.done && ctx.done();
+        //ctx && ctx.done && ctx.done();
+    },
+    build: function(name, area) {
+        this.acquired.push(name);
+        var adv = this.advances[name];
+        if (adv.acquired)
+        {
+            //                                      | is this during load?
+            adv.acquired.call(this, ctx);
+        }
+        if (adv.actions)
+        {
+            _.each(adv.actions, function(act, key) {
+                this.actions[key] = this.actions[key] ? _.extend(this.actions[key], act) : act;
+                console.log("Added action "+key)
+            }, this);
+        }
+        console.log("Built "+name+" to area "+area);
     },
     doEvent: function(ev, ctx) {
         var eng = this;

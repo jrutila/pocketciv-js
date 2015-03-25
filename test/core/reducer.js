@@ -1,9 +1,9 @@
 var should = require('chai').should()
-var pocketciv = require('../src/core/pocketciv')
-var reducer = require('../src/core/reducer')
-var event = require('../src/core/event')
+var pocketciv = require('../../src/core/pocketciv')
+var reducer = require('../../src/core/reducer')
+var event = require('../../src/core/event')
 var _ = require('underscore')
-var CityAdvance = require('../src/phases/city_advance').CityAdvance;
+var CityAdvance = require('../../src/phases/city_advance').CityAdvance;
 
 var engine = pocketciv.Engine
 

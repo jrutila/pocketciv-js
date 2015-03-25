@@ -342,10 +342,12 @@
     </a>
     
     <pc-techtree ng-show="showTT"
-    selected="acquire.selected"
+    selected="acquire.selected || build.selected"
     engine="engine"
     acquirer="acquire.acquirer"
     acquiring="acquire.acquiring"
+    builder="build.builder"
+    building="build.building"
     ></pc-techtree>
     
     </div><!-- snap-content -->

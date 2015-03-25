@@ -167,7 +167,38 @@
 </tab>
         
 <tab heading="Wonders">
-    WONDERS!
+    {{ builder.nowbuilt }}
+    <table class="table table-condensed table-hover">
+        <thead>
+            <th>Areas</th>
+            <th>Name</th>
+            <th>VP</th>
+            <th>Cost</th>
+            <th>Description</th>
+        </thead>
+        <tbody>
+            <tr ng-repeat="wonder in builder.wonders">
+                <td>
+                    <ul class="btn-group" role="group">
+                        <li ng-click="buildWon(wonder.name, a)"
+                            class="btn"
+                            ng-repeat="a in possibleWonders[wonder.name].areas">
+                            <p class="areaCode">{{ a }}</p>
+                        </li>
+                    </ul>
+                </td>
+                <td>{{ wonder.title }}<button class="godMode" ng-show="godMode" ng-click="engine.build(wonder.name)">B</button></td>
+                <td>{{ wonder.points }}</td>
+                <td>
+                    <ul class="list-inline">
+                        <li class="tribes" ng-if="wonder.cost.tribes">{{ wonder.cost.tribes }}</li>
+                        <li class="gold" ng-if="wonder.cost.gold">{{ wonder.cost.gold }}</li>
+                    </ul>
+                </td>
+                <td>{{ wonder.description }}</td>
+            </tr>
+        </tbody>
+    </table>
 </tab>
 
 </tabset>

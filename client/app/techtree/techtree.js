@@ -10,6 +10,7 @@ pocketcivApp.directive('pcTechtree', function() {
             //'acquired': "=",
             'engine': "=",
             'acquirer': "=",
+            'builder': "=",
             'acquiring': "=",
             //'areas': "=",
         },
@@ -24,6 +25,12 @@ pocketcivApp.directive('pcTechtree', function() {
                     $scope.possibleAdvances = acq.possibleAdvances;
                     console.log($scope.possibleAdvances);
                     $scope.selected.advance && $scope.autoSelectArea($scope.selected.advance);
+                }
+            });
+            $scope.$watch("builder", function(bui) {
+                if (bui) {
+                    console.log("Update possible wonders to")
+                    $scope.possibleWonders = bui.possibleWonders;
                 }
             });
             $scope.getAcquireClasses = function(key) {
@@ -95,6 +102,10 @@ pocketcivApp.directive('pcTechtree', function() {
             $scope.acquire = function() {
                 $scope.acquirer.acquire($scope.selAdv.name, $scope.selArea.id);
                 $scope.possibleAdvances = $scope.acquirer.possibleAdvances;
+            }
+            $scope.buildWon = function(name, area) {
+                $scope.builder.build(name, area);
+                $scope.possibleWonders = $scope.builder.possibleWonders;
             }
         }
     }

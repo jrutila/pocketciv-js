@@ -32,9 +32,9 @@ PhaseContext.prototype = {
         }
     },
     change: function(key, value) {
-        if (!isNaN(parseInt(key))) 
+        if (!isNaN(parseInt(key))) {
             this.targets[key] = this._chn(this.targets[key], value);
-        else if (_.isString(key))
+        } else if (_.isString(key))
             this.targets[key] = this._chn(this.targets[key], value);
         else if (_.isObject(key)) {
             value = key;
@@ -51,7 +51,12 @@ PhaseContext.prototype = {
         else if (_.isObject(n)) {
             var ret = _.isObject(o) ? o : {};
             _.each(n, function(nn, nk) {
-                ret[nk] = this._chn(_.isUndefined(o) ? o : o[nk], nn);
+                if (nk == '+') {
+                    ret = _.union(ret, nn);
+                } else if (nk == '-') {
+                    ret = _.difference(ret, nn);
+                } else
+                    ret[nk] = this._chn(_.isUndefined(o) ? o : o[nk], nn);
             },this);
             return ret;
         } else

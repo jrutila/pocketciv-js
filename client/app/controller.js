@@ -13,6 +13,7 @@ var sprintf = require("sprintf");
 var mustache = require("mustache");
 var Map = require("./map")
 var AdvanceAcquirer = require("../../src/actions/acquire").AdvanceAcquirer;
+var WonderBuilderer = require("../../src/actions/build").WonderBuilderer;
 
 engine = undefined;
 
@@ -46,6 +47,7 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
         "reduce": [],
         "advance": [],
         "acquires": [],
+        "builds": [],
     };
     };
     resetGameLog();
@@ -216,7 +218,14 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
         acquiring: false,
         acquirer: undefined,
     }; };
+    var resetBuild = function() { return {
+        selected: {},
+        done: undefined,
+        building: false,
+        builder: undefined,
+    }; };
     $scope.acquire = resetAcquire();
+    $scope.build = resetBuild();
     $scope.showTT = false;
 
     pocketimpl.advanceAcquirer = function(engine, done) {
@@ -225,29 +234,44 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
         $scope.acquire.done = done;
         $scope.toggleTechTree();
     }
+    pocketimpl.wonderBuilder = function(engine, done) {
+        $scope.build.builder = new WonderBuilderer(engine);
+        $scope.build.building = true;
+        $scope.build.done = done;
+        $scope.toggleTechTree();
+    }
     
     $scope.toggleTechTree = function() {
         $scope.showTT = !$scope.showTT;
-        if ($scope.acquire.acquiring) {
+        if ($scope.acquire.acquiring || $scope.build.building) {
             if (!$scope.showTT) {
-                console.log("ACQUIRE")
-                var acquirer = $scope.acquire.acquirer;
-                $scope.acquire.done.call($scope.engine, acquirer.nowacquired);
-                if (acquirer.nowacquired)
-                    $scope.debug.gameLog.acquires.push(
-                        _.object(_.map(acquirer.nowacquired, function (advn, key) {
-                            return [key, advn.name];
-                        }))
-                    );
+                console.log("ACQUIRE/BUILD")
+                if ($scope.acquire.acquiring) {
+                    var d = $scope.acquire.done;
+                    var now = $scope.acquire.acquirer.nowacquired;
+                    var log = $scope.debug.gameLog.acquires;
+                } else {
+                    var d = $scope.build.done;
+                    var now = $scope.build.builder.nowbuilt;
+                    var log = $scope.debug.gameLog.builds;
+                }
+                d.call($scope.engine, now);
+                
+                if (now)
+                    log.push(now);
                 else
-                    _.last($scope.debug.gameLog.advance).pop("acquire");
+                    _.last($scope.debug.gameLog.advance).pop();
                     
                 $scope.acquire.acquiring = false;
+                $scope.build.building = false;
                 $scope.acquire.done = undefined;
+                $scope.build.done = undefined;
                 $scope.acquire.acquirer = new AdvanceAcquirer($scope.engine);
+                $scope.build.builder = new WonderBuilderer($scope.engine);
             }
         } else {
             $scope.acquire.acquirer = new AdvanceAcquirer($scope.engine);
+            $scope.build.builder = new WonderBuilderer($scope.engine);
         }
     }
     
