@@ -411,8 +411,7 @@ Engine.prototype = {
             else {
                 if (ctx.changes)
                 {
-                    var str = Ctx.getString(ctx.changes);
-                    eng.areaChange(str, final);
+                    eng.areaChange(ctx, final);
                 } else {
                     final();
                 }
@@ -478,46 +477,17 @@ Engine.prototype = {
         var event = eng.events[ev.name];
         eventRunner.runEvent(eng, event, ev, ctx);
     },
-    areaChange: function(changes, done) {
-        this.areaChanger(changes, function() {
-            var applyChange = function(elem, change)
-            {
-                for (var k in change)
-                {
-                    if (change[k] === true || change[k] === false)
-                        elem[k] = change[k];
-                    else
-                    {
-                        var v = change[k];
-                        if (!elem[k])
-                            elem[k] = 0;
-                        
-                        if (v.indexOf('-') == 0 || v.indexOf('+') == 0)
-                            elem[k] += parseInt(v);
-                        else
-                            elem[k] = parseInt(v);
-                            
-                        if (elem[k] < 0)
-                            elem[k] = 0;
-                    }
+    areaChange: function(ctx, done) {
+        this.areaChanger(ctx, function() {
+            _.each(ctx.targets, function(trg, key) {
+                if (!isNaN(parseInt(key))) {
+                    // Area target
+                    this.map.areas[key] = _.extend(this.map.areas[key], trg);
+                } else {
+                    // Other target
+                    this[key] = trg;
                 }
-            };
-            
-            for (var a in changes)
-            {
-                var change = changes[a];
-                var area = this.map.areas[a];
-                if (area)
-                {
-                    applyChange(area, change);
-                }
-                else
-                {
-                    change = {};
-                    change[a] = changes[a];
-                    applyChange(this, change)
-                }
-            }
+            },this);
             done && done.call(this);
         });
     }

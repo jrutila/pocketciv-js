@@ -23,14 +23,14 @@
         <accordion>
             <accordion-group>
                 <accordion-heading>New Game</accordion-heading>
-                <div class="button-group">
+                <div class="btn-group-vertical" role="group">
                     <button class="btn btn-primary" ng-repeat="(k, s) in scenarios" ng-click="load(s,k)" snap-toggle>{{ s.title }}</button>
                 </div>
             </accordion-group>
             <accordion-group>
                 <accordion-heading>Load Game</accordion-heading>
                 <button class="btn btn-primary" ng-click="load($storage['current'])" snap-toggle>Continue</button>
-                <div class="button-group">
+                <div class="btn-group-vertical" role="group">
                     <button class="btn btn-primary" ng-repeat="(k, s) in $storage.saves" ng-click="saveName = k; load(s)" snap-toggle>{{ k }}</button>
                 </div>
             </accordion-group>
@@ -223,6 +223,10 @@
             <div class="icon mountain" id="mountain"></div>
             <div class="icon volcano" id="volcano"></div>
             <div class="icon desert" id="desert"></div>
+            <div class="wonder amphitheater" id="amphitheater" title="{{ engine.wonders.amphitheater.title }}"></div>
+            <div class="wonder justice" id="justice" title="{{ engine.wonders.justice.title }}"></div>
+            <div class="wonder coliseum" id="coliseum" title="{{ engine.wonders.coliseum.title }}"></div>
+            <div class="wonder citadel" id="citadel" title="{{ engine.wonders.citadel.title }}"></div>
         </div>
         
         <div id="changePrompt" ng-hide="!areaChange">
@@ -235,7 +239,9 @@
                                 <span ng-if="a > 0" class="areaCode">{{ a }}</span>
                                 <span ng-if="a == 'gold'">{{ a }}</span>
                             </li>
-                            <li ng-if="a > 0" ng-repeat="(k, v) in c"><span class="icon {{ k }}" data-val="{{ v }}">{{ v }}</span></li>
+                            <li ng-if="a > 0" ng-repeat="(k, v) in c">
+                                <span class="icon {{ k }}" data-val="{{ v }}">{{ v }}</span>
+                            </li>
                             <li ng-if="a == 'gold'" class="gold">{{ c }}</li>
                         </ul>
                     </div>
@@ -243,6 +249,7 @@
                 <div class="row">
                     <button class="btn btn-primary col-xs-12" ng-click="areaChangeOk()">OK</button>
                     <button class="btn btn-default col-xs-12" ng-show="currentStep.skip" ng-click="currentStep.skip()">skip</button>
+                    <button class="btn btn-default col-xs-12" ng-show="godMode" ng-click="areaChangeOk(true)">ignore</button>
                 </div>
             </div>
         </div>

@@ -9,6 +9,7 @@ var pocketcivApp = angular.module('pocketcivApp', [
 var runplay = require("../../src/core/runplay");
 var eventplay = require("../../src/core/event");
 var reducer = require("../../src/core/reducer");
+var Context = require("../../src/core/context");
 var sprintf = require("sprintf");
 var mustache = require("mustache");
 var Map = require("./map")
@@ -172,15 +173,16 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
         drawnFunc = drawn;
     }
 
-    $scope.areaChangeOk = function() {
+    $scope.areaChangeOk = function(skip) {
         $scope.areaChange = undefined;
-        areaChangeDone.call($scope.engine);
+        !skip && areaChangeDone.call($scope.engine);
         areaChangeDone = undefined;
         $(".highlight").removeClass('highlight');
     }
     
     var areaChangeDone = undefined;
-    pocketimpl.areaChanger = function(changes, done) {
+    pocketimpl.areaChanger = function(ctx, done) {
+        var changes = Context.getString(ctx.changes);
         $scope.areaChange = changes;
         areaChangeDone = done;
         if (_.isEmpty(changes) || $scope.engine.phase == 'move')
@@ -361,6 +363,7 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
     }
     
     var drawElem = function(prop, reg, val) {
+        if (!_.has(map.symbols[reg], prop)) return;
         var $elem = $('#' + prop + reg);
 
         if ($elem.length == 0 && val) {
@@ -370,7 +373,8 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
                 left: map.symbols[reg][prop].X
             })
         }
-        if ($elem.length > 0 && !val) $elem.remove()
+        if ($elem.length > 0 && !val)
+            $elem.remove()
         else {
             $elem.html(val).show();
             $elem.attr("data-val", val);
@@ -521,19 +525,27 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
             
         $scope.$watch('engine.map', function() {
             console.log("Hey! Map changed!")
+            $("#canvases .wonder").hide();
             for (var reg in $scope.map.areas)
             {
+                var area = $scope.map.areas[reg];
                 if (!(reg in map.symbols))
                     continue
                 
-                for (var prop in $scope.map.areas[reg])
-                {
-                    if (!(prop in map.symbols[reg]))
-                        continue;
-                        
-                    var val = $scope.map.areas[reg][prop];
-                    drawElem(prop, reg, val);
-                }
+                _.each($scope.map.areas[reg], function(val, prop) {
+                    if (prop == "wonders")
+                    {
+                        _.each(val, function(w) {
+                            drawElem(w, reg, true);
+                        })
+                    } else if (!(prop in map.symbols[reg])) {
+                        return;
+                    } else {
+                        drawElem(prop, reg, val);
+                    }
+                })
+                if (_.contains(area.wonders, 'atlantis') && area.city > 0)
+                    $("#city"+reg).addClass("atlantis");
             }
         }, true)
         

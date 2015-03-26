@@ -1,5 +1,6 @@
 var pocketcivApp = angular.module('pocketcivApp');
 var AdvanceAcquirer = require("../../../src/actions/acquire").AdvanceAcquirer;
+var WonderBuilderer = require("../../../src/actions/build").WonderBuilderer;
 
 pocketcivApp.directive('pcTechtree', function() {
     return {
@@ -62,6 +63,9 @@ pocketcivApp.directive('pcTechtree', function() {
             }
             $scope.resetAcquires = function() {
                 $scope.acquirer = new AdvanceAcquirer($scope.engine);
+            }
+            $scope.resetBuilds = function() {
+                $scope.builder = new WonderBuilderer($scope.engine);
             }
             $scope.nowAcquired = function() {
                 return $scope.acquirer ? 

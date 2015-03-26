@@ -15,7 +15,7 @@ function WonderBuilderer(engine) {
     this.acquired = _.clone(engine.acquired);
     this.wonders = _.clone(engine.wonders);
     this.existing = _.clone(engine.built) || {}; // [area] = { wonders: ['a', 'b'] }
-    this.nowbuilt = {};
+    this.nowbuilt = [];
     this.areas = {};
     this.replaceable_resources = engine.params.replaceable_resources || [];
     _.each(engine.map.areas, function(a, ak) {
@@ -43,8 +43,9 @@ WonderBuilderer.prototype = {
             };
             
             _.each(_.pick(this.areas, function(a) { return a.tribes >= w.cost.tribes }), function(a, ak) {
-                if (_.has(a.wonders, name)) // No same wonder to the same are twice (I Guess?)
+                if (_.contains(a.wonders, name)) // No same wonder to the same are twice (I Guess?)
                     return;
+                if (_.any(this.nowbuilt, function(b) { return b[0] == name && b[1] == ak })) return;
                 if (w.can_acquire == undefined || w.can_acquire(a))
                     bb[name].areas.push(ak);
             },this);
@@ -54,7 +55,7 @@ WonderBuilderer.prototype = {
     },
     build: function(name, area) {
         this.existing[name] = area;
-        this.nowbuilt[name] = [this.wonders[name], area];
+        this.nowbuilt.push([name, area]);
         this.areas[area].tribes -= this.wonders[name].cost.tribes || 0;
         this.gold -= this.wonders[name].cost.gold || 0;
     },
@@ -69,7 +70,7 @@ module.exports = {
             console.log(builds)
             var changes = { };
             _.each(builds, function(xx) {
-                var b = xx[0];
+                var b = engine.wonders[xx[0]];
                 var area = xx[1];
                 if (_.has(b.cost, 'tribes'))
                     ctx.change(area, { tribes: -1*b.cost.tribes});

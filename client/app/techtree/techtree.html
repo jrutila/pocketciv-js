@@ -29,7 +29,7 @@
         Advances <span ng-show="acquirer">{{ _.size(acquirer.acquired) }} / {{ acquirer.totalCity }}</span>
     </tab-heading>
     <span ng-show="acquiring">{{ nowAcquired() }}
-    <button class="btn" ng-if="nowAcquired().length > 0" ng-click="resetAcquires()">Reset</button>
+    <button class="btn btn-danger" ng-if="nowAcquired().length > 0" ng-click="resetAcquires()">Reset</button>
     </span>
             
     <div class="tt_main_table tt_layout_table">
@@ -167,7 +167,7 @@
 </tab>
         
 <tab heading="Wonders">
-    {{ builder.nowbuilt }}
+    {{ builder.nowbuilt }}<button class="btn btn-danger" ng-show="builder.nowbuilt.length > 0" ng-click="resetBuilds()">Reset</button>
     <table class="table table-condensed table-hover">
         <thead>
             <th>Areas</th>
