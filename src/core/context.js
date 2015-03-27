@@ -75,12 +75,19 @@ function changes(initial, target) {
                 ret[key] = {};
                 _.each(val, function(v,k) {
                     if (_.isNumber(v)) {
-                        //var vv = _getChangeString((initial[key][k] || 0), v);
                         var vv = v - (initial[key][k] || 0);
                         if (vv != 0) ret[key][k] = vv;
                     } else if (_.isBoolean(v)) {
                         var vv = v != (initial[key][k] || false);
                         if (vv) ret[key][k] = v;
+                    } else if (_.isArray(v)) {
+                        var plus = _.difference(v, initial[key][k]);
+                        var minus = _.difference(initial[key][k], v);
+                        if (plus.length == 0 && minus.length == 0)
+                            return;
+                        ret[key][k] = {};
+                        if (plus.length > 0) ret[key][k]['+'] = plus;
+                        if (minus.length > 0) ret[key][k]['-'] = minus;
                     }
                 });
             }
@@ -95,23 +102,8 @@ function changes(initial, target) {
         },this);
         return ret;
     };
-function changeString(chg) {
-    var ret = undefined;
-    if (_.isObject(chg)) {
-        ret = {};
-        _.each(chg, function(v,k) {
-            ret[k] = changeString(v);
-        });
-    } else if (_.isNumber(chg)) {
-        return chg > 0 ? "+"+chg.toString() : chg.toString();
-    } else {
-        return chg;
-    }
-    return ret;
-    };
 
 module.exports = {
     Context: PhaseContext,
     changes: changes,
-    getString: changeString,
 }

@@ -180,9 +180,24 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
         $(".highlight").removeClass('highlight');
     }
     
+var changeString = function(chg) {
+    var ret = undefined;
+    if (_.isObject(chg)) {
+        ret = {};
+        _.each(chg, function(v,k) {
+            ret[k] = changeString(v);
+        });
+    } else if (_.isNumber(chg)) {
+        return chg > 0 ? "+"+chg.toString() : chg.toString();
+    } else {
+        return chg;
+    }
+    return ret;
+};
+    
     var areaChangeDone = undefined;
     pocketimpl.areaChanger = function(ctx, done) {
-        var changes = Context.getString(ctx.changes);
+        var changes = changeString(ctx.changes);
         $scope.areaChange = changes;
         areaChangeDone = done;
         if (_.isEmpty(changes) || $scope.engine.phase == 'move')

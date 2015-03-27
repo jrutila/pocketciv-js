@@ -227,6 +227,9 @@
             <div class="wonder justice" id="justice" title="{{ engine.wonders.justice.title }}"></div>
             <div class="wonder coliseum" id="coliseum" title="{{ engine.wonders.coliseum.title }}"></div>
             <div class="wonder citadel" id="citadel" title="{{ engine.wonders.citadel.title }}"></div>
+            <div class="wonder giant_statue" id="giant_statue" title="{{ engine.wonders.giant_statue.title }}"></div>
+            <div class="wonder monolith" id="monolith" title="{{ engine.wonders.monolith.title }}"></div>
+            <div class="wonder palace" id="palace" title="{{ engine.wonders.palace.title }}"></div>
         </div>
         
         <div id="changePrompt" ng-hide="!areaChange">
@@ -240,7 +243,9 @@
                                 <span ng-if="a == 'gold'">{{ a }}</span>
                             </li>
                             <li ng-if="a > 0" ng-repeat="(k, v) in c">
-                                <span class="icon {{ k }}" data-val="{{ v }}">{{ v }}</span>
+                                <span ng-if="!_.isObject(v)" class="icon {{ k }}" data-val="{{ v }}">{{ v }}</span>
+                                <span ng-if="_.isObject(v)"  class="{{ k }} array_adding">{{ v['+'] }}</span>
+                                <span ng-if="_.isObject(v)"  class="{{ k }} array_removing">{{ v['-'] }}</span>
                             </li>
                             <li ng-if="a == 'gold'" class="gold">{{ c }}</li>
                         </ul>
