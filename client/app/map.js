@@ -87,6 +87,7 @@ Map.prototype.paint = function(ctx) {
     var hexCtxs = {}
     var focusCtxs = {}
     var activeCtxs = {}
+    this.commonPoints = {};
     for (var i = -1; i <= regionCount; i++)
     {
         var cnv = this.getCanvas(i);
@@ -134,6 +135,7 @@ Map.prototype.paint = function(ctx) {
                 commonPoints[key]++;
             }
         }
+        this.commonPoints[i] = commonPoints;
         ctx.globalCompositeOperation = 'source-over';
         ctx.lineWidth = 1
         ctx.strokeStyle = "black"
@@ -164,6 +166,7 @@ Map.prototype.paint = function(ctx) {
                 ctx.lineWidth = 5;
             }
         }
+        this.hexCtxs = hexCtxs;
     }
     
     for (var reg in this.regions)
@@ -179,9 +182,10 @@ Map.prototype.paint = function(ctx) {
             this.symbols[reg]['monolith'] = new HT.Point(mp.X-25, mp.Y-25+30)
             mp = this.regions[reg][1].MidPoint;
             this.symbols[reg]['forest'] = new HT.Point(mp.X-25, mp.Y-25)
+            this.symbols[reg]['gardens'] = new HT.Point(mp.X-25, mp.Y-25+30)
             this.symbols[reg]['mountain'] = new HT.Point(mp.X, mp.Y)
             this.symbols[reg]['volcano'] = new HT.Point(mp.X, mp.Y)
-            this.symbols[reg]['citadel'] = new HT.Point(mp.X+10, mp.Y+10)
+            this.symbols[reg]['citadel'] = new HT.Point(mp.X, mp.Y)
             mp = this.regions[reg][2].MidPoint;
             this.symbols[reg]['city'] = new HT.Point(mp.X-25, mp.Y-25)
             this.symbols[reg]['amphitheater'] = new HT.Point(mp.X-25-15, mp.Y-25-20)
@@ -195,33 +199,6 @@ Map.prototype.paint = function(ctx) {
 
         }
     }
-    /*
-    for (var r = 1; r <= regionCount; r++)
-    {
-        for (var h = 0; h < this.grid.Hexes.length; h++)
-        {
-            var hex = this.grid.Hexes[h]
-            var rid = this.hex[hex.Id]
-            if (rid === r)
-            {
-                var neigh = this.grid.GetNeighbors(hex.Id)
-                for (var n = 0; n < neigh.length; n++)
-                {
-                    if (this.hex[neigh[n].Id].id !== rid)
-                    {
-                        ctx.beginPath()
-                        ctx.moveTo(hex.Points[n].X, hex.Points[n].Y)
-                        ctx.lineTo(hex.Points[(n+1)%6].X, hex.Points[(n+1)%6].Y)
-                        ctx.closePath()
-                        ctx.lineWidth = 1
-                        ctx.strokeStyle = "black"
-                        ctx.stroke()
-                    }
-                }
-            }
-        }
-    }
-    */
 }
 
 Map.prototype.getRegionAt = function(x, y) {
@@ -230,6 +207,41 @@ Map.prototype.getRegionAt = function(x, y) {
     p.Y = y
     var hex = this.grid.GetHexAt(p)
     return hex != undefined ? this.hex[hex.Id] : undefined;
+}
+
+Map.prototype.drawWall = function(reg) {
+    if (!this.wallDrawed || !this.wallDrawed[reg]) {
+        this.wallDrawed = this.wallDrawed || {};
+        this.wallDrawed[reg] = true;
+        console.log("Drawing wall to "+reg)
+        var ctx = this.hexCtxs[reg];
+        var region = this.regions[reg];
+        
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.lineWidth = 3
+        ctx.strokeStyle = "orange"
+        
+        _.each(region, function(hex) {
+            for (var n = 0; n < 6; n++) {
+                var start = [hex.Points[n].X, hex.Points[n].Y]
+                var end = [hex.Points[(n + 1) % 6].X, hex.Points[(n + 1) % 6].Y]
+
+                var theEdge = getCPKey(start, end);
+                if (this.commonPoints[reg][theEdge] > 1) continue;
+                if (_.any(_.omit(this.regions, reg), function(neig, n) {
+                    return this.commonPoints[n][theEdge] > 0;
+                }, this))
+                {
+                    continue;
+                }
+                ctx.beginPath()
+                ctx.moveTo(start[0], start[1])
+                ctx.lineTo(end[0], end[1])
+                ctx.closePath()
+                ctx.stroke()
+            }
+        },this);
+    }
 }
 
 module.exports = Map;

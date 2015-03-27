@@ -552,6 +552,8 @@ var changeString = function(chg) {
                     {
                         _.each(val, function(w) {
                             drawElem(w, reg, true);
+                            if (w == "wall")
+                                map.drawWall(reg);
                         })
                     } else if (!(prop in map.symbols[reg])) {
                         return;

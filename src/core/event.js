@@ -67,7 +67,7 @@ Context.prototype = {
         }
     },
     target: function(chg, area) {
-        if (_.isObject(chg) && _.isNumber(parseInt(_.first(_.keys(chg)))) && area == undefined) {
+        if (_.isObject(chg) && !isNaN(parseInt(_.first(_.keys(chg)))) && area == undefined) {
             // This is a full blown change with area ids and all
             this.ctx.target(chg);
         }
