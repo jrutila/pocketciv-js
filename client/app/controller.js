@@ -3,6 +3,7 @@ var pocketcivApp = angular.module('pocketcivApp', [
         'ngStorage',
         'snap',
         'ui.bootstrap',
+        'checklist-model',
         'ngSanitize',
         'angulartics', 'angulartics.google.analytics'
         ]);
