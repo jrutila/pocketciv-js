@@ -90,10 +90,11 @@ module.exports = {
                     // All damage absorbed !
                     this.amount -= (areaDamages[key] - decr*dmgWn);
                 }
-                return chg;
+                return {'wonders': _.difference(this.initial[key].wonders, chg.wonders['-']) };
             }
             
             this.engine.reducer(new reducer.Reducer(opts), function(ok) {
+                console.log(ok.changes)
                 ctx.change(ok.changes);
                 ctx.done && ctx.done();
             });
