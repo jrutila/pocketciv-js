@@ -7,6 +7,7 @@ module.exports = {
         console.log("Running advance "+name);
         var eng = this;
         var pre = undefined;
+        var post = undefined;
         _.each(eng.acquired, function(key) {
             var adv = eng.advances[key];
             if (adv.actions && name in adv.actions) {
@@ -19,11 +20,20 @@ module.exports = {
                 {
                     pre = action.pre;
                 }
+                if (action.post) {
+                    post = action.post;
+                }
             }
         }, this)
         var prevDone = ctx.done;
         ctx.done = function() {
-            ctx.done = prevDone;
+            if (post) {
+                ctx.done = function() {
+                    ctx.done = prevDone;
+                    post.call(eng, ctx);
+                }
+            } else
+                ctx.done = prevDone;
             eng.actions[name].run.call(eng, ctx);
         }
         
