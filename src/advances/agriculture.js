@@ -23,8 +23,13 @@ Decimate 2 Tribes to create a Farm.",
                 ctx.done && ctx.done();
             },
             'post': function(ctx) {
-                // TODO: Check from ctx if forest free was used
-                console.log(ctx)
+                _.each(ctx.changes, function(c, key) {
+                    if (c.forest === undefined && c.farm === true)
+                    {
+                        ctx.engine.round.agriculture_farm_used = true;
+                    }
+                });
+                ctx.done && ctx.done();
             }
         },
     }

@@ -15,10 +15,15 @@ module.exports = {
                     ctx.params.forest_free);
         },this);
         if (ctx.params.forest_free)
-        _.each(initial, function(i) {
-            if (i.forest)
-                i.do_not_use_forest = false;
-        });
+        {
+            var one_forest_free = true;
+            _.each(initial, function(i) {
+                if (i.forest) {
+                    i.do_not_use_forest = one_forest_free;
+                    one_forest_free = false;
+                }
+            });
+        }
         
         var opts = {
             map: engine.map.areas,
