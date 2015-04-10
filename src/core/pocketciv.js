@@ -353,8 +353,12 @@ Engine.prototype = {
     checkLosing: function() {
         return this.map.tribeCount == 0 && this.map.cityCount == 0;
     },
+    endPhase: function() {
+        this.currentContext.done && this.currentContext.done();
+    },
     runPhase: function(name, arg) {
         var ctx = new PhaseContext(this);
+        this.currentContext = ctx;
         var eng = this;
         var posts = [];
         var pres = [];
@@ -390,7 +394,7 @@ Engine.prototype = {
                             return;
                         }
                         
-                        if (name != "advance" && name != "end_of_era" && eng.phase != "gameover")
+                        if (name != "end_of_era" && eng.phase != "gameover")
                             eng.nextPhase();
                     };
         
