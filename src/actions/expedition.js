@@ -63,12 +63,12 @@ module.exports = {
                     // Frontier expedition
                     if (engine.map.areas[a].neighbours.indexOf('frontier') > -1)
                     {
-                        fgold = expforce * opts.frontier_multi - c.hexagon / opts.split;
+                        fgold = expforce * opts.frontier_multi - Math.ceil(c.hexagon / opts.split);
                     }
                     // Sea expedition
                     if (engine.params.sea_expedition && _.some(engine.map.areas[a].neighbours, reducer.isSea))
                     {
-                        sgold = expforce * opts.sea_multi - c.square / opts.split;
+                        sgold = expforce * opts.sea_multi - Math.ceil(c.square / opts.split);
                         console.log("Sea gold: "+sgold);
                         console.log("Frontier gold: "+fgold);
                     }

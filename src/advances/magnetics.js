@@ -18,6 +18,7 @@ module.exports = {
     acquired: function() {
         console.log("Sea cost now 0")
         this.params.sea_cost = 0;
+        this.params.expedition_split = 2;
     },
     actions: { },
 }
