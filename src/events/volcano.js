@@ -21,6 +21,7 @@ module.exports = {
                 Reduce Tribes to 1 in the Active Region. \
                 Farms and Wonders are Decimated in the Active Region. \
                 {% change({ 'city': '-2', 'farm': false, 'volcano': true }) %} \
+                {% target({ 'wonders': [] }) %} \
                 {% if (active_region.tribes) change({ 'tribes': '1' }) %} \
                 {% break_if(true) %}",
             '2.3': "If the Active Region has a Volcano: \
@@ -29,6 +30,7 @@ module.exports = {
                 Create a Desert in the Active Region. \
                 In all Neighboring Regions, Reduce Tribes by 2. \
                 {% change({ 'city': '0', 'farm': false, 'tribes': '0', forest: false, 'desert': true }) %} \
+                {% target({ 'wonders': [] }) %} \
                 {% reduceNeighbours() %} \
                 "
     },

@@ -22,6 +22,7 @@ Decimate all Wonders in the Active Region \
 Create a Fault Line in up to two Neighboring Regions \
 of your choice that do not have Fault Lines.\
                 {% change({ 'city': -3, 'tribes': -4 }) %} \
+                {% target({ 'wonders': [] }) %} \
                 {%; createFaults() %}",
             '3.2': "Draw the next Event card. {%; draw_card() %} Using the symbols \
 shown on the ORIGINAL Event card to the far right of \

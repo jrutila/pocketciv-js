@@ -4,17 +4,26 @@ module.exports = {
     "description": "You will need to go on Sea Expeditions now. Also, due to \
         the Desert in Region 4, you will need to build up enough Tribes to \
         sail to Region 4 and build the Monolith before upkeep occurs.",
-    "goal": "In Region 4, build a Huge Monolith of Impressiveness before the end of Era 5. \
-    (NOTE! Wonders not yet implemented!)",
+    "goal": "In Region 4, build a Huge Monolith of Impressiveness before the end of Era 5.",
     'end_of_era.post': function(ctx) {
-        console.log("Check for winning conditions")
+        console.log("Check for winning conditions on end_of_era post")
         var engine = this;
         // End of era 5
         if (engine.era == 6)
         {
-            engine.gameOver(false, "Do you have the monolith?");
-            ctx.done && ctx.done();
+            if (_.has(engine.map.areas[4].wonders, 'monolith'))
+                engine.gameOver(true);
+            else
+                engine.gameOver(false, "You don't have the monolith on area 4");
         }
+        ctx.done && ctx.done();
+    },
+    'advance.post': function(ctx) {
+        console.log("Check for winning conditions on advance post")
+        var engine = this;
+        if (_.contains(engine.map.areas[4].wonders, 'monolith'))
+            engine.gameOver(true);
+        ctx.done && ctx.done();
     },
     "map": {
         "areas": {

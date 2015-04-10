@@ -12,7 +12,7 @@ describe('Flood', function() {
     beforeEach(function() {
         event = require('../../src/events/flood')
         // 5 - 4 - 3
-        // sea    /
+        // sea |__/
         //       2
         state.map.areas = {
             5: { id: 5, neighbours: [ 4, 'sea' ]},
@@ -29,52 +29,69 @@ describe('Flood', function() {
         });
         runEvent(event, { expr: 's' }, state);
     });
-    it('should be a TSUNAMI if next to sea', function(d) {
-        state.map.areas[5].tribes = 4;
-        state.map.areas[5].city = 4;
-        state.map.areas[4].tribes = 5;
-        state.map.areas[4].city = 5;
-        
-        deck.push({ circle: 5 }, { square: 7 });
-        done(function() {
-            this.changes.should.deep.equal({
-                5: {'tribes': -4, 'city': -2 },
-                4: {'tribes': -5, 'city': -1 },
-                });
-            d();
+    describe('should be a TSUNAMI', function() {
+        it('if next to sea', function(d) {
+            state.map.areas[5].tribes = 4;
+            state.map.areas[5].city = 4;
+            state.map.areas[4].tribes = 5;
+            state.map.areas[4].city = 5;
+
+            deck.push({ circle: 5 }, { square: 7 });
+            done(function() {
+                this.changes.should.deep.equal({
+                    5: {'tribes': -4, 'city': -2 },
+                    4: {'tribes': -5, 'city': -1 },
+                    });
+                d();
+            });
+            runEvent(event, { expr: 's' }, state);
         });
-        runEvent(event, { expr: 's' }, state);
-    });
-    it('tsunami case 1', function(d) {
-        state.map.areas[5].tribes = 4;
-        state.map.areas[5].city = 4;
-        state.map.areas[4].tribes = 5;
-        state.map.areas[4].city = 5;
-        
-        deck.push({ circle: 5 }, { square: 4 });
-        done(function() {
-            this.changes.should.deep.equal({
-                5: {'tribes': -4 },
-                4: {'tribes': -4 },
-                });
-            d();
+        it('case 1', function(d) {
+            state.map.areas[5].tribes = 4;
+            state.map.areas[5].city = 4;
+            state.map.areas[4].tribes = 5;
+            state.map.areas[4].city = 5;
+
+            deck.push({ circle: 5 }, { square: 4 });
+            done(function() {
+                this.changes.should.deep.equal({
+                    5: {'tribes': -4 },
+                    4: {'tribes': -4 },
+                    });
+                d();
+            });
+            runEvent(event, { expr: 's' }, state);
         });
-        runEvent(event, { expr: 's' }, state);
-    });
-    it('tsunami case 2', function(d) {
-        state.map.areas[5].tribes = 4;
-        state.map.areas[5].city = 4;
-        state.map.areas[4].tribes = 0;
-        state.map.areas[4].city = 5;
-        
-        deck.push({ circle: 5 }, { square: 5 });
-        done(function() {
-            this.changes.should.deep.equal({
-                5: {'tribes': -4, 'city': -1 },
-                4: {'city': -3 },
-                });
-            d();
+        it('case 2', function(d) {
+            state.map.areas[5].tribes = 4;
+            state.map.areas[5].city = 4;
+            state.map.areas[4].tribes = 0;
+            state.map.areas[4].city = 5;
+
+            deck.push({ circle: 5 }, { square: 5 });
+            done(function() {
+                this.changes.should.deep.equal({
+                    5: {'tribes': -4, 'city': -1 },
+                    4: {'city': -3 },
+                    });
+                d();
+            });
+            runEvent(event, { expr: 's' }, state);
         });
-        runEvent(event, { expr: 's' }, state);
+        it('and decimate wonders', function(d) {
+            state.map.areas[2].tribes = 1;
+            state.map.areas[2].city = 1;
+            state.map.areas[2].wonders = ['w1', 'w2'];
+
+            deck.push({ circle: 2 }, { square: 6 });
+            reduce.push({ 2: { 'wonders': { '-': ['w2']}}})
+            done(function() {
+                this.changes.should.deep.equal({
+                    2: {'tribes': -1, 'city': -1, 'wonders': { '-': ['w2'] }}
+                    });
+                d();
+            });
+            runEvent(event, { expr: 's' }, state);
+        });
     });
 })

@@ -44,6 +44,7 @@ var actions = {
     'city': require('../actions/city'),
     'acquire': require('../actions/acquire'),
     'expedition': require('../actions/expedition'),
+    'build': require('../actions/build'),
 }
 
 var advances = {
@@ -97,6 +98,19 @@ var advances = {
     'machining': require('../advances/machining'),
     'common_tongue': require('../advances/common_tongue'),
     'shipping': require('../advances/shipping'),
+}
+
+var wonders = {
+    'amphitheater': require('../wonders/amphitheater'),
+    'atlantis': require('../wonders/atlantis'),
+    'citadel': require('../wonders/citadel'),
+    'coliseum': require('../wonders/coliseum'),
+    'gardens': require('../wonders/gardens'),
+    'giant_statue': require('../wonders/giant_statue'),
+    'justice': require('../wonders/justice'),
+    'monolith': require('../wonders/monolith'),
+    'palace': require('../wonders/palace'),
+    'wall': require('../wonders/wall'),
 }
 
 
@@ -181,6 +195,7 @@ function Engine(impl, map, deck) {
     this.areaChanger = impl && impl.areaChanger || function() { throw "Not implemented areaChanger"; }
     this.eventStepper = impl && impl.eventStepper || function(done) { done & done(); }
     this.advanceAcquirer = impl && impl.advanceAcquirer || function() { throw "Not implemented advaneAcquirer"; }
+    this.wonderBuilder = impl && impl.wonderBuilder || function() { throw "Not implemented wonderBuilder"; }
     this.queryUser = impl && impl.queryUser || function() { throw "Not implemented queryUser"; }
     this.map = map || new Map();
     this.deck = deck || new EventDeck();
@@ -196,7 +211,9 @@ function Engine(impl, map, deck) {
         this.advances[a] = _.clone(advances[a]);
         this.advances[a].cost = _.clone(advances[a].cost);
     }
+    this.wonders = _.clone(wonders);
     this.acquired = [];
+    this.built = {};
     this.trading = [];
     this.actions = actions;
     this.gold = 0;
@@ -232,6 +249,7 @@ var defaults= {
     'map.height': undefined,
     'map.grid': undefined,
     'acquired': [],
+    'built': {},
     'trading': [],
     'gold': 0,
     'glory': 0,
@@ -335,8 +353,13 @@ Engine.prototype = {
     checkLosing: function() {
         return this.map.tribeCount == 0 && this.map.cityCount == 0;
     },
+    endPhase: function() {
+        this.currentContext.done && this.currentContext.done();
+    },
     runPhase: function(name, arg) {
         var ctx = new PhaseContext(this);
+        if (name != 'advance' || arg == undefined)
+            this.currentContext = ctx;
         var eng = this;
         var posts = [];
         var pres = [];
@@ -364,6 +387,7 @@ Engine.prototype = {
         if (this[name+".pre"]) pres.push(this[name+".pre"]);
         
         var final = function() {
+                if (name != 'advance' || arg == undefined) {
                         ctx.confirm && ctx.confirm();
                         
                         if (eng.checkLosing())
@@ -372,9 +396,10 @@ Engine.prototype = {
                             return;
                         }
                         
-                        if (name != "advance" && name != "end_of_era" && eng.phase != "gameover")
+                        if (name != "end_of_era" && eng.phase != "gameover")
                             eng.nextPhase();
-                    };
+                }
+        };
         
         var runpre = function() {
             var olddone = ctx.done;
@@ -393,8 +418,7 @@ Engine.prototype = {
             else {
                 if (ctx.changes)
                 {
-                    var str = Ctx.getString(ctx.changes);
-                    eng.areaChange(str, final);
+                    eng.areaChange(ctx, final);
                 } else {
                     final();
                 }
@@ -436,53 +460,41 @@ Engine.prototype = {
             }, this);
         }
         console.log("Acquired "+name);
-        ctx && ctx.done && ctx.done();
+        //ctx && ctx.done && ctx.done();
+    },
+    build: function(name, area) {
+        this.acquired.push(name);
+        var adv = this.advances[name];
+        if (adv.acquired)
+        {
+            //                                      | is this during load?
+            adv.acquired.call(this, ctx);
+        }
+        if (adv.actions)
+        {
+            _.each(adv.actions, function(act, key) {
+                this.actions[key] = this.actions[key] ? _.extend(this.actions[key], act) : act;
+                console.log("Added action "+key)
+            }, this);
+        }
+        console.log("Built "+name+" to area "+area);
     },
     doEvent: function(ev, ctx) {
         var eng = this;
         var event = eng.events[ev.name];
         eventRunner.runEvent(eng, event, ev, ctx);
     },
-    areaChange: function(changes, done) {
-        this.areaChanger(changes, function() {
-            var applyChange = function(elem, change)
-            {
-                for (var k in change)
-                {
-                    if (change[k] === true || change[k] === false)
-                        elem[k] = change[k];
-                    else
-                    {
-                        var v = change[k];
-                        if (!elem[k])
-                            elem[k] = 0;
-                        
-                        if (v.indexOf('-') == 0 || v.indexOf('+') == 0)
-                            elem[k] += parseInt(v);
-                        else
-                            elem[k] = parseInt(v);
-                            
-                        if (elem[k] < 0)
-                            elem[k] = 0;
-                    }
+    areaChange: function(ctx, done) {
+        this.areaChanger(ctx, function() {
+            _.each(ctx.targets, function(trg, key) {
+                if (!isNaN(parseInt(key))) {
+                    // Area target
+                    this.map.areas[key] = _.extend(this.map.areas[key], trg);
+                } else {
+                    // Other target
+                    this[key] = trg;
                 }
-            };
-            
-            for (var a in changes)
-            {
-                var change = changes[a];
-                var area = this.map.areas[a];
-                if (area)
-                {
-                    applyChange(area, change);
-                }
-                else
-                {
-                    change = {};
-                    change[a] = changes[a];
-                    applyChange(this, change)
-                }
-            }
+            },this);
             done && done.call(this);
         });
     }

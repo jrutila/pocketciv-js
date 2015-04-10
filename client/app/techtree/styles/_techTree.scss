@@ -10,6 +10,7 @@ $nowAcquiredColor: $color-complement-3;
 $availableColor: $color-complement-4;
 $selectedColor: $color-complement-2;
 $acquiredBg: $color-complement-4;
+$usedColor: gray;
 
 #techtree {
     h1 {
@@ -17,6 +18,12 @@ $acquiredBg: $color-complement-4;
         margin-left: 5px;
         margin-bottom: 10px;
         display: inline-block;
+    }
+    .tab-pane {
+        position: absolute;
+        bottom: 0px;
+        top: 40px; // Tab height
+        width: 100%;
     }
     ul {
         margin-bottom: 0px;
@@ -194,7 +201,7 @@ $acquiredBg: $color-complement-4;
     }
     
 @media (max-height: $heightLimit) {
-    #cityinfo tbody tr:not(.areas) {
+    #cityinfo tbody tr:not(.areas):not(.used) {
         display: none;
     }
 }
@@ -207,6 +214,10 @@ $acquiredBg: $color-complement-4;
     
     .areas {
         color: $availableColor;
+    }
+    
+    .used {
+        background-color: $acquiredBg;
     }
     
     .acquired {
@@ -222,4 +233,27 @@ $acquiredBg: $color-complement-4;
         background-color: $selectedColor;
     }
     
+}
+
+#wonders {
+    
+}
+
+.wonderlist {
+    overflow: auto;
+    position: absolute;
+    top: 0px;
+    bottom: 0px;
+}
+
+.resetter {
+    position: absolute;
+    top: -37px;
+    left: 250px;
+@media (max-width: $screen-xs-max) {
+    
+    span {
+        display: none;
+    }
+}
 }

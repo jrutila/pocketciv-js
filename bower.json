@@ -29,7 +29,8 @@
     "angular-hotkeys": "chieffancypants/angular-hotkeys#~1.4.5",
     "bootstrap-sass-official": "~3.3.3",
     "jquery-overflowandroid": "~0.7.7",
-    "angulartics": "~0.17.2"
+    "angulartics": "~0.17.2",
+    "checklist-model": "~0.2.4"
   },
   "exportsOverride": {
     "bootstrap-sass-official": {

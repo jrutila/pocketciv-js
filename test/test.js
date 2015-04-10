@@ -17,10 +17,6 @@ var mocha = new Mocha();
 var passed = [];
 var failed = [];
 
-mocha.addFile('./test/pocketciv');
-mocha.addFile('./test/reducer');
-mocha.addFile('./test/mover');
-
 function addDir(dir) {
 // Here is an example:
 fs.readdirSync(dir).filter(function(file){
@@ -38,6 +34,7 @@ fs.readdirSync(dir).filter(function(file){
 addDir('test/events')
 addDir('test/advances')
 addDir('test/actions')
+addDir('test/core')
 
 mocha.run(function(){
 

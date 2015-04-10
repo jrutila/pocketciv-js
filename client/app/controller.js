@@ -3,16 +3,19 @@ var pocketcivApp = angular.module('pocketcivApp', [
         'ngStorage',
         'snap',
         'ui.bootstrap',
+        'checklist-model',
         'ngSanitize',
         'angulartics', 'angulartics.google.analytics'
         ]);
 var runplay = require("../../src/core/runplay");
 var eventplay = require("../../src/core/event");
 var reducer = require("../../src/core/reducer");
+var Context = require("../../src/core/context");
 var sprintf = require("sprintf");
 var mustache = require("mustache");
 var Map = require("./map")
 var AdvanceAcquirer = require("../../src/actions/acquire").AdvanceAcquirer;
+var WonderBuilderer = require("../../src/actions/build").WonderBuilderer;
 
 engine = undefined;
 
@@ -46,6 +49,7 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
         "reduce": [],
         "advance": [],
         "acquires": [],
+        "builds": [],
     };
     };
     resetGameLog();
@@ -170,15 +174,31 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
         drawnFunc = drawn;
     }
 
-    $scope.areaChangeOk = function() {
+    $scope.areaChangeOk = function(skip) {
         $scope.areaChange = undefined;
-        areaChangeDone.call($scope.engine);
+        !skip && areaChangeDone.call($scope.engine);
         areaChangeDone = undefined;
         $(".highlight").removeClass('highlight');
     }
     
+var changeString = function(chg) {
+    var ret = undefined;
+    if (_.isObject(chg)) {
+        ret = {};
+        _.each(chg, function(v,k) {
+            ret[k] = changeString(v);
+        });
+    } else if (_.isNumber(chg)) {
+        return chg > 0 ? "+"+chg.toString() : chg.toString();
+    } else {
+        return chg;
+    }
+    return ret;
+};
+    
     var areaChangeDone = undefined;
-    pocketimpl.areaChanger = function(changes, done) {
+    pocketimpl.areaChanger = function(ctx, done) {
+        var changes = changeString(ctx.changes);
         $scope.areaChange = changes;
         areaChangeDone = done;
         if (_.isEmpty(changes) || $scope.engine.phase == 'move')
@@ -216,7 +236,14 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
         acquiring: false,
         acquirer: undefined,
     }; };
+    var resetBuild = function() { return {
+        selected: {},
+        done: undefined,
+        building: false,
+        builder: undefined,
+    }; };
     $scope.acquire = resetAcquire();
+    $scope.build = resetBuild();
     $scope.showTT = false;
 
     pocketimpl.advanceAcquirer = function(engine, done) {
@@ -225,29 +252,44 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
         $scope.acquire.done = done;
         $scope.toggleTechTree();
     }
+    pocketimpl.wonderBuilder = function(engine, done) {
+        $scope.build.builder = new WonderBuilderer(engine);
+        $scope.build.building = true;
+        $scope.build.done = done;
+        $scope.toggleTechTree();
+    }
     
     $scope.toggleTechTree = function() {
         $scope.showTT = !$scope.showTT;
-        if ($scope.acquire.acquiring) {
+        if ($scope.acquire.acquiring || $scope.build.building) {
             if (!$scope.showTT) {
-                console.log("ACQUIRE")
-                var acquirer = $scope.acquire.acquirer;
-                $scope.acquire.done.call($scope.engine, acquirer.nowacquired);
-                if (acquirer.nowacquired)
-                    $scope.debug.gameLog.acquires.push(
-                        _.object(_.map(acquirer.nowacquired, function (advn, key) {
-                            return [key, advn.name];
-                        }))
-                    );
+                console.log("ACQUIRE/BUILD")
+                if ($scope.acquire.acquiring) {
+                    var d = $scope.acquire.done;
+                    var now = $scope.acquire.acquirer.nowacquired;
+                    var log = $scope.debug.gameLog.acquires;
+                } else {
+                    var d = $scope.build.done;
+                    var now = $scope.build.builder.nowbuilt;
+                    var log = $scope.debug.gameLog.builds;
+                }
+                d.call($scope.engine, now);
+                
+                if (now)
+                    log.push(now);
                 else
-                    _.last($scope.debug.gameLog.advance).pop("acquire");
+                    _.last($scope.debug.gameLog.advance).pop();
                     
                 $scope.acquire.acquiring = false;
+                $scope.build.building = false;
                 $scope.acquire.done = undefined;
+                $scope.build.done = undefined;
                 $scope.acquire.acquirer = new AdvanceAcquirer($scope.engine);
+                $scope.build.builder = new WonderBuilderer($scope.engine);
             }
         } else {
             $scope.acquire.acquirer = new AdvanceAcquirer($scope.engine);
+            $scope.build.builder = new WonderBuilderer($scope.engine);
         }
     }
     
@@ -337,6 +379,7 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
     }
     
     var drawElem = function(prop, reg, val) {
+        if (!_.has(map.symbols[reg], prop)) return;
         var $elem = $('#' + prop + reg);
 
         if ($elem.length == 0 && val) {
@@ -346,7 +389,8 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
                 left: map.symbols[reg][prop].X
             })
         }
-        if ($elem.length > 0 && !val) $elem.remove()
+        if ($elem.length > 0 && !val)
+            $elem.remove()
         else {
             $elem.html(val).show();
             $elem.attr("data-val", val);
@@ -497,19 +541,29 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
             
         $scope.$watch('engine.map', function() {
             console.log("Hey! Map changed!")
+            $("#canvases .wonder").hide();
             for (var reg in $scope.map.areas)
             {
+                var area = $scope.map.areas[reg];
                 if (!(reg in map.symbols))
                     continue
                 
-                for (var prop in $scope.map.areas[reg])
-                {
-                    if (!(prop in map.symbols[reg]))
-                        continue;
-                        
-                    var val = $scope.map.areas[reg][prop];
-                    drawElem(prop, reg, val);
-                }
+                _.each($scope.map.areas[reg], function(val, prop) {
+                    if (prop == "wonders")
+                    {
+                        _.each(val, function(w) {
+                            drawElem(w, reg, true);
+                            if (w == "wall")
+                                map.drawWall(reg);
+                        })
+                    } else if (!(prop in map.symbols[reg])) {
+                        return;
+                    } else {
+                        drawElem(prop, reg, val);
+                    }
+                })
+                if (_.contains(area.wonders, 'atlantis') && area.city > 0)
+                    $("#city"+reg).addClass("atlantis");
             }
         }, true)
         

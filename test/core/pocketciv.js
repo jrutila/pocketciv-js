@@ -1,6 +1,6 @@
 var should = require('chai').should()
-var pocketciv = require('../src/core/pocketciv')
-var event = require('../src/core/event')
+var pocketciv = require('../../src/core/pocketciv')
+var event = require('../../src/core/event')
 
 describe('EventDeck', function() {
     describe('initialization', function() {

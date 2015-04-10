@@ -76,6 +76,7 @@ NewReducer.prototype = {
       }
       var key = _.isArray(trg) ? trg[0] : key;
       var val = _.isArray(trg) ? trg[1] : trg;
+
       this.targets[key] = val;
       this.values[key] = val;
       this.currentFunc.call(this, chg, key, val);

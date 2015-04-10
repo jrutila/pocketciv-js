@@ -37,10 +37,11 @@ module.exports = {
                         <li>1 Tribe = {{ dmgTr }} Damage</li> \
                         <li>1 City AV = {{ dmgCt }} Damage</li> \
                         <li>1 Wonder = {{ dmgWn }} Damage</li></ul>\
-                        {% tsunami() %}",
+                        {%; tsunami() %}",
     },
     'tsunami': function() {
         console.log("RUNNING TSUNAMI!")
+        var ctx = this;
         var active = this.active_region;
         var seas = _.filter(this.active_region.neighbours, reducer.isSea);
         var ngh = _.pick(this.engine.map.areas, function(area, ak) {
@@ -52,18 +53,52 @@ module.exports = {
         
         // Also the actual active region
         ngh[active.id] = this.active_region;
-        _.each(ngh, function(area) {
+        var opts = {
+            initial: {},
+            shows: ['wonders'],
+            edits: ['wonders'],
+        };
+        var areaDamages = {};
+        _.each(ngh, function(area, ak) {
             var dmg = damage;
-            var tribes = Math.min(Math.ceil(dmg/dmgTr), Math.ceil(area.tribes/dmgTr))
+            var tribes = Math.min(Math.ceil(dmg/dmgTr), Math.ceil((area.tribes || 0)/dmgTr))
             dmg -= tribes*dmgTr;
             //console.log(area.id+ ' ' +Math.ceil(dmg/dmgCt) +' '+ Math.ceil(area.city/dmgCt))
-            var city = Math.min(Math.ceil(dmg/dmgCt), Math.ceil(area.city/dmgCt))
+            var city = Math.min(Math.ceil(dmg/dmgCt), Math.ceil((area.city || 0)/dmgCt))
             dmg -= city*dmgCt;
-            // TODO: Wonders!
+            // Wonders!
             if (tribes)
                 this.change({tribes:-1*tribes}, area);
             if (city)
                 this.change({city:-1*city}, area);
+            areaDamages[ak] = dmg;
+            if (dmg >= dmgWn)
+                opts.initial[ak] = area;
         },this);
+        if (_.size(opts.initial)) {
+            opts.amount = _.reduce(areaDamages, function(memo, d) { return memo + d; }, 0);
+            opts.reduce = function(key, chg) {
+                if (!this.initial[key].wonders)
+                {
+                    this.amount -= areaDamages[key];
+                    return chg;
+                }
+                var orig = this.initial[key].wonders.length;
+                var decr = chg.wonders['-'].length;
+                this.amount -= decr*dmgWn;
+                if (this.amount < dmgWn || orig == decr) {
+                    // All damage absorbed !
+                    this.amount -= (areaDamages[key] - decr*dmgWn);
+                }
+                return {'wonders': _.difference(this.initial[key].wonders, chg.wonders['-']) };
+            }
+            
+            this.engine.reducer(new reducer.Reducer(opts), function(ok) {
+                console.log(ok.changes)
+                ctx.change(ok.changes);
+                ctx.done && ctx.done();
+            });
+        } else
+            ctx.done && ctx.done();
     },
 }
