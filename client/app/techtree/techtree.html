@@ -28,9 +28,9 @@
     <tab-heading>
         Advances <span ng-show="acquirer">{{ _.size(acquirer.acquired) }} / {{ acquirer.totalCity }}</span>
     </tab-heading>
-    <span ng-show="acquiring">{{ nowAcquired() }}
+    <div ng-show="nowAcquired().length > 0" class="resetter"><span>{{ nowAcquired() }}</span>
     <button class="btn btn-danger" ng-if="nowAcquired().length > 0" ng-click="resetAcquires()">Reset</button>
-    </span>
+    </div>
             
     <div class="tt_main_table tt_layout_table">
         <div class="tt_layout_row">
@@ -166,39 +166,46 @@
     
 </tab>
         
-<tab heading="Wonders">
-    {{ builder.nowbuilt }}<button class="btn btn-danger" ng-show="builder.nowbuilt.length > 0" ng-click="resetBuilds()">Reset</button>
-    <table class="table table-condensed table-hover">
-        <thead>
-            <th>Areas</th>
-            <th>Name</th>
-            <th>VP</th>
-            <th>Cost</th>
-            <th>Description</th>
-        </thead>
-        <tbody>
-            <tr ng-repeat="wonder in builder.wonders">
-                <td>
-                    <ul class="btn-group" role="group">
-                        <li ng-click="buildWon(wonder.name, a)"
-                            class="btn"
-                            ng-repeat="a in possibleWonders[wonder.name].areas">
-                            <p class="areaCode">{{ a }}</p>
-                        </li>
-                    </ul>
-                </td>
-                <td>{{ wonder.title }}<button class="godMode" ng-show="godMode" ng-click="engine.build(wonder.name)">B</button></td>
-                <td>{{ wonder.points }}</td>
-                <td>
-                    <ul class="list-inline">
-                        <li class="tribes" ng-if="wonder.cost.tribes">{{ wonder.cost.tribes }}</li>
-                        <li class="gold" ng-if="wonder.cost.gold">{{ wonder.cost.gold }}</li>
-                    </ul>
-                </td>
-                <td>{{ wonder.description }}</td>
-            </tr>
-        </tbody>
-    </table>
+<tab heading="Wonders" id="wonders">
+    <div>
+        <div class="resetter" ng-show="builder.nowbuilt.length > 0">
+            <span>{{ builder.nowbuilt }}</span>
+            <button class="btn btn-danger" ng-show="builder.nowbuilt.length > 0" ng-click="resetBuilds()">Reset</button>
+        </div>
+        <div class="wonderlist">
+            <table class="table table-condensed table-hover">
+                <thead>
+                    <th>Areas</th>
+                    <th>Name</th>
+                    <th>VP</th>
+                    <th>Cost</th>
+                    <th>Description</th>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="wonder in builder.wonders">
+                        <td>
+                            <ul class="btn-group" role="group">
+                                <li ng-click="buildWon(wonder.name, a)"
+                                    class="btn"
+                                    ng-repeat="a in possibleWonders[wonder.name].areas">
+                                    <p class="areaCode">{{ a }}</p>
+                                </li>
+                            </ul>
+                        </td>
+                        <td>{{ wonder.title }}<button class="godMode" ng-show="godMode" ng-click="engine.build(wonder.name)">B</button></td>
+                        <td>{{ wonder.points }}</td>
+                        <td>
+                            <ul class="list-inline">
+                                <li class="tribes" ng-if="wonder.cost.tribes">{{ wonder.cost.tribes }}</li>
+                                <li class="gold" ng-if="wonder.cost.gold">{{ wonder.cost.gold }}</li>
+                            </ul>
+                        </td>
+                        <td>{{ wonder.description }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </tab>
 
 </tabset>

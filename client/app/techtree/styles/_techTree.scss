@@ -23,6 +23,7 @@ $usedColor: gray;
         position: absolute;
         bottom: 0px;
         top: 40px; // Tab height
+        width: 100%;
     }
     ul {
         margin-bottom: 0px;
@@ -232,4 +233,27 @@ $usedColor: gray;
         background-color: $selectedColor;
     }
     
+}
+
+#wonders {
+    
+}
+
+.wonderlist {
+    overflow: auto;
+    position: absolute;
+    top: 0px;
+    bottom: 0px;
+}
+
+.resetter {
+    position: absolute;
+    top: -37px;
+    left: 250px;
+@media (max-width: $screen-xs-max) {
+    
+    span {
+        display: none;
+    }
+}
 }

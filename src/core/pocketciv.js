@@ -386,6 +386,7 @@ Engine.prototype = {
         if (this[name+".pre"]) pres.push(this[name+".pre"]);
         
         var final = function() {
+                if (name != 'advance' || arg == undefined) {
                         ctx.confirm && ctx.confirm();
                         
                         if (eng.checkLosing())
@@ -396,7 +397,8 @@ Engine.prototype = {
                         
                         if (name != "end_of_era" && eng.phase != "gameover")
                             eng.nextPhase();
-                    };
+                }
+        };
         
         var runpre = function() {
             var olddone = ctx.done;
