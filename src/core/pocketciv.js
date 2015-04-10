@@ -358,7 +358,8 @@ Engine.prototype = {
     },
     runPhase: function(name, arg) {
         var ctx = new PhaseContext(this);
-        this.currentContext = ctx;
+        if (name != 'advance' || arg == undefined)
+            this.currentContext = ctx;
         var eng = this;
         var posts = [];
         var pres = [];
