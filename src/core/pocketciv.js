@@ -354,7 +354,10 @@ Engine.prototype = {
         return this.map.tribeCount == 0 && this.map.cityCount == 0;
     },
     endPhase: function() {
-        this.currentContext.done && this.currentContext.done();
+        var ctx = this.currentContext;
+        this.currentContext = undefined;
+        // We are dealing with advance phase
+        ctx.engine.nextPhase();
     },
     runPhase: function(name, arg) {
         var ctx = new PhaseContext(this);
