@@ -133,8 +133,11 @@ $cardsLeftColor: $color-primary-2;
         color: $cardsLeftColor;
     }
     
+    > div {
+        height: 100%;
+    }
+    
     button.draw {
-        position: absolute;
         width: 100%;
         height: 100%;
         opacity: 0.2;

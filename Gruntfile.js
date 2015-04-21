@@ -242,7 +242,7 @@ module.exports = function (grunt) {
         src: '.build/index.html',
         ignorePath: 'client/',
         //directory: '.tmp/bower_components/',
-        exclude: [/bootstrap-sass-official/, /bootstrap.js/, '/json3/', '/es5-shim/',  /font-awesome.css/ ]
+        exclude: [/bootstrap-sass-official/, /bootstrap.js/, '/json3/', '/es5-shim/',  /font-awesome.css/, /tour.js/ ]
       }
     },
 

@@ -39,6 +39,10 @@
             <li ng-click="selectChange(a)" ng-if="a == 'gold'" class="gold">{{ c }}</li>
         </ul>
     </div>
-    <button class="done btn btn-primary col-xs-12 col-sm-6" ng-disabled="!ok.ok" ng-click="done()">Done</button>
+    <button
+        class="done btn btn-primary col-xs-12 col-sm-6"
+        ng-disabled="!ok.ok || (forceReduce && !_.isEqual(ok.chg, forceReduce))"
+        ng-click="done()"
+    >Done</button>
     <button class="btn btn-default col-xs-12 col-sm-6" ng-disabled="Object.keys(ok.changes).length" ng-click="reset()">Reset</button>
 </div>

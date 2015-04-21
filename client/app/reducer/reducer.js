@@ -42,7 +42,11 @@ pocketcivApp.directive('pcReducer', function() {
             $scope.$watch('reducer', function(n, o) {
                 console.log("PC REDUCER")
                 if (n != o && n != undefined)
+                {
                     $scope.reset();
+                    $scope._ = require('underscore');
+                    n.forceReduce && ($scope.forceReduce = n.forceReduce);
+                }
             });
             $scope.$watch('reduceObject', function(n, o) {
                 console.log("robje")

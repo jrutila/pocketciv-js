@@ -30,7 +30,8 @@
     "bootstrap-sass-official": "~3.3.3",
     "jquery-overflowandroid": "~0.7.7",
     "angulartics": "~0.17.2",
-    "checklist-model": "~0.2.4"
+    "checklist-model": "~0.2.4",
+    "bootstrap-tour": "~0.10.2"
   },
   "exportsOverride": {
     "bootstrap-sass-official": {

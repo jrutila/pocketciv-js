@@ -16,6 +16,7 @@ var mustache = require("mustache");
 var Map = require("./map")
 var AdvanceAcquirer = require("../../src/actions/acquire").AdvanceAcquirer;
 var WonderBuilderer = require("../../src/actions/build").WonderBuilderer;
+var signals = require("signals");
 
 engine = undefined;
 
@@ -29,6 +30,10 @@ var scenarios = {
     "scenario6": require("../../src/scenarios/scenario6"),
     "scenario7": require("../../src/scenarios/scenario7"),
     "scenario8": require("../../src/scenarios/scenario8"),
+}
+
+var tutorials = {
+    "scenario1": require("./tutorials/tutorial1"),
 }
 
 pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $analytics) {
@@ -61,9 +66,26 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
     if (!$localStorage.saves)
         $localStorage.saves = {};
     $scope.scenarios = scenarios;
+    $scope.tutorials = tutorials;
+    $scope.tutorial = false;
     $scope.welcome = true;
     $scope.engine = {};
     var pocketimpl = {};
+    
+    $scope.startTutorial = function() {
+        $scope.tutorial = tutorials[$scope.engine.name];
+        $scope.tour = new Tour({
+            steps: $scope.tutorial.steps,
+            container: "#main",
+            //backdrop: true
+        });
+        $scope.tour.end();
+        $scope.tour.init();
+        $scope.tour.signals = {
+            'map': new signals.Signal()
+        }
+        $scope.tour.restart(true);
+    }
     
     var moveFunc = undefined;
     $scope.moveTribes = function() {
@@ -91,6 +113,9 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
     $scope.$on("mapClick", function(event, region) {
         if (region < 1 || region > 8 || !$scope.movement)
             return;
+        // Something does this sometimes, this fixes
+        delete $scope.movement["NaN"];
+        
         if (moveFrom == 0)
         {
             if ($scope.movement[region] > 0)
@@ -120,6 +145,8 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
     var moveFrom = 0;
     pocketimpl.mover = function(situation, move) {
         console.log("Show mover")
+        if ($scope.tutorial)
+            $scope.forceMove = $scope.tutorial.game.move.shift();
         // Plain mover
         $scope.movement = getMovement(situation);
         $scope.hideMover = false;
@@ -131,7 +158,7 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
         
         // UI
         $scope.mapInfo = "Move tribes by clicking start region and then target region";
-        $scope.mapTitle = "MOVE"
+        $scope.mapTitle = "Move"
         $scope.mapDone = function() {
             $scope.moveTribes();
         }
@@ -143,6 +170,10 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
     $scope.drawCard = function(stop) {
         if (stop != true) {
             $scope.card = $scope.deck.draw();
+            
+            if ($scope.tutorial && !$scope.specificCard)
+                $scope.specificCard = $scope.tutorial.game.deck.shift();
+            
             if ($scope.specificCard)
                 $scope.card = $scope.deck.specific($scope.specificCard);
             $scope.debug.gameLog.deck.push($scope.card.id)
@@ -160,6 +191,8 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
    pocketimpl.reducer = function(reducer, done) {
         console.log("Show reducer "+reducer.opts)
         $scope.reducer = reducer;
+        if ($scope.tutorial)
+            $scope.reducer.forceReduce = $scope.tutorial.game.reduce.shift();
         $scope.reduceReady = function(ok) {
             $scope.debug.gameLog.reduce.push(ok ? ok.chg : {});
             done(ok);
@@ -176,6 +209,12 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
 
     $scope.areaChangeOk = function(skip) {
         $scope.areaChange = undefined;
+        
+        // Reset the event runner here
+        $scope.currentEvent = undefined;
+        $scope.currentStep = undefined;
+        clearRegions();
+        
         !skip && areaChangeDone.call($scope.engine);
         areaChangeDone = undefined;
         $(".highlight").removeClass('highlight');
@@ -204,6 +243,11 @@ var changeString = function(chg) {
         if (_.isEmpty(changes) || $scope.engine.phase == 'move')
             $scope.areaChangeOk();
         else {
+            if ($scope.tutorial)
+                if ($scope.tour.afterEvent) {
+                    $scope.tour.goTo($scope.tour.afterEvent);
+                    $scope.tour.afterEvent = undefined;
+                }
             _.each(_.keys(changes), function(k) {
                 $("[id$='"+k+"']:not([id$='-1'])").addClass('highlight');
             });
@@ -325,6 +369,7 @@ var changeString = function(chg) {
         var pnt = getMousePos(mouseCanvas, ev);
         var hex = map.getRegionAt(pnt.X, pnt.Y);
         mapClicked && mapClicked(hex);
+        $scope.tour && $scope.tour.signals.map.dispatch("click", hex);
     }
     
     var mapClicked = function(region) {
@@ -360,7 +405,14 @@ var changeString = function(chg) {
         $scope.mapInfo = undefined;
         $scope.hideDrawer = true;
         $scope.mapClicked = undefined;
-        $scope.engine.runPhase(name);
+        clearRegions();
+        if ($scope.tutorial && $scope.tour.pauseOn == name)
+        {
+            $scope.tour.engineContinue = function() {
+              $scope.engine.runPhase(name);  
+            }
+        }
+        else $scope.engine.runPhase(name);
     })
     
     $scope.saveGamePlay = function() {
@@ -408,40 +460,15 @@ var changeString = function(chg) {
         $scope.godMode = gm;
     };
     
-    /*
-    pocketciv.Engine.signals.eventPhasing.add(function(phase, ev) {
-        console.log("event phasing "+phase)
-        if (phase == "0")
-        {
-            var event = pocketciv.Engine.events[ev.name];
-            $scope.currentEvent = event;
-            $scope.currentStep = phase;
-        }
-        else if (phase == "-1")
-        {
-        }
-        else
-        {
-            $scope.currentStep = phase;
-        }
-    });
-    pocketciv.Engine.signals.phaser.add(function(status, phase) {
-        console.log(phase+": "+status);
-        if (status == "end") // && phase == "event")
-        {
-            $scope.currentEvent = undefined;
-            $scope.currentStep = undefined;
-            clearRegions();
-        }
-    });
-    */
     pocketimpl.eventStepper = function(done, step, ctx) {
         if (step == "end")
         {
             console.log("Event ended")
-            $scope.currentEvent = undefined;
-            $scope.currentStep = undefined;
-            clearRegions();
+            // Leave the current event to show
+            //$scope.currentEvent = undefined;
+            //$scope.currentStep = undefined;
+            //clearRegions();
+            // These will be called when the changes are accepted
             done();
             return;
         }
@@ -503,6 +530,8 @@ var changeString = function(chg) {
         $scope.mainMenu = false;
         $scope.card = undefined;
         $scope.currentEvent = undefined;
+        
+        $scope.tutorial = undefined;
     }
     
     $scope.mainMenu = true;

@@ -92,12 +92,12 @@
             <span class="icon-bar"></span>
         </div>
         <span ng-show="godMode" class="godmodeTitle">G</span>
-        <span>ERA: <span ng-hide="godMode">{{ engine.era }}</span>
+        <span class="infoera">ERA: <span ng-hide="godMode">{{ engine.era }}</span>
         <input type="number" ng-model="engine.era" ng-show="godMode" /></span>
-        <span>Gold: <span ng-hide="godMode">{{ engine.gold }}</span>
+        <span class="infogold">Gold: <span ng-hide="godMode">{{ engine.gold }}</span>
         <input type="number" ng-model="engine.gold" ng-show="godMode"/></span>
-        <span>Glory: {{ engine.glory }}</span><br/>
-        <span>{{ engine.phase }}</span>
+        <span class="infoglory">Glory: {{ engine.glory }}</span><br/>
+        <span class="infophase">{{ engine.phase }}</span>
         <div id="helpButton" ng-click="hideHelp = !hideHelp" ng-show="engine.phase && engine.phase != 'gameover'"><span class="glyphicon glyphicon-info-sign"></span></div>
     </div>
     
@@ -113,6 +113,10 @@
         </p>
         <p>
             Please join the development of this implementation at <a href="https://github.com/jrutila/pocketciv-js">GitHub</a>.
+        </p>
+        <p>
+            <strong>NEW!</strong> You can now run a Tutorial with the first scenario. Just open
+            the scenario "A New World" and click "Play as Tutorial".
         </p>
         <br/>
         <!--@include donations_big.html -->
@@ -178,10 +182,19 @@
             <h2>{{ engine.title }}</h2>
             <p>{{ engine.description }}</p>
             <p class="goal">{{ engine.goal }}</p>
+            <div ng-if="_.has(tutorials, engine.name)" >
+                <button
+                    name="{{ engine.name+'tutorial' }}"
+                    type="checkbox"
+                    ng-hide="tutorial"
+                    ng-click="startTutorial()"
+                    class="btn btn-primary"
+                >Play as Tutorial</button>
+            </div>
             <!-- @include ad_gamestart.html -->
             <button
                 id="startButton"
-                class="btn btn-primary col-xs-12"
+                class="btn btn-primary"
                 ng-click="engine.phase = 'populate'"
                 ng-hide="engine.phase"
                 analytics-on="click"
@@ -319,7 +332,11 @@
                     </span>
                 </li>
             </ul>
-            <button class="done btn btn-primary col-xs-12" ng-click="mapDone()">done</button>
+            <button
+                class="done btn btn-primary col-xs-12"
+                ng-click="mapDone()"
+                ng-disabled="forceMove && !_.isEqual(movement, forceMove)"
+                >Done</button>
         </div>
         
         <pc-reducer class="row" reducer="reducer" ready="reduceReady"></pc-reducer>
@@ -328,9 +345,11 @@
             <h2>Advance</h2>
             <ul class="list-unstyled">
                 <li ng-repeat="(a, act) in engine.actions">
-                    <button ng-click="advance(a)"
-                    ng-class="{'col-xl-4': manyActions }"
-                    class="btn btn-default col-sm-6 col-md-12 col-lg-6 col-xs-12">{{ act.title }}</button>
+                    <button
+                        ng-click="advance(a)"
+                        ng-class="{'col-xl-4': manyActions }"
+                        class="btn btn-default col-sm-6 col-md-12 col-lg-6 col-xs-12 advance-{{ a }}"
+                    >{{ act.title }}</button>
                 </li>
             </ul>
             <button class="done btn btn-primary col-xs-12" ng-click="actionStack.pop(); engine.endPhase()">Done</button>
