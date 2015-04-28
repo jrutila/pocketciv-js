@@ -20,7 +20,7 @@ border the Sea at the cost of 1 Tribe.",
     phases: {
         'city_support.pre': function(ctx) {
             var areas = this.map.areas;
-            ctx.supported = [];
+            ctx.supported = ctx.supported || [];
             _.each(areas, function(a, ak) {
                 if (_.some(a.neighbours, reducer.isSea))
                     ctx.supported.push(ak);

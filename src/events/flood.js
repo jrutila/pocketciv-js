@@ -72,7 +72,7 @@ module.exports = {
             if (city)
                 this.change({city:-1*city}, area);
             areaDamages[ak] = dmg;
-            if (dmg >= dmgWn)
+            if (dmg >= dmgWn && area.wonders && area.wonders.length > 0)
                 opts.initial[ak] = area;
         },this);
         if (_.size(opts.initial)) {

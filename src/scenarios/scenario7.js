@@ -1,8 +1,7 @@
 module.exports = {
     "name": "scenario7",
     "title": "Bay of Plenty",
-    "description": "If a Tsunami Event happens, the Bay of Plenty turns into the Bay of Brine. \
-    <b>NOTTE!! Bay of Brine rules are not yet implemented</b>",
+    "description": "If a Tsunami Event happens, the Bay of Plenty turns into the Bay of Brine.",
     "goal": "Attain 250 total glory.",
     'end_of_era.post': function(ctx) {
         var engine = this;
@@ -17,6 +16,39 @@ module.exports = {
             }
             ctx.done && ctx.done();
         }
+    },
+    "event.post": function(ctx) {
+        if (ctx.event && ctx.event.name == 'flood')
+        {
+            var c = ctx.eventCtx;
+            if (c.active_region &&
+                _.contains(c.active_region.neighbours, "sea"))
+            {
+                // It WAS a Tsunami! Bay of Brine!
+                ctx.engine.params.bay_of_brine = true;
+            }
+        }
+        ctx.done && ctx.done();
+    },
+    "move.pre": function(ctx) {
+        if (ctx.engine.params.bay_of_brine)
+        {
+            ctx.engine.params.sea_cost = 2;
+            ctx.engine.params.sea_expedition = false;
+        }
+        ctx.done && ctx.done();
+    },
+    "advance.post": function(ctx) {
+        if (ctx.engine.params.bay_of_brine)
+        {
+            ctx.engine.params.sea_expedition = false;
+        }
+        ctx.done && ctx.done();
+    },
+    "city_support.pre": function(ctx) {
+        if (ctx.engine.params.bay_of_brine)
+            ctx.supported = [];
+        ctx.done && ctx.done();
     },
     "era": 1,
     "map": {

@@ -257,6 +257,8 @@ function runEventExt(engine, event, ev, extCtx) {
     if (!engine) throw "Engine should not be null"
     if (!extCtx) throw "Context should not be null";
     var context = new Context(extCtx);
+    extCtx.event = event;
+    extCtx.eventCtx = context;
     context.engine = engine;
     context.done = extCtx.done;
     runEvent(event, ev, context);

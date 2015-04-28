@@ -255,6 +255,7 @@ var defaults= {
     'glory': 0,
     'era': 1,
     'round': {},
+    'params': {},
     'round_era': {},
     'goal': 'Try to advance to the end of the 8th era',
     'name': undefined,
@@ -374,6 +375,8 @@ Engine.prototype = {
             return;
         }
         
+        if (this[name+".post"]) posts.push(this[name+".post"]);
+        if (this[name+".pre"]) pres.push(this[name+".pre"]);
         _.each(_.pick(this.advances, this.acquired), function(acq) {
             if (acq.phases && _.has(acq.phases, name+'.post'))
             {
@@ -386,8 +389,6 @@ Engine.prototype = {
             if (acq.phases && _.has(acq.phases, name))
                 thePhase = acq.phases[name].run;
         }, this)
-        if (this[name+".post"]) posts.push(this[name+".post"]);
-        if (this[name+".pre"]) pres.push(this[name+".pre"]);
         
         var final = function() {
                 if (name != 'advance' || arg == undefined) {

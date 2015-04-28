@@ -131,7 +131,7 @@
             <button class="draw" ng-click="drawCard()">draw</button>
             <button class="stop" ng-click="drawCard(true)" ng-show="showStopper">stop</button>
         </div>
-        <input type="text" ng-model="specificCard" ng-show="godMode" />
+        <input type="text" ng-model="specificCard" ng-show="godMode && !hideDrawer" />
     </div>
     <div id="card" ng-mouseover="showCard = true" ng-mouseout="showCard = false" ng-class="{ pushed: hideDrawer, shown: showCard }">
         <span class="circle border">

@@ -164,7 +164,7 @@ TribeMover.prototype = {
         };
         
         // If movement is free, don't calculate the cost areas
-        if (valid.ok && this.seaCost == 1 && bysea.length == 0 && byland.length != 0)
+        if (valid.ok && this.seaCost >= 1 && bysea.length == 0 && byland.length != 0)
         {
             valid.reduce = [];
             var bl = {};
@@ -241,7 +241,7 @@ module.exports = {
                     shows: ['tribes'],
                     edits: ['tribes'],
                     original: ok.reduce,
-                    amount: ok.reduce.length,
+                    amount: ok.reduce.length*engine.params.sea_cost,
                     reduce: function(key, chg) {
                         var rTrb = this.initial[key].tribes - chg.tribes;
                         this.amount -= rTrb;
