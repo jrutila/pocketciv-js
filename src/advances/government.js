@@ -5,7 +5,7 @@ module.exports = {
     cost: { 'tribes': 4 },
     resources: [ 'food' ],
     requires: [ 'sense_of_community' ],
-    required_by: [ 'diplomacy', 'military', 'democracy' ],
+    required_by: [ 'diplomacy', 'military', 'democracy', 'law' ],
     events: {
         'tribal_war': {
             'steps': {

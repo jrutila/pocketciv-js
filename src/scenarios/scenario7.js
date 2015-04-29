@@ -1,7 +1,13 @@
 module.exports = {
     "name": "scenario7",
     "title": "Bay of Plenty",
-    "description": "If a Tsunami Event happens, the Bay of Plenty turns into the Bay of Brine.",
+    "rules": "If a Tsunami Event happens, the Bay of Plenty turns into the Bay of Brine and \
+    following conditions apply. \
+    <ul> \
+        <li>Fishing does not support Cities any more</li> \
+        <li>Sea expeditions are not possible</li> \
+        <li>Moving across the sea costs 2 tribes</li> \
+    </ul>",
     "goal": "Attain 250 total glory.",
     'end_of_era.post': function(ctx) {
         var engine = this;
