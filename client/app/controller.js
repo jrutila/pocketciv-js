@@ -451,6 +451,12 @@ var changeString = function(chg) {
     }
     
     $scope.engine = new pocketciv.EngineBuild({});
+    $scope.engine.signals.phaser.add(function(event, value) {
+        if (event == 'gameover') {
+            console.log("Game Over: " + $scope.engine.name+ " " +value);
+            $analytics.eventTrack('end', { category: 'game', label: $scope.engine.name, resolution: value});
+        }
+    });
     $scope.engine.phase = "";
     $scope.godMode = false;
     //@exclude
