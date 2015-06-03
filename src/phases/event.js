@@ -6,8 +6,8 @@ module.exports = {
         // Take era before card draw if there is era change
         var era = this.era;
         var may_skip = ctx.skip != undefined;
-        this.drawer(this.deck, function(eventcard) {
-            var eng = this;
+        var eng = this;
+        this.draw(function(eventcard) {
             if (era in eventcard.events)
             {
                 var ev = _.clone(eventcard.events[era]);

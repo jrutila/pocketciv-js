@@ -200,7 +200,7 @@ function Engine(impl, map, deck) {
     this.map = map || new Map();
     this.deck = deck || new EventDeck();
     var eng = this;
-    this.deck.noMoreCards = function() { eng.runPhase('end_of_era'); };
+    this.deck.noMoreCards = function() { };
     this.phases = [ ];
     this.phase = "populate";
     this.events = events;
@@ -347,8 +347,32 @@ Engine.prototype = {
         this.signals.phaser.dispatch("start", this.phase)
     },
     draw: function(done, canstop) {
-        this.drawer(this.deck, function(c) {
-            done(c);
+        var deck = this.deck;
+        var that = this;
+        this.drawer(deck, function(c) {
+            if (deck.cardsLeft == 0)
+            {
+                console.log("Deck exhausted")
+                // Deck exhausted
+                var funcs = that._getRunFuncs("end_of_era");
+                var ctx = that.currentContext || new PhaseContext(that);
+                var eng = that;
+                var final = function() {
+                    _.each(ctx.changes, function(val, key) {
+                        // Set inits on current context so that it works
+                        var newval = _.pick(ctx.targets[key], _.keys(val));
+                        ctx.init(key, newval);
+                    });
+                    done(c);
+                };
+                that.processPhase(ctx, function(ctxx) {
+                    // Handle the area change
+                    if (ctxx.changes) eng.areaChange(ctxx, final);
+                    else final(ctxx);
+                }, funcs);
+            } else {
+                done(c);
+            }
         }, canstop);
     },
     checkLosing: function() {
@@ -360,20 +384,31 @@ Engine.prototype = {
         // We are dealing with advance phase
         ctx.engine.nextPhase();
     },
-    runPhase: function(name, arg) {
-        var ctx = new PhaseContext(this);
-        if (name != 'advance' || arg == undefined)
-            this.currentContext = ctx;
+    processPhase: function(ctx, final, funcs) {
         var eng = this;
+        // funcs is a list of pres, the phase and posts
+        var runFuncs = function() {
+            var func = funcs.shift();
+            if (!func)
+                return function() {
+                    final.call(eng, ctx); 
+                };
+            var olddone = ctx.done;
+            ctx.done = function() {
+                ctx.done = olddone;
+                runFuncs()();
+            };
+            return function() {
+                func.call(eng, ctx);
+            };
+        }
+        runFuncs()();
+    },
+    _getRunFuncs: function(name, arg) {
         var posts = [];
         var pres = [];
         var thePhase = undefined;
-        
-        if (eng.checkLosing())
-        {
-            eng.gameOver(false, "notribesandcities");
-            return;
-        }
+        var eng = this;
         
         if (this[name+".post"]) posts.push(this[name+".post"]);
         if (this[name+".pre"]) pres.push(this[name+".pre"]);
@@ -390,6 +425,35 @@ Engine.prototype = {
                 thePhase = acq.phases[name].run;
         }, this)
         
+        if (thePhase == undefined)
+        {
+            thePhase = this.phaseImpl[name] && this.phaseImpl[name].run;
+            if (thePhase == undefined)
+                thePhase = this[name];
+            if (thePhase == undefined)
+                console.log("NO phase found: "+name);
+        }
+        
+        var funcs = [];
+        _.each(pres, function(pre) { funcs.push(function(ctx) { pre.call(eng, ctx); }); },this);
+        funcs.push(function(ctx) { thePhase.call(eng, ctx, arg); });
+        _.each(posts, function(post) { funcs.push(function(ctx) { post.call(eng, ctx); }); },this);
+        return funcs;
+    },
+    runPhase: function(name, arg) {
+        var ctx = new PhaseContext(this);
+        // Why is this?
+        if (name != 'advance' || arg == undefined)
+            this.currentContext = ctx;
+        var eng = this;
+        
+        if (eng.checkLosing())
+        {
+            eng.gameOver(false, "notribesandcities");
+            return;
+        }
+        
+        
         var final = function() {
                 if (name != 'advance' || arg == undefined) {
                         ctx.confirm && ctx.confirm();
@@ -405,48 +469,12 @@ Engine.prototype = {
                 }
         };
         
-        var runpre = function() {
-            var olddone = ctx.done;
-            ctx.done = function() {
-                var pre = pres.pop();
-                if (pre) pre.call(eng, ctx);
-                else olddone && olddone()
-            }
-            ctx.done()
-        }
-        
-        var runpost = function() {
-            // TODO: Only supports one post for now
-            var post = posts.pop();
-            if (post) post.call(eng, ctx);
-            else {
-                if (ctx.changes)
-                {
-                    eng.areaChange(ctx, final);
-                } else {
-                    final();
-                }
-            }
-        }
-        
-        if (thePhase == undefined)
-        {
-            thePhase = this.phaseImpl[name] && this.phaseImpl[name].run;
-            if (thePhase == undefined)
-                thePhase = eng[name];
-            if (thePhase == undefined)
-                console.log("NO phase found: "+name);
-        }
-        
-        ctx.done = function() {
-            ctx.done = runpost;
-            if (thePhase != undefined)
-                thePhase.call(eng, ctx, arg);
-            else
-                ctx.done();
-        }
-
-        runpre();
+        var funcs = this._getRunFuncs(name, arg);
+        this.processPhase(ctx, function(ctx) {
+            // Handle the area change
+            if (ctx.changes) eng.areaChange(ctx, final);
+            else final(ctx);
+        }, funcs);
     },
     acquire: function(name, ctx) {
         this.acquired.push(name);

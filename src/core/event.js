@@ -93,7 +93,7 @@ Context.prototype = {
     area_card: function()
     {
         var ctx = this;
-        this.engine.drawer(this.engine.deck, function(c) {
+        this.engine.draw(function(c) {
             ctx.active_region = ctx.engine.map.areas[c.circle.toString()];
             if (!ctx.active_region) {
                 ctx.break = true;
@@ -103,7 +103,7 @@ Context.prototype = {
     },
     draw_card: function(canstop) {
         var ctx = this;
-        this.engine.drawer(this.engine.deck, function(c) {
+        this.engine.draw(function(c) {
             ctx.card = c;
             ctx.done();
         },canstop == true);

@@ -176,6 +176,7 @@ Map.prototype.paint = function(ctx) {
             this.symbols[reg] = {};
             var mp = this.regions[reg][0].MidPoint;
             this.symbols[reg]['area'] = new HT.Point(mp.X-25, mp.Y-25)
+            this.symbols[reg]['counter'] = new HT.Point(mp.X, mp.Y-25)
             this.symbols[reg]['tribes'] = new HT.Point(mp.X, mp.Y)
             this.symbols[reg]['giant_statue'] = new HT.Point(mp.X, mp.Y-30)
             this.symbols[reg]['palace'] = new HT.Point(mp.X, mp.Y+15)

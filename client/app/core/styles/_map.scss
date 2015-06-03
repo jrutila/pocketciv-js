@@ -75,6 +75,15 @@
     display: inline-block;
 }
 
+.counter {
+    background-color: red;
+    width: 25px;
+    color: white;
+    font-weight: bolder;
+    text-align: center;
+    display: inline-block;
+}
+
 .city[data-val='5'],
 .city[data-val='6'],
 .city[data-val='7'],

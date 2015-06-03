@@ -17,6 +17,20 @@ PhaseContext.prototype = {
         this.targets.gold = this.engine.gold;
         this.params = this.engine.params;
     },
+    init: function(key, value) { // Changes initial values in context
+        if (!isNaN(parseInt(key)))
+            _.extend(this.initial[key], value);
+        else if (_.isString(key))
+            this.initial[key] = value;
+        else if (_.isObject(key)) {
+            value = key;
+            _.each(value, function(value, key) {
+                this.initial(key, value);
+            },this);
+        } else {
+            throw new Error("NotSupportedInitKey "+key);
+        }
+    },
     target: function(key, value) {
         if (!isNaN(parseInt(key)))
             _.extend(this.targets[key], value);
