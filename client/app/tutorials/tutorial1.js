@@ -240,7 +240,7 @@ module.exports = {
             content: "The Event's description is shown here. It tells you what \
             will happen to your Empire step-by-step. Events usually require you to draw more cards \
             or make decisions about the Event. Acquired <strong>Advances</strong> \
-            have negative or positive effects on Events.",
+            have <span class='negative'>negative</span> or <span class='positive'>positive</span> effects on Events.",
             onShow: function(tour) {
                 $("#eventRunner").removeClass("hidden");
             },
