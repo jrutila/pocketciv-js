@@ -1,6 +1,6 @@
 module.exports = {
     "name": "scenario4",
-    "title": "From the Mountains to the Sea",
+    "title": "4. From the Mountains to the Sea",
     "description": "",
     "goal": "Build a City in Region 1 before the end of Era 4. The City must be standing at the end of a Round (after Upkeep).",
     'end_of_era.post': function(ctx) {

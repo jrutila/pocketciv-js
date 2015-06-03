@@ -1,6 +1,6 @@
 module.exports = {
     "name": "scenario6",
-    "title": "In the Shadow of the Twin Peaks",
+    "title": "6. In the Shadow of the Twin Peaks",
     "description": "",
     "goal": "Have at least 6 cities at the end of the 6th era.",
     'end_of_era.post': function(ctx) {

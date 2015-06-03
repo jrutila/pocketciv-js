@@ -1,6 +1,6 @@
 module.exports = {
     "name": "scenario7",
-    "title": "Bay of Plenty",
+    "title": "7. Bay of Plenty",
     "rules": "If a Tsunami Event happens, the Bay of Plenty turns into the Bay of Brine and \
     following conditions apply. \
     <ul> \

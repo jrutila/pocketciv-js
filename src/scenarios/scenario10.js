@@ -3,7 +3,7 @@ var _ = require("underscore");
 
 module.exports = {
     "name": "scenario10",
-    "title": "The Enemy Outpost",
+    "title": "10. The Enemy Outpost",
     "rules": "To remove 1 Enemy Outpost counter: \
 <ul> \
 <li>You must Decimate 10 Tribes from Region 6.</li> \

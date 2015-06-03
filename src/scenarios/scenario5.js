@@ -1,6 +1,6 @@
 module.exports = {
     "name": "scenario5",
-    "title": "Invaders From the Divide",
+    "title": "5. Invaders From the Divide",
     "description": "",
     "goal": "Survive the Invasion.<br/>\
 At the end of the Round when the 4th End of Era check has occurred, an Attacking Force of 50 invades Region 2 from the \

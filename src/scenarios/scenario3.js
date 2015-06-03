@@ -1,6 +1,6 @@
 module.exports = {
     "name": "scenario3",
-    "title": "A Dedication to the Island Gods",
+    "title": "3. A Dedication to the Island Gods",
     "description": "You will need to go on Sea Expeditions now. Also, due to \
         the Desert in Region 4, you will need to build up enough Tribes to \
         sail to Region 4 and build the Monolith before upkeep occurs.",

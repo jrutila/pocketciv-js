@@ -1,6 +1,6 @@
 module.exports = {
     "name": "scenario9",
-    "title": "Sister Lands of the North",
+    "title": "9. Sister Lands of the North",
     "rules": "If you have Roadbuilding or Equestrian, you can move \
     Tribes between Regions 4 and Region 1 as if they share a common border",
     "goal": "Acquire Law before the end of the 8th Era.",

@@ -1,6 +1,6 @@
 module.exports = {
     "name": "scenario1",
-    "title": "A New World",
+    "title": "1. A New World",
     "description": "This scenario is a simple layout, with a simple goal that can be \
     played in a short amount of time to get the hang of how the \
     game works. Many of the more advanced techniques, such as expeditions, and acquiring gold, \

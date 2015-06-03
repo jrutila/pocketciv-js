@@ -62,6 +62,7 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
     resetGameLog();
 
     $scope.snapOpts = {
+        maxPosition: 300
     }
     $scope._ = _;
     $scope.$storage = $localStorage;

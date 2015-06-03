@@ -1,6 +1,6 @@
 module.exports = {
     "name": "scenario8",
-    "title": "Go West",
+    "title": "8. Go West",
     "description": "You may only move Tribes by Sea (with Fishing or Navigation), \
     from one Region to another Region that Neighbors the same Sea. Tribes may \
     not move from the Western Sea to the Eastern Sea, and vice versa. \
