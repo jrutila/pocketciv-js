@@ -1,3 +1,6 @@
+var reducer = require("../core/reducer");
+var _ = require("underscore");
+
 module.exports = {
     "name": "scenario10",
     "title": "The Enemy Outpost",
@@ -31,6 +34,55 @@ At the end of an Era, if an Outpost counter is still in Region 6, add one more O
             }
         }
         ctx.done && ctx.done();
+    },
+    'advance.post': function(ctx) {
+        var engine = this;
+        if (engine.map.areas[6].counter == 0)
+        {
+            engine.gameOver(true);
+        }
+        ctx.done && ctx.done();
+    },
+    "actions": {
+        "destroy": {
+            title: "Enemy Outpost",
+            run: function(ctx) {
+                var engine = this;
+
+                var initial = _.pick(ctx.initial, "6");
+                var cost = 10;
+                var has_military = _.contains(engine.acquired, "military");
+                var has_metal = _.contains(engine.acquired, "metal_working");
+                if (has_metal || has_military) cost = 6;
+                if (has_metal && has_military) cost = 3;
+
+                var opts = {
+                    map: engine.map.areas,
+                    initial: initial,
+                    shows: ['counter', 'tribes'],
+                    edits: ['tribes'],
+                    amount: 0,
+                    cost: cost,
+                    reduce: function(key, chg) {
+                        var rTrb = this.initial[key].tribes - chg.tribes;
+                        if (rTrb < 0) return false; // No adding tribes!
+                        if (chg.tribes < 0) return false; // No negative tribes
+                        var rCnt = Math.floor(rTrb / this.opts.cost);
+                        this.rok = (rTrb % this.opts.cost) == 0  && // Even amount of tribes
+                            rCnt <= this.initial[key].counter;
+                        return { tribes: chg.tribes, counter: this.initial[key].counter - rCnt };
+                    },
+                    check: function() {
+                        return this.rok == undefined || this.rok;
+                    }
+                }
+
+                engine.reducer(new reducer.Reducer(opts), function(ok) {
+                    ctx.target(ok.target);
+                    ctx.done && ctx.done();
+                });
+            }
+        }
     },
     "map": {
         "areas": {

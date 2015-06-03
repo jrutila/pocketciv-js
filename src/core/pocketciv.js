@@ -215,7 +215,7 @@ function Engine(impl, map, deck) {
     this.acquired = [];
     this.built = {};
     this.trading = [];
-    this.actions = actions;
+    this.actions = _.clone(actions);
     this.gold = 0;
     this.round = {} // Will be emptied after upkeep!
     this.round_era = {}; // Will be emptied on end of an era!
@@ -282,7 +282,7 @@ Engine.prototype = {
             if (!_.has(this, stk))
                 this[stk] = st;
         },this);
-        this.actions = _.clone(actions);
+        this.actions = _.extend(_.clone(actions), state.actions);
         this.params = {};
         for (var key in this.map.areas)
         {
@@ -382,7 +382,14 @@ Engine.prototype = {
         var ctx = this.currentContext;
         this.currentContext = undefined;
         // We are dealing with advance phase
-        ctx.engine.nextPhase();
+        if (this['advance.post']) {
+            ctx.done = function() {
+                if (ctx.engine.phase != "gameover")
+                    ctx.engine.nextPhase();
+            }
+            this['advance.post'](ctx);
+        } else
+            ctx.engine.nextPhase();
     },
     processPhase: function(ctx, final, funcs) {
         var eng = this;
@@ -412,18 +419,19 @@ Engine.prototype = {
         
         if (this[name+".post"]) posts.push(this[name+".post"]);
         if (this[name+".pre"]) pres.push(this[name+".pre"]);
-        _.each(_.pick(this.advances, this.acquired), function(acq) {
-            if (acq.phases && _.has(acq.phases, name+'.post'))
-            {
-                posts.push(acq.phases[name+".post"])
-            }
-            if (acq.phases && _.has(acq.phases, name+'.pre'))
-            {
-                pres.push(acq.phases[name+".pre"])
-            }
-            if (acq.phases && _.has(acq.phases, name))
-                thePhase = acq.phases[name].run;
-        }, this)
+        if (name != "advance" || !arg) // advance actions do not support post pre yet
+            _.each(_.pick(this.advances, this.acquired), function(acq) {
+                if (acq.phases && _.has(acq.phases, name+'.post'))
+                {
+                    posts.push(acq.phases[name+".post"])
+                }
+                if (acq.phases && _.has(acq.phases, name+'.pre'))
+                {
+                    pres.push(acq.phases[name+".pre"])
+                }
+                if (acq.phases && _.has(acq.phases, name))
+                    thePhase = acq.phases[name].run;
+            }, this)
         
         if (thePhase == undefined)
         {
