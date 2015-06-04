@@ -5,7 +5,8 @@ var pocketcivApp = angular.module('pocketcivApp', [
         'ui.bootstrap',
         'checklist-model',
         'ngSanitize',
-        'angulartics', 'angulartics.google.analytics'
+        'angulartics', 'angulartics.google.analytics',
+        'monospaced.qrcode'
         ]);
 var runplay = require("../../src/core/runplay");
 var eventplay = require("../../src/core/event");
@@ -38,7 +39,14 @@ var tutorials = {
     "scenario1": require("./tutorials/tutorial1"),
 }
 
-pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $analytics) {
+pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $analytics, $location) {
+    var gameId = $location.$$absUrl.split('?');
+    if (gameId.length > 1)
+        gameId = gameId[1];
+    else
+        gameId = null;
+    $scope.url = $location.$$protocol+"://"+$location.$$host;
+    console.log(gameId)
     var getMovement = function(areas) {
         return _.object(_.map($scope.map.areas, function (area, id) {
             return [id, area.tribes ? area.tribes : 0 ];
@@ -607,6 +615,7 @@ var changeString = function(chg) {
         
         $scope.$watch('engine.state', function(val) {
             $scope.$storage.current = val;
+            $scope.saved = false;
         }, true);
         
         $scope.$watch('engine.actions', function(val) {
@@ -621,10 +630,14 @@ var changeString = function(chg) {
     }
     
     $scope.saveName = "";
+    $scope.saved = false;
     $scope.save = function(saveName) {
-        $scope.$storage.saves[saveName] = $scope.engine.state
-        $scope.saved = true;
-        setTimeout(function() { $scope.saved = false; }, 3000);
+        $http.post('game/add', $scope.$storage.current).success(function(data) {
+            $scope.saved = { 'id': data._id, 'slug': data.slug };
+        }).error(function(data) {
+            alert("Save failed!")
+            $scope.saved = false;
+        });
     }
     
     $scope.bugDescr = undefined;
@@ -640,6 +653,16 @@ var changeString = function(chg) {
     }
     
     $(document).ready(function() {
+        if (gameId)
+        {
+            // Load given game
+            $http.get('/game/'+gameId).success(function(data) {
+                console.log("Loaded game from server: ");
+                console.log(data);
+                $scope.load(data, data.name);
+            });
+        }
+        
         $("#rightAction").on("click", "> div > h2", function() {
             var $par = $(this).parent();
             $par.toggleClass("away");

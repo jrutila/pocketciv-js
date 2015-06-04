@@ -20,8 +20,8 @@ module.exports = {
             } else {
                 engine.gameOver(false, "You did not manage to get 250 Glory.");
             }
-            ctx.done && ctx.done();
         }
+        ctx.done && ctx.done();
     },
     "event.post": function(ctx) {
         if (ctx.event && ctx.event.name == 'flood')

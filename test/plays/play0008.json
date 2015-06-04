@@ -292,16 +292,7 @@
     2,
     16
   ],
-  "reduce": [
-    [
-      "5"
-    ]
-  ],
-  "areas": [
-    "8",
-    "8",
-    "4"
-  ],
+  "reduce": [ [8], [5], [8], [4] ],
   "advance": [
     [],
     [],
@@ -319,7 +310,7 @@
       "city"
     ]
   ],
-  "acquires": [ { 8: "cartage" } ],
+  "acquires": [ { "8": "cartage" } ],
   "check": {
     "map": {
       "areas": {

@@ -5,7 +5,7 @@ var _ = require("underscore")
 var expect = require("chai").expect
 var runplay = require("../src/core/runplay")
 
-var engine = pocketciv.Engine;
+var engine = new pocketciv.EngineBuild();
 
 function check(final, chk, path) {
     if (!path) path = "";
@@ -25,7 +25,7 @@ try {
     runplay.run(engine, play);
 }
 catch (e) {
-    if (e == "END" || e == "Not implemented") {
+    if (typeof e == 'string' && (e == "END" || e.indexOf("Not implemented") > -1)) {
         console.log("ENDED");
         console.log(engine.map)
         if (play.check)

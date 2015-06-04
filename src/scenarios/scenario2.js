@@ -18,8 +18,8 @@ Advances (such as Mining and Black Market) or through Expeditions",
             } else {
                 engine.gameOver(false, "You did not manage to acquire Architecture.");
             }
-            ctx.done && ctx.done();
         }
+        ctx.done && ctx.done();
     },
     "advance.post": function(ctx) {
         var engine = this;

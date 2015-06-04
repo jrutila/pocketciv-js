@@ -1,0 +1,102 @@
+{
+  "scenario": {
+    "name": "scenario2",
+    "title": "2. The Gilded Land",
+    "description": "This is another simple scenario. You will be required now     to create some gold at some point, in order to acquire Architecture. This can be done through various ways, through other Advances (such as Mining and Black Market) or through Expeditions",
+    "goal": "Acquire Architecture before the end of Era 3.",
+    "map": {
+      "areas": {
+        "3": {
+          "id": 3,
+          "tribes": 1,
+          "farm": true,
+          "neighbours": [ 4, 5, 6, 8, "sea" ]
+        },
+        "4": {
+          "id": 4,
+          "tribes": 1,
+          "mountain": true,
+          "forest": true,
+          "farm": true,
+          "neighbours": [ 3, 8, "sea", "frontier" ]
+        },
+        "5": {
+          "id": 5,
+          "tribes": 1,
+          "mountain": true,
+          "forest": true,
+          "neighbours": [ 3, 6, 8, "sea", "frontier" ]
+        },
+        "6": {
+          "id": 6,
+          "tribes": 1,
+          "neighbours": [ 3, 5, 8 ],
+          "forest": true
+        },
+        "8": {
+          "id": 8,
+          "neighbours": [ 3, 4, 5, 6, "frontier" ],
+          "desert": true
+        }
+      },
+      "width": 11,
+      "height": 11,
+      "grid": [ [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ], [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ], [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ], [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ], [ 0, 5, 5, 8, 8, 0, 0, 0, 0, 0 ], [ -1, -1, 5, 6, 6, 8, 0, 0, 0, 0 ], [ -1, -1, -1, 5, 6, 6, 8, 0, 0, 0 ], [ -1, -1, -1, -1, 3, 3, 3, 4, 4, 0 ], [ -1, -1, -1, -1, -1, 3, -1, 4, 4, 0 ], [ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ], [ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ], [ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ], [ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ], [ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ], [ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ] ] } 
+    
+    },
+    "move": [
+    { "3": 1, "4": 4, "5": 2, "6": 1, "8": 0 },
+    { "3": 1, "4": 1, "5": 4, "6": 1, "8": 0 },
+    { "3": 1, "4": 2, "5": 5, "6": 1, "8": 0 },
+    { "3": 1, "4": 0, "5": 2, "6": 1, "8": 0 },
+    { "3": 1, "4": 1, "5": 4, "6": 1, "8": 0 },
+    { "3": 1, "4": 3, "5": 1, "6": 1, "8": 0 },
+    { "3": 1, "4": 1, "5": 5, "6": 1, "8": 0 }
+  ],
+  "deck": [ 8, 2, 7, 16, 3, 9, 13, 10, 5, 12, 6, 14, 15 ],
+  "reduce": [ [ 4 ], [ 5 ], [ 3, 4 ], [ 5 ] ],
+  "advance": [
+    [
+      "city"
+    ],
+    [
+      "farm"
+    ],
+    [
+      "city"
+    ],
+    [],
+    [],
+    [
+      "acquire"
+    ]
+  ],
+  "acquires": [
+    {
+      "4": {
+        "name": "cartage",
+        "title": "Cartage",
+        "description": "Cities upkeep requirements for farms are not confined to local Regions.",
+        "points": 2,
+        "cost": {
+          "tribes": 2
+        },
+        "resources": [
+          "stone"
+        ],
+        "requires": [],
+        "required_by": [
+          "roadbuilding"
+        ],
+        "events": {},
+        "actions": {},
+        "phases": {}
+      }
+    }
+  ],
+  "builds": [],
+  "check": {
+    "phase": "advance",
+    "era": 2
+  }
+}

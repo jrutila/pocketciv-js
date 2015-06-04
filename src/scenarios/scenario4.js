@@ -15,15 +15,15 @@ module.exports = {
             } else {
                 engine.gameOver(false, "You did not manage to build the city to area 1.");
             }
-            ctx.done && ctx.done();
         }
+        ctx.done && ctx.done();
     },
     'upkeep.post': function(ctx) {
-            if (this.map.areas[1].city > 0)
-            {
-                this.gameOver(true);
-            }
-            ctx.done && ctx.done();
+        if (this.map.areas[1].city > 0)
+        {
+            this.gameOver(true);
+        }
+        ctx.done && ctx.done();
     },
     "map": {
         "areas": {

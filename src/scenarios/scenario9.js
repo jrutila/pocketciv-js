@@ -17,8 +17,8 @@ module.exports = {
             } else {
                 engine.gameOver(false, "You did not manage to acquire the Law.");
             }
-            ctx.done && ctx.done();
         }
+        ctx.done && ctx.done();
     },
     "advance.post": function(ctx) {
         var engine = this;

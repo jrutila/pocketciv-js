@@ -20,6 +20,7 @@ require('http').createServer(function (request, response) {
 */
 
 var gameLogRoutes = require('./routes/gameLog')
+var gameRoutes = require('./routes/game')
 var app = express();
 var db = mongo.db(process.env.MONGOHQ_URL || "mongodb://localhost:27017/pocketciv", { native_parser: true});
 
@@ -35,6 +36,7 @@ app.use(function(req, res, next) {
 });
 
 app.use('/gamelog', gameLogRoutes);
+app.use('/game', gameRoutes);
 
 app.set('port', process.env.PORT || 3000);
 

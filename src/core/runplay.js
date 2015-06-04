@@ -1,4 +1,5 @@
 var _ = require("underscore")
+var mover = require("../phases/move").TribeMover;
 
 module.exports = {
     run: function(engine, play, done) {
@@ -19,7 +20,7 @@ module.exports = {
             }
             var a = { };
             done(_.object(_.map(acq, function (advn, key) {
-                return [key, engine.advances[advn]];
+                return [key, _.isObject(advn) ? advn : engine.advances[advn]];
             })));
         }
         engine.drawer = function(deck, done) {
@@ -29,13 +30,12 @@ module.exports = {
                 throw "END"
             }
             var card = engine.deck.draw(id);
-            console.log(card)
+            console.log("card: "+card.id)
             done.call(engine, card)
         }
 
-        engine.areaChanger = function(changes, done) {
-            console.log("CHANGE: ")
-            console.log(changes);
+        engine.areaChanger = function(ctx, done) {
+            console.log("("+engine.phase+") ready")
             done.call(engine);
         }
 
@@ -48,6 +48,12 @@ module.exports = {
             }
             done(possibleAreas[id])
         }
+        
+        var getMovement = function(areas) {
+            return _.object(_.map(engine.map.areas, function (area, id) {
+                return [id, area.tribes ? area.tribes : 0 ];
+            }));
+        }
 
         engine.mover = function(situation, done) {
             var move = play.move.shift();
@@ -55,8 +61,17 @@ module.exports = {
                 old['mover'](situation, done)
                 throw "END"
             }
+            var mr = new mover(engine.map.areas,
+            engine.params.moveLimit,
+            engine.params.sea_move ? engine.params.sea_cost : undefined);
+            console.log(getMovement(engine.map.areas));
             console.log(move)
-            done.call(engine, move);
+            mr.init(getMovement(engine.map.areas));
+            var ok = mr.ok(move);
+            if (!ok.ok)
+                throw new Error("Failed move!");
+            
+            done.call(engine, ok);
         }
 
         engine.reducer = function(reducer, done) {
@@ -67,8 +82,10 @@ module.exports = {
                 old['reducer'](reducer, done)
                 throw "END"
             }
-            console.log(reducer.ok(red))
-            done(reducer.ok(red).changes);
+            var ok = reducer.ok(red);
+            console.log(ok.target)
+            console.log(ok.ok)
+            done(ok);
         }
 
         if (play.scenario) engine.init(play.scenario)

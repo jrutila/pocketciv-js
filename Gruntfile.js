@@ -24,6 +24,7 @@ module.exports = function (grunt) {
     bower: 'grunt-bower-task',
     preprocess: 'grunt-preprocess',
     uglify: 'grunt-contrib-uglify',
+    shell: 'grunt-shell-spawn',
   });
 
   // Time how long tasks take. Can help when optimizing build times
@@ -58,6 +59,14 @@ module.exports = function (grunt) {
     open: {
       server: {
         url: 'http://localhost:<%= express.options.port %>'
+      }
+    },
+    shell: {
+      mongo: {
+        command: "mongod --nojournal --dbpath data/",
+        options: {
+          async: true,
+        }
       }
     },
     watch: {
@@ -654,6 +663,7 @@ module.exports = function (grunt) {
     }
 
     grunt.task.run([
+      'shell:mongo',
       'clean:server',
       'env:all',
       'copy:dev',

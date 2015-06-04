@@ -18,8 +18,8 @@ The City must be standing at the end of a Round (after Upkeep).",
             } else {
                 engine.gameOver(false, "You did not manage to build the city to area 4.");
             }
-            ctx.done && ctx.done();
         }
+        ctx.done && ctx.done();
     },
     'upkeep.post': function(ctx) {
             if (this.map.areas[4].city > 0)

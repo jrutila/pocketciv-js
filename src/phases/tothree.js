@@ -1,4 +1,5 @@
 var reducer = require('../core/reducer');
+var _ = require("underscore");
 
 module.exports = {
     run: function(ctx) {
@@ -34,9 +35,12 @@ module.exports = {
                 return { 'tribes': chg.tribes };
             }
         }
-        this.reducer(new reducer.Reducer(opts), function(rdc) {
-            ctx.target(rdc.target);
+        if (opts.amount >= 0)
+            this.reducer(new reducer.Reducer(opts), function(rdc) {
+                ctx.target(rdc.target);
+                ctx.done && ctx.done();
+            });
+        else
             ctx.done && ctx.done();
-        });
     }
 };

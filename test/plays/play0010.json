@@ -1,9 +1,7 @@
 {
   "scenario": {
     "phase": "move",
-    "deck": {
-      "usedCards": [ 2, 6, 13, 7, 5, 4, 16, 10, 3 ]
-    },
+    "deck": { "usedCards": [ 2, 6, 13, 7, 5, 4, 16, 10, 3 ] },
     "map": {
       "areas": {
         "3": {
@@ -54,7 +52,6 @@
       "simple_tools",
       "cartage"
     ],
-    "trading": [],
     "era": 1,
     "round": {}
   },
@@ -71,10 +68,7 @@
     10,
     3
   ],
-  "reduce": [ { "6": { "city": "+1" }}],
-  "areas": [
-    "6"
-  ],
+  "reduce": [ [6], { "6": { "city": 2 }}],
   "advance": [
     [
       "city"
@@ -84,7 +78,7 @@
   "check": {
       "map": {
         "areas": {
-          "6": { "city": 2, "tribes": 3 }
+          "6": { "city": 2, "tribes": 2 }
         }
       }
   },

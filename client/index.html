@@ -34,14 +34,15 @@
                     <button class="btn btn-primary" ng-repeat="(k, s) in $storage.saves" ng-click="saveName = k; load(s)" snap-toggle>{{ k }}</button>
                 </div>
             </accordion-group>
-            <!--
             <accordion-group>
                 <accordion-heading>Save Game</accordion-heading>
-                <input type="text" ng-model="saveName" />
-                <button ng-hide="saved" class="btn btn-primary" ng-click="save(saveName)">Save</button>
-                <span ng-show="saved" class="info">{{ saveName }} saved!</span>
+                <button ng-hide="saved" class="btn btn-primary" ng-click="save()">Save</button>
+                <div ng-show="saved">
+                    <qrcode version="4" size="100" data="{{ url }}/?{{ saved.slug }}">
+                    </qrcode>
+                    <a href="{{ url }}/?{{ saved.slug }}">permalink</a>
+                </div>
             </accordion-group>
-            -->
             <accordion-group>
                 <accordion-heading>God Mode</accordion-heading>
                 <label class="btn btn-primary" ng-model="godMode" btn-checkbox ng-change="toggleGod(godMode)" hotkey="{ esc: godMode }">God Mode</label>

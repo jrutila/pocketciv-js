@@ -23,8 +23,8 @@ module.exports = {
                 engine.gameOver(false, "You did not manage to build the cities \
                 with 2 AV to areas 1 and 6.");
             }
-            ctx.done && ctx.done();
         }
+        ctx.done && ctx.done();
     },
     'upkeep.post': function(ctx) {
         var engine = this;

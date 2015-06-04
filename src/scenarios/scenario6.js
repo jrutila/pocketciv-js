@@ -14,8 +14,8 @@ module.exports = {
             } else {
                 engine.gameOver(false, "You did not manage to build 6 cities.");
             }
-            ctx.done && ctx.done();
         }
+        ctx.done && ctx.done();
     },
     "era": 3,
     "map": {
