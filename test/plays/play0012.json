@@ -1,0 +1,704 @@
+{
+  "scenario": {
+    "phase": "advance",
+    "phases": [
+      "populate",
+      "tothree",
+      "move",
+      "event",
+      "advance",
+      "support",
+      "gold_decimate",
+      "city_advance",
+      "gold_management",
+      "city_support",
+      "upkeep"
+    ],
+    "deck": {
+      "usedCards": [
+        10,
+        6,
+        14,
+        9,
+        11,
+        1,
+        2,
+        8,
+        12,
+        15,
+        7,
+        5
+      ]
+    },
+    "map": {
+      "areas": {
+        "3": {
+          "id": 3,
+          "tribes": 1,
+          "farm": true,
+          "neighbours": [
+            4,
+            5,
+            6,
+            8,
+            "sea"
+          ]
+        },
+        "4": {
+          "id": 4,
+          "tribes": 1,
+          "mountain": true,
+          "forest": false,
+          "farm": true,
+          "neighbours": [
+            3,
+            8,
+            "sea",
+            "frontier"
+          ],
+          "city": 1,
+          "desert": true
+        },
+        "5": {
+          "id": 5,
+          "tribes": 1,
+          "mountain": true,
+          "forest": false,
+          "neighbours": [
+            3,
+            6,
+            8,
+            "sea",
+            "frontier"
+          ],
+          "farm": true,
+          "city": 1
+        },
+        "6": {
+          "id": 6,
+          "tribes": 1,
+          "neighbours": [
+            3,
+            5,
+            8
+          ],
+          "forest": true,
+          "farm": false,
+          "city": 1
+        },
+        "8": {
+          "id": 8,
+          "neighbours": [
+            3,
+            4,
+            5,
+            6,
+            "frontier"
+          ],
+          "desert": true,
+          "tribes": 1,
+          "farm": true
+        }
+      },
+      "width": 11,
+      "height": 10,
+      "grid": [
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          5,
+          5,
+          8,
+          8,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          -1,
+          -1,
+          5,
+          6,
+          6,
+          8,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          -1,
+          -1,
+          -1,
+          5,
+          6,
+          6,
+          8,
+          0,
+          0,
+          0
+        ],
+        [
+          -1,
+          -1,
+          -1,
+          -1,
+          3,
+          3,
+          3,
+          4,
+          4,
+          0
+        ],
+        [
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          3,
+          -1,
+          4,
+          4,
+          0
+        ],
+        [
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1
+        ],
+        [
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1
+        ],
+        [
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1
+        ],
+        [
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1
+        ],
+        [
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1
+        ],
+        [
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1
+        ]
+      ]
+    },
+    "acquired": [
+      "cartage",
+      "agriculture"
+    ],
+    "built": {},
+    "trading": [],
+    "era": 1,
+    "round": {
+      "agriculture_farm_used": true
+    },
+    "params": {
+      "forest_free": true
+    },
+    "round_era": {},
+    "goal": "Acquire Architecture before the end of Era 3.",
+    "name": "scenario2",
+    "at": "2015-06-04T11:37:34.188Z",
+    "slug": "igfdbcnnhlgi",
+    "_id": "5570387e77ae8d4a42fb9207",
+    "title": "2. The Gilded Land",
+    "description": "This is another simple scenario. You will be required now     to create some gold at some point, in order to acquire Architecture. This can be done through various ways, through other Advances (such as Mining and Black Market) or through Expeditions"
+  },
+  "move": [
+    {
+      "3": 1,
+      "4": 4,
+      "5": 3,
+      "6": 1,
+      "8": 1
+    },
+    {
+      "3": 1,
+      "4": 3,
+      "5": 3,
+      "6": 3,
+      "8": 1
+    },
+    {
+      "3": 1,
+      "4": 5,
+      "5": 3,
+      "6": 2,
+      "8": 1
+    },
+    {
+      "3": 1,
+      "4": 6,
+      "5": 5,
+      "6": 1,
+      "8": 1
+    },
+    {
+      "3": 1,
+      "4": 1,
+      "5": 1,
+      "6": 1,
+      "8": 4
+    },
+    {
+      "3": 1,
+      "4": 2,
+      "5": 2,
+      "6": 2,
+      "8": 1
+    },
+    {
+      "3": 1,
+      "4": 2,
+      "5": 6,
+      "6": 2,
+      "8": 1
+    },
+    {
+      "3": 1,
+      "4": 6,
+      "5": 4,
+      "6": 1,
+      "8": 1
+    }
+  ],
+  "deck": [
+    13,
+    3,
+    15,
+    14,
+    16,
+    13,
+    10,
+    11,
+    7,
+    12,
+    8,
+    9,
+    4,
+    1,
+    1,
+    11
+  ],
+  "reduce": [
+    {
+      "3": {
+        "tribes": 1
+      },
+      "4": {
+        "tribes": 2,
+        "city": 2
+      },
+      "5": {
+        "tribes": 1,
+        "city": 1
+      },
+      "6": {
+        "tribes": 1,
+        "city": 1
+      },
+      "8": {
+        "tribes": 1
+      }
+    },
+    {
+      "3": {
+        "tribes": 1
+      },
+      "4": {
+        "tribes": 2,
+        "city": 2
+      },
+      "5": {
+        "tribes": 2,
+        "city": 1
+      },
+      "6": {
+        "tribes": 1,
+        "city": 2
+      },
+      "8": {
+        "tribes": 1
+      }
+    },
+    [],
+    {
+      "3": {
+        "tribes": 1
+      },
+      "4": {
+        "tribes": 3,
+        "city": 2
+      },
+      "5": {
+        "tribes": 2,
+        "city": 2
+      },
+      "6": {
+        "tribes": 2,
+        "city": 2
+      },
+      "8": {
+        "tribes": 1
+      }
+    },
+    [
+      4
+    ],
+    [
+      8
+    ],
+    {
+      "3": {
+        "tribes": 1
+      },
+      "4": {
+        "tribes": 1,
+        "city": 2
+      },
+      "5": {
+        "tribes": 1,
+        "city": 2
+      },
+      "6": {
+        "tribes": 1,
+        "city": 2
+      },
+      "8": {
+        "tribes": 0,
+        "city": 1
+      }
+    },
+    {
+      "3": {
+        "tribes": 1
+      },
+      "4": {
+        "tribes": 2,
+        "city": 2
+      },
+      "5": {
+        "tribes": 2,
+        "city": 2
+      },
+      "6": {
+        "tribes": 1,
+        "city": 2
+      },
+      "8": {
+        "tribes": 1,
+        "city": 2
+      }
+    },
+    [
+      5
+    ]
+  ],
+  "advance": [
+    [],
+    [
+      "acquire"
+    ],
+    [
+      "acquire"
+    ],
+    [
+      "acquire",
+      "forest"
+    ],
+    [
+      "mining",
+      "acquire"
+    ],
+    [
+      "city",
+      "acquire"
+    ],
+    [],
+    [
+      "forest",
+      "acquire"
+    ],
+    [
+      "acquire"
+    ]
+  ],
+  "acquires": [
+    {
+      "4": {
+        "name": "masonry",
+        "title": "Masonry",
+        "description": "During Upkeep, you can increase one City AV by 1. The maximum AV of a City is 2, unless otherwise noted.",
+        "points": 3,
+        "cost": {
+          "tribes": 2
+        },
+        "resources": [
+          "stone"
+        ],
+        "requires": [],
+        "required_by": [
+          "engineering"
+        ],
+        "events": {},
+        "phases": {},
+        "actions": {}
+      }
+    },
+    {
+      "6": {
+        "name": "horticulture",
+        "title": "Horticulture",
+        "description": "Decimate 4 Tribes in a Region to Create a Forest.",
+        "points": 8,
+        "cost": {
+          "tribes": 2
+        },
+        "resources": [
+          "wood"
+        ],
+        "requires": [],
+        "required_by": [
+          "irrigation",
+          "equestrian"
+        ],
+        "events": {},
+        "actions": {
+          "forest": {
+            "title": "Create a Forest"
+          }
+        }
+      }
+    },
+    {
+      "4": {
+        "name": "mining",
+        "title": "Mining",
+        "description": "You may draw for Gold during your Advance phase at the cost                     of 3 Tribes in a Region with a Mountain/Volcano",
+        "points": 5,
+        "cost": {
+          "tribes": 1
+        },
+        "resources": [
+          "stone"
+        ],
+        "requires": [],
+        "required_by": [
+          "surveying",
+          "metal_working"
+        ],
+        "events": {},
+        "actions": {
+          "mining": {
+            "title": "Mining"
+          }
+        }
+      }
+    },
+    {
+      "4": {
+        "name": "coinage",
+        "title": "Coinage",
+        "description": "Do not Decimate Gold during upkeep. Effectively,you can now store Gold for the entire game.",
+        "points": 3,
+        "cost": {
+          "tribes": 2,
+          "gold": 3
+        },
+        "resources": [
+          "stone"
+        ],
+        "requires": [],
+        "required_by": [
+          "banking"
+        ],
+        "events": {},
+        "phases": {},
+        "actions": {}
+      }
+    },
+    {
+      "4": {
+        "name": "basic_tools",
+        "title": "Basic Tools",
+        "description": "Reduce the cost of Decimating Tribes when increasing a City AV by 1.",
+        "points": 1,
+        "cost": {},
+        "resources": [],
+        "requires": [],
+        "required_by": [],
+        "events": {},
+        "phases": {},
+        "actions": {}
+      }
+    },
+    {},
+    {
+      "5": {
+        "name": "engineering",
+        "title": "Engineering",
+        "description": "The maximum AV of a City is 3, unless otherwise noted.",
+        "points": 5,
+        "cost": {
+          "tribes": 3
+        },
+        "resources": [
+          "stone",
+          "wood"
+        ],
+        "requires": [
+          "masonry"
+        ],
+        "required_by": [
+          "architecture",
+          "machining"
+        ],
+        "events": {
+          "volcano": {
+            "steps": {
+              "2.3.1": "+ If you have {{ adv:engineering }}, Cities cannot be                         Reduced below 1 AV. Decimated Cities are instead reduced to 1 AV.                         {% saveCities() %}"
+            }
+          },
+          "earthquake": {
+            "steps": {
+              "f4.1": "+ If you have {{ adv:engineering }}, Cities cannot be                         Reduced below 1 AV. Decimated Cities are instead reduced to 1 AV.                         {% saveCities() %}"
+            }
+          },
+          "flood": {
+            "steps": {
+              "3.2.1": "+ If you have {{ adv:engineering }}, 1 Wonder = 10 Damage.{% dmgWn = 10 %}"
+            }
+          }
+        },
+        "phases": {},
+        "actions": {}
+      }
+    }
+  ],
+  "builds": [],
+  "check": {
+      "map": {
+          "areas": {
+              "5": { "tribes": 2 }
+          }
+      }
+  }
+}

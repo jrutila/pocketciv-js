@@ -1,4 +1,5 @@
 var reducer = require("../core/reducer");
+var _ = require('underscore')
 
 module.exports = {
     name: "mining",
