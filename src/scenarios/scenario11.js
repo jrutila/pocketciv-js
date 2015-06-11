@@ -61,7 +61,7 @@ module.exports = {
                 "neighbours": [ 4, 5, 'sea', 'lake'],
             },
         },
-        "width": 11,
+        "width": 10,
         "height": 10,
         "grid":[
         [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
