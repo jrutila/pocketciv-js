@@ -35,25 +35,8 @@ Map = function(map) {
     this.width = Math.ceil(map.width/2)*HT.Hexagon.Static.WIDTH + Math.floor(map.width/2)*HT.Hexagon.Static.SIDE;
     this.height = map.height*HT.Hexagon.Static.HEIGHT;
     this.grid = new HT.Grid(this.width, this.height)
-    this.hex = {}
-    this.regions = { 1:[], 2:[], 3:[], 4:[], 5:[], 6:[], 7:[], 8:[]}
+    this.originalGrid = map.grid;
     this.symbols = {}
-
-    for (var h = 0; h < this.grid.Hexes.length; h++)
-    {
-        var hex = this.grid.Hexes[h]        
-        var reg = 0
-        if (hex.PathCoOrdY in map.grid)
-            if (hex.PathCoOrdX in map.grid[hex.PathCoOrdY])
-                var reg = map.grid[hex.PathCoOrdY][hex.PathCoOrdX]
-        this.hex[hex.Id] = reg
-        if (reg > 0)
-        {
-            this.regions[reg].push(hex)
-        }
-        //if ("id" in reg)
-            //this.regionHexes[reg.id-1].push(hex)
-    }
 }
 
 function drawLand(ctx, region) {
@@ -88,6 +71,27 @@ Map.prototype.paint = function(ctx) {
     var focusCtxs = {}
     var activeCtxs = {}
     this.commonPoints = {};
+    
+    this.regions = { 1:[], 2:[], 3:[], 4:[], 5:[], 6:[], 7:[], 8:[]}
+    this.hex = {}
+    // Find out what Hex is in what area
+    for (var h = 0; h < this.grid.Hexes.length; h++)
+    {
+        var hex = this.grid.Hexes[h]        
+        var reg = 0
+        if (hex.PathCoOrdY in this.originalGrid)
+            if (hex.PathCoOrdX in this.originalGrid[hex.PathCoOrdY])
+                var reg = this.originalGrid[hex.PathCoOrdY][hex.PathCoOrdX]
+        this.hex[hex.Id] = reg
+        if (reg > 0)
+        {
+            this.regions[reg].push(hex)
+        }
+        //if ("id" in reg)
+            //this.regionHexes[reg.id-1].push(hex)
+    }
+
+    // Get the contextes
     for (var i = -1; i <= regionCount; i++)
     {
         var cnv = this.getCanvas(i);
@@ -106,6 +110,7 @@ Map.prototype.paint = function(ctx) {
         activeCtxs[i] && activeCtxs[i].clearRect(0,0,1000, 1000);
     }
 
+    // Check the hexes
     for (var h = 0; h < this.grid.Hexes.length; h++)
     {
         var hex = this.grid.Hexes[h]
@@ -171,7 +176,7 @@ Map.prototype.paint = function(ctx) {
     
     for (var reg in this.regions)
     {
-        if (this.regions[reg].length > 0)
+        if (this.regions[reg].length >= 4)
         {
             this.symbols[reg] = {};
             var mp = this.regions[reg][0].MidPoint;
@@ -208,6 +213,15 @@ Map.prototype.getRegionAt = function(x, y) {
     p.Y = y
     var hex = this.grid.GetHexAt(p)
     return hex != undefined ? this.hex[hex.Id] : undefined;
+}
+
+Map.prototype.getHexAt = function(x, y)
+{
+    var p = {}
+    p.X = x
+    p.Y = y
+    var hex = this.grid.GetHexAt(p);
+    return { Id: hex.Id, X: hex.PathCoOrdX, Y: hex.PathCoOrdY };
 }
 
 Map.prototype.drawWall = function(reg) {

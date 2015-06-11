@@ -1,0 +1,16 @@
+<h2>Map Editor</h2>
+<ul>
+    <li ng-repeat="n in [-1,0,1,2,3,4,5,6,7,8]">
+        <a href="#" ng-click="selectEdit(n)" ng-class="{editing: editing == n }">
+            <span ng-if="n > 0">
+                Area {{ n }} (key: {{ n }})
+            </span>
+            <span ng-if="n == 0">
+                Land (key: 0)
+            </span>
+            <span ng-if="n == -1">
+                Sea (key: 9)
+            </span>
+        </a>
+    </li>
+</ul>

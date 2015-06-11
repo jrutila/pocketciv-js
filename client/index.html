@@ -25,6 +25,7 @@
                 <accordion-heading>New Game</accordion-heading>
                 <div class="btn-group-vertical text-left" role="group">
                     <button class="btn btn-primary" ng-repeat="k in _.keys(scenarios)" ng-click="load(scenarios[k],k)" snap-toggle>{{ scenarios[k].title }}</button>
+                    <button class="btn btn-primary" ng-click="createGame()" snap-toggle>Create your own!</button>
                 </div>
             </accordion-group>
             <accordion-group>
@@ -56,6 +57,7 @@
                     <option value="advance">4. Advance</option>
                     <option value="support">5. Upkeep - Support</option>
                 </select>
+                <label class="btn" ng-show="godMode" ng-model="mapEditor" ng-change="toggleMapEditor(mapEditor)" btn-checkbox>Edit Map</label>
             </accordion-group>
             <accordion-group>
                 <accordion-heading>Report a Bug</accordion-heading>
@@ -157,6 +159,8 @@
     <!-- BEGIN LEFT INFO ELEMENTS -->
     <div id="leftInfo" style="width: calc(50% - {{ (mapArea.width - 18) / 2 }}px)">
       <div id="leftInfoWrapper">
+          
+        <pc-mapeditor ng-if="mapEditor" map="engine.map">I am a map editor</pc-mapeditor>
         
         <div id="eventRunner" ng-show="currentEvent">
             <pc-event-view event="currentEvent" engine="engine" step="currentStep" close="hideEvent()"></pc-event-view>
@@ -279,32 +283,32 @@
         <div id="mapWrapper">
             <div id="map" style="width: {{ mapArea.width - 18 }}px">
                 <div id="canvases">
-                <canvas class="mapCanvas" id="mapCanvas-1" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
-                <canvas class="mapCanvas" id="mapCanvas0" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
-                <canvas class="mapCanvas" id="mapCanvas1" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
-                <canvas class="mapCanvas" id="mapCanvas2" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
-                <canvas class="mapCanvas" id="mapCanvas3" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
-                <canvas class="mapCanvas" id="mapCanvas4" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
-                <canvas class="mapCanvas" id="mapCanvas5" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
-                <canvas class="mapCanvas" id="mapCanvas6" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
-                <canvas class="mapCanvas" id="mapCanvas7" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
-                <canvas class="mapCanvas" id="mapCanvas8" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
-                <canvas class="activeCanvas" id="activeCanvas1" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
-                <canvas class="activeCanvas" id="activeCanvas2" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
-                <canvas class="activeCanvas" id="activeCanvas3" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
-                <canvas class="activeCanvas" id="activeCanvas4" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
-                <canvas class="activeCanvas" id="activeCanvas5" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
-                <canvas class="activeCanvas" id="activeCanvas6" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
-                <canvas class="activeCanvas" id="activeCanvas7" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
-                <canvas class="activeCanvas" id="activeCanvas8" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
-                <canvas class="focusCanvas" id="focusCanvas1" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
-                <canvas class="focusCanvas" id="focusCanvas2" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
-                <canvas class="focusCanvas" id="focusCanvas3" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
-                <canvas class="focusCanvas" id="focusCanvas4" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
-                <canvas class="focusCanvas" id="focusCanvas5" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
-                <canvas class="focusCanvas" id="focusCanvas6" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
-                <canvas class="focusCanvas" id="focusCanvas7" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
-                <canvas class="focusCanvas" id="focusCanvas8" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
+                <canvas class="mapCanvas" id="mapCanvas-1"></canvas>
+                <canvas class="mapCanvas" id="mapCanvas0" ></canvas>
+                <canvas class="mapCanvas" id="mapCanvas1" ></canvas>
+                <canvas class="mapCanvas" id="mapCanvas2" ></canvas>
+                <canvas class="mapCanvas" id="mapCanvas3" ></canvas>
+                <canvas class="mapCanvas" id="mapCanvas4" ></canvas>
+                <canvas class="mapCanvas" id="mapCanvas5" ></canvas>
+                <canvas class="mapCanvas" id="mapCanvas6" ></canvas>
+                <canvas class="mapCanvas" id="mapCanvas7" ></canvas>
+                <canvas class="mapCanvas" id="mapCanvas8" ></canvas>
+                <canvas class="activeCanvas" id="activeCanvas1"></canvas>
+                <canvas class="activeCanvas" id="activeCanvas2"></canvas>
+                <canvas class="activeCanvas" id="activeCanvas3"></canvas>
+                <canvas class="activeCanvas" id="activeCanvas4"></canvas>
+                <canvas class="activeCanvas" id="activeCanvas5"></canvas>
+                <canvas class="activeCanvas" id="activeCanvas6"></canvas>
+                <canvas class="activeCanvas" id="activeCanvas7"></canvas>
+                <canvas class="activeCanvas" id="activeCanvas8"></canvas>
+                <canvas class="focusCanvas" id="focusCanvas1"></canvas>
+                <canvas class="focusCanvas" id="focusCanvas2"></canvas>
+                <canvas class="focusCanvas" id="focusCanvas3"></canvas>
+                <canvas class="focusCanvas" id="focusCanvas4"></canvas>
+                <canvas class="focusCanvas" id="focusCanvas5"></canvas>
+                <canvas class="focusCanvas" id="focusCanvas6"></canvas>
+                <canvas class="focusCanvas" id="focusCanvas7"></canvas>
+                <canvas class="focusCanvas" id="focusCanvas8"></canvas>
                 <span class="areaCode" id="area1">1</span>
                 <span class="areaCode" id="area2">2</span>
                 <span class="areaCode" id="area3">3</span>

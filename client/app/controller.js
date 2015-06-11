@@ -6,7 +6,8 @@ var pocketcivApp = angular.module('pocketcivApp', [
         'checklist-model',
         'ngSanitize',
         'angulartics', 'angulartics.google.analytics',
-        'monospaced.qrcode'
+        'monospaced.qrcode',
+        'cfp.hotkeys'
         ]);
 var runplay = require("../../src/core/runplay");
 var eventplay = require("../../src/core/event");
@@ -378,9 +379,11 @@ var changeString = function(chg) {
     var focusCnvs = $.makeArray($(".focusCanvas"));
     $scope.mapClick = function(ev) {
         var pnt = getMousePos(mouseCanvas, ev);
-        var hex = map.getRegionAt(pnt.X, pnt.Y);
-        mapClicked && mapClicked(hex);
-        $scope.tour && $scope.tour.signals.map.dispatch("click", hex);
+        var hex = $scope.mapHex.getHexAt(pnt.X, pnt.Y);
+        var region = $scope.mapHex.getRegionAt(pnt.X, pnt.Y);
+        $scope.$broadcast("hexClick", hex);
+        mapClicked && mapClicked(region);
+        $scope.tour && $scope.tour.signals.map.dispatch("click", region);
     }
     
     var mapClicked = function(region) {
@@ -390,7 +393,7 @@ var changeString = function(chg) {
     $scope.mapFocus= function(ev) {
         if ('ontouchstart' in document.documentElement) return;
         var pnt = getMousePos(mouseCanvas, ev);
-        var hex = map.getRegionAt(pnt.X, pnt.Y);
+        var hex = $scope.mapHex.getRegionAt(pnt.X, pnt.Y);
         for (var i = 1; i <= 8; i++)
         {
             if (i == hex)
@@ -442,6 +445,7 @@ var changeString = function(chg) {
     }
     
     var drawElem = function(prop, reg, val) {
+        var map = $scope.mapHex;
         if (!_.has(map.symbols[reg], prop)) return;
         var $elem = $('#' + prop + reg);
 
@@ -457,6 +461,10 @@ var changeString = function(chg) {
         else {
             $elem.html(val).show();
             $elem.attr("data-val", val);
+            $elem.css({
+                top: map.symbols[reg][prop].Y,
+                left: map.symbols[reg][prop].X
+            })
         }
     }
     
@@ -469,12 +477,18 @@ var changeString = function(chg) {
     });
     $scope.engine.phase = "";
     $scope.godMode = false;
+    $scope.mapEditor = false;
     //@exclude
     $scope.godMode = true;
     //@endexclude
     
     $scope.toggleGod = function(gm) {
         $scope.godMode = gm;
+        if (gm == false)
+            $scope.mapEditor = false;
+    };
+    $scope.toggleMapEditor = function(me) {
+        $scope.mapEditor = me;
     };
     
     pocketimpl.eventStepper = function(done, step, ctx) {
@@ -523,7 +537,6 @@ var changeString = function(chg) {
         else
             done & done();
     };
-    var map = new Object();
     
     var getCanvas = function(i) {
         return [$('#mapCanvas'+i)[0],
@@ -547,11 +560,47 @@ var changeString = function(chg) {
         $scope.mainMenu = false;
         $scope.card = undefined;
         $scope.currentEvent = undefined;
+        $scope.mapEditor = false;
         
         $scope.tutorial = undefined;
     }
     
     $scope.mainMenu = true;
+    $scope.createGame = function() {
+        console.log("Creating game");
+        $scope.resetUI();
+        resetGameLog({});
+        $scope.map = new pocketciv.MapBuild();
+        $scope.deck = new pocketciv.DeckBuild();
+        $scope.engine = new pocketciv.EngineBuild(pocketimpl, $scope.map, $scope.deck);
+        
+        $scope.engine.map.grid = []
+        for (var i = 0; i < 16; i++)
+        {
+            $scope.engine.map.grid.push([]);
+            for (var j = 0; j < 16; j++)
+            {
+                $scope.engine.map.grid[i].push(-1);
+            }
+        }
+        $scope.engine.map.width = 10;
+        $scope.engine.map.height = 10;
+        
+        $scope.mapHex = new Map($scope.engine.map);
+        $scope.mapArea = _.clone($scope.mapHex);
+        $scope.mapArea.width = Math.ceil($scope.mapArea.width - 80);
+        $scope.mapArea.height -= 40;
+        $("canvas").attr("width", Math.ceil($scope.mapHex.width - 80))
+        $("canvas").attr("height", $scope.mapHex.height - 40)
+        //$scope.$apply();
+        $scope.mapHex.getCanvas = getCanvas;
+        $scope.mapHex.getImage = getImage;
+        
+        $scope.welcome = false;
+        $scope.mapEditor = true;
+        engine = $scope.engine;
+    };
+    
     $scope.load = function(scen, name) {
         console.log("Loading "+name);
         $scope.resetUI();
@@ -569,66 +618,82 @@ var changeString = function(chg) {
         }
         $scope.engine.init(scen);
         
-        map = new Map($scope.engine.map);
-        $scope.mapArea = _.clone(map);
+        $scope.mapHex = new Map($scope.engine.map);
+        $scope.mapArea = _.clone($scope.mapHex);
         $scope.mapArea.width = Math.ceil($scope.mapArea.width - 80);
         $scope.mapArea.height -= 40;
-        $scope.$apply();
-        map.getCanvas = getCanvas;
-        map.getImage = getImage;
+        $("canvas").attr("width", Math.ceil($scope.mapHex.width - 80))
+        $("canvas").attr("height", $scope.mapHex.height - 40)
+        //$scope.$apply();
+        $scope.mapHex.getCanvas = getCanvas;
+        $scope.mapHex.getImage = getImage;
         
-        $("#canvases .icon, #canvases .symbol").remove();
+        $scope.welcome = false;
+        engine = $scope.engine;
+    };
+    
+    var paintMap = function(map) {
         $('#map .areaCode').hide();
         map.paint();
         for (var reg in map.symbols)
         {
             $('#area'+reg).css({top: map.symbols[reg]['area'].Y, left: map.symbols[reg]['area'].X }).show()
         }
-            
-        $scope.$watch('engine.map', function() {
-            console.log("Hey! Map changed!")
-            $("#canvases .wonder").hide();
-            for (var reg in $scope.map.areas)
-            {
-                var area = $scope.map.areas[reg];
-                if (!(reg in map.symbols))
-                    continue
-                
-                _.each($scope.map.areas[reg], function(val, prop) {
-                    if (prop == "wonders")
-                    {
-                        _.each(val, function(w) {
-                            drawElem(w, reg, true);
-                            if (w == "wall")
-                                map.drawWall(reg);
-                        })
-                    } else if (!(prop in map.symbols[reg])) {
-                        return;
-                    } else {
-                        drawElem(prop, reg, val);
-                    }
-                })
-                if (_.contains(area.wonders, 'atlantis') && area.city > 0)
-                    $("#city"+reg).addClass("atlantis");
-            }
-        }, true)
-        
-        $scope.$watch('engine.state', function(val) {
-            $scope.$storage.current = val;
-            $scope.saved = false;
-        }, true);
-        
-        $scope.$watch('engine.actions', function(val) {
-            if (_.size(val) > 5)
-            {
-                $scope.manyActions = true;
-            }
-        }, true);
-        
-        $scope.welcome = false;
-        engine = $scope.engine;
     }
+            
+    $scope.$watch('engine.map', function() {
+        if (!$scope.mapHex)
+            return;
+        if (!$scope.mapHex.painted)
+            paintMap($scope.mapHex)
+        var map = $scope.mapHex;
+        console.log("Hey! Map changed!")
+        $("#canvases .wonder").hide();
+        $("#canvases .icon, #canvases .symbol").remove();
+        for (var reg in $scope.map.areas)
+        {
+            var area = $scope.map.areas[reg];
+            if (!(reg in map.symbols))
+                continue
+            
+            _.each($scope.map.areas[reg], function(val, prop) {
+                if (prop == "wonders")
+                {
+                    _.each(val, function(w) {
+                        drawElem(w, reg, true);
+                        if (w == "wall")
+                            map.drawWall(reg);
+                    })
+                } else if (!(prop in map.symbols[reg])) {
+                    return;
+                } else {
+                    drawElem(prop, reg, val);
+                }
+            })
+            if (_.contains(area.wonders, 'atlantis') && area.city > 0)
+                $("#city"+reg).addClass("atlantis");
+        }
+    }, true)
     
+    $scope.$watch('engine.map.grid', function(map) {
+        if (!$scope.map)
+            return;
+        console.log("Hey! Map GRID changed!");
+        paintMap($scope.mapHex);
+    }, true);
+    
+    $scope.$watch('engine.state', function(val) {
+        $scope.$storage.current = val;
+        $scope.saved = false;
+    }, true);
+    
+    $scope.$watch('engine.actions', function(val) {
+        if (_.size(val) > 5)
+        {
+            $scope.manyActions = true;
+        }
+    }, true);
+        
     $scope.saveName = "";
     $scope.saved = false;
     $scope.save = function(saveName) {
