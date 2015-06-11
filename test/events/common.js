@@ -4,7 +4,8 @@ var PhaseContext = require('../../src/core/context').Context;
 
 var engine = undefined;
 var runEvent = eventRunner.runEvent;
-var done = function() { throw "Nomplemented"; };
+var done = undefined; //function() { throw "Nomplemented"; };
+var notok = undefined;
 var deck = [];
 var reduce = [];
 
@@ -14,18 +15,27 @@ var getContext = function(state) {
     
     engine.drawer = function(dde, done) { console.log(deck); done(deck.shift()) }
     engine.reducer = function(rdc, done) {
+        console.log(rdc.opts);
         var r = reduce.shift();
         var ok = rdc.ok(r);
-        if (ok.ok)
-            done(ok);
-        else {
-            throw "NotOK";
-        }
+        ctx.ok = ok;
+        done(ok);
     }
     
     var ctx = new PhaseContext(engine);
     ctx.done = function() {
-        done.call(this);
+        if (this.ok.ok)
+            if (done)
+                done.call(this, this.ok);
+            else
+                throw "WasOK";
+        else {
+            if (notok)
+                notok.call(this, this.ok);
+            else
+                throw "NotOK";
+        }
+        //done.call(this);
     };
     return ctx;
 }
@@ -33,6 +43,9 @@ var getContext = function(state) {
 module.exports = {
     done: function(newdone) {
         done = newdone;
+    },
+    notok: function(newnotok) {
+        notok = newnotok;
     },
     deck: deck,
     reduce: reduce,

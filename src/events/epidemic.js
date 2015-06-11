@@ -46,7 +46,7 @@ module.exports = {
         },
         current: function(chg, key, val) {
           this.current = {};
-          if (key == undefined) return;
+          if (key == undefined || this.amount <= 0) return;
           _.each(this.initial, function(i, ik) {
             ik = parseInt(ik);
             if (_.contains(this.map[key].neighbours, ik))
