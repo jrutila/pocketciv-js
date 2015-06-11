@@ -34,6 +34,7 @@ var scenarios = {
     "scenario8": require("../../src/scenarios/scenario8"),
     "scenario9": require("../../src/scenarios/scenario9"),
     "scenario10": require("../../src/scenarios/scenario10"),
+    "scenario11": require("../../src/scenarios/scenario11"),
 }
 
 var tutorials = {
