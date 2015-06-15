@@ -3,7 +3,7 @@ var chai = require('chai');
 require('mocha');
 var common = require('./common');
 
-describe.only('Epidemic', function() {
+describe('Epidemic', function() {
     var deck = common.deck;
     var reduce = common.reduce;
     var done = common.done;
@@ -143,6 +143,21 @@ describe.only('Epidemic', function() {
             runEvent(event, { expr: 's' }, state);
         });
         it("should stop", function(d) {
+            deck.push({ circle: 5 }, { square: 4 });
+            reduce.push([3]);
+            done(function(ok) {
+                ok.ok.should.be.true;
+                ok.amount.should.equal(0);
+                this.changes.should.deep.equal({
+                    5: {'tribes': -3 },
+                    3: {'tribes': -1 },
+                });
+                ok.current.should.deep.equal({ });
+                d();
+            });
+            runEvent(event, { expr: 's' }, state);
+        });
+        it("should allow", function(d) {
             deck.push({ circle: 5 }, { square: 4 });
             reduce.push([3]);
             done(function(ok) {

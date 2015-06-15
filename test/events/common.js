@@ -24,18 +24,21 @@ var getContext = function(state) {
     
     var ctx = new PhaseContext(engine);
     ctx.done = function() {
-        if (this.ok.ok)
-            if (done)
-                done.call(this, this.ok);
-            else
-                throw "WasOK";
-        else {
-            if (notok)
-                notok.call(this, this.ok);
-            else
-                throw "NotOK";
-        }
-        //done.call(this);
+        if (this.ok)
+        {
+            if (this.ok.ok) {
+                if (done)
+                    done.call(this, this.ok);
+                else
+                    throw "WasOK";
+            } else {
+                if (notok)
+                    notok.call(this, this.ok);
+                else
+                    throw "NotOK";
+            }
+        } else
+            done.call(this);
     };
     return ctx;
 }
