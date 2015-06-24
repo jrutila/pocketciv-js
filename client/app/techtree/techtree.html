@@ -80,7 +80,7 @@
     </div>
 </div>
 <div id="advanceinfo_event_details" ng-show="selEvent">
-    <pc-event-view ui-if="selEvent" event="selEvent" engine="engine" close="selEvent = undefined"></pc-event-view>
+    <pc-event-view ui-if="selEvent" event="selEvent" engine="engine" close="closeEvent()"></pc-event-view>
 </div>
 <div id="advanceinfo_acquire" ng-show="acquiring">
     <button ng-click="acquire()" class="btn btn-lg btn-primary" ng-disabled="possibleAdvances[selAdv.name].areas.length == 0 || !selArea">Acquire</button>

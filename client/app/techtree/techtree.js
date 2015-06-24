@@ -93,14 +93,13 @@ pocketcivApp.directive('pcTechtree', function() {
                     $scope.possibleAdvances[$scope.selAdv.name].areas.indexOf(area.id.toString()) > -1)
                     $scope.selArea = area;
             }
+
+            $scope.closeEvent = function() {
+                $scope.selEvent = undefined;
+            }
     
             $scope.selectEvent = function(ev) {
-                $scope.selEvent = null;
-                if (ev)
-                    setTimeout(function() {
-                        $scope.selEvent = ev
-                        $scope.$apply();
-                    }, 10)
+                $scope.selEvent = ev;
             }
             
             $scope.acquire = function() {
