@@ -13,6 +13,15 @@ module.exports = {
     5 or 8 is Decimated by a Tsunami.",
     "goal": "Attain 300 Glory",
     "description": "",
+    "isSeaNeighbour": function(area, domain) {
+        var isSea = _.any(area.neighbours, function(r) { return r === 'sea'; });
+        var isLake = _.any(area.neighbours, function(r) { return r === 'lake'; });
+        if (isSea)
+            return true;
+        if (isLake && domain == "fishing")
+            return true;
+        return false;
+    },
     "map": {
         "areas": {
             "1": {
@@ -41,7 +50,7 @@ module.exports = {
                 "id": 5,
                 "forest": true,
                 "farm": true,
-                "neighbours": [ 6, 8, 'sea', 'lake'],
+                "neighbours": [ 6, 8, 'sea', 'lake', 'frontier'],
             },
             "6": {
                 "id": 6,
@@ -58,7 +67,7 @@ module.exports = {
                 "id": 8,
                 "forest": true,
                 "farm": true,
-                "neighbours": [ 4, 5, 'sea', 'lake'],
+                "neighbours": [ 4, 5, 'sea', 'lake', 'frontier'],
             },
         },
         "width": 10,

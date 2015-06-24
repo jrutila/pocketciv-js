@@ -38,7 +38,7 @@ module.exports = {
         ctx.wait = true;
     },
     no_attack: function() {
-        return (!this.active_region || !_.find(this.active_region.neighbours, function(a) { return typeof a === 'string'; }))
+        return !(this.active_region && ( _.any(this.active_region.neighbours, function(r) { return r === "frontier"; }) || this.engine.isSeaNeighbour(this.active_region)))
     },
     
 }

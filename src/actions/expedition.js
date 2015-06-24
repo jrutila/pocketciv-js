@@ -15,6 +15,7 @@ module.exports = {
                     initial[key] = a;
             }
         }, this);
+        var engine = this;
         var opts = {
             map: this.map.areas,
             initial: initial,
@@ -27,7 +28,7 @@ module.exports = {
             reduce: function(key, chg) {
                 var rTrb = this.initial[key].tribes - chg.tribes;
                 this.amount = rTrb;
-                if (_.some(this.map[key].neighbours, reducer.isSea))
+                if (engine.isSeaNeighbour(this.map[key], "expedition"))
                     this.amount *= this.opts.sea_multi;
                 else if (_.contains(this.map[key].neighbours, 'frontier'))
                     this.amount *= this.opts.frontier_multi;
@@ -66,7 +67,7 @@ module.exports = {
                         fgold = expforce * opts.frontier_multi - Math.ceil(c.hexagon / opts.split);
                     }
                     // Sea expedition
-                    if (engine.params.sea_expedition && _.some(engine.map.areas[a].neighbours, reducer.isSea))
+                    if (engine.params.sea_expedition && engine.isSeaNeighbour(engine.map.areas[a], "expedition"))
                     {
                         sgold = expforce * opts.sea_multi - Math.ceil(c.square / opts.split);
                         console.log("Sea gold: "+sgold);

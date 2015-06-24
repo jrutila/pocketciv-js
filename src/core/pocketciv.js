@@ -259,6 +259,7 @@ var defaults= {
     'round_era': {},
     'goal': 'Try to advance to the end of the 8th era',
     'name': undefined,
+    'isSeaNeighbour': function(area) { return _.some(area.neighbours, reducer.isSea); },
 }
 
 Engine.prototype = {
@@ -276,7 +277,9 @@ Engine.prototype = {
                 en = en[p];
                 p = pp.shift();
             }
-            en[p] = st && st[p] || _.clone(defaults[d]);
+            en[p] = typeof defaults[d] == "function" ? defaults[d] : _.clone(defaults[d]);
+            if (st && st[p])
+                en[p] = st[p];
         }
         _.each(state, function(st, stk) {
             if (!_.has(this, stk))
@@ -309,7 +312,7 @@ Engine.prototype = {
                 st = st[p];
                 p = pp.shift()
             }
-            if (st && st[p])
+            if (st && st[p] && JSON.stringify(st[p]))
                 en[p] = JSON.parse(JSON.stringify(st[p]));
         }, this);
         return ret;

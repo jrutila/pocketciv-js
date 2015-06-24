@@ -23,6 +23,7 @@ function AdvanceAcquirer(engine) {
             this.areas[ak] = _.clone(a);
     },this);
     this.gold = engine.gold;
+    this.engine = engine;
 }
 
 AdvanceAcquirer.prototype = {
@@ -104,7 +105,7 @@ AdvanceAcquirer.prototype = {
                     
                     // Extra check
                     if (this.advances[key].can_acquire)
-                        extra_ok = this.advances[key].can_acquire(this.areas[a]);
+                        extra_ok = this.advances[key].can_acquire(this.areas[a], this.engine);
     
                     if (has_tribes && has_resources && has_gold && extra_ok)
                         adv[key].areas.push(a);

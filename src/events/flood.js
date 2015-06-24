@@ -39,6 +39,9 @@ module.exports = {
                         <li>1 Wonder = {{ dmgWn }} Damage</li></ul>\
                         {%; tsunami() %}",
     },
+    'hasSea': function(area) {
+        return this.engine.isSeaNeighbour(area, 'flood');
+    },
     'tsunami': function() {
         console.log("RUNNING TSUNAMI!")
         var ctx = this;

@@ -29,8 +29,12 @@ function TribeMover(map, moveLimit, seaCost) {
     this.seaCost = seaCost;
     
     var seas = _.object(_.map(this.map, function(area, n) {
+        // TODO: Should this use engine.isSeaNeighbour in some way?
+        // Find the seas
         var ss = _.filter(area.neighbours, function (e) { return typeof e == "string" && e != 'frontier'; });
         var seangh = [];
+        
+        // Determine the sea neighbours
         for (var a in this.map)
         {
             if (a != n && _.intersection(this.map[a].neighbours, ss).length > 0)
