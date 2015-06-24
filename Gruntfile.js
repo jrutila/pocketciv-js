@@ -63,7 +63,7 @@ module.exports = function (grunt) {
     },
     shell: {
       mongo: {
-        command: "mongod --nojournal --dbpath data/",
+        command: "mongod --smallfiles --nojournal --dbpath data/",
         options: {
           async: true,
         }
