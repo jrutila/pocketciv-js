@@ -258,6 +258,7 @@ var defaults= {
     'params': {},
     'round_era': {},
     'goal': 'Try to advance to the end of the 8th era',
+    'rules': '',
     'name': undefined,
     'isSeaNeighbour': function(area) { return _.some(area.neighbours, reducer.isSea); },
 }

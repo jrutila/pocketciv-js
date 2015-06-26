@@ -9,6 +9,17 @@ pocketcivApp.directive('pcReducer', function() {
         },
         replace: true,
         templateUrl: 'app/reducer/reducer.html',
+        controller: function($scope, hotkeys) {
+            // TODO: Add Hotkeys
+            /*
+            hotkeys.add({
+                combo: '1',
+                callback: function(event, hotkey) {
+                    $scope.selectArea(1);
+                }
+            });
+            */
+        },
         link: function($scope, tElem) {
             $scope.getType = function(key) {
                 if (key == 'tribes' || key == 'city')

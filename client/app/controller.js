@@ -59,7 +59,7 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
     $scope.hideHelp = true;
     
     var resetGameLog = function(scen){
-    $scope.debug.gameLog = {
+    $localStorage.gameLog = {
         "scenario": scen,
         "move": [],
         "deck": [],
@@ -112,7 +112,7 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
         {
             console.log("OK MOVE!");
             moveFunc(ok);
-            $scope.debug.gameLog.move.push($scope.movement)
+            $localStorage.gameLog.move.push($scope.movement)
             $scope.hideMover = true;
             $scope.mapInfo = undefined;
             $scope.movement = undefined;
@@ -189,7 +189,7 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
             
             if ($scope.specificCard)
                 $scope.card = $scope.deck.specific($scope.specificCard);
-            $scope.debug.gameLog.deck.push($scope.card.id)
+            $localStorage.gameLog.deck.push($scope.card.id)
         } else {
             
         }
@@ -207,7 +207,11 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
         if ($scope.tutorial)
             $scope.reducer.forceReduce = $scope.tutorial.game.reduce.shift();
         $scope.reduceReady = function(ok) {
-            $scope.debug.gameLog.reduce.push(ok ? ok.chg : {});
+            if (ok)
+            {
+                $localStorage.gameLog.reduce.push(_.rest(ok.chg, reducer.opts.initial.length));
+            } else 
+                $localStorage.gameLog.reduce.push({});
             done(ok);
         };
     }
@@ -221,6 +225,9 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
     }
 
     $scope.areaChangeOk = function(skip) {
+        // Pressed space
+        if (skip instanceof KeyboardEvent)
+            skip = null;
         $scope.areaChange = undefined;
         
         // Reset the event runner here
@@ -324,18 +331,18 @@ var changeString = function(chg) {
                 if ($scope.acquire.acquiring) {
                     var d = $scope.acquire.done;
                     var now = $scope.acquire.acquirer.nowacquired;
-                    var log = $scope.debug.gameLog.acquires;
+                    var log = $localStorage.gameLog.acquires;
                 } else {
                     var d = $scope.build.done;
                     var now = $scope.build.builder.nowbuilt;
-                    var log = $scope.debug.gameLog.builds;
+                    var log = $localStorage.gameLog.builds;
                 }
                 d.call($scope.engine, now);
                 
                 if (now)
                     log.push(now);
                 else
-                    _.last($scope.debug.gameLog.advance).pop();
+                    _.last($localStorage.gameLog.advance).pop();
                     
                 $scope.acquire.acquiring = false;
                 $scope.build.building = false;
@@ -406,7 +413,7 @@ var changeString = function(chg) {
     
     $scope.advance = function(name) {
         $scope.engine.runPhase('advance', name);
-        _.last($scope.debug.gameLog.advance).push(name);
+        _.last($localStorage.gameLog.advance).push(name);
     }
     
     $scope.$watch(function(){ return $scope.engine.phase; }, function(name) {
@@ -414,7 +421,7 @@ var changeString = function(chg) {
         if (name == 'advance')
         {
             console.log("gameLog advance")
-            $scope.debug.gameLog.advance.push([]);
+            $localStorage.gameLog.advance.push([]);
         }
         $scope.currentEvent = undefined;
         $scope.mapInfo = undefined;
@@ -432,14 +439,14 @@ var changeString = function(chg) {
     
     $scope.saveGamePlay = function() {
         console.log("Saving game "+$scope.gameName)
-        $scope.$storage[$scope.gameName] = JSON.stringify($scope.debug.gameLog);
+        $scope.$storage[$scope.gameName] = JSON.stringify($localStorage.gameLog);
     }
     
     var loading = false;
     $scope.loadGamePlay = function(name, game) {
         $scope.gameName = name;
         console.log("run: "+game)
-        $scope.debug.gameLog = JSON.parse(game);
+        $localStorage.gameLog = JSON.parse(game);
         loading = true;
         $scope.engine.phase = "populate";
         runplay.run($scope.engine, JSON.parse(game), function() { loading = false; })
@@ -602,7 +609,7 @@ var changeString = function(chg) {
         engine = $scope.engine;
     };
     
-    $scope.load = function(scen, name) {
+    $scope.load = function(scen, name, gameLog) {
         console.log("Loading "+name);
         $scope.resetUI();
         resetGameLog(scen);
@@ -684,8 +691,10 @@ var changeString = function(chg) {
     }, true);
     
     $scope.$watch('engine.state', function(val) {
-        $scope.$storage.current = val;
-        $scope.saved = false;
+        if (val.phase) {
+            $scope.$storage.current = val;
+            $scope.saved = false;
+        }
     }, true);
     
     $scope.$watch('engine.actions', function(val) {
@@ -709,7 +718,7 @@ var changeString = function(chg) {
     $scope.bugDescr = undefined;
     $scope.sendBug = function() {
         console.log("Sending bug")
-        var gLog = _.clone($scope.debug.gameLog)
+        var gLog = _.clone($localStorage.gameLog)
         gLog.comment = $scope.bugDescr;
         //gLog.engine = $scope.engine;
         $http.post('gamelog/add', gLog).success(function(data) {

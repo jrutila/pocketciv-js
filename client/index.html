@@ -30,7 +30,7 @@
             </accordion-group>
             <accordion-group>
                 <accordion-heading>Load Game</accordion-heading>
-                <button class="btn btn-primary" ng-click="load($storage['current'])" snap-toggle>Continue</button>
+                <button ng-if="$storage.current" class="btn btn-primary" ng-click="load($storage.current, null, $storage.gameLog)" snap-toggle>Continue</button>
                 <div class="btn-group-vertical" role="group">
                     <button class="btn btn-primary" ng-repeat="(k, s) in $storage.saves" ng-click="saveName = k; load(s)" snap-toggle>{{ k }}</button>
                 </div>
@@ -70,7 +70,7 @@
                 <p>Please start a new issue on <a href="https://github.com/jrutila/pocketciv-js/issues/new">github</a>. Tell what you were doing,
                     what happened and what should have happened. Also attach the game log from below.
                 </p>
-                <textarea json-text rows="10" ng-model="debug.gameLog"></textarea>
+                <textarea json-text rows="10" ng-model="$storage.gameLog"></textarea>
             </accordion-group>
             <accordion-group>
                 <accordion-heading>Credits</accordion-heading>
@@ -129,8 +129,8 @@
     <!--BEGIN DECK AND CARD-->
     <div id="deck" ng-class="{ pushed: hideDrawer }">
         <span id="cardsLeft">{{ deck.cardsLeft }}</span>
-        <div ng-hide="hideDrawer">
-            <button class="draw" ng-click="drawCard()">draw</button>
+        <div ng-if="!hideDrawer">
+            <button class="draw" ng-click="drawCard()" hotkey="{ space: drawCard }">draw</button>
             <button class="stop" ng-click="drawCard(true)" ng-show="showStopper">stop</button>
         </div>
         <input type="text" ng-model="specificCard" ng-show="godMode && !hideDrawer" />
@@ -253,7 +253,7 @@
             <div class="wonder gardens" id="gardens" title="{{ engine.wonders.gardens.title }}"></div>
         </div>
         
-        <div id="changePrompt" ng-hide="!areaChange">
+        <div id="changePrompt" ng-if="areaChange">
             <div class="cover"></div>
             <div class="content">
                 <div class="row">
@@ -273,7 +273,7 @@
                     </div>
                 </div>
                 <div class="row">
-                    <button class="btn btn-primary col-xs-12" ng-click="areaChangeOk()">OK</button>
+                    <button class="btn btn-primary col-xs-12" ng-click="areaChangeOk()" hotkey="{ space: areaChangeOk }">OK</button>
                     <button class="btn btn-default col-xs-12" ng-show="currentStep.skip" ng-click="currentStep.skip()">skip</button>
                     <button class="btn btn-default col-xs-12" ng-show="godMode" ng-click="areaChangeOk(true)">ignore</button>
                 </div>
