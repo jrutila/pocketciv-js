@@ -643,9 +643,10 @@ var changeString = function(chg) {
     var paintMap = function(map) {
         $('#map .areaCode').hide();
         map.paint();
-        for (var reg in map.symbols)
+        for (var reg in map.regions)
         {
-            $('#area'+reg).css({top: map.symbols[reg]['area'].Y, left: map.symbols[reg]['area'].X }).show()
+            if (map.regions[reg].length)
+                $('#area'+reg).css({top: map.symbols[reg]['area'].Y, left: map.symbols[reg]['area'].X }).show()
         }
     }
             

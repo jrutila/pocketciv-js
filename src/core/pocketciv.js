@@ -501,6 +501,11 @@ Engine.prototype = {
         }, funcs);
     },
     acquire: function(name, ctx) {
+        if (_.contains(this.acquired, name))
+        {
+            console.log("Already acquired "+name);
+            return;
+        }
         this.acquired.push(name);
         var adv = this.advances[name];
         if (adv.acquired)

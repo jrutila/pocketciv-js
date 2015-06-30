@@ -135,7 +135,7 @@
         </thead>
         <tbody>
             <tr ng-click="selectAdv(adv)" ng-class="getAcquireClasses(adv.name)" ng-repeat="adv in acquirer.advances | orderAdvances:possibleAdvances:acquirer.acquired">
-                <td>{{ adv.title }}<button class="godMode" ng-show="godMode" ng-click="engine.acquire(adv.name)">A</button></td>
+                <td>{{ adv.title }}<button class="godmode" ng-show="godmode" ng-click="engine.acquire(adv.name)">A</button></td>
                 <td>{{ adv.points }}</td>
                 <td>
                     <ul class="list-inline">
@@ -192,7 +192,7 @@
                                 </li>
                             </ul>
                         </td>
-                        <td>{{ wonder.title }}<button class="godMode" ng-show="godMode" ng-click="engine.build(wonder.name)">B</button></td>
+                        <td>{{ wonder.title }}<button class="godmode" ng-show="godmode" ng-click="engine.build(wonder.name)">B</button></td>
                         <td>{{ wonder.points }}</td>
                         <td>
                             <ul class="list-inline">

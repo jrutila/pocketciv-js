@@ -13,7 +13,7 @@ pocketcivApp.directive('pcTechtree', function() {
             'acquirer': "=",
             'builder': "=",
             'acquiring': "=",
-            //'areas': "=",
+            'godmode': "=",
         },
         //replace: true,
         templateUrl: 'app/techtree/techtree.html',
@@ -21,6 +21,7 @@ pocketcivApp.directive('pcTechtree', function() {
             console.log("LINK tecthree")
             $scope._ = _;
             $scope.$watch("acquirer", function(acq) {
+                console.log("GodMode: "+$scope.godmode);
                 if (acq) {
                     console.log("Update possible advances to")
                     $scope.possibleAdvances = acq.possibleAdvances;
