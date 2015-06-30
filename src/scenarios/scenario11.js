@@ -22,6 +22,32 @@ module.exports = {
             return true;
         return false;
     },
+    "event.post": function(ctx) {
+        if (ctx.event && ctx.event.name == 'flood' && ctx.engine.params.nolake != true)
+        {
+            var c = ctx.eventCtx;
+            if (c.active_region && (c.active_region.id == 5 || c.active_region.id == 8))
+            {
+                var id = c.active_region.id;
+                delete ctx.engine.map.areas[id];
+                var grid = ctx.engine.map.grid;
+                for (var i = 0; i < grid.length; i++)
+                    for (var j = 0; j < grid.length; j++)
+                        if (grid[i][j] == id)
+                            grid[i][j] = -1;
+                delete ctx.initial[id];
+                delete ctx.targets[id];
+                _.each(ctx.engine.map.areas, function(area) {
+                    area.neighbours = _.without(area.neighbours, id);
+                    if (_.contains(area.neighbours, "lake"))
+                        area.neighbours = _.union(
+                            _.without(area.neighbours, "lake"), ["sea"]);
+                }, this);
+                ctx.engine.params.nolake = true;
+            }
+        }
+        ctx.done && ctx.done();
+    },
     "map": {
         "areas": {
             "1": {

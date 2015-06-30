@@ -46,12 +46,10 @@ module.exports = {
         console.log("RUNNING TSUNAMI!")
         var ctx = this;
         var active = this.active_region;
-        var seas = _.filter(this.active_region.neighbours, reducer.isSea);
+        //var seas = _.filter(this.active_region.neighbours, reducer.isSea);
         var ngh = _.pick(this.engine.map.areas, function(area, ak) {
-            return _.contains(active.neighbours, parseInt(ak)) &&
-                    _.size(_.intersection(
-                    _.filter(area.neighbours, reducer.isSea),
-                    seas)) > 0;
+            return this.hasSea(area) &&
+                _.contains(active.neighbours, parseInt(ak));
         },this);
         
         // Also the actual active region

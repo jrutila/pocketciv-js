@@ -11,15 +11,14 @@ function getResources(area) {
     return ret;
 }
 
-function AdvanceAcquirer(engine) {
+function AdvanceAcquirer(engine, areas) {
     this.advances = _.clone(engine.advances);
     this.acquired = _.clone(engine.acquired) || [];
     this.nowacquired = {};
     this.round_acquired = _.clone(engine.round.acquired) || {};
     this.areas = {};
     this.replaceable_resources = engine.params.replaceable_resources || [];
-    _.each(engine.map.areas, function(a, ak) {
-        //if (a.city > 0)
+    _.each(areas || engine.map.areas, function(a, ak) {
             this.areas[ak] = _.clone(a);
     },this);
     this.gold = engine.gold;

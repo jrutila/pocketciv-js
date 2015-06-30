@@ -263,6 +263,18 @@ var defaults= {
     'isSeaNeighbour': function(area) { return _.some(area.neighbours, reducer.isSea); },
 }
 
+function deepClone(object) {
+  var clone = _.clone(object);
+
+  _.each(clone, function(value, key) {
+    if (_.isObject(value)) {
+      clone[key] = deepClone(value);
+    }
+  });
+
+  return clone;
+}
+
 Engine.prototype = {
     init: function(state) {
         console.log("init engine")
@@ -278,9 +290,9 @@ Engine.prototype = {
                 en = en[p];
                 p = pp.shift();
             }
-            en[p] = typeof defaults[d] == "function" ? defaults[d] : _.clone(defaults[d]);
+            en[p] = typeof defaults[d] == "function" ? defaults[d] : deepClone(defaults[d]);
             if (st && st[p])
-                en[p] = st[p];
+                en[p] = typeof st[p] == "function" ? st[p] : deepClone(st[p]);
         }
         _.each(state, function(st, stk) {
             if (!_.has(this, stk))

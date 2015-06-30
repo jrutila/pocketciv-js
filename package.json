@@ -53,7 +53,8 @@
     "grunt-ng-annotate": "^0.2.3",
     "grunt-nodemon": "^0.2.1",
     "imagemin-mozjpeg": "^5.1.0",
-    "grunt-rev": "^0.1.0"
+    "grunt-rev": "^0.1.0",
+    "underscore.deepclone": "^0.1.1"
   },
   "devDependencies": {},
   "engines": {
