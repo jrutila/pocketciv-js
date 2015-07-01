@@ -1,3 +1,4 @@
+var _ = require('underscore')
 module.exports = {
     name: 'civil_war',
     title: 'Civil War',
@@ -26,9 +27,10 @@ module.exports = {
             ctx.target({city: Math.max(this.initial[ak].city + activeCityReduce, cityMin)},this.active_region);
          
         areas = this.neighbours(this.active_region)
-        _.each(areas, function(area, ak) {
+        _.each(areas, function(area, nk) {
             if (area.city > 0)
-                ctx.target({city:Math.max(this.initial[ak].city + neighbourCityReduce, cityMin)}, area);
-        });
+                ctx.target({city:Math.max(this.initial[nk].city + neighbourCityReduce, cityMin)}, area);
+        },this);
+        areas[ak] = this.active_region;
     }
 }

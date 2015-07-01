@@ -63,7 +63,7 @@ module.exports = function (grunt) {
     },
     shell: {
       mongo: {
-        command: "mongod --smallfiles --nojournal --dbpath data/",
+        command: 'if [ $( ps axu | grep -cim 1 "[m]ongod") != "1" ]; then mongod --smallfiles --nojournal --dbpath data/; fi',
         options: {
           async: true,
         }
