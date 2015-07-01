@@ -25,7 +25,7 @@
                 <accordion-heading>New Game</accordion-heading>
                 <div class="btn-group-vertical text-left" role="group">
                     <button class="btn btn-primary" ng-repeat="k in _.keys(scenarios)" ng-click="load(scenarios[k],k)" snap-toggle>{{ scenarios[k].title }}</button>
-                    <button class="btn btn-primary" ng-click="createGame()" snap-toggle>Create your own!</button>
+                    <button class="btn btn-primary" ng-show="godMode" ng-click="createGame()" snap-toggle>Create your own!</button>
                 </div>
             </accordion-group>
             <accordion-group>
