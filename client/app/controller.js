@@ -7,7 +7,8 @@ var pocketcivApp = angular.module('pocketcivApp', [
         'ngSanitize',
         'angulartics', 'angulartics.google.analytics',
         'monospaced.qrcode',
-        'cfp.hotkeys'
+        'cfp.hotkeys',
+        'ui.checkbox'
         ]);
 var runplay = require("../../src/core/runplay");
 var eventplay = require("../../src/core/event");
@@ -310,9 +311,23 @@ var changeString = function(chg) {
     $scope.acquire = resetAcquire();
     $scope.build = resetBuild();
     $scope.showTT = false;
+    
+    $scope.$watch("engine.map.areas", function(areas) {
+        $scope.acquire.acquirer = new AdvanceAcquirer($scope.engine);
+    });
+    $scope.$watch("engine.gold", function() {
+        $scope.acquire.acquirer = new AdvanceAcquirer($scope.engine);
+    });
+    $scope.$watch("movement", function(movement) {
+        var areas = {};
+        _.each(movement, function(m, area) {
+            areas[area] = _.clone($scope.engine.map.areas[area]);
+            areas[area].tribes = m;
+        });
+        $scope.acquire.acquirer = new AdvanceAcquirer($scope.engine, areas);
+    }, true);
 
     pocketimpl.advanceAcquirer = function(engine, done) {
-        $scope.acquire.acquirer = new AdvanceAcquirer(engine);
         $scope.acquire.acquiring = true;
         $scope.acquire.done = done;
         $scope.toggleTechTree();

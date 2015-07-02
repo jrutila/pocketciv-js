@@ -21,7 +21,6 @@ pocketcivApp.directive('pcTechtree', function() {
             console.log("LINK tecthree")
             $scope._ = _;
             $scope.$watch("acquirer", function(acq) {
-                console.log("GodMode: "+$scope.godmode);
                 if (acq) {
                     console.log("Update possible advances to")
                     $scope.possibleAdvances = acq.possibleAdvances;
@@ -82,7 +81,7 @@ pocketcivApp.directive('pcTechtree', function() {
             }
             $scope.selectAdv = function(adv) {
                 $scope.selAdv = adv;
-                $scope.selected.advance = adv;
+                //$scope.selected.advance = adv;
                 $scope.selArea = undefined;
                 $scope.selEvent = undefined;
                 $scope.autoSelectArea(adv);
@@ -105,6 +104,7 @@ pocketcivApp.directive('pcTechtree', function() {
             
             $scope.acquire = function() {
                 $scope.acquirer.acquire($scope.selAdv.name, $scope.selArea.id);
+                $scope.selected[$scope.selAdv.name] = false;
                 $scope.possibleAdvances = $scope.acquirer.possibleAdvances;
             }
             $scope.buildWon = function(name, area) {
@@ -115,8 +115,9 @@ pocketcivApp.directive('pcTechtree', function() {
     }
 })
 pocketcivApp.filter("orderAdvances", function() {
-    return function(input,poss,acquired) {
+    return function(input,poss,acquired,selected) {
         return _.sortBy(_.sortBy(input, 'name'), function(i) {
+            if (selected[i.name]) return -1;
             if (_.has(poss, i.name)) return poss[i.name].areas.length || 9;
             if (_.contains(acquired, i.name)) return 11;
             return 10;

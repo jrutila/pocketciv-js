@@ -366,17 +366,27 @@
     
     <a id="showTechTree" ng-click="toggleTechTree()">
         <div class="img"></div>
-        <div class="tt_info" ng-show="acquire.selected.advance">
-            <div class="tt_name">{{ acquire.selected.advance.title }}</div>
-            <div class="advancecost">
-                <span class="tribes" ng-if="acquire.selected.advance.cost.tribes">{{ acquire.selected.advance.cost.tribes }}</span>
-                <span class="gold" ng-if="acquire.selected.advance.cost.gold">{{ acquire.selected.advance.cost.gold }}</span>
-            </div>
-            <div class="advanceres">
-                <ul class="list-inline">
-                    <li class="icon small" ng-class="{ forest: res == 'wood', mountain: res == 'stone', farm: res == 'food' }" ng-repeat="res in acquire.selected.advance.resources">{{ res }}</li>
-                </ul>
-            </div>
+        <div class="tt_frees" ng-class="{ available: acquire.acquirer.totalCity > _.size(acquire.acquirer.acquired) }">{{ _.size(acquire.acquirer.acquired) }} / {{ acquire.acquirer.totalCity }}</div>
+        <div class="tt_info" ng-show="_.any(acquire.selected)">
+            <ul>
+                <li ng-init="advance = engine.advances[key]" ng-if="ss" ng-repeat="(key, ss) in acquire.selected">
+                    <div>
+                        <div class="tt_name"
+                            ng-class="{ available: acquire.acquirer.possibleAdvances[advance.name].areas.length }">
+                            {{ advance.title }}
+                        </div>
+                        <div class="advancecost">
+                            <span class="tribes" ng-if="advance.cost.tribes">{{ advance.cost.tribes }}</span>
+                            <span class="gold" ng-if="advance.cost.gold">{{ advance.cost.gold }}</span>
+                        </div>
+                        <div class="advanceres">
+                            <ul class="list-inline">
+                                <li class="icon small" ng-class="{ forest: res == 'wood', mountain: res == 'stone', farm: res == 'food' }" ng-repeat="res in advance.resources">{{ res }}</li>
+                            </ul>
+                        </div>
+                    </div>
+                </li>
+            </ul>
         </div>
     </a>
     

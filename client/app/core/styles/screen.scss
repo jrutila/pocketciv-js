@@ -443,19 +443,60 @@ a {
         background-image: url("/images/modern/techtree.svg");
         background-size: 100% 100%;
     }
-    div.tt_info {
-        position: absolute;
+    .tt_info {
         width: $ttInfoWidth;
-        background-color: aliceblue;
+        position: absolute;
+        background-color: $color-complement-2;
         height: $ttToggleSize;
         top: 0px; right: 0px;
         padding-left: 4px;
-        div {
-            margin-top: 2px;
-            ul {
-                margin-left: 0px;
+        
+        > ul {
+            padding-left: 0px;
+            list-style-type: none;
+            position: absolute;
+            bottom: 0px;
+            width: 100%;
+            
+            > li {
+                background-color: $color-complement-2;
+                height: 64px;
+                display: none;
+                padding-left: 2px;
+                /*position: relative;*/
+                
+                > div {
+                    height: 100%;
+                    width: 100%;
+                    ul {
+                        margin-left: 0px;
+                    }
+                    /*position: absolute;*/
+                }
+            }
+            > li:last-child {
+                display: block;
             }
         }
+        > ul:hover > li {
+            display: block;
+        }
+    }
+    .tt_frees {
+        color: red;
+        font-weight: bold;
+        position: absolute;
+        top: 5px;
+        left: 7px;
+    }
+    .tt_frees.available {
+        color: $color-complement-1;
+    }
+    .tt_name {
+        color: $color-secondary-1-4;
+    }
+    .tt_name.available {
+        color: $color-complement-4;
     }
 }
 

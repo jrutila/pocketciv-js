@@ -157,6 +157,10 @@ $usedColor: gray;
         left: 0px;
         right: 0px;
         white-space: nowrap;
+        
+        tr > td:first-child {
+            width: 40px;
+        }
     }
     
     

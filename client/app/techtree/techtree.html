@@ -127,6 +127,7 @@
 <div id="advancelist">
     <table class="table table-condensed table-hover">
         <thead>
+            <th></th>
             <th>Name</th>
             <th>VP</th>
             <th>Cost</th>
@@ -134,7 +135,10 @@
             <th>Requires</th>
         </thead>
         <tbody>
-            <tr ng-click="selectAdv(adv)" ng-class="getAcquireClasses(adv.name)" ng-repeat="adv in acquirer.advances | orderAdvances:possibleAdvances:acquirer.acquired">
+            <tr ng-click="selectAdv(adv)" ng-class="getAcquireClasses(adv.name)" ng-repeat="adv in acquirer.advances | orderAdvances:possibleAdvances:acquirer.acquired:selected">
+                <td>
+                  <checkbox ng-show="!_.contains(acquirer.acquired, adv.name)" ng-model="selected[adv.name]" large></checkbox>
+                </td>
                 <td>{{ adv.title }}<button class="godmode" ng-show="godmode" ng-click="engine.acquire(adv.name)">A</button></td>
                 <td>{{ adv.points }}</td>
                 <td>
