@@ -279,6 +279,30 @@ describe('TribeMover', function() {
             ok.reduce.should.deep.equal([[4]]);
         });
     });
+    describe.only('scenario 12', function() {
+        beforeEach(function() {
+            /*
+             2       5
+             | \   / |
+             3 - 4 - 1
+                   \ |
+                     8
+            */
+            map = {
+             "1": { "id":  1, "tribes":  2, "forest": true, "neighbours": [  4,  5,  8, 'eastern' ], },
+             "2": { "id":  2, "forest": true, "mountain": true, "neighbours": [  3,  4, 'western', 'frontier' ], },
+             "3": { "id":  3, "forest": true, "neighbours": [  2,  4, 'western', 'frontier' ] , },
+             "4": { "id":  4, "desert": true, "neighbours": [  1,  2,  3,  5,  8, 'frontier' ] },
+             "5": { "id":  5, "forest": true, "mountain": true, "tribes":  2, "neighbours": [  1,  4, 'eastern', 'frontier' ], },
+             "8": { "id":  8, "forest": true, "volcano": true, "neighbours": [  1,  4, 'eastern', 'frontier' ], },
+            }
+        });
+        it('interesting thing', function() {
+            mover = new pocketciv.TribeMover(map, 1);
+            mover.init({ 1: 2, 2: 0, 3: 0, 4: 2, 5: 2, 8: 2 });
+            mover.ok({ 1: 2, 2: 2, 3: 1, 4: 0, 5: 1, 8: 2 }).ok.should.be.false;
+        });
+    });
     describe('simple with two steps', function() {
         beforeEach(function() {
             // 1 - 2 - 3 - 4
