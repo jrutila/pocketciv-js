@@ -47,8 +47,11 @@ module.exports = {
         var ctx = this;
         var active = this.active_region;
         //var seas = _.filter(this.active_region.neighbours, reducer.isSea);
+        var mySeas =  _.filter(active.neighbours,
+                    function(n) { return typeof n == "string" && n != "frontier" });
         var ngh = _.pick(this.engine.map.areas, function(area, ak) {
             return this.hasSea(area) &&
+                _.intersection(mySeas, area.neighbours).length > 0 &&
                 _.contains(active.neighbours, parseInt(ak));
         },this);
         
