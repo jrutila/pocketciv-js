@@ -224,6 +224,9 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
         $scope.hideDrawer = false;
         $scope.showStopper = (canstop == true);
         drawnFunc = drawn;
+        if (!canstop && $localStorage.options.fastgame && !$localStorage.options.drawcards )
+            // Auto draw!
+            $scope.drawCard();
     }
 
     $scope.areaChangeOk = function(skip) {
@@ -265,11 +268,17 @@ var changeString = function(chg) {
         if (_.isEmpty(changes) || $scope.engine.phase == 'move')
             $scope.areaChangeOk();
         else {
-            if ($scope.tutorial)
+            if ($scope.tutorial) {
                 if ($scope.tour.afterEvent) {
                     $scope.tour.goTo($scope.tour.afterEvent);
                     $scope.tour.afterEvent = undefined;
                 }
+            } else {
+                if ($localStorage.options.fastgame) {
+                    $scope.areaChangeOk();
+                    return;
+                }
+            }
             _.each(_.keys(changes), function(k) {
                 $("[id$='"+k+"']:not([id$='-1'])").addClass('highlight');
             });
@@ -501,6 +510,10 @@ var changeString = function(chg) {
     });
     $scope.engine.phase = "";
     $scope.godMode = false;
+    $localStorage.options = $localStorage.options || {
+        fastgame: false,
+        drawcards: false,
+    };
     $scope.mapEditor = false;
     //@exclude
     $scope.godMode = true;

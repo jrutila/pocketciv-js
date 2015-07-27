@@ -45,6 +45,11 @@
                 </div>
             </accordion-group>
             <accordion-group>
+                <accordion-heading>Options</accordion-heading>
+                <input type="checkbox" id="optionFast" ng-model="$storage.options.fastgame" /><label for="optionFast">Fast Game</label>
+                <input type="checkbox" id="optionCards" ng-model="$storage.options.drawcards" ng-show="$storage.options.fastgame" /><label for="optionCards" ng-show="$storage.options.fastgame" >Let me draw cards still</label>
+            </accordion-group>
+            <accordion-group>
                 <accordion-heading>God Mode</accordion-heading>
                 <label class="btn btn-primary" ng-model="godMode" btn-checkbox ng-change="toggleGod(godMode)" hotkey="{ esc: godMode }">God Mode</label>
                 <textarea ng-show="godMode" json-text rows="5" cols="30" ng-model="engine.map.areas"></textarea>
