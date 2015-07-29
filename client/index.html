@@ -155,7 +155,7 @@
             <li class="event" ng-repeat="(era, e) in card.events">
                 <span class="era">{{ era }}</span>
                 <span class="name">{{ engine.events[e.name].title || e.name | sprintf:e }}</span>
-                <span class="expr">{{ e.expr }}</span>
+                <span class="expr {{ e.expr | exprcss }}">{{ e.expr }}</span>
             </li>
         </ul>
     </div>

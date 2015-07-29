@@ -41,7 +41,7 @@ var eventDeck = {
         'gold': 1,
         'events': {
             2: { name: 'bandits', expr: 'h+s' },
-            4: { name: 'epidemic', expr: 'c+s+h' },
+            4: { name: 'epidemic', expr: 'c+h+s' },
             5: { name: 'visitation', visitor: 'atlantea', expr: '3*h' },
             7: { name: 'visitation', visitor: 'gilda', expr: 'c+h+s' },
             8: { name: 'civil_war', expr: 'h' },
@@ -156,7 +156,7 @@ var eventDeck = {
             3: { name: 'sandstorm' },
             5: { name: 'visitation', visitor: 'atlantea', expr: '3*h' },
             6: { name: 'uprising' },
-            8: { name: 'bandits', expr: 'h+c+s' },
+            8: { name: 'bandits', expr: 'c+h+s' },
         }
     },
     11: {

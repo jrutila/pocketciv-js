@@ -72,7 +72,8 @@ module.exports = function (grunt) {
     watch: {
       sprite: {
         files: [
-          'client/images/**/icons/*.png'
+          'client/images/**/icons/*.png',
+          'client/images/**/card/*.png'
         ],
         tasks: ['sprite']
       },
@@ -123,7 +124,7 @@ module.exports = function (grunt) {
     },
     sprite:{
       css: {
-        src: 'client/images/modern/icons/*.png',
+        src: ['client/images/modern/icons/*.png', 'client/images/**/card/*.png'],
         dest: '.build/images/spritesheet.png',
         destCss: '.build/css/sprites.css',
         cssOpts: {
@@ -131,7 +132,7 @@ module.exports = function (grunt) {
         }
       },
       scss: {
-        src: 'client/images/modern/icons/*.png',
+        src: ['client/images/modern/icons/*.png', 'client/images/**/card/*.png'],
         dest: '.build/images/spritesheet.png',
         destCss: '.build/scss/sprite/sprites.scss',
         cssOpts: {

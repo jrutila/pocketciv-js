@@ -8,7 +8,7 @@ module.exports = {
     description: "",
     steps: {
             '1': "Draw the next card.{%; area_card() %} Circle denotes the Active Region {{ active_region }}.",
-            '2': "If the {{ Active Region|active_region}} neighbors the Sea then see Tsunami below.\
+            '2': "If the Active Region neighbors the Sea then see Tsunami below.\
                   {% if (hasSea(active_region)) goto('3') %}",
             '2.1': "If the Active Region does not Neighbor the Sea: \
                     Reduce Tribes by 2 in the Active Region. \

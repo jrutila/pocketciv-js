@@ -24,16 +24,13 @@ of your choice that do not have Fault Lines.\
                 {% change({ 'city': -3, 'tribes': -4 }) %} \
                 {% target({ 'wonders': [] }) %} \
                 {%; createFaults() %}",
-            '3.2': "Draw the next Event card. {%; draw_card() %} Using the symbols \
-shown on the ORIGINAL Event card to the far right of \
-the Earthquake event, add up the values in the symbols \
-on the newly drawn card. The total value that this \
-creates determines Population Loss. Decimate Tribes equal to the amount\
-of Population Loss in any combination of the Active\
-Region and Neighboring Regions. You may choose to \
-divide up the Population loss any way you see fit, as \
-long as you Decimate Tribes up to the described value.\
-                {% populationLoss = card_value(event.expr) %} \
+            '3.2': "Draw the next Event card.{%; draw_card() %} \
+Using the symbols {% populationLoss = card_value(event.expr) %}\
+shown on the ORIGINAL Event card ({{ event.expr }}) calculate \
+Population Loss ({{ populationLoss }}). \
+Decimate Tribes equal to the amount \
+of Population Loss in any combination of the Active \
+Region and Neighboring Regions.\
                 {%; reducePopulation() %} \
                     "
     },

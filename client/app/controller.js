@@ -881,7 +881,7 @@ pocketcivApp.directive('pcEventStep', function($rootScope) {
                 var context = (step && step.ctx) || {};
                 if (!$scope.step)  return;
                 var d = $scope.step.replace(/{%.*?%}/g, "");
-                d = d.replace(/{{ ([a-z_]+) }}/g, "{{{ $1 }}}")
+                d = d.replace(/{{ ([a-z_.]+) }}/g, "{{{ $1 }}}")
                 
                 var adv_regex = /{{ adv:(.*?) }}/g;
                 var m;
@@ -902,6 +902,10 @@ pocketcivApp.directive('pcEventStep', function($rootScope) {
                     ctx.active_region = "<span class='areaCode'>"+context.active_region.id+"</span>"
                 var rctx = _.extend(window, ctx);
                 rctx = _.extend(rctx, $scope.engine.advances);
+                if (ctx.event && ctx.event.expr) {
+                    rctx.event = _.clone(ctx.event);
+                    rctx.event.expr = "<span class='expr "+exprcss(ctx.event.expr)+"'>"+ctx.event.expr+"</span>";
+                }
                 if (d.indexOf("+") == 0)
                 {
                     stepcl = stepcl + "positive";
@@ -945,6 +949,10 @@ pocketcivApp.filter('eventFormat', function() {
             ctx.active_region = "<span class='areaCode'>"+context.active_region.id+"</span>"
         var rctx = _.extend(window, ctx);
         rctx = _.extend(rctx, engine.advances);
+        if (ctx.event.expr) {
+            rctx.event = _.clone(ctx.event);
+            rctx.event.expr = "<span class='expr "+exprcss(ctx.event.expr)+"'>"+ctx.event.expr+"</span>";
+        }
         if (d.indexOf("+") == 0)
         {
             stepcl = stepcl + "positive";
@@ -958,6 +966,17 @@ pocketcivApp.filter('eventFormat', function() {
 pocketcivApp.filter('sprintf', function() {
     return function(str, params) {
         return sprintf(str, params);
+    };
+});
+
+function exprcss(str) {
+    return str.replace("2*h","hh").replace("2*s","ss").replace("2*c","cc").replace("3*s","sss").replace("3*h","hhh").replace("+","").replace("+","");
+}
+
+pocketcivApp.filter('exprcss', function() {
+    return function(str, params) {
+        if (str == undefined) return "";
+        return exprcss(str);
     };
 });
 /*
