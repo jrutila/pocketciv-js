@@ -38,6 +38,7 @@ var scenarios = {
     "scenario10": require("../../src/scenarios/scenario10"),
     "scenario11": require("../../src/scenarios/scenario11"),
     "scenario12": require("../../src/scenarios/scenario12"),
+    "scenario15": require("../../src/scenarios/scenario15"),
 }
 
 var tutorials = {
@@ -563,7 +564,7 @@ var changeString = function(chg) {
         }
         if (event == 'end') {
             var phase = $scope.engine.phaseImpl[value];
-            gameLogText(phase, $scope.engine.currentContext);
+            phase && gameLogText(phase, $scope.engine.currentContext);
         }
     });
     $scope.engine.phase = "";
