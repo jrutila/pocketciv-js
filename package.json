@@ -54,7 +54,8 @@
     "grunt-nodemon": "^0.2.1",
     "imagemin-mozjpeg": "^5.1.0",
     "grunt-rev": "^0.1.0",
-    "underscore.deepclone": "^0.1.1"
+    "underscore.deepclone": "^0.1.1",
+    "handlebars": "^3.0.3"
   },
   "devDependencies": {},
   "engines": {

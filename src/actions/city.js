@@ -3,6 +3,7 @@ var _ = require("underscore");
 
 module.exports = {
     title: "Build a City",
+    log: "Built a city to {{ regions changes }}",
     params: {
         city_cost: 4,
     },

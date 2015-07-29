@@ -4,6 +4,7 @@ var _ = require("underscore");
 
 module.exports = {
     title: "Create a Farm",
+    log: "Created a farm to {{ regions changes }}",
     params: {
         forest_free: false,
     },

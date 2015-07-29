@@ -16,6 +16,7 @@ var reducer = require("../../src/core/reducer");
 var Context = require("../../src/core/context");
 var sprintf = require("sprintf");
 var mustache = require("mustache");
+var handlebars = require("handlebars");
 var Map = require("./map")
 var AdvanceAcquirer = require("../../src/actions/acquire").AdvanceAcquirer;
 var WonderBuilderer = require("../../src/actions/build").WonderBuilderer;
@@ -69,6 +70,7 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
         "advance": [],
         "acquires": [],
         "builds": [],
+        "log": [],
     };
     };
     resetGameLog();
@@ -211,11 +213,55 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
         $scope.reduceReady = function(ok) {
             if (ok)
             {
-                $localStorage.gameLog.reduce.push(_.rest(ok.chg, reducer.opts.initial.length));
+                if ($scope.engine.phase == "advance" && _.isEmpty(ok.chg))
+                    _.last($localStorage.gameLog.advance).pop();
+                else {
+                    $localStorage.gameLog.reduce.push(_.rest(ok.chg, reducer.opts.initial.length));
+                    if ($scope.engine.phase == "advance") {
+                        // Something was done!
+                        var action = _.last(_.last($localStorage.gameLog.advance));
+                        action = $scope.engine.actions[action];
+                        gameLogText(action, ok);
+                    }
+                }
+                    
             } else 
                 $localStorage.gameLog.reduce.push({});
             done(ok);
         };
+    }
+    
+    handlebars.registerHelper("regions", function(context, options) {
+        if (_.isObject(context))
+            return _.keys(context).toString();
+        else
+            return context;
+    });
+    handlebars.registerHelper("render_acquires", function(context, options) {
+        return _.map(context, function(acq) { return acq.name }).toString();
+    });
+    
+    // TODO: Put this somewhere else please. Should it be in core pocketciv?
+    function gameLogText(happening, ctx) {
+        /*
+        var change = { chg: ok };
+        change.regions = "";
+        _.each(ok.changes, function(v, k) {
+            change.regions += k+",";
+        });
+        change.regions = change.regions.slice(0,-1);
+        var ctx = {
+            engine: $scope.engine,
+            change: change,
+        }
+        */
+        var log = happening.log;
+        if (happening.log instanceof Function)
+            log = happening.log(ctx)
+        if (log) {
+            var text = handlebars.compile(log)(ctx);
+            $localStorage.gameLog.log.push(text);
+        }
     }
     
     pocketimpl.drawer = function(deck, drawn, canstop) {
@@ -364,8 +410,10 @@ var changeString = function(chg) {
                 }
                 d.call($scope.engine, now);
                 
-                if (now)
+                if (now) {
                     log.push(now);
+                    gameLogText($scope.engine.actions['acquire'],  $scope.engine.currentContext);
+                }
                 else
                     _.last($localStorage.gameLog.advance).pop();
                     
@@ -502,10 +550,15 @@ var changeString = function(chg) {
     }
     
     $scope.engine = new pocketciv.EngineBuild({});
+    // signals is static
     $scope.engine.signals.phaser.add(function(event, value) {
         if (event == 'gameover') {
             console.log("Game Over: " + $scope.engine.name+ " " +value);
             $analytics.eventTrack('end', { category: 'game', label: $scope.engine.name, resolution: value});
+        }
+        if (event == 'end') {
+            var phase = $scope.engine.phaseImpl[value];
+            gameLogText(phase, $scope.engine.currentContext);
         }
     });
     $scope.engine.phase = "";

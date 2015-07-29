@@ -326,7 +326,12 @@
                     class="mapCanvas" id="clickCanvas" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
             </div>
             </div>
+            
+            <div id="gameLog" style="position: absolute; bottom: 0px;">
+                <div class="logEntry" ng-repeat="l in $storage.gameLog.log track by $index">{{ l }}</div>
+            </div>
         </div>
+        
         
     </div>
     <!-- END MAP -->

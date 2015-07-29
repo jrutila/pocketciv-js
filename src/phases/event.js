@@ -1,6 +1,24 @@
 var _ = require("underscore");
 
 module.exports = {
+    log: function(ctx) {
+        if (!ctx.event)
+            return "No event happened";
+        else
+        {
+            if (ctx.event.log)
+            {
+                
+            }
+            else
+            {
+                var commonText = "{{ event.title }} happened";
+                if (ctx.eventCtx.active_region)
+                    commonText += " in region {{ regions eventCtx.active_region.id }}";
+                return commonText;
+            }
+        }
+    },
     run: function(ctx) {
         console.log("Drawing event card")
         // Take era before card draw if there is era change

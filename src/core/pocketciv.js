@@ -221,11 +221,6 @@ function Engine(impl, map, deck) {
     this.round_era = {}; // Will be emptied on end of an era!
     this.params = {} // Will be emptied on init!
     this.era = 1;
-    /** SIGNALS **/
-    this.signals = {
-        'eventPhasing': new signals.Signal(),
-        'phaser': new signals.Signal()
-    }
 }
 
 var defaults= {
@@ -276,6 +271,12 @@ function deepClone(object) {
 }
 
 Engine.prototype = {
+    /** SIGNALS **/
+    signals: {
+        'eventPhasing': new signals.Signal(),
+        'phaser': new signals.Signal()
+    },
+
     init: function(state) {
         console.log("init engine")
         for (var d in defaults)
@@ -476,7 +477,6 @@ Engine.prototype = {
             eng.gameOver(false, "notribesandcities");
             return;
         }
-        
         
         var final = function() {
                 if (name != 'advance' || arg == undefined) {

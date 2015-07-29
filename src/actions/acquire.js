@@ -123,6 +123,7 @@ AdvanceAcquirer.prototype = {
 
 module.exports = {
     title: "Acquire Advances",
+    log: "Acquired: {{ render_acquires acquires }}",
     run: function(ctx) {
         var engine = this;
         engine.round.acquired = engine.round.acquired || {};
@@ -131,6 +132,7 @@ module.exports = {
             console.log(acquires)
             var changes = { };
             acquires = _.omit(acquires, _.keys(engine.round.acquired));
+            ctx.acquires = acquires;
             for (var area in acquires)
             {
                 var acq = acquires[area];
