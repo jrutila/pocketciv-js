@@ -270,7 +270,10 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
         $scope.hideDrawer = false;
         $scope.showStopper = (canstop == true);
         drawnFunc = drawn;
-        if (!canstop && $localStorage.options.fastgame && !$localStorage.options.drawcards )
+        if (!canstop
+            && (!$scope.engine.currentContext.eventCtx || $scope.engine.currentContext.eventCtx.skip == undefined)
+            && $localStorage.options.fastgame
+            && !$localStorage.options.drawcards )
             // Auto draw!
             $scope.drawCard();
     }
@@ -320,7 +323,9 @@ var changeString = function(chg) {
                     $scope.tour.afterEvent = undefined;
                 }
             } else {
-                if ($localStorage.options.fastgame) {
+                if ($localStorage.options.fastgame
+                    && (!$scope.engine.currentContext.eventCtx || $scope.engine.currentContext.eventCtx.skip == undefined)
+                    ) {
                     $scope.areaChangeOk();
                     return;
                 }
@@ -612,6 +617,7 @@ var changeString = function(chg) {
                     $scope.currentStep = undefined;
                     $scope.areaChange = undefined;
                     $scope.currentEvent = undefined;
+                    $scope.reducer = undefined;
                     $(".highlight").removeClass('highlight');
                     ctx.skip();
                 }

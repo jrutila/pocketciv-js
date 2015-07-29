@@ -26,12 +26,17 @@ module.exports = {
             frontier_multi: this.params.expedition_frontier_force || 1,
             split: this.params.expedition_split || 1,
             reduce: function(key, chg) {
+                if (chg.tribes < 0) return false;
                 var rTrb = this.initial[key].tribes - chg.tribes;
-                this.amount = rTrb;
-                if (engine.isSeaNeighbour(this.map[key], "expedition"))
-                    this.amount *= this.opts.sea_multi;
-                else if (_.contains(this.map[key].neighbours, 'frontier'))
-                    this.amount *= this.opts.frontier_multi;
+                if (rTrb > 0)
+                {
+                    if (this.amount != 0) return false;
+                    this.amount = rTrb;
+                    if (engine.isSeaNeighbour(this.map[key], "expedition"))
+                        this.amount *= this.opts.sea_multi;
+                    else if (_.contains(this.map[key].neighbours, 'frontier'))
+                        this.amount *= this.opts.frontier_multi;
+                } else if (rTrb < 0) return false;
                 
                 return { tribes: chg.tribes };
             },

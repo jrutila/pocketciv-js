@@ -94,6 +94,7 @@ Context.prototype = {
     {
         var ctx = this;
         this.engine.draw(function(c) {
+            ctx.skip = undefined;
             ctx.active_region = ctx.engine.map.areas[c.circle.toString()];
             if (!ctx.active_region) {
                 ctx.break = true;
@@ -104,6 +105,7 @@ Context.prototype = {
     draw_card: function(canstop) {
         var ctx = this;
         this.engine.draw(function(c) {
+            ctx.skip = undefined;
             ctx.card = c;
             ctx.done();
         },canstop == true);
