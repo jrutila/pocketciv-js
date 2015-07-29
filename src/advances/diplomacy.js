@@ -54,6 +54,7 @@ module.exports = {
                 }
                 var ctx = this;
                 ctx.engine.reducer(new reducer.Reducer(opts), function(ok) {
+                    ctx.skip = undefined;
                     diplomatic_offer = ok.amount;
                     console.log("Making offer of "+diplomatic_offer)
                     ctx.change(ok.changes);

@@ -117,6 +117,7 @@ Context.prototype = {
         opts.initial = areas;
         
         this.engine.reducer(new reducer.Reducer(opts), function(rdc) {
+            ctx.skip = undefined;
             ctx.ctx.change(rdc.changes);
             ctx.done && ctx.done();
         });

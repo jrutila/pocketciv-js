@@ -18,10 +18,10 @@ module.exports = {
                 Go to TRADE. {% if (card.friendly) trade() %}",
             '3': "If there is no Handshake, then the Empire is attacking you!",
             '3.1': "Draw the next Event card {%; area_card() %}. Read square indicates the active region {{ active_region }}.",
-            '3.2': "If the active region does not neighbor the Sea or Frontier, then there is no attack.",
-            '3.3': "{% break_if(no_attack()) %}Draw the next Event card {%; draw_card() %}. Based on the symbols on the original \
+            '3.2': "If the active region does not neighbor the Sea or Frontier, then there is no attack.{% break_if(no_attack()) %}",
+            '3.3': "Draw the next Event card {%; draw_card() %}. Based on the symbols on the original \
                     event card ({{ event.expr }}) {% attack_force = card_value(event.expr) %}calculate the Attacking Force {{ attack_force }}.",
-            '3.4': 'See {%; sub("attack") %}',
+            '3.4': 'Goto ATTACK{%; sub("attack") %}',
     },
     trading: function(visitor) {
         return this.engine.trading.indexOf(visitor) > -1;
