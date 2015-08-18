@@ -88,6 +88,25 @@ function sum(arr) {
     return total;
 }
 
+function pp(cur, perms, maxMoves, max) {
+    if (_.size(maxMoves) == 0)
+    {
+        perms.push(_.clone(cur));
+        return;
+    }
+    
+    var key = _.keys(maxMoves)[0];
+    var mm = maxMoves[key];
+    
+    for (var i = 0; i <= Math.min(mm, max === undefined ? mm : max); i++)
+    {
+        cur[key] = i;
+        pp(cur, perms, _.omit(maxMoves, key), max === undefined ? undefined : max-i);
+    }
+    
+}
+
+
 TribeMover.prototype = {
     init: function(start) {
         this.start = start;
@@ -98,8 +117,25 @@ TribeMover.prototype = {
     },
     ok: function(situation) {
         if (this.moveLimit == -1) return { ok: true };
+        var start = this.start;
         var ngh = this._nghValue(situation, this.neighbours);
         var nghSea = this._nghValue(situation, this.neighboursSea);
+        var delta = _.mapObject(situation, function(val, key) {
+            return val - this.start[key];
+        },this);
+        var nghDelta = _.mapObject(delta, function(val, key) {
+            return _.reduce(_.pick(delta, this.neighbours[key]), function(memo, n) { return memo+n; }, val);
+        },this);
+        var moveFrom = {};
+        var moveTo = {};
+        _.each(this.start, function(val, key) {
+            var from = _.object(_.map(this.neighbours[key], function(nn) {
+                if (start[key] == 0) return [nn, 0];
+                if (situation[nn] == 0) return [nn, 0];
+                return [nn, _.min([start[key], situation[nn]])];
+            }));
+            moveFrom[key] = from;
+        }, this);
         var byland = [];
         var bysea = [];
         if (sum(this.start) != sum(situation))
@@ -125,39 +161,53 @@ TribeMover.prototype = {
                 bysea.push([key, 0]);
             }
         }
-        /*
         console.log('--COMP--')
         console.log('this.neighbours')
         console.log(this.neighbours)
-        console.log('this.neighboursSea')
-        console.log(this.neighboursSea)
-        console.log('this.neighbours2')
-        console.log(this.neighbours2)
-        console.log('this.neighboursSea2')
-        console.log(this.neighboursSea2)
+        //console.log('this.neighboursSea')
+        //console.log(this.neighboursSea)
+        //console.log('this.neighbours2')
+        //console.log(this.neighbours2)
+        //console.log('this.neighboursSea2')
+        //console.log(this.neighboursSea2)
         console.log('this.max')
         console.log(this.max)
-        console.log('this.maxSea')
-        console.log(this.maxSea)
+        //console.log('this.maxSea')
+        //console.log(this.maxSea)
         console.log('this.ngh2')
         console.log(this.ngh2)
-        console.log('this.ngh2Sea')
-        console.log(this.ngh2Sea)
+        //console.log('this.ngh2Sea')
+        //console.log(this.ngh2Sea)
         console.log('this.start')
         console.log(this.start)
         console.log('curr - situation')
         console.log(situation)
+        console.log('curr - delta')
+        console.log(delta)
+        console.log('curr - nghDelta')
+        console.log(nghDelta)
+        console.log('curr - moveFrom')
+        console.log(moveFrom)
+        _.each(moveFrom, function(mf, key) {
+            console.log("Area "+key + " start: "+this.start[key]);
+            var perms = [];
+            pp({}, perms, mf, this.start[key]);
+            console.log(perms)
+        },this);
+        
+        
+        console.log('curr - delta Sum')
+        console.log(_.reduce(_.values(delta).concat(_.values(nghDelta)), function(memo, n) { return memo+n; }, 0))
         console.log('curr - ngh')
         console.log(ngh)
-        console.log('curr - nghSea')
-        console.log(nghSea)
+        //console.log('curr - nghSea')
+        //console.log(nghSea)
         console.log(sum(this.start) + " != " + sum(situation))
         console.log('byland')
         console.log(byland)
         console.log('bysea')
         console.log(bysea)
         console.log('--XOMP--')
-        */
         // If sea movement is forbidden, don't allow bysea
         if (this.seaCost == -1) bysea.push(-1);
         
@@ -266,5 +316,6 @@ module.exports = {
                 ctx.done && ctx.done();
         });
     },
-    TribeMover: TribeMover
+    TribeMover: TribeMover,
+    pp: pp
 };
