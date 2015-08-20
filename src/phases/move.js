@@ -188,13 +188,60 @@ TribeMover.prototype = {
         console.log(nghDelta)
         console.log('curr - moveFrom')
         console.log(moveFrom)
+        var areaPerms = {};
         _.each(moveFrom, function(mf, key) {
-            console.log("Area "+key + " start: "+this.start[key]);
             var perms = [];
+            //console.log("Area "+key + " start: "+this.start[key]);
             pp({}, perms, mf, this.start[key]);
-            console.log(perms)
+            //console.log(perms)
+            areaPerms[key] = perms;
         },this);
         
+        var mutch = {};
+        _.each(this.neighbours, function(nn, k) {
+            var findMatch = function (cur, matches, ngh, count) {
+                if (_.size(ngh) == 0)
+                {
+                    if (count == situation[k])
+                        matches.push(_.clone(cur));
+                    return;
+                }
+                
+                if (count > situation[k])
+                    return;
+                
+                var n = ngh[0];
+                
+                _.each(areaPerms[n], function(p) {
+                    cur[n] = p;
+                    findMatch(cur, matches, ngh.slice(1), count + p[k]);
+                },this);
+            };
+        
+            var mat = [];
+            findMatch({}, mat, nn, 0);
+            mutch[k] = mat;
+        },this);
+        //console.log('matches')
+        _.each(situation, function(sit, key) {
+            //console.log("Area "+key+" should have "+sit)
+            //console.log("mutchi "+key)
+            console.log(require("util").inspect(mutch[key], true, 10)) ;
+            _.each(this.neighbours[key], function(nnn) {
+                var allowed = _.map(mutch[key], function(gee) {return gee[nnn];});
+                //console.log("Area "+key+" allows "+nnn+":")
+                areaPerms[nnn] = _.intersection(areaPerms[nnn], allowed);
+                //console.log(areaPerms[nnn]);
+            },this);
+        },this);
+        
+        console.log("FINAL PERMS")
+        _.each(areaPerms, function(perm, key) {
+            console.log(key)
+            console.log(perm)
+            if (_.size(perm) == 0)
+                byland.push([key, 2]);
+        });
         
         console.log('curr - delta Sum')
         console.log(_.reduce(_.values(delta).concat(_.values(nghDelta)), function(memo, n) { return memo+n; }, 0))
