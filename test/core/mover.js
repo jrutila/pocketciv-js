@@ -3,7 +3,7 @@ var expect = require('chai').expect;
 var pocketciv = require('../../src/core/pocketciv');
 var event = require('../../src/core/event');
 
-describe('TribeMover', function() {
+describe.only('TribeMover', function() {
     describe('simple', function() {
         beforeEach(function() {
             // 1 - 2 - 3
@@ -22,11 +22,17 @@ describe('TribeMover', function() {
             mover.init({ 1: 1, 2: 1, 3: 0 });
             mover.ok({ 1: 0, 2: 1, 3: 1 }).ok.should.be.true;
         });
-        it('case 3', function() {
-            mover.init({ 1: 2, 2: 0, 3: 0 });
-            mover.ok({ 1: 0, 2: 2, 3: 0 }).ok.should.be.true;
-            mover.ok({ 1: 1, 2: 1, 3: 0 }).ok.should.be.true;
-            mover.ok({ 1: 1, 2: 0, 3: 1 }).ok.should.be.false;
+        describe('case 3', function() {
+            beforeEach(function() {
+                mover.init({ 1: 2, 2: 0, 3: 0 });
+            });
+            it('should work', function() {
+                mover.ok({ 1: 0, 2: 2, 3: 0 }).ok.should.be.true;
+                mover.ok({ 1: 1, 2: 1, 3: 0 }).ok.should.be.true;
+            });
+            it('should fail', function() {
+                mover.ok({ 1: 1, 2: 0, 3: 1 }).ok.should.be.false;
+            });
         });
         it('case 4 - neighbour limit', function() {
             mover.init({ 1: 2, 2: 0, 3: 0 });
@@ -279,7 +285,7 @@ describe('TribeMover', function() {
             ok.reduce.should.deep.equal([[4]]);
         });
     });
-    describe.only('central point', function() {
+    describe('central point', function() {
         beforeEach(function() {
             /*
              2       5
@@ -311,14 +317,20 @@ describe('TribeMover', function() {
                 map[5].neighbours.push('sea');
                 mover = new pocketciv.TribeMover(map, 1);
             });
-            it('move in the mainland', function() {
+            it('move in the mainland works', function() {
                 mover.init({ 1: 2, 2: 0, 3: 0, 4: 2, 5: 2, 7: 0, 8: 0 });
                 mover.ok(  { 1: 1, 2: 2, 3: 0, 4: 1, 5: 2, 7: 0, 8: 0 }).ok.should.be.true;
+            });
+            it('move in the mainland fails', function() {
+                mover.init({ 1: 2, 2: 0, 3: 0, 4: 2, 5: 2, 7: 0, 8: 0 });
                 mover.ok(  { 1: 1, 2: 2, 3: 1, 4: 0, 5: 2, 7: 0, 8: 0 }).ok.should.be.false;
             });
-            it('move in island', function() {
+            it('move in island works', function() {
                 mover.init({ 1: 2, 2: 0, 3: 0, 4: 2, 5: 2, 7: 1, 8: 0 });
-                //mover.ok(  { 1: 1, 2: 2, 3: 0, 4: 1, 5: 2, 7: 0, 8: 1 }).ok.should.be.true;
+                mover.ok(  { 1: 1, 2: 2, 3: 0, 4: 1, 5: 2, 7: 0, 8: 1 }).ok.should.be.true;
+            });
+            it('move in island works', function() {
+                mover.init({ 1: 2, 2: 0, 3: 0, 4: 2, 5: 2, 7: 1, 8: 0 });
                 mover.ok(  { 1: 1, 2: 2, 3: 0, 4: 2, 5: 2, 7: 0, 8: 0 }).ok.should.be.false;
             });
         });

@@ -109,7 +109,7 @@ TribeMover.prototype = {
         this.ngh2 = this._nghValue(start, this.neighbours2);
     },
     ok: function(situation, fail, cost) {
-        var debug = true;
+        var debug = 1;
         var valid = {
             ok: true,
             target: situation,
@@ -207,7 +207,10 @@ TribeMover.prototype = {
             };
         
             var mat = [];
-            findMatch({}, mat, nghbrs, 0);
+            _.each(areaPerms[k], function(p) {
+                findMatch({}, mat, nghbrs, 
+                    start[k] - _.reduce(_.values(p), function(memo, n) { return memo+n;}, 0));
+            });
             mutch[k] = mat;
         });
         
