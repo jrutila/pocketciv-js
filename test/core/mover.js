@@ -3,7 +3,7 @@ var expect = require('chai').expect;
 var pocketciv = require('../../src/core/pocketciv');
 var event = require('../../src/core/event');
 
-describe.only('TribeMover', function() {
+describe('TribeMover', function() {
     describe('simple', function() {
         beforeEach(function() {
             // 1 - 2 - 3
@@ -38,6 +38,10 @@ describe.only('TribeMover', function() {
             mover.init({ 1: 2, 2: 0, 3: 0 });
             mover.ok({ 1: 2, 2: 2, 3: 0 }).ok.should.be.false;
             mover.ok({ 1: 0, 2: 0, 3: 0 }).ok.should.be.false;
+        });
+        it('large amounts', function() {
+            mover.init({ 1: 18, 2: 19, 3: 0 });
+            mover.ok(  { 1: 10, 2: 25, 3: 2 }).ok.should.be.true;
         });
     });
     describe('complex', function() {
@@ -101,10 +105,11 @@ describe.only('TribeMover', function() {
     describe('with sea and frontier', function() {
         beforeEach(function() {
             //       1 - 2---------
-            //      SEA / \
-            //          |  3
+            //          / \
+            //    SEA   |  3
             //          \ / \ FRONTIER
             //           4 - 5
+            //           |
             map = {
                 1: { 'neighbours': [2, 'sea'] },
                 2: { 'neighbours': [1, 3, 'sea', 'frontier'] },
@@ -120,7 +125,7 @@ describe.only('TribeMover', function() {
         });
         it('case 2', function() {
             mover.init({ 1: 6, 2: 6, 3: 6, 4: 0, 5: 0 });
-            mover.ok({ 1: 6, 2: 6, 3: 6, 4: 3, 5: 3 }).ok.should.be.false;
+            mover.ok(  { 1: 6, 2: 6, 3: 6, 4: 3, 5: 3 }).ok.should.be.false;
         });
         it('cannot move across the sea', function() {
             mover.init({ 1: 6, 2: 6, 3: 0, 4: 0, 5: 0 });
@@ -174,7 +179,7 @@ describe.only('TribeMover', function() {
                         { 1: 1 }
                         ]);
             });
-            it.only('changes by rel 0', function() {
+            it('changes by rel 0', function() {
                 mover.init({ 1: 3, 2: 3, 3: 0, 4: 3, 5: 0, 6: 0, 7: 0 });
                 var ok =
                 mover.ok(  { 1: 2, 2: 3, 3: 2, 4: 2, 5: 0, 6: 0, 7: 0 });

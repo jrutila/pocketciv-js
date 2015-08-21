@@ -129,7 +129,7 @@ TribeMover.prototype = {
             },this);
         }
     },
-    ok: function(situation, fail, cost) {
+    ok: function(situation, fail, costFunc) {
         this.handleMissing(situation, this.neighbours);
         var debug = 0;
         var valid = {
@@ -145,6 +145,7 @@ TribeMover.prototype = {
             if (debug)
                 console.log("FAIL HERE!")
         };
+        costFunc = costFunc || function() {  };
         
         if (sum(this.start) != sum(situation))
             fail();
@@ -286,60 +287,46 @@ TribeMover.prototype = {
             return cost;
         };
         
-        // Determine costs
-        var totalCost = 10;
-        var findCost = function(costs, curr, perms) {
-            if (_.size(perms) == 0)
-            {
-                var cost = calcCost(curr);
-                if (cost) 
-                {
-                    var total = _.reduce(_.values(cost), function(memo, n) {return memo+n;}, 0);
-                    if (total <= totalCost && !_.some(costs, function(c) { return _.isEqual(c, cost); }))
-                    {
-                        debug == 2 && console.log(require('util').inspect(curr));
-                        debug == 2 && console.log("cost : "+require('util').inspect(cost));
-                        if (total < totalCost) costs.splice(0, costs.length);
-                        totalCost = total;
-                        costs.push(cost);
-                    }
-                }
-                else
-                    return true;
-                return;
-            }
-            
-            var key = _.keys(perms)[0];
-            
-            _.each(perms[key], function(p) {
-                curr[key] = p;
-                if (findCost(costs, curr, _.omit(perms,key)))
-                    return true;
-            });
-        };
         if (this.seaCost > 0)
         {
+            // Determine costs
+            var totalCost = 10;
+            var findCost = function(costs, curr, perms) {
+                if (_.size(perms) == 0)
+                {
+                    var cost = calcCost(curr);
+                    if (cost) 
+                    {
+                        var total = _.reduce(_.values(cost), function(memo, n) {return memo+n;}, 0);
+                        if (total <= totalCost && !_.some(costs, function(c) { return _.isEqual(c, cost); }))
+                        {
+                            debug == 2 && console.log(require('util').inspect(curr));
+                            debug == 2 && console.log("cost : "+require('util').inspect(cost));
+                            if (total < totalCost) costs.splice(0, costs.length);
+                            totalCost = total;
+                            costs.push(cost);
+                        }
+                    }
+                    else
+                        return true;
+                    return;
+                }
+                
+                var key = _.keys(perms)[0];
+                
+                _.each(perms[key], function(p) {
+                    curr[key] = p;
+                    if (findCost(costs, curr, _.omit(perms,key)))
+                        return true;
+                });
+            };
             var costs = [];
             debug && console.log("seacost: "+this.seaCost)
             findCost(costs, {}, areaPerms);
             debug && console.log(require("util").inspect(costs, true, 10))
             valid.cost = costs;
+            costFunc(costs);
         }
-        /*
-        _.each(areaPerms, function(perm, key) {
-        });
-            _.each(perm, function(c) {
-                _.each(c, function(amnt, area) {
-                    if (amnt > 0 &&
-                        !_.contains(this.landNeighbours[key], parseInt(area)))
-                    {
-                        var ccs = {};
-                        ccs[area] = Math.min(ccs[area] || 9, this.seaCost);
-                        valid.cost.push(ccs);
-                    }
-                },this);
-            },this);
-            */
         
         return valid;
     },
