@@ -59,10 +59,10 @@ function TribeMover(map, moveLimit, seaCost) {
         var nextFirst = {};
         _.each(this.neighbours, function(ngh, ak) {
             nextFirst[ak] = _mergeNgh(ngh, this.neighbours, ak);
-        });
+        },this);
         _.each(this.neighbours, function(ngh, ak) {
             this.neighbours[ak] = nextFirst[ak];
-        });
+        },this);
     }
     // Second level neighbours
     _.each(this.neighbours, function(ngh, ak) {
