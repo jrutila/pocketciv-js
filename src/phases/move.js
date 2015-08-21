@@ -50,30 +50,24 @@ function TribeMover(map, moveLimit, seaCost) {
         this.neighboursSea[ak] = _.union(this.neighbours[ak], seas[ak]);
     }, this);
     
+    if (seaCost > -1)
+        this.neighbours = this.neighboursSea;
     
-    var build = [[this.neighbours, this.neighbours2]]
-    if (this.seaCost > -1)
-        build.push([this.neighboursSea, this.neighboursSea2])
-    
-    _.each(build, function(b) {
-        var first = b[0];
-        var second = b[1];
-        // First level neighbours with moveLimit
-        for (var m = 1; m < moveLimit; m++)
-        {
-            var nextFirst = {};
-            _.each(first, function(ngh, ak) {
-                nextFirst[ak] = _mergeNgh(ngh, first, ak);
-            });
-            _.each(first, function(ngh, ak) {
-                first[ak] = nextFirst[ak];
-            });
-        }
-        // Second level neighbours
-        _.each(first, function(ngh, ak) {
-            second[ak] = _mergeNgh(ngh, first, ak);
-        },this)
-    },this);
+    // First level neighbours with moveLimit
+    for (var m = 1; m < moveLimit; m++)
+    {
+        var nextFirst = {};
+        _.each(this.neighbours, function(ngh, ak) {
+            nextFirst[ak] = _mergeNgh(ngh, this.neighbours, ak);
+        });
+        _.each(this.neighbours, function(ngh, ak) {
+            this.neighbours[ak] = nextFirst[ak];
+        });
+    }
+    // Second level neighbours
+    _.each(this.neighbours, function(ngh, ak) {
+        this.neighbours2[ak] = _mergeNgh(ngh, this.neighbours, ak);
+    },this)
 }
 
 function sum(arr) {
@@ -88,22 +82,23 @@ function sum(arr) {
     return total;
 }
 
-function pp(cur, perms, maxMoves, max) {
+function pp(cur, perms, maxMoves, max, min, count) {
     if (_.size(maxMoves) == 0)
     {
-        perms.push(_.clone(cur));
+        if (max >= count && count >= min)
+            perms.push(_.clone(cur));
         return;
     }
     
     var key = _.keys(maxMoves)[0];
     var mm = maxMoves[key];
+    count = count || 0;
     
-    for (var i = 0; i <= Math.min(mm, max === undefined ? mm : max); i++)
+    for (var i = 0; i <= Math.min(mm, max === undefined ? mm : max - count); i++)
     {
         cur[key] = i;
-        pp(cur, perms, _.omit(maxMoves, key), max === undefined ? undefined : max-i);
+        pp(cur, perms, _.omit(maxMoves, key), max, min, count+i);
     }
-    
 }
 
 
@@ -111,21 +106,28 @@ TribeMover.prototype = {
     init: function(start) {
         this.start = start;
         this.max = this._nghValue(start, this.neighbours);
-        this.maxSea = this._nghValue(start, this.neighboursSea);
         this.ngh2 = this._nghValue(start, this.neighbours2);
-        this.ngh2Sea = this._nghValue(start, this.neighboursSea2);
     },
-    ok: function(situation) {
-        if (this.moveLimit == -1) return { ok: true };
+    ok: function(situation, fail, cost) {
+        var debug = true;
+        var valid = {
+            ok: true,
+            target: situation,
+            initial: this.start,
+        };
+        if (this.moveLimit == -1) return valid;
+        if (_.isEqual(this.start, situation)) return valid;
+        fail = fail || function() {
+            valid.ok = false;
+            if (debug)
+                console.log("FAIL HERE!")
+        };
+        
+        if (sum(this.start) != sum(situation))
+            fail();
+        
         var start = this.start;
         var ngh = this._nghValue(situation, this.neighbours);
-        var nghSea = this._nghValue(situation, this.neighboursSea);
-        var delta = _.mapObject(situation, function(val, key) {
-            return val - this.start[key];
-        },this);
-        var nghDelta = _.mapObject(delta, function(val, key) {
-            return _.reduce(_.pick(delta, this.neighbours[key]), function(memo, n) { return memo+n; }, val);
-        },this);
         var moveFrom = {};
         var moveTo = {};
         _.each(this.start, function(val, key) {
@@ -136,72 +138,58 @@ TribeMover.prototype = {
             }));
             moveFrom[key] = from;
         }, this);
-        var byland = [];
-        var bysea = [];
-        if (sum(this.start) != sum(situation))
-            return { ok: false };
-        for (var key in situation)
-        {
-            if ((situation[key] || 0) > this.max[key]) {
-                byland.push([key, 1]);
-            }
-            if ((situation[key] || 0) > this.maxSea[key]) {
-                bysea.push([key, 1]);
-            }
-            if (ngh[key] < this.start[key]) {
-                byland.push([key, -1]);
-            }
-            if (nghSea[key] < this.start[key]) {
-                bysea.push([key, -1]);
-            }
-            if (ngh[key] > this.ngh2[key]) {
-                byland.push([key, 0]);
-            }
-            if (nghSea[key] > this.ngh2Sea[key]) {
-                bysea.push([key, 0]);
-            }
-        }
+        
+        if (debug) {
         console.log('--COMP--')
+        console.log(sum(this.start) + " != " + sum(situation))
         console.log('this.neighbours')
         console.log(this.neighbours)
-        //console.log('this.neighboursSea')
-        //console.log(this.neighboursSea)
-        //console.log('this.neighbours2')
-        //console.log(this.neighbours2)
-        //console.log('this.neighboursSea2')
-        //console.log(this.neighboursSea2)
+        console.log('this.neighbours2')
+        console.log(this.neighbours2)
         console.log('this.max')
         console.log(this.max)
-        //console.log('this.maxSea')
-        //console.log(this.maxSea)
         console.log('this.ngh2')
         console.log(this.ngh2)
-        //console.log('this.ngh2Sea')
-        //console.log(this.ngh2Sea)
         console.log('this.start')
         console.log(this.start)
         console.log('curr - situation')
         console.log(situation)
-        console.log('curr - delta')
-        console.log(delta)
-        console.log('curr - nghDelta')
-        console.log(nghDelta)
         console.log('curr - moveFrom')
         console.log(moveFrom)
+        console.log('--XOMP--')
+        }
+        
+        for (var key in situation)
+        {
+            debug && console.log("check "+key)
+            if ((situation[key] || 0) > this.max[key]) {
+                fail();
+            }
+            if (ngh[key] < this.start[key]) {
+                fail();
+            }
+            if (ngh[key] > this.ngh2[key]) {
+                fail();
+            }
+        }
+        debug && console.log("AREA PERMS");
         var areaPerms = {};
         _.each(moveFrom, function(mf, key) {
             var perms = [];
-            //console.log("Area "+key + " start: "+this.start[key]);
-            pp({}, perms, mf, this.start[key]);
-            //console.log(perms)
+            debug == 2 && console.log("Area "+key + " start: "+start[key] + " now: "+situation[key]);
+            pp({}, perms, mf, start[key], start[key] - situation[key]);
+            debug == 2 && console.log(perms)
             areaPerms[key] = perms;
         },this);
         
         var mutch = {};
-        _.each(this.neighbours, function(nn, k) {
+        _.each(this.neighbours, function(nghbrs, k) {
+            debug == 2 && console.log("Check combination for "+k+" neighbours "+require('util').inspect(nghbrs))
             var findMatch = function (cur, matches, ngh, count) {
                 if (_.size(ngh) == 0)
                 {
+                    debug == 2 && console.log("comb  : "+require('util').inspect(cur));
+                    debug == 2 && console.log("count : "+count+ " "+ (count == situation[k] ? "ok" : ""))
                     if (count == situation[k])
                         matches.push(_.clone(cur));
                     return;
@@ -219,14 +207,15 @@ TribeMover.prototype = {
             };
         
             var mat = [];
-            findMatch({}, mat, nn, 0);
+            findMatch({}, mat, nghbrs, 0);
             mutch[k] = mat;
-        },this);
-        //console.log('matches')
+        });
+        
+        //debug && console.log(require('util').inspect(mutch, true, 10));
+        
         _.each(situation, function(sit, key) {
-            //console.log("Area "+key+" should have "+sit)
-            //console.log("mutchi "+key)
-            console.log(require("util").inspect(mutch[key], true, 10)) ;
+            debug == 2 && console.log("Area "+key+" should have "+sit)
+            debug == 2 && console.log(require("util").inspect(mutch[key], true, 10)) ;
             _.each(this.neighbours[key], function(nnn) {
                 var allowed = _.map(mutch[key], function(gee) {return gee[nnn];});
                 //console.log("Area "+key+" allows "+nnn+":")
@@ -235,68 +224,18 @@ TribeMover.prototype = {
             },this);
         },this);
         
-        console.log("FINAL PERMS")
+        debug && console.log("FINAL PERMS")
         _.each(areaPerms, function(perm, key) {
-            console.log(key)
-            console.log(perm)
+            debug && console.log(key+ " "+ require('util').inspect(perm));
             if (_.size(perm) == 0)
-                byland.push([key, 2]);
-        });
+                fail();
+        },this);
         
-        console.log('curr - delta Sum')
-        console.log(_.reduce(_.values(delta).concat(_.values(nghDelta)), function(memo, n) { return memo+n; }, 0))
-        console.log('curr - ngh')
-        console.log(ngh)
-        //console.log('curr - nghSea')
-        //console.log(nghSea)
-        console.log(sum(this.start) + " != " + sum(situation))
-        console.log('byland')
-        console.log(byland)
-        console.log('bysea')
-        console.log(bysea)
-        console.log('--XOMP--')
-        // If sea movement is forbidden, don't allow bysea
-        if (this.seaCost == -1) bysea.push(-1);
-        
-        var valid = {
-            ok: byland.length == 0 || bysea.length == 0,
-            target: situation,
-            initial: this.start,
-        };
-        
-        // If movement is free, don't calculate the cost areas
-        if (valid.ok && this.seaCost >= 1 && bysea.length == 0 && byland.length != 0)
-        {
-            valid.reduce = [];
-            var bl = {};
-            _.each(byland, function(b) {
-                var id = b[0];
-                bl[id] = bl[id] ? bl[id] : { id: parseInt(id), relevance: b[1], count: 0};
-                bl[id].count++;
-                bl[id].relevance = Math.max(bl[id].relevance, b[1]);
-            });
-            var find = _.sortBy(_.values(bl), function(b) { return b.count+b.relevance*5; });
-            var maxrelevance = -2;
-            var ind = {};
-            var ii = -1;
-            while (f = find.pop())
-            {
-                if (situation[f.id] > 0)
-                {
-                    if (f.relevance < maxrelevance)
-                        continue;
-                    var i = _.find(ind, function(val, key) {
-                        return _.contains(this.map[key].neighbours, f.id);
-                    }, this);
-                    if (i === undefined || i < 0) {
-                        i = ++ii;
-                        valid.reduce[i] = [];
-                    }
-                    ind[f.id] = i;
-                    valid.reduce[i].push(f.id); 
-                    maxrelevance = Math.max(f.relevance, maxrelevance);
-                }
-            }
+        if (debug) {
+        console.log("MOVE READY")
+        console.log(this.start)
+        console.log(situation)
+        console.log(valid.ok)
         }
         return valid;
     },

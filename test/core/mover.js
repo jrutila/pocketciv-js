@@ -304,6 +304,24 @@ describe('TribeMover', function() {
             mover.init({ 1: 2, 2: 0, 3: 0, 4: 2, 5: 2 });
             mover.ok(  { 1: 1, 2: 2, 3: 1, 4: 0, 5: 2 }).ok.should.be.false;
         });
+        describe('with island', function() {
+            beforeEach(function() {
+                map[8] = { id: 8, neighbours: [ 7, 'sea' ] };
+                map[7] = { id: 7, neighbours: [ 8, 'sea' ] };
+                map[5].neighbours.push('sea');
+                mover = new pocketciv.TribeMover(map, 1);
+            });
+            it('move in the mainland', function() {
+                mover.init({ 1: 2, 2: 0, 3: 0, 4: 2, 5: 2, 7: 0, 8: 0 });
+                mover.ok(  { 1: 1, 2: 2, 3: 0, 4: 1, 5: 2, 7: 0, 8: 0 }).ok.should.be.true;
+                mover.ok(  { 1: 1, 2: 2, 3: 1, 4: 0, 5: 2, 7: 0, 8: 0 }).ok.should.be.false;
+            });
+            it('move in island', function() {
+                mover.init({ 1: 2, 2: 0, 3: 0, 4: 2, 5: 2, 7: 1, 8: 0 });
+                //mover.ok(  { 1: 1, 2: 2, 3: 0, 4: 1, 5: 2, 7: 0, 8: 1 }).ok.should.be.true;
+                mover.ok(  { 1: 1, 2: 2, 3: 0, 4: 2, 5: 2, 7: 0, 8: 0 }).ok.should.be.false;
+            });
+        });
     })
     describe('scenario 12', function() {
         beforeEach(function() {
