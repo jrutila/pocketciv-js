@@ -165,20 +165,23 @@ describe.only('TribeMover', function() {
                 mover.init({ 1: 0, 2: 3, 3: 0, 4: 3, 5: 0, 6: 0, 7: 0 });
                 mover.ok(  { 1: 0, 2: 5, 3: 0, 4: 1, 5: 0, 6: 0, 7: 0 }).ok.should.be.false;
             });
-            
             it('changes by max', function() {
                 mover.init({ 1: 0, 2: 3, 3: 0, 4: 3, 5: 0, 6: 0, 7: 0 });
-                mover.ok(  { 1: 5, 2: 0, 3: 0, 4: 1, 5: 0, 6: 0, 7: 0 }).reduce
-                    .should.deep.equal([[1]]);
-                mover.ok(  { 1: 0, 2: 0, 3: 6, 4: 0, 5: 0, 6: 0, 7: 0 }).reduce
-                    .should.deep.equal([[3]]);
+                var ok =
+                mover.ok(  { 1: 6, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0 });
+                ok.ok.should.be.true;
+                ok.cost.should.deep.equal([
+                        { 1: 1 }
+                        ]);
             });
-            it('changes by rel 0', function() {
+            it.only('changes by rel 0', function() {
                 mover.init({ 1: 3, 2: 3, 3: 0, 4: 3, 5: 0, 6: 0, 7: 0 });
-                mover.ok(  { 1: 2, 2: 3, 3: 2, 4: 2, 5: 0, 6: 0, 7: 0 }).reduce
-                    .should.deep.equal([[4,3]]);
-                mover.ok(  { 1: 2, 2: 3, 3: 0, 4: 2, 5: 0, 6: 2, 7: 0 }).reduce
-                    .should.deep.equal([[6,4]]);
+                var ok =
+                mover.ok(  { 1: 2, 2: 3, 3: 2, 4: 2, 5: 0, 6: 0, 7: 0 });
+                ok.ok.should.be.true;
+                ok.cost.should.deep.equal([
+                    { 4: 1 }, { 3: 1 }
+                ])
             });
         });
         describe('complex1', function() {
@@ -200,17 +203,21 @@ describe.only('TribeMover', function() {
             });
             it('case 1', function() {
                 mover.init({ 1: 2, 2: 5, 3: 0, 4: 0, 5: 0, 6: 0 });
-                mover.ok(  { 1: 0, 2: 3, 3: 2, 4: 0, 5: 0, 6: 2 }).ok.should.be.true;
-                mover.ok(  { 1: 0, 2: 3, 3: 2, 4: 0, 5: 0, 6: 2 }).reduce
-                    .should.deep.equal([[6],[3]]);
-                mover.ok(  { 1: 0, 2: 3, 3: 2, 4: 0, 5: 2, 6: 0 }).reduce
-                    .should.deep.equal([[5],[3]]);
+                var ok =
+                mover.ok(  { 1: 0, 2: 3, 3: 2, 4: 0, 5: 0, 6: 2 });
+                ok.ok.should.be.true;
+                ok.cost.should.deep.equal([ { 3: 1, 6: 1 }]);
+                mover.ok(  { 1: 0, 2: 3, 3: 2, 4: 0, 5: 2, 6: 0 })
+                 .cost.should.deep.equal([ { 5: 1, 3: 1 }]);
             });
-            it.skip('case neighbours because of move limit 1', function() {
+            it('case neighbours because of move limit 1', function() {
                 mover.init({ 1: 2, 2: 5, 3: 0, 4: 0, 5: 0, 6: 0 });
-                mover.ok(  { 1: 0, 2: 3, 3: 2, 4: 2, 5: 0, 6: 0 }).ok.should.be.true;
-                mover.ok(  { 1: 0, 2: 3, 3: 2, 4: 2, 5: 0, 6: 0 }).reduce
-                    .should.deep.equal([[4],[3]]);
+                var ok =
+                mover.ok(  { 1: 0, 2: 3, 3: 2, 4: 2, 5: 0, 6: 0 });
+                ok.ok.should.be.true;
+                ok.cost.should.deep.equal([
+                    { 4: 1, 3: 1 }
+                    ]);
             });
         });
     });
@@ -251,6 +258,13 @@ describe.only('TribeMover', function() {
     });
     describe('scenario 2', function() {
         beforeEach(function() {
+            /*     8 --- 4 -----
+              f  / |     |
+                /  6     |
+                | /  \  /
+                5 --- 3
+               /             sea
+            **/
             map = {
             "3": { "id": 3, "tribes": 1, "farm": true, "neighbours": [ 4, 5, 6, 8, 'sea'], },
             "4": { "id": 4, "tribes": 1, "mountain": true, "forest": true, "farm": true, "neighbours": [ 3, 8, 'sea', 'frontier'] },
@@ -262,27 +276,28 @@ describe.only('TribeMover', function() {
         it('over the sea?', function() {
             mover = new pocketciv.TribeMover(map, 1);
             mover.init({ 3: 0, 4: 0, 5: 2, 8: 0 });
-            mover.ok({ 3: 0, 4: 2, 5: 0, 8: 0 }).ok.should.be.false;
+            mover.ok(  { 3: 0, 4: 2, 5: 0, 8: 0 }).ok.should.be.false;
         });
         it('over the sea!', function() {
             mover = new pocketciv.TribeMover(map, 1, 1);
             mover.init({ 3: 0, 4: 0, 5: 2, 8: 0 });
-            mover.ok({ 3: 0, 4: 2, 5: 0, 8: 0 }).reduce.should.deep.equal(
-                [[4]]
-                )
+            var ok =
+            mover.ok(  { 3: 0, 4: 2, 5: 0, 8: 0 });
+            ok.ok.should.be.true;
+            ok.cost.should.deep.equal([{4:1}])
         });
         it('free sailing', function() {
             mover = new pocketciv.TribeMover(map, 1, 0);
             mover.init({ 3: 0, 4: 0, 5: 2, 8: 0 });
             mover.ok({ 3: 0, 4: 2, 5: 0, 8: 0 }).ok.should.be.true;
-            expect(mover.ok({ 3: 0, 4: 2, 5: 0, 8: 0 }).reduce).to.be.undefined;
+            mover.ok({ 3: 0, 4: 2, 5: 0, 8: 0 }).cost.should.deep.equal([]);
         });
         it('bypassing', function() {
             mover = new pocketciv.TribeMover(map, 1, 1);
             mover.init(       { 3: 0, 4: 4, 5: 3, 6: 0, 8: 0 });
             var ok = mover.ok({ 3: 0, 4: 1, 5: 3, 6: 3, 8: 0 });
             ok.ok.should.be.true;
-            ok.reduce.should.deep.equal([[4]]);
+            ok.cost.should.deep.equal([{5:1}]);
         });
     });
     describe('central point', function() {

@@ -51,19 +51,30 @@ function TribeMover(map, moveLimit, seaCost) {
     }, this);
     
     if (seaCost > -1)
+    {
+        this.landNeighbours = _.clone(this.neighbours);
         this.neighbours = this.neighboursSea;
+    }
     
     // First level neighbours with moveLimit
     for (var m = 1; m < moveLimit; m++)
     {
         var nextFirst = {};
+        var landish = {};
         _.each(this.neighbours, function(ngh, ak) {
             nextFirst[ak] = _mergeNgh(ngh, this.neighbours, ak);
         },this);
         _.each(this.neighbours, function(ngh, ak) {
             this.neighbours[ak] = nextFirst[ak];
         },this);
+        _.each(this.landNeighbours, function(ngh, ak) {
+            landish[ak] = _mergeNgh(ngh, this.landNeighbours, ak);
+        },this);
+        _.each(this.landNeighbours, function(ngh, ak) {
+            this.landNeighbours[ak] = landish[ak];
+        },this);
     }
+    
     // Second level neighbours
     _.each(this.neighbours, function(ngh, ak) {
         this.neighbours2[ak] = _mergeNgh(ngh, this.neighbours, ak);
@@ -103,17 +114,29 @@ function pp(cur, perms, maxMoves, max, min, count) {
 
 
 TribeMover.prototype = {
-    init: function(start) {
-        this.start = start;
-        this.max = this._nghValue(start, this.neighbours);
-        this.ngh2 = this._nghValue(start, this.neighbours2);
+    init: function(strt) {
+        this.start = strt;
+        this.handleMissing(this.start, this.neighbours);
+        this.max = this._nghValue(this.start, this.neighbours);
+        this.ngh2 = this._nghValue(this.start, this.neighbours2);
+    },
+    handleMissing: function(situation, neighbours) {
+        if (_.size(situation) != _.size(this.neighbours))
+        {
+            _.each(this.neighbours, function(nn, area) {
+                if (!_.has(situation, area))
+                    situation[area] = 0;
+            },this);
+        }
     },
     ok: function(situation, fail, cost) {
-        var debug = 1;
+        this.handleMissing(situation, this.neighbours);
+        var debug = 0;
         var valid = {
             ok: true,
             target: situation,
             initial: this.start,
+            cost: [],
         };
         if (this.moveLimit == -1) return valid;
         if (_.isEqual(this.start, situation)) return valid;
@@ -239,24 +262,99 @@ TribeMover.prototype = {
         console.log(this.start)
         console.log(situation)
         console.log(valid.ok)
+        console.log(require('util').inspect(valid.cost, true, 10))
         }
+        
+        // Determine cost
+        debug && console.log(this.landNeighbours)
+        
+        var seaCost = this.seaCost;
+        var landNeighbours = this.landNeighbours;
+        var calcCost = function(curr) {
+            var sit = _.clone(start);
+            var cost = {};
+            _.each(curr, function(p, from) {
+                _.each(p, function(val, to) {
+                    sit[from] -= val;
+                    sit[to] += val;
+                    if (val > 0 && !_.contains(landNeighbours[from], parseInt(to)))
+                        cost[to] = (cost[to] || 0) + seaCost;
+                })
+            })
+            if (!_.isEqual(sit, situation))
+                return false;
+            return cost;
+        };
+        
+        // Determine costs
+        var totalCost = 10;
+        var findCost = function(costs, curr, perms) {
+            if (_.size(perms) == 0)
+            {
+                var cost = calcCost(curr);
+                if (cost) 
+                {
+                    var total = _.reduce(_.values(cost), function(memo, n) {return memo+n;}, 0);
+                    if (total <= totalCost && !_.some(costs, function(c) { return _.isEqual(c, cost); }))
+                    {
+                        debug == 2 && console.log(require('util').inspect(curr));
+                        debug == 2 && console.log("cost : "+require('util').inspect(cost));
+                        if (total < totalCost) costs.splice(0, costs.length);
+                        totalCost = total;
+                        costs.push(cost);
+                    }
+                }
+                else
+                    return true;
+                return;
+            }
+            
+            var key = _.keys(perms)[0];
+            
+            _.each(perms[key], function(p) {
+                curr[key] = p;
+                if (findCost(costs, curr, _.omit(perms,key)))
+                    return true;
+            });
+        };
+        if (this.seaCost > 0)
+        {
+            var costs = [];
+            debug && console.log("seacost: "+this.seaCost)
+            findCost(costs, {}, areaPerms);
+            debug && console.log(require("util").inspect(costs, true, 10))
+            valid.cost = costs;
+        }
+        /*
+        _.each(areaPerms, function(perm, key) {
+        });
+            _.each(perm, function(c) {
+                _.each(c, function(amnt, area) {
+                    if (amnt > 0 &&
+                        !_.contains(this.landNeighbours[key], parseInt(area)))
+                    {
+                        var ccs = {};
+                        ccs[area] = Math.min(ccs[area] || 9, this.seaCost);
+                        valid.cost.push(ccs);
+                    }
+                },this);
+            },this);
+            */
+        
         return valid;
     },
-    _nghValue: function(situation, neighbours) {
+    _nghValue: function(sit, neighbours) {
         var nghVal = {};
-        for (var key in situation)
-        {
-            var ngh = neighbours[key];
-            nghVal[key] = situation[key];
-            _.each(ngh, function(n) {
-                nghVal[key] += situation[n];
-            }, this);
-        }
+        _.each(sit, function(val, key) {
+            nghVal[key] = _.reduce(neighbours[key], function(memo, n) {
+                return memo + sit[n];
+            },val);
+        },this);
         return nghVal;
     },
-    changes: function(situation) {
+    changes: function(sit) {
         var nets = {};
-        _.each(situation, function(s, k) {
+        _.each(sit, function(s, k) {
             nets[k] = s - this.start[k];
         }, this);
         console.log(nets);
