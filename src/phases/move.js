@@ -304,11 +304,14 @@ TribeMover.prototype = {
                             debug == 2 && console.log("cost : "+require('util').inspect(cost));
                             if (total < totalCost) costs.splice(0, costs.length);
                             totalCost = total;
-                            costs.push(cost);
+                            if (_.size(cost))
+                                costs.push(cost);
                         }
                     }
                     else
+                    {
                         return true;
+                    }
                     return;
                 }
                 

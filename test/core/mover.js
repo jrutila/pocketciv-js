@@ -304,6 +304,15 @@ describe('TribeMover', function() {
             ok.ok.should.be.true;
             ok.cost.should.deep.equal([{5:1}]);
         });
+        it('simple case', function() {
+            mover = new pocketciv.TribeMover(map, 1, 1);
+            mover.init({ 3: 0, 4: 2, 5: 2, 8: 0 });
+            var ok =
+            mover.ok(  { 3: 1, 4: 1, 5: 2, 8: 0 });
+            ok.ok.should.be.true;
+            ok.cost.should.deep.equal([])
+            
+        });
     });
     describe('central point', function() {
         beforeEach(function() {
