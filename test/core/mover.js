@@ -348,7 +348,7 @@ describe('TribeMover', function() {
             ok.ok.should.be.true;
             ok.cost.should.deep.equal([{2:1}]);
         });
-        it.only('slow case', function() {
+        it('slow case', function() {
             mover = new pocketciv.TribeMover(map, 1, 1);
             mover.init({ 1: 2, 2: 3, 5: 2, 6: 2, 3: 2, 4: 3 });
             mover.ok(  { 1: 3, 2: 3, 5: 2, 6: 1, 3: 2, 4: 3 }).ok.should.be.true;
@@ -404,7 +404,30 @@ describe('TribeMover', function() {
                 mover.ok(  { 1: 1, 2: 2, 3: 0, 4: 2, 5: 2, 7: 0, 8: 0 }).ok.should.be.false;
             });
         });
-    })
+    });
+    describe('neighborhood', function() {
+        beforeEach(function() {
+            /*
+         6 - 2       5 - 7
+             | \   / | /
+             3 - 4 - 1
+            */
+            map = {
+             "1": { "id":  1, "neighbours": [ 4, 5, 7 ] },
+             "2": { "id":  2, "neighbours": [ 3, 4, 6 ] },
+             "3": { "id":  3, "neighbours": [ 2, 4 ] },
+             "4": { "id":  4, "neighbours": [ 1, 2, 3, 5 ] },
+             "5": { "id":  5, "neighbours": [ 1, 4, 7 ] },
+             "6": { "id":  6, "neighbours": [ 2 ] },
+             "7": { "id":  7, "neighbours": [ 1, 5 ] },
+            }
+        });
+        it.only('is fine', function() {
+            mover = new pocketciv.TribeMover(map, 1);
+            mover.init({ 1: 2, 2: 0, 3: 0, 4: 2, 5: 2 });
+            mover.ok(  { 1: 1, 2: 2, 3: 0, 4: 1, 5: 2 }).ok.should.be.true;
+        });
+    });
     describe('scenario 12', function() {
         beforeEach(function() {
             /*

@@ -59,26 +59,64 @@ function TribeMover(map, moveLimit, seaCost) {
     // First level neighbours with moveLimit
     for (var m = 1; m < moveLimit; m++)
     {
-        var nextFirst = {};
-        var landish = {};
-        _.each(this.neighbours, function(ngh, ak) {
-            nextFirst[ak] = _mergeNgh(ngh, this.neighbours, ak);
+        var neigh = _.clone(this.neighbours);
+        
+        _.each(neigh, function(ngh, ak) {
+            _.each(ngh, function(n) {
+                this.neighbours[ak] = _.union(this.neighbours[ak], this.map[n].neighbours)
+            },this);
+            this.neighbours[ak] = _.without(this.neighbours[ak], parseInt(ak));
         },this);
-        _.each(this.neighbours, function(ngh, ak) {
-            this.neighbours[ak] = nextFirst[ak];
-        },this);
-        _.each(this.landNeighbours, function(ngh, ak) {
-            landish[ak] = _mergeNgh(ngh, this.landNeighbours, ak);
-        },this);
+        /*
         _.each(this.landNeighbours, function(ngh, ak) {
             this.landNeighbours[ak] = landish[ak];
         },this);
+        */
     }
     
     // Second level neighbours
     _.each(this.neighbours, function(ngh, ak) {
         this.neighbours2[ak] = _mergeNgh(ngh, this.neighbours, ak);
     },this)
+    
+    // Neighborhoods
+    var hoods = [];
+    var hq = [];
+    _.each(this.neighbours, function(ngh, ak) {
+        var hods = [];
+        _.each(ngh, function(n) {
+            var nngh = _.intersection(this.neighbours[n], ngh);
+            var h = _.uniq(_.union([parseInt(ak), n], nngh));
+            hods.push(h.sort())
+        },this);
+        hoods = _.union(hoods, hods);
+    },this);
+    var final = [];
+    _.each(_.uniq(hoods, false, function(h) { return h.toString() }), function(hood) {
+        if (_.every(hood, function(h) {
+            var hodo = _.union([h], this.neighbours[h]);
+            return _.isEqual(_.intersection(hodo, hood).sort(), hood);
+        },this))
+            final.push(hood);
+    },this);
+    var fenal = {};
+    _.each(final, function(h) {
+        var hodo = { start: 0, areas: h, neighbours: [] };
+        _.each(final, function(f) {
+            if (f != h)
+            {
+                if (_.size(_.intersection(f,h)) > 0)
+                {
+                    hodo.neighbours.push(f);
+                }
+            }
+        })
+        fenal[h] = hodo;
+    },this);
+    _.each(fenal, function(h) {
+        h.neighbours = _.map(h.neighbours, function(f) { return fenal[f]; });
+    });
+    this.hoods = _.values(fenal);
 }
 
 function sum(arr) {
@@ -119,6 +157,14 @@ TribeMover.prototype = {
         this.handleMissing(this.start, this.neighbours);
         this.max = this._nghValue(this.start, this.neighbours);
         this.ngh2 = this._nghValue(this.start, this.neighbours2);
+        this.setHood("start", strt);
+    },
+    setHood: function(prop, sit) {
+        _.each(this.hoods, function(hood) {
+            hood[prop] = _.reduce(hood.areas, function(memo, a) {
+                return memo+sit[a];
+            }, 0,this);
+        },this);
     },
     handleMissing: function(situation, neighbours) {
         if (_.size(situation) != _.size(this.neighbours))
@@ -131,13 +177,16 @@ TribeMover.prototype = {
     },
     ok: function(situation, fail, costFunc) {
         this.handleMissing(situation, this.neighbours);
-        var debug = 1;
+        var debug = 0;
         var valid = {
             ok: true,
             target: situation,
             initial: this.start,
             cost: [],
         };
+        this.setHood("end", situation);
+        console.log(this.hoods)
+        
         if (this.moveLimit == -1) return valid;
         if (_.isEqual(this.start, situation)) return valid;
         fail = fail || function() {
@@ -196,6 +245,9 @@ TribeMover.prototype = {
                 fail();
             }
         }
+        
+        debug && console.log("NEIGHBORHOODS");
+        
         debug && console.log("AREA PERMS");
         var areaPerms = {};
         _.each(moveFrom, function(mf, key) {
