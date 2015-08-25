@@ -185,7 +185,41 @@ TribeMover.prototype = {
             cost: [],
         };
         this.setHood("end", situation);
-        console.log(this.hoods)
+        
+        var start = this.start;
+        _.each(this.hoods, function(hood) {
+            console.log("n - "+hood.areas)
+            _.each(hood.neighbours, function(nghood, key) {
+                console.log(" - "+nghood.areas)
+                var common = _.intersection(hood.areas, nghood.areas);
+                var my = _.difference(hood.areas, common);
+                var foreign = _.difference(nghood.areas, common);
+                console.log(my +" - "+common+" - "+foreign)
+                var calc = function(xx) {
+                    return function(memo, key) {
+                        return memo + xx[key];
+                    };
+                };
+                var st = [
+                    _.reduce(my, calc(start), 0),
+                    _.reduce(common, calc(start), 0),
+                    _.reduce(foreign, calc(start), 0)
+                    ];
+                console.log(st)
+                var en = [
+                    _.reduce(my, calc(situation), 0),
+                    _.reduce(common, calc(situation), 0),
+                    _.reduce(foreign, calc(situation), 0)
+                    ];
+                console.log(en)
+                hood.neighbours[key] = {
+                    start: st,
+                    end: en,
+                    hood: nghood
+                };
+            });
+        });
+        console.log(require('util').inspect(this.hoods, true, 5));
         
         if (this.moveLimit == -1) return valid;
         if (_.isEqual(this.start, situation)) return valid;

@@ -422,10 +422,11 @@ describe('TribeMover', function() {
              "7": { "id":  7, "neighbours": [ 1, 5 ] },
             }
         });
-        it.only('is fine', function() {
+        it.only('is fail', function() {
             mover = new pocketciv.TribeMover(map, 1);
             mover.init({ 1: 2, 2: 0, 3: 0, 4: 2, 5: 2 });
             mover.ok(  { 1: 1, 2: 2, 3: 0, 4: 1, 5: 2 }).ok.should.be.true;
+            //mover.ok(  { 1: 1, 2: 2, 3: 1, 4: 0, 5: 2 }).ok.should.be.false;
         });
     });
     describe('scenario 12', function() {
