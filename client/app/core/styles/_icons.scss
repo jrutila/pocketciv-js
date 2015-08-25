@@ -5,9 +5,15 @@
     display: inline-block;
 }
 
-.icon.tribes, .icon.city, .icon.counter {
+.icon.tribes, .icon.city, .icon.counter, .icon.seacost {
     text-indent: 0px;
     padding-top: 6px;
+}
+
+.seacost {
+    font-weight: bold;
+    color: lightblue;
+    font-size: 28px;
 }
 
 .icon[data-val='false'] {

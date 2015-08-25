@@ -131,7 +131,7 @@ TribeMover.prototype = {
     },
     ok: function(situation, fail, costFunc) {
         this.handleMissing(situation, this.neighbours);
-        var debug = 0;
+        var debug = 1;
         var valid = {
             ok: true,
             target: situation,
@@ -254,7 +254,7 @@ TribeMover.prototype = {
         debug && console.log("FINAL PERMS")
         _.each(areaPerms, function(perm, key) {
             debug && console.log(key+ " "+ require('util').inspect(perm));
-            if (_.size(perm) == 0)
+            if (_.size(perm) == 0 && _.size(this.neighbours[key]) > 0)
                 fail();
         },this);
         
@@ -358,21 +358,24 @@ module.exports = {
         this.mover(this.map.areas, function(ok) {
             ctx.target(_.mapObject(ok.target, function(t) { return {tribes: t }}));
             
-            if (ok.reduce) {
+            if (ok.cost) {
                 console.log("Used SEA, must pay tribes!")
+                
                 var initial = {};
                 _.each(ctx.initial, function(area, ak) {
-                    ak = parseInt(ak);
-                    if (_.contains(_.flatten(ok.reduce), ak))
+                    if (_.any(ok.cost, function(c) { return _.has(c, ak ); }))
                         initial[ak] = { tribes: ok.target[ak] };
                 });
+                
                 var opts = {
                     map: this.map.areas,
                     initial: initial,
                     shows: ['tribes'],
                     edits: ['tribes'],
                     original: ok.reduce,
-                    amount: ok.reduce.length*engine.params.sea_cost,
+                    amount: _.reduce(ok.cost[0], function(memo, n) {
+                        return memo + n;
+                    }, 0),
                     reduce: function(key, chg) {
                         var rTrb = this.initial[key].tribes - chg.tribes;
                         this.amount -= rTrb;

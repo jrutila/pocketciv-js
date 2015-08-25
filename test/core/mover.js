@@ -314,6 +314,47 @@ describe('TribeMover', function() {
             
         });
     });
+    describe('scenario 7', function() {
+        beforeEach(function() {
+            /*    1 f 2
+            
+                   sea
+            
+             7 - 5 - 6 - 3 - 4 
+                      \ /
+                       8
+            */
+            map = {
+            "1": { "id": 1, "forest": true, "volcano": true, "neighbours": [ 'sea', 'frontier' ], },
+            "2": { "id": 2, "forest": true, "mountain": true, "neighbours": [ 'sea', 'frontier' ], },
+            "3": { "id": 3, "mountain": true, "neighbours": [ 4, 6, 8, 'sea', 'frontier'], },
+            "4": { "id": 4, "forest": true, "neighbours": [ 3, 'sea', 'frontier'] },
+            "5": { "id": 5, "desert": true, "neighbours": [ 6, 7, 'sea', 'frontier'] },
+            "6": { "id": 6, "forest": true, "neighbours": [ 3, 5, 8, 'sea', 'frontier'], },
+            "7": { "id": 7, "forest": true, "neighbours": [ 5, 'sea', 'frontier' ] },
+            "8": { "id": 8, "desert": true, "mountain": true, "tribes": 3, "neighbours": [ 3, 6, 'frontier' ] },
+            }
+        });
+        it('case 1', function() {
+            mover = new pocketciv.TribeMover(map, 1);
+            mover.init({ 8: 4 });
+            mover.ok(  { 8: 3, 3: 1 }).ok.should.be.true;
+        });
+        it('case 2', function() {
+            mover = new pocketciv.TribeMover(map, 1, 1);
+            mover.init({ 1: 2 });
+            var ok =
+            mover.ok(  { 2: 2 });
+            ok.ok.should.be.true;
+            ok.cost.should.deep.equal([{2:1}]);
+        });
+        it.only('slow case', function() {
+            mover = new pocketciv.TribeMover(map, 1, 1);
+            mover.init({ 1: 2, 2: 3, 5: 2, 6: 2, 3: 2, 4: 3 });
+            mover.ok(  { 1: 3, 2: 3, 5: 2, 6: 1, 3: 2, 4: 3 }).ok.should.be.true;
+            
+        });
+    });
     describe('central point', function() {
         beforeEach(function() {
             /*

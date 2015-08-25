@@ -111,6 +111,7 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
             $scope.engine.map.areas,
             $scope.engine.params.moveLimit,
             $scope.engine.params.sea_move ? $scope.engine.params.sea_cost : undefined);
+            
         mover.init(getMovement($scope.engine.map.areas));
         var ok = mover.ok($scope.movement);
         if (ok.ok)
@@ -146,11 +147,21 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
             $scope.movement[moveFrom]--;
             $scope.movement[region]++;
             var ok = $scope.mover.ok($scope.movement);
-            $scope.mapTitle = "MOVE "+(ok.reduce || "");
+            $scope.mapTitle = "MOVE "+(ok.cost || "");
             if (ok.ok)
             {
                 drawElem("tribes", region, $scope.movement[region]);
                 drawElem("tribes", moveFrom, $scope.movement[moveFrom]);
+                
+                _.each(ok.target, function(t, reg) {
+                    drawElem("seacost", reg, false);
+                });
+                if (ok.cost)
+                {
+                    _.each(ok.cost[0], function(c, reg) {
+                        drawElem("seacost", reg, -1*c);
+                    })
+                }
                 moveFrom = 0;
                 clearRegions();
             } else {
