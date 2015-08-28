@@ -3,7 +3,7 @@ var expect = require('chai').expect;
 var pocketciv = require('../../src/core/pocketciv');
 var event = require('../../src/core/event');
 
-describe('TribeMover', function() {
+describe.only('TribeMover', function() {
     describe('simple', function() {
         beforeEach(function() {
             // 1 - 2 - 3
@@ -422,11 +422,38 @@ describe('TribeMover', function() {
              "7": { "id":  7, "neighbours": [ 1, 5 ] },
             }
         });
-        it.only('is fail', function() {
+        it('is fail', function() {
             mover = new pocketciv.TribeMover(map, 1);
             mover.init({ 1: 2, 2: 0, 3: 0, 4: 2, 5: 2 });
             mover.ok(  { 1: 1, 2: 2, 3: 0, 4: 1, 5: 2 }).ok.should.be.true;
             //mover.ok(  { 1: 1, 2: 2, 3: 1, 4: 0, 5: 2 }).ok.should.be.false;
+        });
+    });
+    describe('neighborhood2', function() {
+        beforeEach(function() {
+            /*
+                7
+                |
+                2       5
+              /   \   /
+            1   |   4   |
+              \   /   \
+                3       6
+            */
+            map = {
+             "1": { "id":  1, "neighbours": [ 2, 3 ] },
+             "2": { "id":  2, "neighbours": [ 1, 3, 4, 7 ] },
+             "3": { "id":  3, "neighbours": [ 1, 2, 4 ] },
+             "4": { "id":  4, "neighbours": [ 2, 3, 5, 6 ] },
+             "5": { "id":  5, "neighbours": [ 4, 6 ] },
+             "6": { "id":  6, "neighbours": [ 4, 5 ] },
+             "7": { "id":  7, "neighbours": [ 2 ] },
+            }
+        });
+        it('is fail', function() {
+            mover = new pocketciv.TribeMover(map, 1);
+            mover.init({ 1: 2, 5: 2, 7: 2 });
+            mover.ok(  { 1: 2, 4: 2, 7: 2 }).ok.should.be.true;
         });
     });
     describe('scenario 12', function() {

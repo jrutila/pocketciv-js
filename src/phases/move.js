@@ -177,7 +177,8 @@ TribeMover.prototype = {
     },
     ok: function(situation, fail, costFunc) {
         this.handleMissing(situation, this.neighbours);
-        var debug = 0;
+        var debug = 2;
+        var no_perm_check = 1;
         var valid = {
             ok: true,
             target: situation,
@@ -185,41 +186,8 @@ TribeMover.prototype = {
             cost: [],
         };
         this.setHood("end", situation);
-        
         var start = this.start;
-        _.each(this.hoods, function(hood) {
-            console.log("n - "+hood.areas)
-            _.each(hood.neighbours, function(nghood, key) {
-                console.log(" - "+nghood.areas)
-                var common = _.intersection(hood.areas, nghood.areas);
-                var my = _.difference(hood.areas, common);
-                var foreign = _.difference(nghood.areas, common);
-                console.log(my +" - "+common+" - "+foreign)
-                var calc = function(xx) {
-                    return function(memo, key) {
-                        return memo + xx[key];
-                    };
-                };
-                var st = [
-                    _.reduce(my, calc(start), 0),
-                    _.reduce(common, calc(start), 0),
-                    _.reduce(foreign, calc(start), 0)
-                    ];
-                console.log(st)
-                var en = [
-                    _.reduce(my, calc(situation), 0),
-                    _.reduce(common, calc(situation), 0),
-                    _.reduce(foreign, calc(situation), 0)
-                    ];
-                console.log(en)
-                hood.neighbours[key] = {
-                    start: st,
-                    end: en,
-                    hood: nghood
-                };
-            });
-        });
-        console.log(require('util').inspect(this.hoods, true, 5));
+        
         
         if (this.moveLimit == -1) return valid;
         if (_.isEqual(this.start, situation)) return valid;
@@ -266,6 +234,7 @@ TribeMover.prototype = {
         console.log('--XOMP--')
         }
         
+        debug && console.log("BASIC CHECKS");
         for (var key in situation)
         {
             debug && console.log("check "+key)
@@ -280,7 +249,52 @@ TribeMover.prototype = {
             }
         }
         
-        debug && console.log("NEIGHBORHOODS");
+        debug && console.log("NEIGHBORHOOD CHECKS");
+        _.each(this.hoods, function(hood) {
+            debug == 2 && console.log("n - "+hood.areas)
+            _.each(hood.neighbours, function(nghood, key) {
+                debug == 2 && console.log(" - "+nghood.areas)
+                var common = _.intersection(hood.areas, nghood.areas);
+                var my = _.difference(hood.areas, common);
+                var foreign = _.difference(nghood.areas, common);
+                debug == 2 && console.log(my +" - "+common+" - "+foreign)
+                var calc = function(xx) {
+                    return function(memo, key) {
+                        return memo + xx[key];
+                    };
+                };
+                var st = [
+                    _.reduce(my, calc(start), 0),
+                    _.reduce(common, calc(start), 0),
+                    _.reduce(foreign, calc(start), 0)
+                    ];
+                debug == 2 && console.log(st)
+                var en = [
+                    _.reduce(my, calc(situation), 0),
+                    _.reduce(common, calc(situation), 0),
+                    _.reduce(foreign, calc(situation), 0)
+                    ];
+                debug == 2 && console.log(en)
+                hood.neighbours[key] = {
+                    start: st,
+                    end: en,
+                    hood: nghood
+                };
+                hood.common = _.union(hood.common || [], common);
+            });
+        });
+        debug && console.log(require('util').inspect(this.hoods, true, 5));
+        _.each(this.hoods, function(hood) {
+            debug && console.log("check "+hood.areas)
+            var hoodMaxOut = _.reduce(hood.common, function(memo, h) {
+                return memo + start[h]; // The amount of outer limit areas
+            },0);
+            debug == 2 && console.log(" hoodmax: "+hoodMaxOut);
+            if (hoodMaxOut < (hood.start - hood.end))
+                fail();
+        });
+        
+        if (no_perm_check) return valid;
         
         debug && console.log("AREA PERMS");
         var areaPerms = {};
