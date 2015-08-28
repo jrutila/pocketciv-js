@@ -3,7 +3,7 @@ var expect = require('chai').expect;
 var pocketciv = require('../../src/core/pocketciv');
 var event = require('../../src/core/event');
 
-describe.only('TribeMover', function() {
+describe('TribeMover', function() {
     describe('simple', function() {
         beforeEach(function() {
             // 1 - 2 - 3
@@ -132,8 +132,8 @@ describe.only('TribeMover', function() {
             mover.ok({ 1: 3, 2: 6, 3: 0, 4: 3, 5: 0 }).ok.should.be.false;
         });
     });
-    describe('across the sea', function() {
-        describe('basic', function() {
+    describe('sea cost', function() {
+        describe('complex1', function() {
             beforeEach(function() {
                 //       1 - 2
                 //         |     west
@@ -170,7 +170,7 @@ describe.only('TribeMover', function() {
                 mover.init({ 1: 0, 2: 3, 3: 0, 4: 3, 5: 0, 6: 0, 7: 0 });
                 mover.ok(  { 1: 0, 2: 5, 3: 0, 4: 1, 5: 0, 6: 0, 7: 0 }).ok.should.be.false;
             });
-            it('changes by max', function() {
+            it.only('changes by max', function() {
                 mover.init({ 1: 0, 2: 3, 3: 0, 4: 3, 5: 0, 6: 0, 7: 0 });
                 var ok =
                 mover.ok(  { 1: 6, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0 });
@@ -189,7 +189,7 @@ describe.only('TribeMover', function() {
                 ])
             });
         });
-        describe('complex1', function() {
+        describe('complex2', function() {
             beforeEach(function() {
                 //       1 - 2
                 //              
@@ -223,6 +223,100 @@ describe.only('TribeMover', function() {
                 ok.cost.should.deep.equal([
                     { 4: 1, 3: 1 }
                     ]);
+            });
+        });
+        describe('scenario 2', function() {
+            beforeEach(function() {
+                /*     8 --- 4 -----
+                  f  / |     |
+                    /  6     |
+                    | /  \  /
+                    5 --- 3
+                   /             sea
+                **/
+                map = {
+                "3": { "id": 3, "tribes": 1, "farm": true, "neighbours": [ 4, 5, 6, 8, 'sea'], },
+                "4": { "id": 4, "tribes": 1, "mountain": true, "forest": true, "farm": true, "neighbours": [ 3, 8, 'sea', 'frontier'] },
+                "5": { "id": 5, "tribes": 1, "mountain": true, "forest": true, "neighbours": [ 3, 6, 8, 'sea', 'frontier'], "mountain": true },
+                "6": { "id": 6, "tribes": 1, "neighbours": [ 3, 5, 8 ], "forest": true },
+                "8": { "id": 8, "neighbours": [ 3, 4, 5, 6, 'frontier'], "desert": true }
+                }
+            });
+            it('over the sea?', function() {
+                mover = new pocketciv.TribeMover(map, 1);
+                mover.init({ 3: 0, 4: 0, 5: 2, 8: 0 });
+                mover.ok(  { 3: 0, 4: 2, 5: 0, 8: 0 }).ok.should.be.false;
+            });
+            it('over the sea!', function() {
+                mover = new pocketciv.TribeMover(map, 1, 1);
+                mover.init({ 3: 0, 4: 0, 5: 2, 8: 0 });
+                var ok =
+                mover.ok(  { 3: 0, 4: 2, 5: 0, 8: 0 });
+                ok.ok.should.be.true;
+                ok.cost.should.deep.equal([{4:1}])
+            });
+            it('free sailing', function() {
+                mover = new pocketciv.TribeMover(map, 1, 0);
+                mover.init({ 3: 0, 4: 0, 5: 2, 8: 0 });
+                mover.ok({ 3: 0, 4: 2, 5: 0, 8: 0 }).ok.should.be.true;
+                mover.ok({ 3: 0, 4: 2, 5: 0, 8: 0 }).cost.should.deep.equal([]);
+            });
+            it('bypassing', function() {
+                mover = new pocketciv.TribeMover(map, 1, 1);
+                mover.init(       { 3: 0, 4: 4, 5: 3, 6: 0, 8: 0 });
+                var ok = mover.ok({ 3: 0, 4: 1, 5: 3, 6: 3, 8: 0 });
+                ok.ok.should.be.true;
+                ok.cost.should.deep.equal([{5:1}]);
+            });
+            it('simple case', function() {
+                mover = new pocketciv.TribeMover(map, 1, 1);
+                mover.init({ 3: 0, 4: 2, 5: 2, 8: 0 });
+                var ok =
+                mover.ok(  { 3: 1, 4: 1, 5: 2, 8: 0 });
+                ok.ok.should.be.true;
+                ok.cost.should.deep.equal([])
+                
+            });
+        });
+        describe('scenario 7', function() {
+            beforeEach(function() {
+                /*    1 f 2
+                
+                       sea
+                
+                 7 - 5 - 6 - 3 - 4 
+                          \ /
+                           8
+                */
+                map = {
+                "1": { "id": 1, "forest": true, "volcano": true, "neighbours": [ 'sea', 'frontier' ], },
+                "2": { "id": 2, "forest": true, "mountain": true, "neighbours": [ 'sea', 'frontier' ], },
+                "3": { "id": 3, "mountain": true, "neighbours": [ 4, 6, 8, 'sea', 'frontier'], },
+                "4": { "id": 4, "forest": true, "neighbours": [ 3, 'sea', 'frontier'] },
+                "5": { "id": 5, "desert": true, "neighbours": [ 6, 7, 'sea', 'frontier'] },
+                "6": { "id": 6, "forest": true, "neighbours": [ 3, 5, 8, 'sea', 'frontier'], },
+                "7": { "id": 7, "forest": true, "neighbours": [ 5, 'sea', 'frontier' ] },
+                "8": { "id": 8, "desert": true, "mountain": true, "tribes": 3, "neighbours": [ 3, 6, 'frontier' ] },
+                }
+            });
+            it('case 1', function() {
+                mover = new pocketciv.TribeMover(map, 1);
+                mover.init({ 8: 4 });
+                mover.ok(  { 8: 3, 3: 1 }).ok.should.be.true;
+            });
+            it('case 2', function() {
+                mover = new pocketciv.TribeMover(map, 1, 1);
+                mover.init({ 1: 2 });
+                var ok =
+                mover.ok(  { 2: 2 });
+                ok.ok.should.be.true;
+                ok.cost.should.deep.equal([{2:1}]);
+            });
+            it('slow case', function() {
+                mover = new pocketciv.TribeMover(map, 1, 1);
+                mover.init({ 1: 2, 2: 3, 5: 2, 6: 2, 3: 2, 4: 3 });
+                mover.ok(  { 1: 3, 2: 3, 5: 2, 6: 1, 3: 2, 4: 3 }).ok.should.be.true;
+                
             });
         });
     });
@@ -259,100 +353,6 @@ describe.only('TribeMover', function() {
             mover.ok({ 1: 0, 2: 0, 3: 0, 4: 0, 5: 2, 7: 2, 8: 0 }).ok.should.be.true;
             mover.ok({ 1: 0, 2: 1, 3: 0, 4: 0, 5: 1, 7: 1, 8: 1 }).ok.should.be.true;
             mover.ok({ 1: 0, 2: 0, 3: 1, 4: 0, 5: 1, 7: 1, 8: 1 }).ok.should.be.false;
-        });
-    });
-    describe('scenario 2', function() {
-        beforeEach(function() {
-            /*     8 --- 4 -----
-              f  / |     |
-                /  6     |
-                | /  \  /
-                5 --- 3
-               /             sea
-            **/
-            map = {
-            "3": { "id": 3, "tribes": 1, "farm": true, "neighbours": [ 4, 5, 6, 8, 'sea'], },
-            "4": { "id": 4, "tribes": 1, "mountain": true, "forest": true, "farm": true, "neighbours": [ 3, 8, 'sea', 'frontier'] },
-            "5": { "id": 5, "tribes": 1, "mountain": true, "forest": true, "neighbours": [ 3, 6, 8, 'sea', 'frontier'], "mountain": true },
-            "6": { "id": 6, "tribes": 1, "neighbours": [ 3, 5, 8 ], "forest": true },
-            "8": { "id": 8, "neighbours": [ 3, 4, 5, 6, 'frontier'], "desert": true }
-            }
-        });
-        it('over the sea?', function() {
-            mover = new pocketciv.TribeMover(map, 1);
-            mover.init({ 3: 0, 4: 0, 5: 2, 8: 0 });
-            mover.ok(  { 3: 0, 4: 2, 5: 0, 8: 0 }).ok.should.be.false;
-        });
-        it('over the sea!', function() {
-            mover = new pocketciv.TribeMover(map, 1, 1);
-            mover.init({ 3: 0, 4: 0, 5: 2, 8: 0 });
-            var ok =
-            mover.ok(  { 3: 0, 4: 2, 5: 0, 8: 0 });
-            ok.ok.should.be.true;
-            ok.cost.should.deep.equal([{4:1}])
-        });
-        it('free sailing', function() {
-            mover = new pocketciv.TribeMover(map, 1, 0);
-            mover.init({ 3: 0, 4: 0, 5: 2, 8: 0 });
-            mover.ok({ 3: 0, 4: 2, 5: 0, 8: 0 }).ok.should.be.true;
-            mover.ok({ 3: 0, 4: 2, 5: 0, 8: 0 }).cost.should.deep.equal([]);
-        });
-        it('bypassing', function() {
-            mover = new pocketciv.TribeMover(map, 1, 1);
-            mover.init(       { 3: 0, 4: 4, 5: 3, 6: 0, 8: 0 });
-            var ok = mover.ok({ 3: 0, 4: 1, 5: 3, 6: 3, 8: 0 });
-            ok.ok.should.be.true;
-            ok.cost.should.deep.equal([{5:1}]);
-        });
-        it('simple case', function() {
-            mover = new pocketciv.TribeMover(map, 1, 1);
-            mover.init({ 3: 0, 4: 2, 5: 2, 8: 0 });
-            var ok =
-            mover.ok(  { 3: 1, 4: 1, 5: 2, 8: 0 });
-            ok.ok.should.be.true;
-            ok.cost.should.deep.equal([])
-            
-        });
-    });
-    describe('scenario 7', function() {
-        beforeEach(function() {
-            /*    1 f 2
-            
-                   sea
-            
-             7 - 5 - 6 - 3 - 4 
-                      \ /
-                       8
-            */
-            map = {
-            "1": { "id": 1, "forest": true, "volcano": true, "neighbours": [ 'sea', 'frontier' ], },
-            "2": { "id": 2, "forest": true, "mountain": true, "neighbours": [ 'sea', 'frontier' ], },
-            "3": { "id": 3, "mountain": true, "neighbours": [ 4, 6, 8, 'sea', 'frontier'], },
-            "4": { "id": 4, "forest": true, "neighbours": [ 3, 'sea', 'frontier'] },
-            "5": { "id": 5, "desert": true, "neighbours": [ 6, 7, 'sea', 'frontier'] },
-            "6": { "id": 6, "forest": true, "neighbours": [ 3, 5, 8, 'sea', 'frontier'], },
-            "7": { "id": 7, "forest": true, "neighbours": [ 5, 'sea', 'frontier' ] },
-            "8": { "id": 8, "desert": true, "mountain": true, "tribes": 3, "neighbours": [ 3, 6, 'frontier' ] },
-            }
-        });
-        it('case 1', function() {
-            mover = new pocketciv.TribeMover(map, 1);
-            mover.init({ 8: 4 });
-            mover.ok(  { 8: 3, 3: 1 }).ok.should.be.true;
-        });
-        it('case 2', function() {
-            mover = new pocketciv.TribeMover(map, 1, 1);
-            mover.init({ 1: 2 });
-            var ok =
-            mover.ok(  { 2: 2 });
-            ok.ok.should.be.true;
-            ok.cost.should.deep.equal([{2:1}]);
-        });
-        it('slow case', function() {
-            mover = new pocketciv.TribeMover(map, 1, 1);
-            mover.init({ 1: 2, 2: 3, 5: 2, 6: 2, 3: 2, 4: 3 });
-            mover.ok(  { 1: 3, 2: 3, 5: 2, 6: 1, 3: 2, 4: 3 }).ok.should.be.true;
-            
         });
     });
     describe('central point', function() {
@@ -477,7 +477,7 @@ describe.only('TribeMover', function() {
         it('interesting thing', function() {
             mover = new pocketciv.TribeMover(map, 1);
             mover.init({ 1: 2, 2: 0, 3: 0, 4: 2, 5: 2, 8: 2 });
-            mover.ok({ 1: 2, 2: 2, 3: 1, 4: 0, 5: 1, 8: 2 }).ok.should.be.false;
+            mover.ok(  { 1: 2, 2: 2, 3: 1, 4: 0, 5: 1, 8: 2 }).ok.should.be.false;
         });
     });
     describe('simple with two steps', function() {

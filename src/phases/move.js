@@ -281,17 +281,50 @@ TribeMover.prototype = {
                     hood: nghood
                 };
                 hood.common = _.union(hood.common || [], common);
+                hood.foreign = _.union(hood.foreign || [], foreign);
             });
         });
         debug && console.log(require('util').inspect(this.hoods, true, 5));
         _.each(this.hoods, function(hood) {
             debug && console.log("check "+hood.areas)
-            var hoodMaxOut = _.reduce(hood.common, function(memo, h) {
-                return memo + start[h]; // The amount of outer limit areas
-            },0);
-            debug == 2 && console.log(" hoodmax: "+hoodMaxOut);
-            if (hoodMaxOut < (hood.start - hood.end))
-                fail();
+            var commonMax = 0; // The amount of outer limit areas
+            var commonCur = 0;
+            var foreignStart = 0;
+            var foreignCurr = 0;
+            
+            _.each(hood.common, function(h) {
+                commonMax += start[h];
+                commonCur += situation[h];
+            });
+            _.each(hood.foreign, function(f) {
+                foreignStart += start[f];
+                foreignCurr += situation[f];
+            });
+            
+            var delta = hood.end - hood.start;
+            debug == 2 && console.log(" commonMax: "+commonMax);
+            debug == 2 && console.log(" commonCur: "+commonCur);
+            debug == 2 && console.log(" foreignStart: "+foreignStart);
+            debug == 2 && console.log(" foreignCurr: "+foreignCurr);
+            debug == 2 && console.log(" delta: "+delta);
+            
+            // If there is more tribes in this hood
+            if (delta > 0)
+            {
+                // can't have more income than neighbour start amount
+                if (delta > foreignStart)
+                    fail();
+                // the added tribes should be on common areas
+                if (commonCur < delta)
+                    fail();
+            }
+            // If tribes are moved away from this hood
+            if (delta < 0)
+            {
+                // There is not enought tribes outside!
+                if (delta > foreignCurr)
+                    fail();
+            }
         });
         
         if (no_perm_check) return valid;
