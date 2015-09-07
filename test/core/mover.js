@@ -133,7 +133,7 @@ describe('TribeMover', function() {
         });
     });
     describe('sea cost', function() {
-        describe('basic', function() {
+        describe('basic1: over one sea', function() {
             beforeEach(function() {
                 //       1 - 2
                 //
@@ -197,7 +197,7 @@ describe('TribeMover', function() {
                 mover.ok(  { 1: 0, 2: 0, 3: 0, 4: 0, 5: 2, 6: 0 });
                 ok.ok.should.be.false;
             });
-            it.only('case 3: over two seas!', function() {
+            it('case 3: over two seas!', function() {
                 mover = new pocketciv.TribeMover(map, 2, 1);
                 mover.init({ 1: 3, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 });
                 var ok =
@@ -206,6 +206,31 @@ describe('TribeMover', function() {
                 ok.cost.should.deep.equal([ { 5: 2 } ]);
             });
         });
+        describe.only('basic3: no islands', function() {
+            beforeEach(function() {
+                // 1  sea   4
+                //  \      /
+                //   2  - 3
+                map = {
+                    1: { 'neighbours': [ 2, 'sea' ] },
+                    2: { 'neighbours': [ 1, 3, 'sea' ] },
+                    3: { 'neighbours': [ 4, 2, 'sea' ] },
+                    4: { 'neighbours': [ 3, 'sea' ] },
+                }
+                mover = new pocketciv.TribeMover(map, 1, 1);
+            });
+            it('case 1', function() {
+                mover.init({ 1: 2, 2: 0, 3: 0, 4: 0 });
+                var ok =
+                mover.ok(  { 1: 0, 2: 0, 3: 2, 4: 0 });
+                ok.ok.should.be.true;
+                ok.cost.should.deep.equal([ { 3: 1 } ]);
+            });
+        });
+        // TODO
+        // 1
+        // |  first    3 - 4   scnd    5 - 6 - 7
+        // 2
         describe('complex1', function() {
             beforeEach(function() {
                 //       1 - 2

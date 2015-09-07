@@ -104,6 +104,8 @@ function TribeMover(map, moveLimit, seaCost) {
     var fenal = {};
     _.each(final, function(h) {
         var hodo = { start: 0, areas: h, neighbours: [] };
+        if (thisseas)
+            hodo.seas = _.uniq(_.flatten(_.values(_.pick(thisseas, h))));
         _.each(final, function(f) {
             if (f != h)
             {
@@ -123,8 +125,9 @@ function TribeMover(map, moveLimit, seaCost) {
     };
     
     this.hoods = calcHoods(this.neighbours);
-    if (seaCost > -1)
+    if (seaCost > -1) {
         this.landHoods = calcHoods(this.landNeighbours, this.seas);
+    }
 }
 
 function sum(arr) {
@@ -345,7 +348,7 @@ TribeMover.prototype = {
             // If tribes are moved away from this hood
             if (delta < 0)
             {
-                // There is not enought tribes outside!
+                // There is not enough tribes outside!
                 if (delta > foreignCurr)
                     fail();
             }
@@ -356,23 +359,54 @@ TribeMover.prototype = {
         var costs = [];
         _.each(this.landHoods, function(hood) {
             debug && console.log("calc "+hood.areas)
+            // If the hood does not neighbour a sea, forget it
+            if (_.size(hood.seas) == 0)
+                return;
+                
+            // How many tribes has this hood taken or lost
             var delta = hood.end - hood.start;
             debug == 2 && console.log(" delta: "+delta);
+            
+            // If the hood has not gain tribes, forget it
+            if (delta <= 0)
+                return;
+            
             // If there is more tribes in this hood
-            // and there is no neighbours (on an island)
-            // they've must come by ship
+            // and there is no neighbours (on an island) with start tribes
+            // they must have come by ship
             if (delta > 0 && _.size(hood.neighbours) == 0)
             {
-                _.each(hood.areas, function(a) {
-                    if (situation[a] > start[a])
+                var steps = 1;
+                // Find out the steps to an original hood
+                _.each(hood.seas, function(sea) {
+                    if (!_.any(this.landHoods, function(h) {
+                        return _.contains(h.seas, sea) &&
+                               h.start > 0;
+                    }))
+                        steps = 2;
+                },this);
+                
+                var hd = delta;
+                var cost = {};
+                _.each(_.sortBy(hood.areas, function(a) {
+                        return -1 * (situation[a] - start[a]);
+                    }), function(a) {
+                    if (hd > 0 && situation[a] > 0)
                     {
-                        var cost = {};
-                        cost[a] = seaCost;
-                        costs.push(cost);
+                        cost[a] = seaCost*steps;
+                        hd -= situation[a];
+                        if (hd <= 0)
+                        {
+                            hd = delta;
+                            costs.push(cost);
+                            cost = {};
+                        }
                     }
                 });
+                if (_.size(cost) > 0)
+                    costs.push(cost);
             }
-        });
+        },this);
         valid.cost = costs;
             
         costFunc(valid.cost);
