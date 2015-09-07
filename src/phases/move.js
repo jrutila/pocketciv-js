@@ -27,12 +27,14 @@ function TribeMover(map, moveLimit, seaCost) {
     this.moveLimit = moveLimit;
     seaCost = seaCost === undefined ? -1 : seaCost;
     this.seaCost = seaCost;
+    this.seas = {};
     
     var seas = _.object(_.map(this.map, function(area, n) {
         // TODO: Should this use engine.isSeaNeighbour in some way?
         // Find the seas
         var ss = _.filter(area.neighbours, function (e) { return typeof e == "string" && e != 'frontier'; });
         var seangh = [];
+        this.seas[n] = ss;
         
         // Determine the sea neighbours
         for (var a in this.map)
@@ -59,19 +61,18 @@ function TribeMover(map, moveLimit, seaCost) {
     // First level neighbours with moveLimit
     for (var m = 1; m < moveLimit; m++)
     {
-        var neigh = _.clone(this.neighbours);
+        var neigh = {};
+        _.each(this.neighbours, function(ngh, ak) {
+            neigh[ak] = _.clone(ngh);
+        });
         
         _.each(neigh, function(ngh, ak) {
             _.each(ngh, function(n) {
-                this.neighbours[ak] = _.union(this.neighbours[ak], this.map[n].neighbours)
+                this.neighbours[ak] = _.union(this.neighbours[ak], neigh[n])
             },this);
             this.neighbours[ak] = _.without(this.neighbours[ak], parseInt(ak));
+            this.neighbours[ak] = _.filter(this.neighbours[ak], function(a) { return typeof a == "number"; });
         },this);
-        /*
-        _.each(this.landNeighbours, function(ngh, ak) {
-            this.landNeighbours[ak] = landish[ak];
-        },this);
-        */
     }
     
     // Second level neighbours
@@ -79,26 +80,27 @@ function TribeMover(map, moveLimit, seaCost) {
         this.neighbours2[ak] = _mergeNgh(ngh, this.neighbours, ak);
     },this)
     
+    var calcHoods = function(thisneighbours, thisseas) {
     // Neighborhoods
     var hoods = [];
     var hq = [];
-    _.each(this.neighbours, function(ngh, ak) {
+    _.each(thisneighbours, function(ngh, ak) {
         var hods = [];
         _.each(ngh, function(n) {
-            var nngh = _.intersection(this.neighbours[n], ngh);
+            var nngh = _.intersection(thisneighbours[n], ngh);
             var h = _.uniq(_.union([parseInt(ak), n], nngh));
             hods.push(h.sort())
-        },this);
+        });
         hoods = _.union(hoods, hods);
-    },this);
+    });
     var final = [];
     _.each(_.uniq(hoods, false, function(h) { return h.toString() }), function(hood) {
         if (_.every(hood, function(h) {
-            var hodo = _.union([h], this.neighbours[h]);
+            var hodo = _.union([h], thisneighbours[h]);
             return _.isEqual(_.intersection(hodo, hood).sort(), hood);
-        },this))
+        }))
             final.push(hood);
-    },this);
+    });
     var fenal = {};
     _.each(final, function(h) {
         var hodo = { start: 0, areas: h, neighbours: [] };
@@ -116,7 +118,13 @@ function TribeMover(map, moveLimit, seaCost) {
     _.each(fenal, function(h) {
         h.neighbours = _.map(h.neighbours, function(f) { return fenal[f]; });
     });
-    this.hoods = _.values(fenal);
+    return _.values(fenal);
+    // calcHoods END
+    };
+    
+    this.hoods = calcHoods(this.neighbours);
+    if (seaCost > -1)
+        this.landHoods = calcHoods(this.landNeighbours, this.seas);
 }
 
 function sum(arr) {
@@ -165,6 +173,12 @@ TribeMover.prototype = {
                 return memo+sit[a];
             }, 0,this);
         },this);
+        if (this.seaCost > -1)
+        _.each(this.landHoods, function(hood) {
+            hood[prop] = _.reduce(hood.areas, function(memo, a) {
+                return memo+sit[a];
+            }, 0,this);
+        },this);
     },
     handleMissing: function(situation, neighbours) {
         if (_.size(situation) != _.size(this.neighbours))
@@ -187,7 +201,7 @@ TribeMover.prototype = {
         };
         this.setHood("end", situation);
         var start = this.start;
-        
+        var seaCost = this.seaCost;
         
         if (this.moveLimit == -1) return valid;
         if (_.isEqual(this.start, situation)) return valid;
@@ -250,7 +264,8 @@ TribeMover.prototype = {
         }
         
         debug && console.log("NEIGHBORHOOD CHECKS");
-        _.each(this.hoods, function(hood) {
+        var initHoods = function(thishoods) {
+        _.each(thishoods, function(hood) {
             debug == 2 && console.log("n - "+hood.areas)
             _.each(hood.neighbours, function(nghood, key) {
                 debug == 2 && console.log(" - "+nghood.areas)
@@ -284,7 +299,16 @@ TribeMover.prototype = {
                 hood.foreign = _.union(hood.foreign || [], foreign);
             });
         });
+        // initHoods END
+        };
+        initHoods(this.hoods);
         debug && console.log(require('util').inspect(this.hoods, true, 5));
+        if (seaCost > 0)
+        {
+            initHoods(this.landHoods);
+            debug && console.log(require('util').inspect(this.landHoods, true, 5));
+        }
+        
         _.each(this.hoods, function(hood) {
             debug && console.log("check "+hood.areas)
             var commonMax = 0; // The amount of outer limit areas
@@ -327,6 +351,34 @@ TribeMover.prototype = {
             }
         });
         
+        if (seaCost > 0)
+        {
+        var costs = [];
+        _.each(this.landHoods, function(hood) {
+            debug && console.log("calc "+hood.areas)
+            var delta = hood.end - hood.start;
+            debug == 2 && console.log(" delta: "+delta);
+            // If there is more tribes in this hood
+            // and there is no neighbours (on an island)
+            // they've must come by ship
+            if (delta > 0 && _.size(hood.neighbours) == 0)
+            {
+                _.each(hood.areas, function(a) {
+                    if (situation[a] > start[a])
+                    {
+                        var cost = {};
+                        cost[a] = seaCost;
+                        costs.push(cost);
+                    }
+                });
+            }
+        });
+        valid.cost = costs;
+            
+        costFunc(valid.cost);
+        // seaCost > 0 END
+        }
+            
         if (no_perm_check) return valid;
         
         debug && console.log("AREA PERMS");
@@ -402,7 +454,6 @@ TribeMover.prototype = {
         // Determine cost
         debug && console.log(this.landNeighbours)
         
-        var seaCost = this.seaCost;
         var landNeighbours = this.landNeighbours;
         var calcCost = function(curr) {
             var sit = _.clone(start);

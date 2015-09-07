@@ -133,6 +133,79 @@ describe('TribeMover', function() {
         });
     });
     describe('sea cost', function() {
+        describe('basic', function() {
+            beforeEach(function() {
+                //       1 - 2
+                //
+                //        sea 
+                //
+                // ----- 3 - 4 ---------
+                map = {
+                    1: { 'neighbours': [ 2, 'sea' ] },
+                    2: { 'neighbours': [ 1, 'sea' ] },
+                    3: { 'neighbours': [ 4, 'sea', 'frontier'] },
+                    4: { 'neighbours': [ 3, 'sea', 'frontier'] },
+                }
+                mover = new pocketciv.TribeMover(map, 1, 1);
+            });
+            it('case 1', function() {
+                mover.init({ 1: 0, 2: 0, 3: 3, 4: 0 });
+                var ok =
+                mover.ok(  { 1: 3, 2: 0, 3: 0, 4: 0 });
+                ok.ok.should.be.true;
+                ok.cost.should.deep.equal([ { 1: 1 } ]);
+            });
+            it('case 2: inner move', function() {
+                mover.init({ 1: 1, 2: 0, 3: 3, 4: 0 });
+                var ok =
+                mover.ok(  { 1: 3, 2: 1, 3: 0, 4: 0 });
+                ok.ok.should.be.true;
+                ok.cost.should.deep.equal([ { 1: 1 }, { 2: 1 } ]);
+            });
+            it('case 3: both moves', function() {
+                mover.init({ 1: 0, 2: 0, 3: 2, 4: 2 });
+                var ok =
+                mover.ok(  { 1: 2, 2: 2, 3: 0, 4: 0 });
+                ok.ok.should.be.true;
+                ok.cost.should.deep.equal([ { 1: 1, 2: 1 } ]);
+            });
+        });
+        describe('basic2: chained', function() {
+            beforeEach(function() {
+                //  1       3       5
+                //  | first | secon |
+                //  2       4       6
+                map = {
+                    1: { 'neighbours': [ 2, 'first' ] },
+                    2: { 'neighbours': [ 1, 'first' ] },
+                    3: { 'neighbours': [ 4, 'second', 'first'] },
+                    4: { 'neighbours': [ 3, 'second', 'first'] },
+                    5: { 'neighbours': [ 6, 'second' ] },
+                    6: { 'neighbours': [ 5, 'second' ] },
+                }
+                mover = new pocketciv.TribeMover(map, 1, 1);
+            });
+            it('case 1', function() {
+                mover.init({ 1: 2, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 });
+                var ok =
+                mover.ok(  { 1: 0, 2: 0, 3: 2, 4: 0, 5: 0, 6: 0 });
+                ok.ok.should.be.true;
+            });
+            it('case 2', function() {
+                mover.init({ 1: 2, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 });
+                var ok =
+                mover.ok(  { 1: 0, 2: 0, 3: 0, 4: 0, 5: 2, 6: 0 });
+                ok.ok.should.be.false;
+            });
+            it.only('case 3: over two seas!', function() {
+                mover = new pocketciv.TribeMover(map, 2, 1);
+                mover.init({ 1: 3, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 });
+                var ok =
+                mover.ok(  { 1: 0, 2: 0, 3: 0, 4: 0, 5: 3, 6: 0 });
+                ok.ok.should.be.true;
+                ok.cost.should.deep.equal([ { 5: 2 } ]);
+            });
+        });
         describe('complex1', function() {
             beforeEach(function() {
                 //       1 - 2
@@ -170,7 +243,7 @@ describe('TribeMover', function() {
                 mover.init({ 1: 0, 2: 3, 3: 0, 4: 3, 5: 0, 6: 0, 7: 0 });
                 mover.ok(  { 1: 0, 2: 5, 3: 0, 4: 1, 5: 0, 6: 0, 7: 0 }).ok.should.be.false;
             });
-            it.only('changes by max', function() {
+            it('changes by max', function() {
                 mover.init({ 1: 0, 2: 3, 3: 0, 4: 3, 5: 0, 6: 0, 7: 0 });
                 var ok =
                 mover.ok(  { 1: 6, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0 });
