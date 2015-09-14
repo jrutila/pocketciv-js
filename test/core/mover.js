@@ -155,7 +155,7 @@ describe('TribeMover', function() {
                 ok.ok.should.be.true;
                 ok.cost.should.deep.equal([ { 1: 1 } ]);
             });
-            it('case 2: inner move', function() {
+            it.only('case 2: inner move', function() {
                 mover.init({ 1: 1, 2: 0, 3: 3, 4: 0 });
                 var ok =
                 mover.ok(  { 1: 3, 2: 1, 3: 0, 4: 0 });
@@ -206,25 +206,60 @@ describe('TribeMover', function() {
                 ok.cost.should.deep.equal([ { 5: 2 } ]);
             });
         });
-        describe.only('basic3: no islands', function() {
+        describe('basic3: no islands', function() {
             beforeEach(function() {
-                // 1  sea   4
-                //  \      /
+                // 1  sea    
+                //  \       
                 //   2  - 3
                 map = {
                     1: { 'neighbours': [ 2, 'sea' ] },
                     2: { 'neighbours': [ 1, 3, 'sea' ] },
-                    3: { 'neighbours': [ 4, 2, 'sea' ] },
-                    4: { 'neighbours': [ 3, 'sea' ] },
+                    3: { 'neighbours': [ 2, 'sea' ] },
+                    //4: { 'neighbours': [ 3, 'sea' ] },
                 }
                 mover = new pocketciv.TribeMover(map, 1, 1);
             });
             it('case 1', function() {
-                mover.init({ 1: 2, 2: 0, 3: 0, 4: 0 });
+                mover.init({ 1: 2, 2: 0, 3: 0 });
                 var ok =
-                mover.ok(  { 1: 0, 2: 0, 3: 2, 4: 0 });
+                mover.ok(  { 1: 0, 2: 2, 3: 0 });
+                ok.ok.should.be.true;
+                ok.cost.should.deep.equal([ ]);
+            });
+            it('case 2', function() {
+                mover.init({ 1: 2, 2: 0, 3: 0 });
+                var ok =
+                mover.ok(  { 1: 0, 2: 0, 3: 2 });
                 ok.ok.should.be.true;
                 ok.cost.should.deep.equal([ { 3: 1 } ]);
+            });
+        });
+        describe('basic3.1: no islands', function() {
+            beforeEach(function() {
+                // 1  sea    4
+                //  \       / 
+                //   2  - 3
+                map = {
+                    1: { 'neighbours': [ 2, 'sea' ] },
+                    2: { 'neighbours': [ 1, 3, 'sea' ] },
+                    3: { 'neighbours': [ 2, 4, 'sea' ] },
+                    4: { 'neighbours': [ 3, 'sea' ] },
+                }
+                mover = new pocketciv.TribeMover(map, 1, 1);
+            });
+            it('case 2', function() {
+                mover.init({ 1: 2, 2: 0, 3: 0 });
+                var ok =
+                mover.ok(  { 1: 0, 2: 0, 3: 2 });
+                ok.ok.should.be.true;
+                ok.cost.should.deep.equal([ { 3: 1 } ]);
+            });
+            it('case 3', function() {
+                mover.init({ 1: 2, 4: 0 });
+                var ok =
+                mover.ok(  { 1: 0, 4: 2 });
+                ok.ok.should.be.true;
+                ok.cost.should.deep.equal([ { 4: 1 } ]);
             });
         });
         // TODO

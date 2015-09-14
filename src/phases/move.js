@@ -270,6 +270,7 @@ TribeMover.prototype = {
         var initHoods = function(thishoods) {
         _.each(thishoods, function(hood) {
             debug == 2 && console.log("n - "+hood.areas)
+            hood.delta = hood.end - hood.start;
             _.each(hood.neighbours, function(nghood, key) {
                 debug == 2 && console.log(" - "+nghood.areas)
                 var common = _.intersection(hood.areas, nghood.areas);
@@ -356,58 +357,68 @@ TribeMover.prototype = {
         
         if (seaCost > 0)
         {
+        debug && console.log("CALC LANDHOODS ")
         var costs = [];
         _.each(this.landHoods, function(hood) {
-            debug && console.log("calc "+hood.areas)
             // If the hood does not neighbour a sea, forget it
             if (_.size(hood.seas) == 0)
                 return;
                 
             // How many tribes has this hood taken or lost
             var delta = hood.end - hood.start;
-            debug == 2 && console.log(" delta: "+delta);
             
             // If the hood has not gain tribes, forget it
             if (delta <= 0)
                 return;
-            
-            // If there is more tribes in this hood
-            // and there is no neighbours (on an island) with start tribes
-            // they must have come by ship
-            if (delta > 0 && _.size(hood.neighbours) == 0)
-            {
-                var steps = 1;
-                // Find out the steps to an original hood
-                _.each(hood.seas, function(sea) {
-                    if (!_.any(this.landHoods, function(h) {
-                        return _.contains(h.seas, sea) &&
-                               h.start > 0;
-                    }))
-                        steps = 2;
-                },this);
                 
-                var hd = delta;
-                var cost = {};
-                _.each(_.sortBy(hood.areas, function(a) {
-                        return -1 * (situation[a] - start[a]);
-                    }), function(a) {
-                    if (hd > 0 && situation[a] > 0)
-                    {
-                        cost[a] = seaCost*steps;
-                        hd -= situation[a];
-                        if (hd <= 0)
-                        {
-                            hd = delta;
-                            costs.push(cost);
-                            cost = {};
+            debug && console.log("calc "+hood.areas)
+            debug == 2 && console.log(" delta: "+delta);
+            var thishoods = this.landHoods;
+            
+            var findClosest = function(stHood, sea, d, chain, steps)
+            {
+                chain = chain || [];
+                chain.push(stHood);
+                var ret = null;
+                steps = steps || 1;
+                
+                if (sea == null)
+                {
+                    _.each(stHood.seas, function(s) {
+                        var h = findClosest(stHood, s, d, chain, steps);
+                        ret = ret || h;
+                    },this);
+                }
+                
+                _.each(_.sortBy(thishoods, "delta"), function(h, k) {
+                    if (!_.contains(chain, h) && _.contains(h.seas, sea)) {
+                        if (h.delta < 0)
+                            ret = ret || { hood: h, steps: steps};
+                        else {
+                            var dh = findClosest(h, null, d, chain, steps+1);
+                            ret = ret || dh;
                         }
                     }
-                });
-                if (_.size(cost) > 0)
-                    costs.push(cost);
+                },this);
+                chain.pop();
+                return ret;
+            }
+            var closeHood = findClosest(hood, null, delta);
+            closeHood != null && debug == 2 && console.log("found close: "+closeHood.hood.areas+" with delta "+closeHood.hood.delta);
+            if (closeHood && -1*closeHood.hood.delta >= delta )
+            {
+                debug == 2 && console.log(" -> satisfied");
+                _.each(hood.areas, function(a) {
+                    if (situation[a] >= seaCost)
+                    {
+                        var c = {};
+                        c[a] = closeHood.steps*seaCost;
+                        costs.push(c);
+                    }
+                }, this);
             }
         },this);
-        valid.cost = costs;
+        valid.cost = _.uniq(costs, {}.toString);
             
         costFunc(valid.cost);
         // seaCost > 0 END
