@@ -408,22 +408,33 @@ TribeMover.prototype = {
             if (closeHood && -1*closeHood.hood.delta >= delta )
             {
                 debug == 2 && console.log(" -> satisfied");
+                var c = {};
                 _.each(hood.areas, function(a) {
-                    if (situation[a] >= seaCost)
+                    if (situation[a] >= 0)
                     {
-                        var c = {};
                         c[a] = closeHood.steps*seaCost;
-                        costs.push(c);
+                        if (_.reduce(c, function(memo, n) {
+                            return memo-n;
+                        }, delta) <= 0)
+                        {
+                            costs.push(c);
+                            c = {};
+                        }
                     }
                 }, this);
+                if (_.size(c))
+                    costs.push(c);
             }
         },this);
-        valid.cost = _.uniq(costs, {}.toString);
+        valid.cost = _.uniq(costs, function(c) {
+            return require('util').inspect(c, true);
+        });
             
         costFunc(valid.cost);
         // seaCost > 0 END
         }
             
+        no_perm_check && debug && console.log("no perm check");
         if (no_perm_check) return valid;
         
         debug && console.log("AREA PERMS");

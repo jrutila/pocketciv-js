@@ -148,18 +148,19 @@ describe('TribeMover', function() {
                 }
                 mover = new pocketciv.TribeMover(map, 1, 1);
             });
-            it('case 1', function() {
+            it.only('case 1', function() {
                 mover.init({ 1: 0, 2: 0, 3: 3, 4: 0 });
                 var ok =
                 mover.ok(  { 1: 3, 2: 0, 3: 0, 4: 0 });
                 ok.ok.should.be.true;
                 ok.cost.should.deep.equal([ { 1: 1 } ]);
             });
-            it.only('case 2: inner move', function() {
+            it('case 2: inner move', function() {
                 mover.init({ 1: 1, 2: 0, 3: 3, 4: 0 });
                 var ok =
                 mover.ok(  { 1: 3, 2: 1, 3: 0, 4: 0 });
                 ok.ok.should.be.true;
+                // Remove either from 1 or 2
                 ok.cost.should.deep.equal([ { 1: 1 }, { 2: 1 } ]);
             });
             it('case 3: both moves', function() {
@@ -167,6 +168,23 @@ describe('TribeMover', function() {
                 var ok =
                 mover.ok(  { 1: 2, 2: 2, 3: 0, 4: 0 });
                 ok.ok.should.be.true;
+                // Remove from both 1 and 2
+                ok.cost.should.deep.equal([ { 1: 1, 2: 1 } ]);
+            });
+            it('case 4: two-step move', function() {
+                mover.init({ 1: 0, 2: 0, 3: 0, 4: 4 });
+                var ok =
+                mover.ok(  { 1: 2, 2: 2, 3: 0, 4: 0 });
+                ok.ok.should.be.true;
+                // First 4 over a sea, then 1 -> 2
+                ok.cost.should.deep.equal([ { 1: 1 }, { 2: 1 } ]);
+            });
+            it('case 5: two-step move wont help', function() {
+                mover.init({ 1: 0, 2: 0, 3: 2, 4: 2 });
+                var ok =
+                mover.ok(  { 1: 2, 2: 2, 3: 0, 4: 0 });
+                ok.ok.should.be.true;
+                // There needs to be two trips over the sea
                 ok.cost.should.deep.equal([ { 1: 1, 2: 1 } ]);
             });
         });
