@@ -357,81 +357,127 @@ TribeMover.prototype = {
         
         if (seaCost > 0)
         {
-        debug && console.log("CALC LANDHOODS ")
-        var costs = [];
-        _.each(this.landHoods, function(hood) {
-            // If the hood does not neighbour a sea, forget it
-            if (_.size(hood.seas) == 0)
-                return;
-                
-            // How many tribes has this hood taken or lost
-            var delta = hood.end - hood.start;
+            debug && console.log("CALC LANDHOODS ")
+            var costs = [];
+            var conn = {};
+            var deltas = {};
+            _.each(this.landHoods, function(hood) {
+                var c = {};
+                _.each(this.landHoods, function(h) {
+                    if (hood == h)
+                    {
+                        // null connection to self
+                        c[h.areas] = null;
+                        return;
+                    }
+                    var s = _.intersection(hood.seas, h.seas);
+                    var l = _.intersection(hood.areas, h.areas);
+                    debug == 2  && console.log(hood);
+                    debug == 2  && console.log(h);
+                    var cc = { sea: null, land: null };
+                    if (_.size(s) > 0) {
+                        // Sea connection
+                        cc.sea = s[0];
+                    }
+                    if (_.size(l) > 0)
+                    {
+                        // They are land neighbours
+                        cc.land = 0;
+                        _.each(l, function(a) {
+                            cc.land += start[a];
+                        });
+                    }
+                    c[h.areas] = cc;
+                },this);
+                conn[hood.areas] = c;
+                deltas[hood.areas] = hood.delta;
+            },this);
+            debug && console.log("CONN");
+            debug && console.log(require('util').inspect(conn, true));
+            debug && console.log(require('util').inspect(deltas, true));
             
-            // If the hood has not gain tribes, forget it
-            if (delta <= 0)
-                return;
-                
-            debug && console.log("calc "+hood.areas)
-            debug == 2 && console.log(" delta: "+delta);
-            var thishoods = this.landHoods;
-            
-            var findClosest = function(stHood, sea, d, chain, steps)
-            {
-                chain = chain || [];
-                chain.push(stHood);
-                var ret = null;
-                steps = steps || 1;
-                
-                if (sea == null)
-                {
-                    _.each(stHood.seas, function(s) {
-                        var h = findClosest(stHood, s, d, chain, steps);
-                        ret = ret || h;
-                    },this);
+            var findCheapest = function(conn, dd, tr, seaTravel, limit) {
+                var next = _.findKey(dd, function(v, d) {
+                    // If already traversed
+                    if (_.contains(tr,d)) return false;
+                    // If no connection
+                    if (_.size(tr) > 0) {
+                        var co = conn[d][_.last(tr)];
+                        if (co == null) return false;
+                        if (co.sea == null && co.land == 0) return false;
+                        
+                        if (co.land == null || co.land < -1*dd[tr[0]]) {
+                            if (co.sea)
+                            {
+                                seaTravel.push([_.last(tr), d]);
+                                return true;
+                            }
+                            return false;
+                        }
+                    }
+                    
+                    if (_.size(tr) == 0 && v >= 0) return false;
+                    
+                    return true;
+                });
+                if (next) {
+                    tr.push(next);
+                    var amount = Math.min(limit, Math.max(dd[_.last(tr)], 0));
+                    dd[tr[0]] += amount;
+                    dd[_.last(tr)] -= amount;
+                    
+                    if (_.every(dd, function(d) { return d == 0; }))
+                        return;
+                        
+                    findCheapest(conn, dd, tr, seaTravel, limit);
+                } else {
+                    debug == 2 && console.log(tr);
+                    debug == 2 && console.log(dd);
                 }
+            };
+            
+            var dd = _.clone(deltas);
+            var cc = JSON.parse(JSON.stringify(conn));
+            var travel = [];
+            while (_.any(dd, function(d) { return d < 0; }))
+                findCheapest(cc, dd, [], travel, 999);
                 
-                _.each(_.sortBy(thishoods, "delta"), function(h, k) {
-                    if (!_.contains(chain, h) && _.contains(h.seas, sea)) {
-                        if (h.delta < 0)
-                            ret = ret || { hood: h, steps: steps};
-                        else {
-                            var dh = findClosest(h, null, d, chain, steps+1);
-                            ret = ret || dh;
+            debug && console.log("travel");
+            debug && console.log(travel);
+            
+            var cost = {};
+            var loaned = 0;
+            _.each(travel, function(tr) {
+                var hood0 = _.find(this.landHoods, function(h) { return h.areas.toString() == tr[0]; });
+                var hood1 = _.find(this.landHoods, function(h) { return h.areas.toString() == tr[1]; });
+                var usedSea = _.intersection(hood0.seas, hood1.seas)[0];
+                var theHood = hood0.delta > 0 ? hood0 : hood1;
+                debug == 2 && console.log("hood "+theHood.areas+" delta: "+theHood.delta)
+                var left = theHood.delta;
+                loaned += seaCost;
+                _.each(_.sortBy(theHood.areas, function(a) {
+                    return start[a] - situation[a];
+                },this), function(a) {
+                    // Is by the sea
+                    if (_.contains(this.map[a].neighbours, usedSea))
+                    {
+                        // Got tribes
+                        if (situation[a] > 0 && left > 0) {
+                            left -= situation[a];
+                            cost[a] = cost[a] ? cost[a] + loaned : loaned;
+                            loaned = 0;
                         }
                     }
                 },this);
-                chain.pop();
-                return ret;
-            }
-            var closeHood = findClosest(hood, null, delta);
-            closeHood != null && debug == 2 && console.log("found close: "+closeHood.hood.areas+" with delta "+closeHood.hood.delta);
-            if (closeHood && -1*closeHood.hood.delta >= delta )
-            {
-                debug == 2 && console.log(" -> satisfied");
-                var c = {};
-                _.each(hood.areas, function(a) {
-                    if (situation[a] >= 0)
-                    {
-                        c[a] = closeHood.steps*seaCost;
-                        if (_.reduce(c, function(memo, n) {
-                            return memo-n;
-                        }, delta) <= 0)
-                        {
-                            costs.push(c);
-                            c = {};
-                        }
-                    }
-                }, this);
-                if (_.size(c))
-                    costs.push(c);
-            }
-        },this);
-        valid.cost = _.uniq(costs, function(c) {
-            return require('util').inspect(c, true);
-        });
+            },this);
+            _.size(cost) > 0 && costs.push(cost);
             
-        costFunc(valid.cost);
-        // seaCost > 0 END
+            valid.cost = _.uniq(costs, function(c) {
+                return require('util').inspect(c, true);
+            });
+                
+            costFunc(valid.cost);
+            // seaCost > 0 END
         }
             
         no_perm_check && debug && console.log("no perm check");
