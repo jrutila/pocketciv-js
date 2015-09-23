@@ -353,10 +353,12 @@
                 </li>
             </ul>
             <button
-                class="done btn btn-primary col-xs-12"
+                class="done btn btn-primary col-xs-12 col-md-6"
                 ng-click="mapDone()"
                 ng-disabled="forceMove && !_.isEqual(movement, forceMove)"
                 >Done</button>
+            <button class="btn col-md-6"
+                ng-click="moveReset()">Reset</button>
         </div>
         
         <pc-reducer class="row" reducer="reducer" ready="reduceReady"></pc-reducer>

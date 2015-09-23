@@ -45,7 +45,7 @@ var tutorials = {
     "scenario1": require("./tutorials/tutorial1"),
 }
 
-pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $analytics, $location) {
+pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $analytics, $location, $timeout) {
     var gameId = $location.$$absUrl.split('?');
     if (gameId.length > 1)
         gameId = gameId[1];
@@ -129,14 +129,18 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
     }
     $scope.hideMover = true;
     
+    function drawMovement() {
+        _.each($scope.movement, function(tr, ak) {
+            drawElem("tribes", ak, tr);
+        });
+    }
+    
     function handleOk(ok) {
+        console.log("handleOk")
+        console.log(ok)
         $scope.mapTitle = "MOVE "+(ok.cost || "");
         if (ok.ok)
         {
-            _.each(ok.target, function(tr, ak) {
-                drawElem("tribes", ak, tr);
-            });
-            
             _.each(ok.target, function(t, reg) {
                 drawElem("seacost", reg, false);
             });
@@ -147,9 +151,20 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
                 })
             }
             $scope.movement = ok.target;
+            drawMovement();
             moveFrom = 0;
             clearRegions();
+        } else {
+            drawMovement();
         }
+    }
+    
+    $scope.$watch('movement', function() {
+        drawMovement();
+    });
+    
+    $scope.moveReset = function() {
+        $scope.movement = getMovement($scope.engine.map.areas);
     }
     
     $scope.$on("mapClick", function(event, region) {
@@ -206,7 +221,10 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
                 seaCost: $scope.engine.params.sea_move ? $scope.engine.params.sea_cost : undefined
             });
             $scope.mover.onmessage = function(msg) {
-                handleOk(msg.data);
+                if (msg.data.ok != undefined)
+                    handleOk(msg.data);
+                else if (msg.data.cost != undefined)
+                    handleCost(msg.data);
             };
         } else
             $scope.mover = new pocketciv.TribeMover(

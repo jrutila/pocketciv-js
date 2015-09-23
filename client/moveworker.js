@@ -13,9 +13,19 @@ onmessage = function(msg) {
         self.mover.init(msg.data.start);
         console.log("Start set");
     } else if (action == "ok") {
-        var ok = self.mover.ok(msg.data.situation);
+        var handled = false;
+        var ok = self.mover.ok(msg.data.situation,
+        function(ok) {
+            // Failed fast
+            handled = true;
+            !handled && postMessage({ ok: false });
+        });
+        //var millis = 2000;
+        //var date = new Date();
+        //var curDate = null;
+        //do { curDate = new Date(); }
+        ////while(curDate-date < millis);
         console.log("Calculated!");
-        console.log(ok);
-        postMessage(ok);
+        !handled && postMessage(ok);
     }
 }
