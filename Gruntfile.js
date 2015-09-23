@@ -397,6 +397,16 @@ module.exports = function (grunt) {
             '**/*.js',
           ]
       },
+      movejs: {
+          expand: true,
+          dot: true,
+          cwd: 'src',
+          dest: '.build',
+          flatten: true,
+          src: [
+            'phases/move.js',
+          ]
+      },
       tmp: {
         files: [{
           expand: true,
@@ -670,6 +680,7 @@ module.exports = function (grunt) {
       'copy:dev',
       'injector:sass', 
       'browserify',
+      'copy:movejs',
       'sprite',
       'sass',
       'wiredep',
@@ -700,6 +711,7 @@ module.exports = function (grunt) {
       'preprocess',
       'wiredep',
       'browserify',
+      'copy:movejs',
       'sprite',
       'injector:sass',
       'sass',

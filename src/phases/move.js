@@ -18,7 +18,11 @@ function _seaUnion(area, sea) {
 
 function TribeMover(map, moveLimit, seaCost) {
     this.start = {};
-    this.map = _.clone(map);
+    // Clean up the map, only areas needed
+    if (map.areas != undefined)
+        this.map = { areas: _.clone(map.areas) };
+    else
+        this.map = _.clone(map);
     this.neighbours = {};
     this.neighbours2 = {};
     this.neighboursSea = {};
@@ -164,7 +168,8 @@ function pp(cur, perms, maxMoves, max, min, count) {
 
 TribeMover.prototype = {
     init: function(strt) {
-        this.start = strt;
+        // Clean up the start
+        this.start = _.pick(strt, _.filter(_.keys(strt), function(s) { return parseInt(s) }));
         this.handleMissing(this.start, this.neighbours);
         this.max = this._nghValue(this.start, this.neighbours);
         this.ngh2 = this._nghValue(this.start, this.neighbours2);
@@ -193,6 +198,8 @@ TribeMover.prototype = {
         }
     },
     ok: function(situation, fail, costFunc) {
+        // Clean up the situation
+        situation = _.pick(situation, _.filter(_.keys(situation), function(s) { return parseInt(s) }));
         this.handleMissing(situation, this.neighbours);
         var debug = 0;
         var no_perm_check = 1;
@@ -670,7 +677,7 @@ module.exports = {
         this.mover(this.map.areas, function(ok) {
             ctx.target(_.mapObject(ok.target, function(t) { return {tribes: t }}));
             
-            if (ok.cost) {
+            if (_.size(ok.cost)) {
                 console.log("Used SEA, must pay tribes!")
                 
                 var initial = {};
