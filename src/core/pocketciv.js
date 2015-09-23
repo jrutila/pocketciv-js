@@ -434,9 +434,8 @@ Engine.prototype = {
         var thePhase = undefined;
         var eng = this;
         
-        if (this[name+".post"]) posts.push(this[name+".post"]);
-        if (this[name+".pre"]) pres.push(this[name+".pre"]);
         if (name != "advance" || !arg) // advance actions do not support post pre yet
+        {
             _.each(_.pick(this.advances, this.acquired), function(acq) {
                 if (acq.phases && _.has(acq.phases, name+'.post'))
                 {
@@ -449,6 +448,10 @@ Engine.prototype = {
                 if (acq.phases && _.has(acq.phases, name))
                     thePhase = acq.phases[name].run;
             }, this)
+        }
+
+        if (this[name+".post"]) posts.push(this[name+".post"]);
+        if (this[name+".pre"]) pres.push(this[name+".pre"]);
         
         if (thePhase == undefined)
         {
