@@ -266,7 +266,7 @@ describe('TribeMover', function() {
                 ok.cost.should.deep.equal([]);
             });
         });
-        describe.only('basic3.1: no islands', function() {
+        describe('basic3.1: no islands', function() {
             beforeEach(function() {
                 // 1  sea    4
                 //  \       / 
@@ -290,6 +290,27 @@ describe('TribeMover', function() {
                 mover.init({ 1: 2, 4: 0 });
                 var ok =
                 mover.ok(  { 1: 0, 4: 2 });
+                ok.ok.should.be.true;
+                ok.cost.should.deep.equal([ { 4: 1 } ]);
+            });
+        });
+        describe('basic3.2: no islands and frontier', function() {
+            beforeEach(function() {
+                // 1  sea    4
+                //  \-------/ 
+                //   2  - 3
+                map = {
+                    1: { 'neighbours': [ 2, 'sea' ] },
+                    2: { 'neighbours': [ 1, 3 ] },
+                    3: { 'neighbours': [ 2, 4 ] },
+                    4: { 'neighbours': [ 3, 'sea' ] },
+                }
+                mover = new pocketciv.TribeMover(map, 1, 1);
+            });
+            it.only('case 1', function() {
+                mover.init({ 1: 2, 2: 2, 3: 2, 4: 0 });
+                var ok =
+                mover.ok(  { 1: 0, 2: 2, 3: 1, 4: 3 });
                 ok.ok.should.be.true;
                 ok.cost.should.deep.equal([ { 4: 1 } ]);
             });

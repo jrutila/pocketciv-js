@@ -194,7 +194,7 @@ TribeMover.prototype = {
     },
     ok: function(situation, fail, costFunc) {
         this.handleMissing(situation, this.neighbours);
-        var debug = 2;
+        var debug = 0;
         var no_perm_check = 1;
         var valid = {
             ok: true,
@@ -396,8 +396,11 @@ TribeMover.prototype = {
             debug && console.log(require('util').inspect(conn, true));
             debug && console.log(require('util').inspect(deltas, true));
             
+            var travel = [];
             var findCheapest = function(conn, dd, tr, seaTravel, limit) {
-                var next = _.findKey(dd, function(v, d) {
+                seaTravel = seaTravel || [];
+                limit = limit || 999;
+                var next = _.filter(_.keys(dd), function(d) {
                     // If already traversed
                     if (_.contains(tr,d)) return false;
                     // If no connection
@@ -409,38 +412,61 @@ TribeMover.prototype = {
                         if (co.land == null || co.land < -1*dd[tr[0]]) {
                             if (co.sea)
                             {
-                                seaTravel.push([_.last(tr), d]);
+                                //seaTravel.push([_.last(tr), d]);
                                 return true;
                             }
                             return false;
                         }
                     }
                     
-                    if (_.size(tr) == 0 && v >= 0) return false;
+                    if (_.size(tr) == 0 && dd[d] >= 0) return false;
                     
                     return true;
                 });
-                if (next) {
-                    tr.push(next);
-                    var amount = Math.min(limit, Math.max(dd[_.last(tr)], 0));
-                    dd[tr[0]] += amount;
-                    dd[_.last(tr)] -= amount;
-                    
-                    if (_.every(dd, function(d) { return d == 0; }))
-                        return;
+                debug == 2 && console.log((_.size(tr)+1)+"("+(_.last(tr) ? _.last(tr) : "-")+"): ");
+                
+                var ret = [];
+                for (var i = 0; i < next.length; i++) {
+                    var ne = next[i];
+                    var deltas = _.clone(dd);
+                    var nort = [];
+                    if (tr[0]) {
+                        var target = deltas[tr[0]];
+                        var co = conn[ne][_.last(tr)];
+                        if (co.land == null || co.land < -1*deltas[tr[0]]) {
+                            if (co.sea)
+                            {
+                                nort.push(_.last(tr) + " -> " + ne)
+                            }
+                        }
                         
-                    findCheapest(conn, dd, tr, seaTravel, limit);
-                } else {
-                    debug == 2 && console.log(tr);
-                    debug == 2 && console.log(dd);
+                        if (deltas[ne] > 0)
+                        {
+                            var amount = Math.min(limit, Math.max(deltas[ne], 0));
+                            deltas[tr[0]] += amount;
+                            deltas[ne] -= amount;
+                            var result = [_.union(tr,[ne]), deltas, _.union(seaTravel, nort)];
+                            travel.push(result);
+                            debug == 2 && console.log(_.union(tr,[ne])+" found result");
+                            debug == 2 && console.log(result)
+                            return;
+                        } else if (deltas[ne] < 0) {
+                            // We are traversing through negative hood
+                            debug == 2 && console.log(ne+" was negative");
+                            continue;
+                        }
+                    }
+                    
+                    findCheapest(conn, deltas, _.union(tr,[ne]), _.union(seaTravel, nort), limit);
                 }
+                if (_.size(next) == 0)
+                    debug == 2 && console.log("end")
+                return ret;
             };
             
             var dd = _.clone(deltas);
             var cc = JSON.parse(JSON.stringify(conn));
-            var travel = [];
-            while (_.any(dd, function(d) { return d < 0; }))
-                findCheapest(cc, dd, [], travel, 999);
+            findCheapest(cc, dd, []);
                 
             debug && console.log("travel");
             debug && console.log(travel);
