@@ -554,10 +554,30 @@ var changeString = function(chg) {
                 left: map.symbols[reg][prop].X
             })
         }
+        $elem.show();
+        if ($scope.godMode && $('#'+prop+'-edit').length) { // There needs to be edit for the prop
+            // Show the editors instead
+            var $edit = $("#"+prop+"-edit"+reg);
+            if ($edit.length == 0) {
+                $edit = $('#' + prop+"-edit").clone().attr('id', prop+"-edit" + reg).appendTo("#canvases")
+                $edit.css({
+                    top: map.symbols[reg][prop].Y,
+                    left: map.symbols[reg][prop].X
+                })
+                // TODO: To angular?
+                $edit.change(function(e) {
+                    $scope.map.areas[reg][prop] = parseInt(e.target.value);
+                });
+            }
+            $edit.attr("data-val", val);
+            $edit.show();
+            $edit.val(val);
+            $elem.hide();
+        }
         if ($elem.length > 0 && !val)
             $elem.remove()
         else {
-            $elem.html(val).show();
+            $elem.html(val);
             $elem.attr("data-val", val);
             $elem.css({
                 top: map.symbols[reg][prop].Y,
@@ -591,6 +611,13 @@ var changeString = function(chg) {
     
     $scope.toggleGod = function(gm) {
         $scope.godMode = gm;
+        _.each($scope.map.areas, function(area, key) {
+            if (area.tribes === undefined)
+                area.tribes = 0;
+            if (area.city === undefined)
+                area.city = 0;
+        });
+        $scope.map.changed = $scope.map.changed ? $scope.map.changed+1 : 1;
         if (gm == false)
             $scope.mapEditor = false;
     };
