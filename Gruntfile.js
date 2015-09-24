@@ -385,6 +385,7 @@ module.exports = function (grunt) {
             '**/*.html',
             '**/*.css',
             '**/*.scss',
+            'fonts/*'
           ]
         }]
       },
@@ -429,6 +430,7 @@ module.exports = function (grunt) {
             '**/*.js',
             '**/index.html',
             'app/app.scss',
+            'fonts/*'
           ]
         }]
         

@@ -52,13 +52,34 @@
     opacity: 0.3;
 }
 
+.godMode .areaCode {
+    z-index: 11 !important; // Over the map to click
+    cursor: pointer;
+    animation: tiltLeft 1s 10 ease;
+    animation-direction: alternate;
+}
+
+@keyframes tiltLeft {
+    from {
+        transform: rotate(-20deg);
+    }
+    to {
+        transform: rotate(20deg);
+    }
+}
+
+@font-face {
+    font-family: 'OldeFont';
+    src: url('../fonts/Blackwood Castle.ttf') format('truetype');
+}
+
 .areaCode {
         background-color: darkRed;
         color: white;
         border-radius: 90px;
         width: $mapSymbolSize;
         height: $mapSymbolSize;
-        font-weight: bolder;
+        font-family: OldeFont;
         text-align: center;
         padding-top: 3px;
         display: inline-block;
@@ -85,6 +106,7 @@
     font-weight: bolder;
     text-align: center;
     display: inline-block;
+    font-family: Trajan;
 }
 
 .counter {

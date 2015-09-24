@@ -45,7 +45,7 @@ var tutorials = {
     "scenario1": require("./tutorials/tutorial1"),
 }
 
-pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $analytics, $location, $timeout) {
+pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $analytics, $location, $timeout, $compile) {
     var gameId = $location.$$absUrl.split('?');
     if (gameId.length > 1)
         gameId = gameId[1];
@@ -61,6 +61,8 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
     
     $scope.debug = {};
     $scope.hideHelp = true;
+    
+    $scope.popoverurl = "areaPopover.html";
     
     var resetGameLog = function(scen){
     $localStorage.gameLog = {
@@ -595,7 +597,8 @@ var changeString = function(chg) {
         var $elem = $('#' + prop + reg);
 
         if ($elem.length == 0 && val) {
-            $elem = $('#' + prop).clone().attr('id', prop + reg).appendTo("#canvases")
+            $elem = $('#' + prop).clone().attr('id', prop + reg);
+            $compile($elem[0])($scope).appendTo("#canvases")
             $elem.css({
                 top: map.symbols[reg][prop].Y,
                 left: map.symbols[reg][prop].X
@@ -927,6 +930,55 @@ var changeString = function(chg) {
         })
     })
 });
+pocketcivApp.directive('roman', function($interpolate) {
+  return {
+    restrict: 'A',
+    transclude: true,
+    compile: function (tElem, tAttrs) {
+      var interpolateStatic = $interpolate(tElem.html(), true);
+      tElem.empty(); // disable automatic intepolation bindings
+      return function(scope, elem, attrs){
+        scope.$watch(interpolateStatic, function (value) {
+            var i = parseInt(elem.html());
+            var c = "";
+            switch(i) {
+                case 1:
+                    c = "I";
+                    break;
+                case 2:
+                    c = "II";
+                    break;
+                case 3:
+                    c = "III";
+                    break;
+                case 4:
+                    c = "IV";
+                    break;
+                case 5:
+                    c = "V";
+                    break;
+                case 6:
+                    c = "VI";
+                    break;
+                case 7:
+                    c = "VII";
+                    break;
+                case 8:
+                    c = "VIII";
+                    break;
+                case 9:
+                    c = "IX";
+                    break;
+                case 10:
+                    c = "X";
+                    break;
+            }
+            elem.html(c);
+        });
+      }
+    }
+  }
+});
 
 pocketcivApp.directive('pcEventView', function() {
     return {
@@ -946,8 +998,42 @@ pocketcivApp.directive('pcEventView', function() {
                 $scope.steps = ext[0];
             });
         },
-      }
+    }
 })
+
+pocketcivApp.directive('godPopover', function($rootScope, $compile) {
+    return {
+        restrict: 'A',
+        link: function($scope, tElem, tAttr) {
+            var areaId = parseInt(tElem.text());
+            $(tElem).popover({
+                title: "Edit area "+$(tElem).html(),
+                container: "#mapWrapper",
+                content: function() {
+                    var tmpl = document.getElementById('areaPopover.html').text;
+                    $scope.helper = $scope.helper || {1:{},2:{},3:{},4:{},5:{},6:{},7:{},8:{}};
+                    $scope.helper[areaId].stone = "none";
+                    if ($scope.engine.map.areas[areaId].mountain)
+                        $scope.helper[areaId].stone = "mountain";
+                    if ($scope.engine.map.areas[areaId].volcano)
+                        $scope.helper[areaId].stone = "volcano";
+                    var compiled = $compile(_.template(tmpl)({ id: areaId }))($scope);
+                    $scope.$apply();
+                    return compiled;
+                },
+                html: true,
+            });
+            $scope.$watch("helper["+areaId+"].stone", function(val) {
+                $scope.engine.map.areas[areaId].mountain = false;
+                $scope.engine.map.areas[areaId].volcano = false;
+                if (val == "mountain")
+                    $scope.engine.map.areas[areaId].mountain = true;
+                if (val == "volcano")
+                    $scope.engine.map.areas[areaId].volcano = true;
+            });
+        }
+    }
+});
 
 pocketcivApp.directive('pcEventStep', function($rootScope) {
     return {

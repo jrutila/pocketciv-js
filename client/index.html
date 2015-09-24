@@ -17,6 +17,24 @@
 </head>    
 <body ng-controller="MainGame" class="initiating">
     <script type="text/javascript">engine = undefined;</script>
+    <script type="text/ng-template" id="areaPopover.html">
+        <button btn-checkbox class="btn btn-primary" ng-model="engine.map.areas[<%= id %>].forest">
+        Forest
+        </button>
+        <button btn-checkbox class="btn btn-primary" ng-model="engine.map.areas[<%= id %>].farm">
+        Farm
+        </button>
+        <button btn-checkbox class="btn btn-primary" ng-model="engine.map.areas[<%= id %>].desert">
+        Desert
+        </button>
+    </label>
+    </div>
+    <div class="btn-group">
+        <label class="btn btn-primary" ng-model="helper[<%= id %>].stone" btn-radio="'none'">None</label>
+        <label class="btn btn-primary" ng-model="helper[<%= id %>].stone" btn-radio="'mountain'">Mountain</label>
+        <label class="btn btn-primary" ng-model="helper[<%= id %>].stone" btn-radio="'volcano'">Volcano</label>
+    </div>
+    </script>
     <p>loading...</p>
     <!--<a id="github" target="_blank" href="https://github.com/jrutila/pocketciv-js"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>-->
     <nav snap-drawer style="width: 320px">
@@ -241,7 +259,7 @@
             <img id="mapImage8" src="images/modern/land8.png"/>
             <div class="symbol tribes" id="tribes"></div>
             <div class="symbol seacost" id="seacost"></div>
-            <div class="symbol city" id="city"></div>
+            <div class="symbol city" id="city" roman></div>
             <div class="symbol counter" id="counter"></div>
             <input type="number" min="0" class="symbol tribes edit" id="tribes-edit" />
             <input type="number" min="0" class="symbol city edit" id="city-edit" />
@@ -289,8 +307,8 @@
         </div>
         
         <div id="mapWrapper">
-            <div id="map" style="width: {{ mapArea.width - 18 }}px">
-                <div id="canvases">
+            <div id="map" style="width: {{ mapArea.width - 18 }}px"></div>
+                <div id="canvases" ng-class="{'godMode': godMode }">
                 <canvas class="mapCanvas" id="mapCanvas-1"></canvas>
                 <canvas class="mapCanvas" id="mapCanvas0" ></canvas>
                 <canvas class="mapCanvas" id="mapCanvas1" ></canvas>
@@ -317,14 +335,14 @@
                 <canvas class="focusCanvas" id="focusCanvas6"></canvas>
                 <canvas class="focusCanvas" id="focusCanvas7"></canvas>
                 <canvas class="focusCanvas" id="focusCanvas8"></canvas>
-                <span class="areaCode" id="area1">1</span>
-                <span class="areaCode" id="area2">2</span>
-                <span class="areaCode" id="area3">3</span>
-                <span class="areaCode" id="area4">4</span>
-                <span class="areaCode" id="area5">5</span>
-                <span class="areaCode" id="area6">6</span>
-                <span class="areaCode" id="area7">7</span>
-                <span class="areaCode" id="area8">8</span>
+                <span class="areaCode" id="area1" god-popover>1</span>
+                <span class="areaCode" id="area2" god-popover>2</span>
+                <span class="areaCode" id="area3" god-popover>3</span>
+                <span class="areaCode" id="area4" god-popover>4</span>
+                <span class="areaCode" id="area5" god-popover>5</span>
+                <span class="areaCode" id="area6" god-popover>6</span>
+                <span class="areaCode" id="area7" god-popover>7</span>
+                <span class="areaCode" id="area8" god-popover>8</span>
                 <canvas ng-click="mapClick($event)" ng-mousemove="mapFocus($event)"
                     class="mapCanvas" id="clickCanvas" width="{{ mapArea.width }}" height="{{ mapArea.height }}"></canvas>
             </div>
