@@ -1,0 +1,16 @@
+CACHE MANIFEST
+
+CACHE:
+/images/modern/land.png
+/images/modern/water.png
+/images/modern/land1.png
+/images/modern/land2.png
+/images/modern/land3.png
+/images/modern/land4.png
+/images/modern/land5.png
+/images/modern/land6.png
+/images/modern/land7.png
+/images/modern/land8.png
+
+NETWORK:
+*
