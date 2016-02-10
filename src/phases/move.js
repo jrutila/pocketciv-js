@@ -1,20 +1,15 @@
 var reducer = require("../core/reducer");
 var _ = require('underscore');
+var YP = require('../core/YieldProlog');
 
-function _mergeNgh(ngh, first, a) {
-    var to = _.reduce(ngh,
-        function(memo, n) {
-            return _.union(memo, first[n])
-        }, ngh);
-    to = _.without(to, parseInt(a));
-    return to;
+var debug = 1;
+        
+function isSea(n)
+{
+    return typeof n == "string" && n != "frontier";
 }
 
-var areaNeighbour = function(n) { return typeof n != "string"; };
 
-function _seaUnion(area, sea) {
-    return _.filter(_.union(area, sea || []), areaNeighbour);
-}
 
 function TribeMover(map, moveLimit, seaCost) {
     this.start = {};
@@ -23,115 +18,67 @@ function TribeMover(map, moveLimit, seaCost) {
         this.map = { areas: _.clone(map.areas) };
     else
         this.map = _.clone(map);
-    this.neighbours = {};
-    this.neighbours2 = {};
-    this.neighboursSea = {};
-    this.neighboursSea2 = {};
+        
     moveLimit = moveLimit ? moveLimit : 1;
     this.moveLimit = moveLimit;
     seaCost = seaCost === undefined ? -1 : seaCost;
     this.seaCost = seaCost;
-    this.seas = {};
     
-    var seas = _.object(_.map(this.map, function(area, n) {
-        // TODO: Should this use engine.isSeaNeighbour in some way?
-        // Find the seas
-        var ss = _.filter(area.neighbours, function (e) { return typeof e == "string" && e != 'frontier'; });
-        var seangh = [];
-        this.seas[n] = ss;
-        
-        // Determine the sea neighbours
-        for (var a in this.map)
-        {
-            if (a != n && _.intersection(this.map[a].neighbours, ss).length > 0)
-            {
-                seangh.push(parseInt(a));
+    var neighbours = _.object(_.keys(this.map), [[],[],[],[],[],[],[],[]])
+    var neighbours2 = _.object(_.keys(this.map), [[],[],[],[],[],[],[],[]])
+    
+    var findMap = this.map;
+    function findRoute(route,dist,found,cost) {
+        dist--;
+        var mySeas = [];
+        _.each(_.difference(findMap[_.last(route)].neighbours, route), function(ngh, nk) {
+            if (ngh == 'frontier') return;
+            if (isSea(ngh)) {
+                mySeas.push(ngh);
+                return;
             }
-        }
-        return [parseInt(n), seangh];
-    }, this));
-    
-    _.each(this.map, function(area, ak) {
-        this.neighbours[ak] = _.filter(area.neighbours, areaNeighbour);
-        this.neighboursSea[ak] = _.union(this.neighbours[ak], seas[ak]);
-    }, this);
-    
-    if (seaCost > -1)
-    {
-        this.landNeighbours = _.clone(this.neighbours);
-        this.neighbours = this.neighboursSea;
-    }
-    
-    // First level neighbours with moveLimit
-    for (var m = 1; m < moveLimit; m++)
-    {
-        var neigh = {};
-        _.each(this.neighbours, function(ngh, ak) {
-            neigh[ak] = _.clone(ngh);
-        });
+            var r = _.union(route, [parseInt(ngh)])
+            found(r);
+            if (dist > 0)
+                findRoute(r,dist, found);
+            
+        }, this);
         
-        _.each(neigh, function(ngh, ak) {
-            _.each(ngh, function(n) {
-                this.neighbours[ak] = _.union(this.neighbours[ak], neigh[n])
-            },this);
-            this.neighbours[ak] = _.without(this.neighbours[ak], parseInt(ak));
-            this.neighbours[ak] = _.filter(this.neighbours[ak], function(a) { return typeof a == "number"; });
+        if (seaCost == 0) return;
+        
+        console.log("seas")
+        _.each(mySeas, function(s) {
+            var sNgh = []
+            _.each(findMap, function(area, sk) {
+                if(_.contains(area.neighbours, s) && !_.contains(route,parseInt(sk)))
+                {
+                    sNgh.push(sk);
+                    var r = _.union(route, [parseInt(sk)]);
+                    found(r);
+                    if (dist > 0)
+                        findRoute(r,dist,found);
+                }
+            });
         },this);
     }
     
-    // Second level neighbours
-    _.each(this.neighbours, function(ngh, ak) {
-        this.neighbours2[ak] = _mergeNgh(ngh, this.neighbours, ak);
-    },this)
-    
-    var calcHoods = function(thisneighbours, thisseas) {
-    // Neighborhoods
-    var hoods = [];
-    var hq = [];
-    _.each(thisneighbours, function(ngh, ak) {
-        var hods = [];
-        _.each(ngh, function(n) {
-            var nngh = _.intersection(thisneighbours[n], ngh);
-            var h = _.uniq(_.union([parseInt(ak), n], nngh));
-            hods.push(h.sort())
+    _.each(this.map, function(from, fk) {
+        findRoute([parseInt(fk)], moveLimit, function(route, cost) {
+            console.log(route)
+            neighbours[_.first(route)].push(_.last(route))
         });
-        hoods = _.union(hoods, hods);
-    });
-    var final = [];
-    _.each(_.uniq(hoods, false, function(h) { return h.toString() }), function(hood) {
-        if (_.every(hood, function(h) {
-            var hodo = _.union([h], thisneighbours[h]);
-            return _.isEqual(_.intersection(hodo, hood).sort(), hood);
-        }))
-            final.push(hood);
-    });
-    var fenal = {};
-    _.each(final, function(h) {
-        var hodo = { start: 0, areas: h, neighbours: [] };
-        if (thisseas)
-            hodo.seas = _.uniq(_.flatten(_.values(_.pick(thisseas, h))));
-        _.each(final, function(f) {
-            if (f != h)
-            {
-                if (_.size(_.intersection(f,h)) > 0)
-                {
-                    hodo.neighbours.push(f);
-                }
-            }
-        })
-        fenal[h] = hodo;
-    },this);
-    _.each(fenal, function(h) {
-        h.neighbours = _.map(h.neighbours, function(f) { return fenal[f]; });
-    });
-    return _.values(fenal);
-    // calcHoods END
-    };
+    }, this);
     
-    this.hoods = calcHoods(this.neighbours);
-    if (seaCost > -1) {
-        this.landHoods = calcHoods(this.landNeighbours, this.seas);
-    }
+    var ngh2 = [];
+    _.each(this.map, function(from, fk) {
+        findRoute([parseInt(fk)], moveLimit+1, function(route) {
+            neighbours2[_.first(route)].push(_.last(route))
+        });
+    }, this);
+    
+    var uniqs = function(val,key) { return _.uniq(val); };
+    this.neighbours = _.mapObject(neighbours, uniqs);
+    this.neighbours2 = _.mapObject(neighbours2, uniqs);
 }
 
 function sum(arr) {
@@ -173,20 +120,48 @@ TribeMover.prototype = {
         this.handleMissing(this.start, this.neighbours);
         this.max = this._nghValue(this.start, this.neighbours);
         this.ngh2 = this._nghValue(this.start, this.neighbours2);
-        this.setHood("start", strt);
     },
-    setHood: function(prop, sit) {
-        _.each(this.hoods, function(hood) {
-            hood[prop] = _.reduce(hood.areas, function(memo, a) {
-                return memo+sit[a];
-            }, 0,this);
-        },this);
-        if (this.seaCost > -1)
-        _.each(this.landHoods, function(hood) {
-            hood[prop] = _.reduce(hood.areas, function(memo, a) {
-                return memo+sit[a];
-            }, 0,this);
-        },this);
+    _umove: function*(m,n,s) {
+        var j = _.size(m)+1;
+        
+        if (_.size(m) == _.size(this.start))
+        {
+            yield m;
+        }
+        else if (n==0) {
+            yield* this._umove(m.concat([0]), n, s);
+        }
+        else if (j == s)
+        {
+            // No movement to self
+            var mm = m.concat([0]);
+            yield* this._umove(mm,n,s);
+        } else { 
+            // Try to move n or end times
+            for (var i = Math.min(this.end[j], n); i>=0; i--)
+            {
+                var mm = m.concat([i]);
+                yield* this._umove(mm,n-i,s);
+            }
+        }
+    },
+    moves: function*(m) {
+        if (!m) m = [];
+        var j = _.size(m)+1;
+        if (_.size(m) == _.size(this.start))
+        {
+            yield m;
+        }
+        else {
+            var g = this._umove([],this.start[j],j)
+            var gg = g.next();
+            while (!gg.done)
+            {
+                var mm = m.concat([gg.value]);
+                yield* this.moves(mm);
+                gg = g.next();
+            }
+        }
     },
     handleMissing: function(situation, neighbours) {
         if (_.size(situation) != _.size(this.neighbours))
@@ -201,7 +176,6 @@ TribeMover.prototype = {
         // Clean up the situation
         situation = _.pick(situation, _.filter(_.keys(situation), function(s) { return parseInt(s) }));
         this.handleMissing(situation, this.neighbours);
-        var debug = 0;
         var no_perm_check = 1;
         var valid = {
             ok: true,
@@ -209,12 +183,12 @@ TribeMover.prototype = {
             initial: this.start,
             cost: [],
         };
-        this.setHood("end", situation);
         var start = this.start;
         var seaCost = this.seaCost;
         
         if (this.moveLimit == -1) return valid;
         if (_.isEqual(this.start, situation)) return valid;
+        
         fail = fail || function() {
             valid.ok = false;
             if (debug)
@@ -222,6 +196,7 @@ TribeMover.prototype = {
         };
         costFunc = costFunc || function() {  };
         
+        // Different amount of tribes
         if (sum(this.start) != sum(situation))
             fail();
         
@@ -273,381 +248,29 @@ TribeMover.prototype = {
             }
         }
         
-        debug && console.log("NEIGHBORHOOD CHECKS");
-        var initHoods = function(thishoods) {
-        _.each(thishoods, function(hood) {
-            debug == 2 && console.log("n - "+hood.areas)
-            hood.delta = hood.end - hood.start;
-            _.each(hood.neighbours, function(nghood, key) {
-                debug == 2 && console.log(" - "+nghood.areas)
-                var common = _.intersection(hood.areas, nghood.areas);
-                var my = _.difference(hood.areas, common);
-                var foreign = _.difference(nghood.areas, common);
-                debug == 2 && console.log(my +" - "+common+" - "+foreign)
-                var calc = function(xx) {
-                    return function(memo, key) {
-                        return memo + xx[key];
-                    };
-                };
-                var st = [
-                    _.reduce(my, calc(start), 0),
-                    _.reduce(common, calc(start), 0),
-                    _.reduce(foreign, calc(start), 0)
-                    ];
-                debug == 2 && console.log(st)
-                var en = [
-                    _.reduce(my, calc(situation), 0),
-                    _.reduce(common, calc(situation), 0),
-                    _.reduce(foreign, calc(situation), 0)
-                    ];
-                debug == 2 && console.log(en)
-                hood.neighbours[key] = {
-                    start: st,
-                    end: en,
-                    hood: nghood
-                };
-                hood.common = _.union(hood.common || [], common);
-                hood.foreign = _.union(hood.foreign || [], foreign);
-            });
-        });
-        // initHoods END
-        };
-        initHoods(this.hoods);
-        debug && console.log(require('util').inspect(this.hoods, true, 5));
-        if (seaCost > 0)
-        {
-            initHoods(this.landHoods);
-            debug && console.log(require('util').inspect(this.landHoods, true, 5));
-        }
+        this.end = situation;
         
-        _.each(this.hoods, function(hood) {
-            debug && console.log("check "+hood.areas)
-            var commonMax = 0; // The amount of outer limit areas
-            var commonCur = 0;
-            var foreignStart = 0;
-            var foreignCurr = 0;
-            
-            _.each(hood.common, function(h) {
-                commonMax += start[h];
-                commonCur += situation[h];
-            });
-            _.each(hood.foreign, function(f) {
-                foreignStart += start[f];
-                foreignCurr += situation[f];
-            });
-            
-            var delta = hood.end - hood.start;
-            debug == 2 && console.log(" commonMax: "+commonMax);
-            debug == 2 && console.log(" commonCur: "+commonCur);
-            debug == 2 && console.log(" foreignStart: "+foreignStart);
-            debug == 2 && console.log(" foreignCurr: "+foreignCurr);
-            debug == 2 && console.log(" delta: "+delta);
-            
-            // If there is more tribes in this hood
-            if (delta > 0)
+        var it = this.moves();
+        var nn = it.next();
+        while (!nn.done)
+        {
+            var summed = [0,0,0,0];
+            for (var i = 0; i < _.size(this.start); i++)
             {
-                // can't have more income than neighbour start amount
-                if (delta > foreignStart)
-                    fail();
-                // the added tribes should be on common areas
-                if (commonCur < delta)
-                    fail();
-            }
-            // If tribes are moved away from this hood
-            if (delta < 0)
-            {
-                // There is not enough tribes outside!
-                if (delta > foreignCurr)
-                    fail();
-            }
-        });
-        
-        if (seaCost > 0)
-        {
-            debug && console.log("CALC LANDHOODS ")
-            var costs = [];
-            var conn = {};
-            var deltas = {};
-            _.each(this.landHoods, function(hood) {
-                var c = {};
-                _.each(this.landHoods, function(h) {
-                    if (hood == h)
-                    {
-                        // null connection to self
-                        c[h.areas] = null;
-                        return;
-                    }
-                    var s = _.intersection(hood.seas, h.seas);
-                    var l = _.intersection(hood.areas, h.areas);
-                    debug == 2  && console.log(hood);
-                    debug == 2  && console.log(h);
-                    var cc = { sea: null, land: null };
-                    if (_.size(s) > 0) {
-                        // Sea connection
-                        cc.sea = s[0];
-                    }
-                    if (_.size(l) > 0)
-                    {
-                        // They are land neighbours
-                        cc.land = 0;
-                        _.each(l, function(a) {
-                            cc.land += start[a];
-                        });
-                    }
-                    c[h.areas] = cc;
-                },this);
-                conn[hood.areas] = c;
-                deltas[hood.areas] = hood.delta;
-            },this);
-            debug && console.log("CONN");
-            debug && console.log(require('util').inspect(conn, true));
-            debug && console.log(require('util').inspect(deltas, true));
-            
-            var travel = [];
-            var findCheapest = function(conn, dd, tr, seaTravel, limit) {
-                seaTravel = seaTravel || [];
-                limit = limit || 999;
-                var next = _.filter(_.keys(dd), function(d) {
-                    // If already traversed
-                    if (_.contains(tr,d)) return false;
-                    // If no connection
-                    if (_.size(tr) > 0) {
-                        var co = conn[d][_.last(tr)];
-                        if (co == null) return false;
-                        if (co.sea == null && co.land == 0) return false;
-                        
-                        if (co.land == null || co.land < -1*dd[tr[0]]) {
-                            if (co.sea)
-                            {
-                                //seaTravel.push([_.last(tr), d]);
-                                return true;
-                            }
-                            return false;
-                        }
-                    }
-                    
-                    if (_.size(tr) == 0 && dd[d] >= 0) return false;
-                    
-                    return true;
-                });
-                debug == 2 && console.log((_.size(tr)+1)+"("+(_.last(tr) ? _.last(tr) : "-")+"): ");
-                
-                var ret = [];
-                for (var i = 0; i < next.length; i++) {
-                    var ne = next[i];
-                    var deltas = _.clone(dd);
-                    var nort = [];
-                    if (tr[0]) {
-                        var target = deltas[tr[0]];
-                        var co = conn[ne][_.last(tr)];
-                        if (co.land == null || co.land < -1*deltas[tr[0]]) {
-                            if (co.sea)
-                            {
-                                nort.push(_.last(tr) + " -> " + ne)
-                            }
-                        }
-                        
-                        if (deltas[ne] > 0)
-                        {
-                            var amount = Math.min(limit, Math.max(deltas[ne], 0));
-                            deltas[tr[0]] += amount;
-                            deltas[ne] -= amount;
-                            var result = [_.union(tr,[ne]), deltas, _.union(seaTravel, nort)];
-                            travel.push(result);
-                            debug == 2 && console.log(_.union(tr,[ne])+" found result");
-                            debug == 2 && console.log(result)
-                            return;
-                        } else if (deltas[ne] < 0) {
-                            // We are traversing through negative hood
-                            debug == 2 && console.log(ne+" was negative");
-                            continue;
-                        }
-                    }
-                    
-                    findCheapest(conn, deltas, _.union(tr,[ne]), _.union(seaTravel, nort), limit);
-                }
-                if (_.size(next) == 0)
-                    debug == 2 && console.log("end")
-                return ret;
-            };
-            
-            var dd = _.clone(deltas);
-            var cc = JSON.parse(JSON.stringify(conn));
-            findCheapest(cc, dd, []);
-                
-            debug && console.log("travel");
-            debug && console.log(travel);
-            
-            var cost = {};
-            var loaned = 0;
-            _.each(travel, function(tr) {
-                var hood0 = _.find(this.landHoods, function(h) { return h.areas.toString() == tr[0]; });
-                var hood1 = _.find(this.landHoods, function(h) { return h.areas.toString() == tr[1]; });
-                var usedSea = _.intersection(hood0.seas, hood1.seas)[0];
-                var theHood = hood0.delta > 0 ? hood0 : hood1;
-                debug == 2 && console.log("hood "+theHood.areas+" delta: "+theHood.delta)
-                var left = theHood.delta;
-                loaned += seaCost;
-                _.each(_.sortBy(theHood.areas, function(a) {
-                    return start[a] - situation[a];
-                },this), function(a) {
-                    // Is by the sea
-                    if (_.contains(this.map[a].neighbours, usedSea))
-                    {
-                        // Got tribes
-                        if (situation[a] > 0 && left > 0) {
-                            left -= situation[a];
-                            cost[a] = cost[a] ? cost[a] + loaned : loaned;
-                            loaned = 0;
-                        }
-                    }
-                },this);
-            },this);
-            _.size(cost) > 0 && costs.push(cost);
-            
-            valid.cost = _.uniq(costs, function(c) {
-                return require('util').inspect(c, true);
-            });
-                
-            costFunc(valid.cost);
-            // seaCost > 0 END
-        }
-            
-        no_perm_check && debug && console.log("no perm check");
-        if (no_perm_check) return valid;
-        
-        debug && console.log("AREA PERMS");
-        var areaPerms = {};
-        _.each(moveFrom, function(mf, key) {
-            var perms = [];
-            debug == 2 && console.log("Area "+key + " start: "+start[key] + " now: "+situation[key]);
-            pp({}, perms, mf, start[key], start[key] - situation[key]);
-            debug == 2 && console.log(perms)
-            areaPerms[key] = perms;
-        },this);
-        
-        var mutch = {};
-        _.each(this.neighbours, function(nghbrs, k) {
-            debug == 2 && console.log("Check combination for "+k+" neighbours "+require('util').inspect(nghbrs))
-            var findMatch = function (cur, matches, ngh, count) {
-                if (_.size(ngh) == 0)
+                for (var j = 0; j < _.size(this.start); j++)
                 {
-                    debug == 2 && console.log("comb  : "+require('util').inspect(cur));
-                    debug == 2 && console.log("count : "+count+ " "+ (count == situation[k] ? "ok" : ""))
-                    if (count == situation[k])
-                        matches.push(_.clone(cur));
-                    return;
+                   summed[i] += nn.value[j][i];
                 }
                 
-                if (count > situation[k])
-                    return;
-                
-                var n = ngh[0];
-                
-                _.each(areaPerms[n], function(p) {
-                    cur[n] = p;
-                    findMatch(cur, matches, ngh.slice(1), count + p[k]);
-                },this);
-            };
-        
-            var mat = [];
-            _.each(areaPerms[k], function(p) {
-                findMatch({}, mat, nghbrs, 
-                    start[k] - _.reduce(_.values(p), function(memo, n) { return memo+n;}, 0));
-            });
-            mutch[k] = mat;
-        });
-        
-        //debug && console.log(require('util').inspect(mutch, true, 10));
-        
-        _.each(situation, function(sit, key) {
-            debug == 2 && console.log("Area "+key+" should have "+sit)
-            debug == 2 && console.log(require("util").inspect(mutch[key], true, 10)) ;
-            _.each(this.neighbours[key], function(nnn) {
-                var allowed = _.map(mutch[key], function(gee) {return gee[nnn];});
-                //console.log("Area "+key+" allows "+nnn+":")
-                areaPerms[nnn] = _.intersection(areaPerms[nnn], allowed);
-                //console.log(areaPerms[nnn]);
-            },this);
-        },this);
-        
-        debug && console.log("FINAL PERMS")
-        _.each(areaPerms, function(perm, key) {
-            debug && console.log(key+ " "+ require('util').inspect(perm));
-            if (_.size(perm) == 0 && _.size(this.neighbours[key]) > 0)
-                fail();
-        },this);
-        
-        if (debug) {
-        console.log("MOVE READY")
-        console.log(this.start)
-        console.log(situation)
-        console.log(valid.ok)
-        console.log(require('util').inspect(valid.cost, true, 10))
-        }
-        
-        // Determine cost
-        debug && console.log(this.landNeighbours)
-        
-        var landNeighbours = this.landNeighbours;
-        var calcCost = function(curr) {
-            var sit = _.clone(start);
-            var cost = {};
-            _.each(curr, function(p, from) {
-                _.each(p, function(val, to) {
-                    sit[from] -= val;
-                    sit[to] += val;
-                    if (val > 0 && !_.contains(landNeighbours[from], parseInt(to)))
-                        cost[to] = (cost[to] || 0) + seaCost;
-                })
-            })
-            if (!_.isEqual(sit, situation))
-                return false;
-            return cost;
-        };
-        
-        if (this.seaCost > 0)
-        {
-            // Determine costs
-            var totalCost = 10;
-            var findCost = function(costs, curr, perms) {
-                if (_.size(perms) == 0)
+                // If the end situation is not correct
+                if (summed[i] != this.end[i+1])
                 {
-                    var cost = calcCost(curr);
-                    if (cost) 
-                    {
-                        var total = _.reduce(_.values(cost), function(memo, n) {return memo+n;}, 0);
-                        if (total <= totalCost && !_.some(costs, function(c) { return _.isEqual(c, cost); }))
-                        {
-                            debug == 2 && console.log(require('util').inspect(curr));
-                            debug == 2 && console.log("cost : "+require('util').inspect(cost));
-                            if (total < totalCost) costs.splice(0, costs.length);
-                            totalCost = total;
-                            if (_.size(cost))
-                                costs.push(cost);
-                        }
-                    }
-                    else
-                    {
-                        return true;
-                    }
-                    return;
+                    summed = false;
                 }
-                
-                var key = _.keys(perms)[0];
-                
-                _.each(perms[key], function(p) {
-                    curr[key] = p;
-                    if (findCost(costs, curr, _.omit(perms,key)))
-                        return true;
-                });
-            };
-            var costs = [];
-            debug && console.log("seacost: "+this.seaCost)
-            findCost(costs, {}, areaPerms);
-            debug && console.log(require("util").inspect(costs, true, 10))
-            valid.cost = costs;
-            costFunc(costs);
+            }
+            if (summed)
+                console.log(nn.value);
+            nn = it.next();
         }
         
         return valid;
