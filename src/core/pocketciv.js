@@ -59,7 +59,6 @@ var advances = {
     'horticulture': require('../advances/horticulture'),
     'sense_of_community': require('../advances/sense_of_community'),
     'music': require('../advances/music'),
-    'literacy': require('../advances/literacy'),
     'slave_labor': require('../advances/slave_labor'),
     'coinage': require('../advances/coinage'),
     'banking': require('../advances/banking'),
