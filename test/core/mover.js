@@ -307,7 +307,15 @@ describe('TribeMover', function() {
                 }
                 mover = new pocketciv.TribeMover(map, 1, 1);
             });
-            it.only('case 1', function() {
+            it('case 1', function() {
+                mover.init({ 1: 2, 2: 2, 3: 2, 4: 0 });
+                var ok =
+                mover.ok(  { 1: 0, 2: 2, 3: 1, 4: 3 });
+                ok.ok.should.be.true;
+                ok.cost.should.deep.equal([ { 4: 1 } ]);
+            });
+            it('case 2', function() {
+                mover = new pocketciv.TribeMover(map, 2, 1);
                 mover.init({ 1: 2, 2: 2, 3: 2, 4: 0 });
                 var ok =
                 mover.ok(  { 1: 0, 2: 2, 3: 1, 4: 3 });
@@ -421,11 +429,11 @@ describe('TribeMover', function() {
                    /             sea
                 **/
                 map = {
-                "3": { "id": 3, "tribes": 1, "farm": true, "neighbours": [ 4, 5, 6, 8, 'sea'], },
+                "3": { "id": 3, "tribes": 1, "farm": true, "neighbours": [ 4, 5, 6, 'sea'], },
                 "4": { "id": 4, "tribes": 1, "mountain": true, "forest": true, "farm": true, "neighbours": [ 3, 8, 'sea', 'frontier'] },
                 "5": { "id": 5, "tribes": 1, "mountain": true, "forest": true, "neighbours": [ 3, 6, 8, 'sea', 'frontier'], "mountain": true },
                 "6": { "id": 6, "tribes": 1, "neighbours": [ 3, 5, 8 ], "forest": true },
-                "8": { "id": 8, "neighbours": [ 3, 4, 5, 6, 'frontier'], "desert": true }
+                "8": { "id": 8, "neighbours": [  4, 5, 6, 'frontier'], "desert": true }
                 }
             });
             it('over the sea?', function() {
@@ -447,7 +455,7 @@ describe('TribeMover', function() {
                 mover.ok({ 3: 0, 4: 2, 5: 0, 8: 0 }).ok.should.be.true;
                 mover.ok({ 3: 0, 4: 2, 5: 0, 8: 0 }).cost.should.deep.equal([]);
             });
-            it('bypassing', function() {
+            it.only('bypassing', function() {
                 mover = new pocketciv.TribeMover(map, 1, 1);
                 mover.init(       { 3: 0, 4: 4, 5: 3, 6: 0, 8: 0 });
                 var ok = mover.ok({ 3: 0, 4: 1, 5: 3, 6: 3, 8: 0 });

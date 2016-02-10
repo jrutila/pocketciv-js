@@ -31,6 +31,7 @@ function TribeMover(map, moveLimit, seaCost) {
     function findRoute(route,dist,found,cost) {
         dist--;
         var mySeas = [];
+        if (!cost) cost = [];
         _.each(_.difference(findMap[_.last(route)].neighbours, route), function(ngh, nk) {
             if (ngh == 'frontier') return;
             if (isSea(ngh)) {
@@ -38,15 +39,15 @@ function TribeMover(map, moveLimit, seaCost) {
                 return;
             }
             var r = _.union(route, [parseInt(ngh)])
-            found(r);
+            found(r,cost);
             if (dist > 0)
-                findRoute(r,dist, found);
+                findRoute(r,dist, found,cost);
             
         }, this);
         
-        if (seaCost == 0) return;
+        // TODO: Change!
+        if (seaCost == -1) return;
         
-        console.log("seas")
         _.each(mySeas, function(s) {
             var sNgh = []
             _.each(findMap, function(area, sk) {
@@ -54,20 +55,27 @@ function TribeMover(map, moveLimit, seaCost) {
                 {
                     sNgh.push(sk);
                     var r = _.union(route, [parseInt(sk)]);
-                    found(r);
+                    var cc = cost.concat(_.last(route))
+                    found(r,cc);
                     if (dist > 0)
-                        findRoute(r,dist,found);
+                        findRoute(r,dist,found,cc);
                 }
             });
         },this);
     }
     
+    var viaMap = {1:{},2:{},3:{},4:{},5:{},6:{},7:{},8:{}};
     _.each(this.map, function(from, fk) {
         findRoute([parseInt(fk)], moveLimit, function(route, cost) {
-            console.log(route)
+            console.log(route,cost)
+            if (viaMap[_.first(route)][_.last(route)] == undefined)
+                viaMap[_.first(route)][_.last(route)] = [];
+            viaMap[_.first(route)][_.last(route)].push(cost);
             neighbours[_.first(route)].push(_.last(route))
         });
     }, this);
+    debug && console.log("viaMap")
+    debug && console.log(require('util').inspect(viaMap, false, 3))
     
     var ngh2 = [];
     _.each(this.map, function(from, fk) {
@@ -77,6 +85,7 @@ function TribeMover(map, moveLimit, seaCost) {
     }, this);
     
     var uniqs = function(val,key) { return _.uniq(val); };
+    this.viaMap = viaMap;
     this.neighbours = _.mapObject(neighbours, uniqs);
     this.neighbours2 = _.mapObject(neighbours2, uniqs);
 }
@@ -121,44 +130,69 @@ TribeMover.prototype = {
         this.max = this._nghValue(this.start, this.neighbours);
         this.ngh2 = this._nghValue(this.start, this.neighbours2);
     },
-    _umove: function*(m,n,s) {
-        var j = _.size(m)+1;
+    _umove: function*(m,n,s,c) {
+        var j = _.size(m);
+        var k = this.keys[j];
+        if (!c) c = [];
+        debug > 3 && console.log('-',s,k,n,m,c)
         
         if (_.size(m) == _.size(this.start))
         {
-            yield m;
+            // We have reached the last area
+            debug > 3 && console.log(s,m,c)
+            yield { move: m, cost: c };
         }
-        else if (n==0) {
-            yield* this._umove(m.concat([0]), n, s);
-        }
-        else if (j == s)
-        {
+        else if (
+            // No movement if there is no moves left
+            n == 0 ||
             // No movement to self
+            k == s ||
+            // No movement if there is no via
+            this.viaMap[s][k] == undefined ||
+            // No movement if there is no tribes in the target
+            this.end[k] == 0
+            )
+        {
             var mm = m.concat([0]);
-            yield* this._umove(mm,n,s);
+            yield* this._umove(mm,n,s,c);
         } else { 
-            // Try to move n or end times
-            for (var i = Math.min(this.end[j], n); i>=0; i--)
+            var via = this.viaMap[s][k];
+            // Try every possible route
+            for (var l = 0; l < via.length; l++)
             {
-                var mm = m.concat([i]);
-                yield* this._umove(mm,n-i,s);
+                debug > 3 && console.log('+',s,k,n,via[l], m,c)
+                // Try to move n or end times
+                for (var i = Math.min(this.end[k], n); i>=0; i--)
+                {
+                    var mm = m.concat([i]);
+                    if (i > 0)
+                        var cc = c.concat(via[l]);
+                    else
+                        var cc = c.concat([]);
+                    yield* this._umove(mm,n-i,s,cc);
+                }
             }
         }
     },
-    moves: function*(m) {
+    moves: function*(m,c) {
         if (!m) m = [];
-        var j = _.size(m)+1;
+        if (!c) c = [];
+        
+        var j = _.size(m);
+        var k = this.keys[j];
         if (_.size(m) == _.size(this.start))
         {
-            yield m;
+            yield { move: m, cost: c }
         }
         else {
-            var g = this._umove([],this.start[j],j)
+            var g = this._umove([],this.start[k],k)
             var gg = g.next();
             while (!gg.done)
             {
-                var mm = m.concat([gg.value]);
-                yield* this.moves(mm);
+                yield* this.moves(
+                    m.concat([gg.value.move]),
+                    c.concat([gg.value.cost])
+                    );
                 gg = g.next();
             }
         }
@@ -248,30 +282,99 @@ TribeMover.prototype = {
             }
         }
         
+        // If the preliminary check failed
+        if (!valid.ok) return valid;
+        
+        // Do the real check
         this.end = situation;
+        this.keys = _.map(_.keys(this.start),function(v) { return parseInt(v); });
+        console.log(this.keys)
         
         var it = this.moves();
         var nn = it.next();
+        valid.ok = false;
+        var smallest_cost = 999;
+        // Go through every possible move
         while (!nn.done)
         {
-            var summed = [0,0,0,0];
-            for (var i = 0; i < _.size(this.start); i++)
+            debug > 3 && console.log(nn.value)
+            var move = nn.value.move;
+            var summed = {1:0,2:0,3:0,4:0,5:0,6:0,7:0,8:0};
+            for (var i = 0; i < _.size(move); i++)
             {
-                for (var j = 0; j < _.size(this.start); j++)
+                var k = this.keys[i];
+                summed[k] = this.start[k];
+                for (var j = 0; j < _.size(move); j++)
                 {
-                   summed[i] += nn.value[j][i];
+                    summed[k] -= move[i][j];
+                    summed[k] += move[j][i];
                 }
                 
                 // If the end situation is not correct
-                if (summed[i] != this.end[i+1])
+                if (summed[k] != (this.end[k] || 0))
                 {
                     summed = false;
                 }
             }
             if (summed)
+            {
+                var cost = 0;
+                for (var i = 0; i < _.size(nn.value.cost); i++)
+                    cost += _.size(_.uniq(nn.value.cost[i]));
+                
+                console.log("--")
                 console.log(nn.value);
+                console.log(cost);
+                valid.ok = true;
+                
+                // Found out the cheapest alternative
+                if (cost == 0 || seaCost == 0){
+                    valid.cost = [];
+                    break;
+                }
+                    
+                if (cost < smallest_cost)
+                {
+                    valid.cost = [nn.value];
+                    smallest_cost = cost;
+                } else if (cost == smallest_cost)
+                {
+                    valid.cost.push(nn.value);
+                }
+            }
             nn = it.next();
         }
+        if (!valid.ok) fail();
+        if (seaCost == 0) return valid;
+        
+        var validcost = [];
+        _.map(valid.cost, function(move) {
+            var trg = {1:[],2:[],3:[],4:[],5:[],6:[],7:[],8:[]};
+            for (var i = 0; i < _.size(this.start); i++)
+            {
+                // No cost for this area
+                if (move.cost[i].length == 0) continue;
+                var k = this.keys[i];
+                _.each(move.move[i], function(am, j) {
+                    if (am == 0) return;
+                    _.each(_.uniq(move.cost[i]), function(fr) {
+                        trg[fr].push(this.keys[j]);
+                        trg[fr] = _.uniq(trg[fr]);
+                    },this);
+                },this);
+            }
+            console.log(trg)
+            var vcost = {};
+            _.each(trg, function(tot,from) {
+                if (tot == []) return;
+                _.each(tot, function(to) {
+                    var tto = vcost[to] || 0;
+                    vcost[to] = tto+seaCost; 
+                },this);
+            },this);
+            validcost.push(vcost);
+        },this);
+        valid.cost = validcost;
         
         return valid;
     },
