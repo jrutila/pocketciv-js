@@ -191,7 +191,7 @@ TribeMover.prototype = {
             for (var l = 0; l < via.length; l++)
             {
                 var burned = n;
-                // Remove burn
+                // Remove prev burn from starting area
                 if (_.has(b,s)) {
                     burned = n - (b[s] - this.end[s]);
                 }
@@ -202,13 +202,22 @@ TribeMover.prototype = {
                 {
                     var mm = m.concat([i]);
                     var bb = _.clone(b);
+                    var cango = true;
                     if (i > 0)
                     {
-                        _.each(via[l].burn, function(bk) {
-                            bb[bk] += i;
-                        });
+                        for (var bi = 0; bi < via[l].burn.length; bi++)
+                        {
+                            var ba = via[l].burn[bi];
+                            bb[ba] += i;
+                            if (bb[ba] > this.start[ba])
+                            {
+                                // Too many burns for one area
+                                cango = false;
+                            }
+                        }
                         bb[s] += i;
                     }
+                    if (!cango) continue;
                     debug && console.log('+',s,k,n-i,bb,mm)
                     yield* this._umove(s,mm,bb,n-i);
                 }
