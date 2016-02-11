@@ -2,7 +2,7 @@ var reducer = require("../core/reducer");
 var _ = require('underscore');
 var YP = require('../core/YieldProlog');
 
-var debug = 1;
+var debug = 0;
         
 function isSea(n)
 {
@@ -63,7 +63,7 @@ TribeMover.prototype = {
         this.start = _.pick(strt, _.filter(_.keys(strt), function(s) { return parseInt(s) }));
         this.handleMissing(this.start, this.map);
     
-        console.log(this.start)
+        debug && console.log("start", this.start)
         var neighbours = _.object(_.keys(this.map), [[],[],[],[],[],[],[],[]])
         var neighbours2 = _.object(_.keys(this.map), [[],[],[],[],[],[],[],[]])
         
@@ -84,7 +84,7 @@ TribeMover.prototype = {
                 var r = _.union(route, [parseInt(ngh)])
                 found(r,cost);
                 if (dist <= 0)
-                    console.log("b", r);
+                    debug > 3 && console.log("b", r);
                 var ccost = {
                     max: Math.min(cost.max, start[_.last(r)]),
                     burn: cost.burn.concat([_.last(r)]),
@@ -107,7 +107,7 @@ TribeMover.prototype = {
                         var cc = cost.concat(_.last(route))
                         found(r,cc);
                         if (dist <= 0)
-                            console.log("s",r)
+                            debug > 3 && console.log("s",r)
                         findRoute(r,dist,found,cc);
                     }
                 });
@@ -117,7 +117,7 @@ TribeMover.prototype = {
         var viaMap = {1:{},2:{},3:{},4:{},5:{},6:{},7:{},8:{}};
         _.each(this.map, function(from, fk) {
             findRoute([parseInt(fk)], moveLimit, function(route, cost) {
-                console.log(route,cost)
+                debug > 3 && console.log(route,cost)
                 if (cost.max > 0) {
                     if (viaMap[_.first(route)][_.last(route)] == undefined)
                         viaMap[_.first(route)][_.last(route)] = [];
@@ -196,7 +196,6 @@ TribeMover.prototype = {
                     burned = n - (b[s] - this.end[s]);
                 }
         
-                debug && console.log()
                 // Try to move n or end times
                 for (var i = Math.min(this.end[k], burned, via[l].max); i>=0; i--)
                 {
@@ -218,7 +217,7 @@ TribeMover.prototype = {
                         bb[s] += i;
                     }
                     if (!cango) continue;
-                    debug && console.log('+',s,k,n-i,bb,mm)
+                    debug > 3 && console.log('+',s,k,n-i,bb,mm)
                     yield* this._umove(s,mm,bb,n-i);
                 }
             }
@@ -379,8 +378,8 @@ TribeMover.prototype = {
             }
             if (summed)
             {
-                console.log("--")
-                console.log(nn.value);
+                debug && console.log("--")
+                debug && console.log(nn.value);
                 valid.ok = true;
                 
                 /*
