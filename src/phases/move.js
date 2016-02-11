@@ -23,71 +23,6 @@ function TribeMover(map, moveLimit, seaCost) {
     this.moveLimit = moveLimit;
     seaCost = seaCost === undefined ? -1 : seaCost;
     this.seaCost = seaCost;
-    
-    var neighbours = _.object(_.keys(this.map), [[],[],[],[],[],[],[],[]])
-    var neighbours2 = _.object(_.keys(this.map), [[],[],[],[],[],[],[],[]])
-    
-    var findMap = this.map;
-    function findRoute(route,dist,found,cost) {
-        dist--;
-        var mySeas = [];
-        if (!cost) cost = [];
-        _.each(_.difference(findMap[_.last(route)].neighbours, route), function(ngh, nk) {
-            if (ngh == 'frontier') return;
-            if (isSea(ngh)) {
-                mySeas.push(ngh);
-                return;
-            }
-            var r = _.union(route, [parseInt(ngh)])
-            found(r,cost);
-            if (dist > 0)
-                findRoute(r,dist, found,cost);
-            
-        }, this);
-        
-        // TODO: Change!
-        if (seaCost == -1) return;
-        
-        _.each(mySeas, function(s) {
-            var sNgh = []
-            _.each(findMap, function(area, sk) {
-                if(_.contains(area.neighbours, s) && !_.contains(route,parseInt(sk)))
-                {
-                    sNgh.push(sk);
-                    var r = _.union(route, [parseInt(sk)]);
-                    var cc = cost.concat(_.last(route))
-                    found(r,cc);
-                    if (dist > 0)
-                        findRoute(r,dist,found,cc);
-                }
-            });
-        },this);
-    }
-    
-    var viaMap = {1:{},2:{},3:{},4:{},5:{},6:{},7:{},8:{}};
-    _.each(this.map, function(from, fk) {
-        findRoute([parseInt(fk)], moveLimit, function(route, cost) {
-            console.log(route,cost)
-            if (viaMap[_.first(route)][_.last(route)] == undefined)
-                viaMap[_.first(route)][_.last(route)] = [];
-            viaMap[_.first(route)][_.last(route)].push(cost);
-            neighbours[_.first(route)].push(_.last(route))
-        });
-    }, this);
-    debug && console.log("viaMap")
-    debug && console.log(require('util').inspect(viaMap, false, 3))
-    
-    var ngh2 = [];
-    _.each(this.map, function(from, fk) {
-        findRoute([parseInt(fk)], moveLimit+1, function(route) {
-            neighbours2[_.first(route)].push(_.last(route))
-        });
-    }, this);
-    
-    var uniqs = function(val,key) { return _.uniq(val); };
-    this.viaMap = viaMap;
-    this.neighbours = _.mapObject(neighbours, uniqs);
-    this.neighbours2 = _.mapObject(neighbours2, uniqs);
 }
 
 function sum(arr) {
@@ -127,6 +62,90 @@ TribeMover.prototype = {
         // Clean up the start
         this.start = _.pick(strt, _.filter(_.keys(strt), function(s) { return parseInt(s) }));
         this.handleMissing(this.start, this.neighbours);
+    
+        var neighbours = _.object(_.keys(this.map), [[],[],[],[],[],[],[],[]])
+        var neighbours2 = _.object(_.keys(this.map), [[],[],[],[],[],[],[],[]])
+        
+        var findMap = this.map;
+        var start = this.start;
+        var moveLimit = this.moveLimit;
+        var seaCost = this.seaCost;
+        function findRoute(route,dist,found,cost) {
+            dist--;
+            var mySeas = [];
+            if (!cost) cost = { max: start[_.first(route)], burn: [], sea: [] };
+            _.each(_.difference(findMap[_.last(route)].neighbours, route), function(ngh, nk) {
+                if (ngh == 'frontier') return;
+                if (isSea(ngh)) {
+                    mySeas.push(ngh);
+                    return;
+                }
+                var r = _.union(route, [parseInt(ngh)])
+                found(r,cost);
+                if (dist <= 0)
+                    console.log("b", r);
+                var ccost = {
+                    max: Math.min(cost.max, start[_.last(r)]),
+                    burn: cost.burn.concat([_.last(r)]),
+                    sea: cost.sea
+                }
+                findRoute(r,dist, found,ccost);
+                
+            }, this);
+            
+            // TODO: Change!
+            if (seaCost == -1) return;
+            
+            _.each(mySeas, function(s) {
+                var sNgh = []
+                _.each(findMap, function(area, sk) {
+                    if(_.contains(area.neighbours, s) && !_.contains(route,parseInt(sk)))
+                    {
+                        sNgh.push(sk);
+                        var r = _.union(route, [parseInt(sk)]);
+                        var cc = cost.concat(_.last(route))
+                        found(r,cc);
+                        if (dist <= 0)
+                            console.log("s",r)
+                        findRoute(r,dist,found,cc);
+                    }
+                });
+            },this);
+        }
+        
+        var viaMap = {1:{},2:{},3:{},4:{},5:{},6:{},7:{},8:{}};
+        _.each(this.map, function(from, fk) {
+            findRoute([parseInt(fk)], moveLimit, function(route, cost) {
+                console.log(route,cost)
+                if (cost.max > 0) {
+                    if (viaMap[_.first(route)][_.last(route)] == undefined)
+                        viaMap[_.first(route)][_.last(route)] = [];
+                    viaMap[_.first(route)][_.last(route)].push(cost);
+                }
+                if (cost.burn.length == 0)
+                    neighbours[_.first(route)].push(_.last(route))
+                if (cost.burn.length <= 1)
+                    neighbours2[_.first(route)].push(_.last(route))
+            });
+        }, this);
+        debug && console.log("viaMap")
+        debug && console.log(require('util').inspect(viaMap, false, 3))
+        
+        /*
+        var ngh2 = [];
+        _.each(this.map, function(from, fk) {
+            findRoute([parseInt(fk)], moveLimit+1, function(route) {
+                if (cost.burn == [])
+                    neighbours2[_.first(route)].push(_.last(route))
+            });
+        }, this);
+        */
+        
+        var uniqs = function(val,key) { return _.uniq(val); };
+        this.viaMap = viaMap;
+        this.neighbours = _.mapObject(neighbours, uniqs);
+        this.neighbours2 = _.mapObject(neighbours2, uniqs);
+        
         this.max = this._nghValue(this.start, this.neighbours);
         this.ngh2 = this._nghValue(this.start, this.neighbours2);
     },
