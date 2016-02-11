@@ -61,8 +61,9 @@ TribeMover.prototype = {
     init: function(strt) {
         // Clean up the start
         this.start = _.pick(strt, _.filter(_.keys(strt), function(s) { return parseInt(s) }));
-        this.handleMissing(this.start, this.neighbours);
+        this.handleMissing(this.start, this.map);
     
+        console.log(this.start)
         var neighbours = _.object(_.keys(this.map), [[],[],[],[],[],[],[],[]])
         var neighbours2 = _.object(_.keys(this.map), [[],[],[],[],[],[],[],[]])
         
@@ -149,77 +150,98 @@ TribeMover.prototype = {
         this.max = this._nghValue(this.start, this.neighbours);
         this.ngh2 = this._nghValue(this.start, this.neighbours2);
     },
-    _umove: function*(m,n,s,c) {
+    _umove: function*(s,m,b,n) {
+        if (!b) {
+            b = _.object(this.keys,[0,0,0,0,0,0,0,0]);
+        }
+        if (!m) m = [];
+        if (n == undefined) {
+            n = Math.max(this.start[s]-this.end[s], 0);
+        }
         var j = _.size(m);
         var k = this.keys[j];
-        if (!c) c = [];
-        debug > 3 && console.log('-',s,k,n,m,c)
+        
+        debug > 3 && console.log('-',s,k,n,m)
         
         if (_.size(m) == _.size(this.start))
         {
             // We have reached the last area
-            debug > 3 && console.log(s,m,c)
-            yield { move: m, cost: c };
+            yield { move: m, burn: b };
         }
         else if (
             // No movement if there is no moves left
-            n == 0 ||
+            n <= 0 ||
             // No movement to self
             k == s ||
             // No movement if there is no via
             this.viaMap[s][k] == undefined ||
             // No movement if there is no tribes in the target
-            this.end[k] == 0
+            this.end[k] == 0 ||
+            // No movement if target is not increased
+            this.end[k] <= this.start[k]
             )
         {
             var mm = m.concat([0]);
-            yield* this._umove(mm,n,s,c);
+            yield* this._umove(s,mm,b,n);
         } else { 
             var via = this.viaMap[s][k];
+            var min = this.start[s]-this.end[s];
             // Try every possible route
+            //debug && console.log('+',s,k,n,_.size(via),this.end[k],b)
             for (var l = 0; l < via.length; l++)
             {
-                debug > 3 && console.log('+',s,k,n,via[l], m,c)
+                var burned = n;
+                // Remove burn
+                if (_.has(b,s)) {
+                    burned = n - (b[s] - this.end[s]);
+                }
+        
+                debug && console.log()
                 // Try to move n or end times
-                for (var i = Math.min(this.end[k], n); i>=0; i--)
+                for (var i = Math.min(this.end[k], burned, via[l].max); i>=0; i--)
                 {
                     var mm = m.concat([i]);
+                    var bb = _.clone(b);
                     if (i > 0)
-                        var cc = c.concat(via[l]);
-                    else
-                        var cc = c.concat([]);
-                    yield* this._umove(mm,n-i,s,cc);
+                    {
+                        _.each(via[l].burn, function(bk) {
+                            bb[bk] += i;
+                        });
+                        bb[s] += i;
+                    }
+                    debug && console.log('+',s,k,n-i,bb,mm)
+                    yield* this._umove(s,mm,bb,n-i);
                 }
             }
         }
     },
-    moves: function*(m,c) {
+    moves: function*(m,b) {
         if (!m) m = [];
-        if (!c) c = [];
         
         var j = _.size(m);
         var k = this.keys[j];
         if (_.size(m) == _.size(this.start))
         {
-            yield { move: m, cost: c }
+            yield { move: m, burn: b }
         }
         else {
-            var g = this._umove([],this.start[k],k)
+            var g = this._umove(k,null,b)
+            
             var gg = g.next();
             while (!gg.done)
             {
                 yield* this.moves(
                     m.concat([gg.value.move]),
-                    c.concat([gg.value.cost])
+                    gg.value.burn
                     );
                 gg = g.next();
             }
         }
     },
     handleMissing: function(situation, neighbours) {
-        if (_.size(situation) != _.size(this.neighbours))
+        if (_.size(situation) != _.size(neighbours))
         {
-            _.each(this.neighbours, function(nn, area) {
+            _.each(neighbours, function(nn, area) {
                 if (!_.has(situation, area))
                     situation[area] = 0;
             },this);
@@ -309,6 +331,17 @@ TribeMover.prototype = {
         this.keys = _.map(_.keys(this.start),function(v) { return parseInt(v); });
         console.log(this.keys)
         
+        /*
+        var it = this._umove(1)
+        var nn = it.next();
+        while (!nn.done)
+        {
+            console.log(nn.value)
+            nn = it.next();
+        }
+        return;
+        */
+        
         var it = this.moves();
         var nn = it.next();
         valid.ok = false;
@@ -337,19 +370,20 @@ TribeMover.prototype = {
             }
             if (summed)
             {
+                console.log("--")
+                console.log(nn.value);
+                valid.ok = true;
+                
+                /*
                 var cost = 0;
                 for (var i = 0; i < _.size(nn.value.cost); i++)
                     cost += _.size(_.uniq(nn.value.cost[i]));
-                
-                console.log("--")
-                console.log(nn.value);
                 console.log(cost);
-                valid.ok = true;
                 
                 // Found out the cheapest alternative
                 if (cost == 0 || seaCost == 0){
                     valid.cost = [];
-                    break;
+                    //break;
                 }
                     
                 if (cost < smallest_cost)
@@ -360,6 +394,7 @@ TribeMover.prototype = {
                 {
                     valid.cost.push(nn.value);
                 }
+                */
             }
             nn = it.next();
         }
