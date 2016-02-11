@@ -2,14 +2,12 @@ var reducer = require("../core/reducer");
 var _ = require('underscore');
 var YP = require('../core/YieldProlog');
 
-var debug = 1;
+var debug = 2;
         
 function isSea(n)
 {
     return typeof n == "string" && n != "frontier";
 }
-
-
 
 function TribeMover(map, moveLimit, seaCost) {
     this.start = {};
@@ -71,6 +69,7 @@ TribeMover.prototype = {
         var start = this.start;
         var moveLimit = this.moveLimit;
         var seaCost = this.seaCost;
+        
         function findRoute(route,dist,found,cost) {
             dist--;
             var mySeas = [];
@@ -83,11 +82,16 @@ TribeMover.prototype = {
                 }
                 var r = _.union(route, [parseInt(ngh)])
                 found(r,cost);
+                var max = Math.max(cost.max, start[_.last(r)]);
+                var burn = cost.burn;
                 if (dist <= 0)
-                    debug > 3 && console.log("b", r);
+                {
+                    max = Math.min(cost.max, start[_.last(r)]);
+                    burn = cost.burn.concat([_.last(r)]);
+                }
                 var ccost = {
-                    max: Math.min(cost.max, start[_.last(r)]),
-                    burn: cost.burn.concat([_.last(r)]),
+                    max: max,
+                    burn: burn,
                     sea: cost.sea
                 }
                 findRoute(r,dist, found,ccost);
@@ -110,9 +114,17 @@ TribeMover.prototype = {
                             sea: cost.sea.concat([from])
                         };
                         found(r,ccost);
+                        var max = Math.max(cost.max, start[_.last(r)]);
+                        var burn = ccost.burn;
+                        if (dist <= 0)
+                        {
+                            max = Math.min(cost.max, start[_.last(r)]);
+                            burn = cost.burn.concat([_.last(r)]);
+                        }
+                        
                         ccost = {
-                            max: Math.min(cost.max, start[_.last(r)]),
-                            burn: cost.burn.concat([_.last(r)]),
+                            max: max,
+                            burn: burn,
                             sea: ccost.sea
                         }
                         findRoute(r,dist,found,ccost);
@@ -130,9 +142,9 @@ TribeMover.prototype = {
                         viaMap[_.first(route)][_.last(route)] = [];
                     viaMap[_.first(route)][_.last(route)].push(cost);
                 }
-                if (cost.burn.length == 0)
+                if (cost.burn.length <= moveLimit-1)
                     neighbours[_.first(route)].push(_.last(route))
-                if (cost.burn.length <= 1)
+                if (cost.burn.length <= moveLimit)
                     neighbours2[_.first(route)].push(_.last(route))
             });
         }, this);
@@ -408,7 +420,7 @@ TribeMover.prototype = {
                 //jvar cost = 0;
                 //for (var i = 0; i < _.size(nn.value.cost); i++)
                 var cost = _.size(_.uniq(nn.value.cost));
-                console.log(cost);
+                debug > 1 && console.log(cost);
                 
                 // Found out the cheapest alternative
                 if (cost == 0 || seaCost == 0){
@@ -418,11 +430,11 @@ TribeMover.prototype = {
                     
                 if (cost < smallest_cost)
                 {
-                    valid.cost = [nn.value];
+                    valid.cost = [nn.value.cost];
                     smallest_cost = cost;
                 } else if (cost == smallest_cost)
                 {
-                    valid.cost.push(nn.value);
+                    valid.cost.push(nn.value.cost);
                 }
             }
             nn = it.next();
@@ -430,32 +442,16 @@ TribeMover.prototype = {
         if (!valid.ok) fail();
         if (seaCost == 0) return valid;
         
-        var validcost = [];
-        _.map(valid.cost, function(move) {
-            var trg = {1:[],2:[],3:[],4:[],5:[],6:[],7:[],8:[]};
-            _.each(_.uniq(move.cost), function(m) {
-                var i = this.keys.indexOf(m);
-                debug > 1 && console.log(m,i,move.move);
-                _.each(move.move[i], function(am, j) {
-                    if (am == 0) return;
-                    _.each(_.uniq(move.cost), function(fr) {
-                        trg[fr].push(this.keys[j]);
-                        trg[fr] = _.uniq(trg[fr]);
-                    },this);
-                },this);
-            },this);
-            debug > 1 && console.log("trg",trg)
-            var vcost = {};
-            _.each(trg, function(tot,from) {
-                if (tot == []) return;
-                _.each(tot, function(to) {
-                    var tto = vcost[to] || 0;
-                    vcost[to] = tto+seaCost; 
-                },this);
-            },this);
-            validcost.push(vcost);
-        },this);
-        valid.cost = validcost;
+        valid.cost = _.uniq(_.map(valid.cost, function(cost) {
+            var fin = {};
+            _.each(cost, function(c) {
+                if (fin[c[1]] == undefined)
+                    fin[c[1]] = 1; //TODO: seaCost!
+                else
+                    fin[c[1]] += 1; //TODO: seaCost!
+            });
+            return fin;
+        }), false, require('util').inspect);
         
         return valid;
     },
