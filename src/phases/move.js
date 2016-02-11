@@ -2,7 +2,7 @@ var reducer = require("../core/reducer");
 var _ = require('underscore');
 var YP = require('../core/YieldProlog');
 
-var debug = 0;
+var debug = 1;
         
 function isSea(n)
 {
@@ -98,17 +98,24 @@ TribeMover.prototype = {
             if (seaCost == -1) return;
             
             _.each(mySeas, function(s) {
-                var sNgh = []
                 _.each(findMap, function(area, sk) {
                     if(_.contains(area.neighbours, s) && !_.contains(route,parseInt(sk)))
                     {
-                        sNgh.push(sk);
+                        var from = _.last(route);
                         var r = _.union(route, [parseInt(sk)]);
-                        var cc = cost.concat(_.last(route))
-                        found(r,cc);
-                        if (dist <= 0)
-                            debug > 3 && console.log("s",r)
-                        findRoute(r,dist,found,cc);
+                        debug > 1 && console.log("s",r)
+                        var ccost = {
+                            max: cost.max,
+                            burn: _.clone(cost.burn),
+                            sea: cost.sea.concat([from])
+                        };
+                        found(r,ccost);
+                        ccost = {
+                            max: Math.min(cost.max, start[_.last(r)]),
+                            burn: cost.burn.concat([_.last(r)]),
+                            sea: ccost.sea
+                        }
+                        findRoute(r,dist,found,ccost);
                     }
                 });
             },this);
@@ -117,7 +124,7 @@ TribeMover.prototype = {
         var viaMap = {1:{},2:{},3:{},4:{},5:{},6:{},7:{},8:{}};
         _.each(this.map, function(from, fk) {
             findRoute([parseInt(fk)], moveLimit, function(route, cost) {
-                debug > 3 && console.log(route,cost)
+                debug > 1 && console.log(route,cost)
                 if (cost.max > 0) {
                     if (viaMap[_.first(route)][_.last(route)] == undefined)
                         viaMap[_.first(route)][_.last(route)] = [];
@@ -150,11 +157,12 @@ TribeMover.prototype = {
         this.max = this._nghValue(this.start, this.neighbours);
         this.ngh2 = this._nghValue(this.start, this.neighbours2);
     },
-    _umove: function*(s,m,b,n) {
+    _umove: function*(s,m,b,n,c) {
         if (!b) {
             b = _.object(this.keys,[0,0,0,0,0,0,0,0]);
         }
         if (!m) m = [];
+        if (!c) c = [];
         if (n == undefined) {
             n = Math.max(this.start[s]-this.end[s], 0);
         }
@@ -166,7 +174,7 @@ TribeMover.prototype = {
         if (_.size(m) == _.size(this.start))
         {
             // We have reached the last area
-            yield { move: m, burn: b };
+            yield { move: m, burn: b, cost: c };
         }
         else if (
             // No movement if there is no moves left
@@ -182,7 +190,7 @@ TribeMover.prototype = {
             )
         {
             var mm = m.concat([0]);
-            yield* this._umove(s,mm,b,n);
+            yield* this._umove(s,mm,b,n,c);
         } else { 
             var via = this.viaMap[s][k];
             var min = this.start[s]-this.end[s];
@@ -202,6 +210,7 @@ TribeMover.prototype = {
                     var mm = m.concat([i]);
                     var bb = _.clone(b);
                     var cango = true;
+                    var cc = c;
                     if (i > 0)
                     {
                         for (var bi = 0; bi < via[l].burn.length; bi++)
@@ -215,32 +224,47 @@ TribeMover.prototype = {
                             }
                         }
                         bb[s] += i;
+                        
+                        debug > 1 && console.log("c",via[l].sea,k)
+                        cc = c.concat([]);
+                        _.each(via[l].sea, function(s) {
+                            var snext = via[l].burn.indexOf(s)+1;
+                            var snext = via[l].burn[snext];
+                            if (!snext) snext = k;
+                            cc.push([s,snext]);
+                        },this);
                     }
                     if (!cango) continue;
-                    debug > 3 && console.log('+',s,k,n-i,bb,mm)
-                    yield* this._umove(s,mm,bb,n-i);
+                    debug > 2 && console.log('+',s,k,n-i,bb,mm,cc)
+                    yield* this._umove(s,mm,bb,null,cc);
                 }
             }
         }
     },
-    moves: function*(m,b) {
+    moves: function*(m,b,c) {
         if (!m) m = [];
+        if (!c) c = [];
         
         var j = _.size(m);
         var k = this.keys[j];
         if (_.size(m) == _.size(this.start))
         {
-            yield { move: m, burn: b }
+            yield {
+                move: m,
+                burn: b,
+                cost: _.uniq(c, false, function(v) { return v.toString() })
+            }
         }
         else {
-            var g = this._umove(k,null,b)
+            var g = this._umove(k,null,b,null,c)
             
             var gg = g.next();
             while (!gg.done)
             {
                 yield* this.moves(
                     m.concat([gg.value.move]),
-                    gg.value.burn
+                    gg.value.burn,
+                    gg.value.cost
                     );
                 gg = g.next();
             }
@@ -337,7 +361,6 @@ TribeMover.prototype = {
         // Do the real check
         this.end = situation;
         this.keys = _.map(_.keys(this.start),function(v) { return parseInt(v); });
-        console.log(this.keys)
         
         /*
         var it = this._umove(1)
@@ -382,16 +405,15 @@ TribeMover.prototype = {
                 debug && console.log(nn.value);
                 valid.ok = true;
                 
-                /*
-                var cost = 0;
-                for (var i = 0; i < _.size(nn.value.cost); i++)
-                    cost += _.size(_.uniq(nn.value.cost[i]));
+                //jvar cost = 0;
+                //for (var i = 0; i < _.size(nn.value.cost); i++)
+                var cost = _.size(_.uniq(nn.value.cost));
                 console.log(cost);
                 
                 // Found out the cheapest alternative
                 if (cost == 0 || seaCost == 0){
                     valid.cost = [];
-                    //break;
+                    break;
                 }
                     
                 if (cost < smallest_cost)
@@ -402,7 +424,6 @@ TribeMover.prototype = {
                 {
                     valid.cost.push(nn.value);
                 }
-                */
             }
             nn = it.next();
         }
@@ -412,20 +433,18 @@ TribeMover.prototype = {
         var validcost = [];
         _.map(valid.cost, function(move) {
             var trg = {1:[],2:[],3:[],4:[],5:[],6:[],7:[],8:[]};
-            for (var i = 0; i < _.size(this.start); i++)
-            {
-                // No cost for this area
-                if (move.cost[i].length == 0) continue;
-                var k = this.keys[i];
+            _.each(_.uniq(move.cost), function(m) {
+                var i = this.keys.indexOf(m);
+                debug > 1 && console.log(m,i,move.move);
                 _.each(move.move[i], function(am, j) {
                     if (am == 0) return;
-                    _.each(_.uniq(move.cost[i]), function(fr) {
+                    _.each(_.uniq(move.cost), function(fr) {
                         trg[fr].push(this.keys[j]);
                         trg[fr] = _.uniq(trg[fr]);
                     },this);
                 },this);
-            }
-            console.log(trg)
+            },this);
+            debug > 1 && console.log("trg",trg)
             var vcost = {};
             _.each(trg, function(tot,from) {
                 if (tot == []) return;
