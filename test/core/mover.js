@@ -3,7 +3,7 @@ var expect = require('chai').expect;
 var pocketciv = require('../../src/core/pocketciv');
 var event = require('../../src/core/event');
 
-describe.only('TribeMover', function() {
+describe('TribeMover', function() {
     describe('simple', function() {
         beforeEach(function() {
             // 1 - 2 - 3
@@ -765,6 +765,39 @@ describe.only('TribeMover', function() {
         it('case 5', function() {
             mover.init({ 1: 2, 2: 0, 3: 0, 4: 0 });
             mover.ok(  { 1: 0, 2: 1, 3: 1, 4: 0 }).ok.should.be.true;
+        });
+    });
+    describe('slow ones', function() {
+        it.only('case 1', function() {
+            //     1 f 2
+            //
+            //  7    sea
+            //   \
+            //     5 - 6 - 3 - 4
+            //         \  /
+            //           8
+            map = {
+                1: { 'neighbours': ['sea','frontier'] },
+                2: { 'neighbours': ['sea','frontier'] },
+                3: { "neighbours": [ 4, 6, 8, 'sea', 'frontier'] },
+                4: { "neighbours": [ 3, 'sea', 'frontier']},
+                5: { "neighbours": [ 6, 7, 'sea', 'frontier'] },
+                6: { "neighbours": [ 3, 5, 8, 'sea', 'frontier']},
+                7: { "neighbours": [ 5, 'sea', 'frontier' ] },
+                8: { "neighbours": [ 3, 6, 'frontier' ] },
+            }
+            mover = new pocketciv.TribeMover(map, 1, 1);
+            mover.init({ 1: 0, 2: 0, 3: 3, 4: 2, 5: 1, 6: 3, 7: 1, 8: 2 });
+            var ok =
+            mover.ok(  { 1: 2, 2: 3, 3: 1, 4: 1, 5: 1, 6: 1, 7: 2, 8: 1 },
+                function(v) {
+                    // succeeded! stop!
+                    mover.stop();
+                    console.log("stopped")
+                }
+            )
+            console.log("exied")
+            ok.ok.should.equal("stopped");
         });
     });
 });

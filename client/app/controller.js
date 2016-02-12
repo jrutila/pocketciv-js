@@ -225,8 +225,10 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
             $scope.mover.onmessage = function(msg) {
                 if (msg.data.ok != undefined)
                     handleOk(msg.data);
-                else if (msg.data.cost != undefined)
-                    handleCost(msg.data);
+                else
+                {
+                    // Not OK! What now?
+                }
             };
         } else
             $scope.mover = new pocketciv.TribeMover(

@@ -2,7 +2,7 @@ var reducer = require("../core/reducer");
 var _ = require('underscore');
 var util = require('util');
 
-var debug = 1;
+var debug = 0;
         
 function isSea(n)
 {
@@ -56,7 +56,12 @@ function pp(cur, perms, maxMoves, max, min, count) {
 
 
 TribeMover.prototype = {
+    stop: function() {
+        debug && console.log("STOP")
+        this.stopped = true;
+    },
     init: function(strt) {
+        this.stopped = false;
         // Clean up the start
         this.start = _.pick(strt, _.filter(_.keys(strt), function(s) { return parseInt(s) }));
         this.handleMissing(this.start, this.map);
@@ -238,6 +243,7 @@ TribeMover.prototype = {
         this.ngh2 = this._nghValue(this.start, this.neighbours2);
     },
     _umove: function*(s,m,b,n,c,a,d) {
+        if (this.stopped) return;
         // burn
         if (!b) b = _.object(this.keys,[0,0,0,0,0,0,0,0]);
         // already moved
@@ -376,6 +382,7 @@ TribeMover.prototype = {
         }
     },
     moves: function*(m,b,c,a,d) {
+        if (this.stopped) return;
         if (!m) m = [];
         if (!c) c = [];
         
@@ -397,6 +404,7 @@ TribeMover.prototype = {
             var gg = g.next();
             while (!gg.done)
             {
+                if (this.stopped) return;
                 debug > 2 && console.log(gg.value)
                 yield* this.moves(
                     m.concat([gg.value.move]),
@@ -518,6 +526,10 @@ TribeMover.prototype = {
         // Go through every possible move
         while (!nn.done)
         {
+            if (this.stopped) {
+                valid.ok = "stopped";
+                return valid;
+            }
             debug > 2 && console.log(nn.value)
             var move = nn.value.move;
             if (true)
@@ -550,6 +562,9 @@ TribeMover.prototype = {
                 }
             }
             nn = it.next();
+        }
+        if (this.stopped) {
+            valid.ok = "stopped";
         }
         
         

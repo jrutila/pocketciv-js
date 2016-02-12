@@ -11,21 +11,25 @@ onmessage = function(msg) {
         console.log("Inited TribeMover")
     } else if (action == "init") {
         self.mover.init(msg.data.start);
-        console.log("Start set");
+        console.log("Start set",msg.data.start);
     } else if (action == "ok") {
-        var handled = false;
+        self.mover.stop();
         var ok = self.mover.ok(msg.data.situation,
-        function(ok) {
-            // Failed fast
-            handled = true;
-            !handled && postMessage({ ok: false });
-        });
+            function(ok) {
+                // Found valid, not necessarily cheapest
+                console.log("Ok",ok);
+                postMessage(ok);
+            }
+        );
         //var millis = 2000;
         //var date = new Date();
         //var curDate = null;
         //do { curDate = new Date(); }
         ////while(curDate-date < millis);
-        console.log("Calculated!");
-        !handled && postMessage(ok);
+        if (ok.ok != "stopped") {
+            console.log("Calculated",ok);
+            console.log("TODO: Cache this fastest one")
+            postMessage(ok);
+        }
     }
 }
