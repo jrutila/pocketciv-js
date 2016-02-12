@@ -1,8 +1,9 @@
 var reducer = require("../core/reducer");
 var _ = require('underscore');
 var YP = require('../core/YieldProlog');
+var util = require('util');
 
-var debug = 2;
+var debug = 0;
         
 function isSea(n)
 {
@@ -149,7 +150,7 @@ TribeMover.prototype = {
             });
         }, this);
         debug && console.log("viaMap")
-        debug && console.log(require('util').inspect(viaMap, false, 3))
+        debug && console.log(util.inspect(viaMap, false, 4))
         
         /*
         var ngh2 = [];
@@ -169,30 +170,46 @@ TribeMover.prototype = {
         this.max = this._nghValue(this.start, this.neighbours);
         this.ngh2 = this._nghValue(this.start, this.neighbours2);
     },
-    _umove: function*(s,m,b,n,c) {
-        if (!b) {
-            b = _.object(this.keys,[0,0,0,0,0,0,0,0]);
-        }
+    _umove: function*(s,m,b,n,c,a) {
+        // burn
+        if (!b) b = _.object(this.keys,[0,0,0,0,0,0,0,0]);
+        // already moved
+        if (!a) a = _.object(this.keys,[0,0,0,0,0,0,0,0]);
+        // movements
         if (!m) m = [];
+        // sea cost
         if (!c) c = [];
+        // n marks what is left in this branch to move from s
         if (n == undefined) {
             n = Math.max(this.start[s]-this.end[s], 0);
+            if (_.has(b,s))
+                var pb = b[s];
         }
-        var j = _.size(m);
-        var k = this.keys[j];
         
-        debug > 3 && console.log('-',s,k,n,m)
+        var j = _.size(m);
+        // current target area
+        var k = this.keys[j];
+        var min = this.start[s]-this.end[s];
+        
+        if (debug > 2)
+        {
+            _.size(m) < _.size(this.start) && console.log('-',s,k,n,m)
+            _.size(m) == _.size(this.start) && console.log('#',s,n,m,a)
+        }
         
         if (_.size(m) == _.size(this.start))
         {
+            if (n > 0) return;
             // We have reached the last area
-            yield { move: m, burn: b, cost: c };
+            yield { move: m, burn: b, cost: c, already: a };
         }
         else if (
             // No movement if there is no moves left
             n <= 0 ||
             // No movement to self
             k == s ||
+            // No movement if the source (s) is not decreased
+            this.end[s] >= this.start[s] ||
             // No movement if there is no via
             this.viaMap[s][k] == undefined ||
             // No movement if there is no tribes in the target
@@ -202,58 +219,73 @@ TribeMover.prototype = {
             )
         {
             var mm = m.concat([0]);
-            yield* this._umove(s,mm,b,n,c);
+            yield* this._umove(s,mm,b,n,c,a);
         } else { 
-            var via = this.viaMap[s][k];
-            var min = this.start[s]-this.end[s];
-            // Try every possible route
+            var viaMap = this.viaMap[s][k];
+            // Try every possible route with every possible amount
             //debug && console.log('+',s,k,n,_.size(via),this.end[k],b)
-            for (var l = 0; l < via.length; l++)
+            for (var l = 0; l < viaMap.length; l++)
             {
-                var burned = n;
-                // Remove prev burn from starting area
-                if (_.has(b,s)) {
-                    burned = n - (b[s] - this.end[s]);
-                }
-        
-                // Try to move n or end times
-                for (var i = Math.min(this.end[k], burned, via[l].max); i>=0; i--)
+                var via = viaMap[l];
+                
+                // What is the maximum
+                var maxEnd = this.end[k]-a[k];
+                if (_.has(b,k))
+                    maxEnd = this.end[k]-b[k];
+                // How many can be transferred from here at max
+                // Either what is left, or via's max or targets final
+                var maxVia = Math.min(n,via.max,this.end[k]);
+                
+                // If this is the first element of the move array
+                // and there is previous burn
+                // pb does not go into recursion, it just fixes n
+                if (pb)
+                    maxVia -= pb;
+                
+                // Try with every move
+                for (var i = maxVia; i>= 0; i--)
                 {
+                    debug > 2 && console.log(Array(m.length+2).join("_"),s,k,i,b,a,c)
+                    debug > 2 && console.log("       ",via)
+                    
                     var mm = m.concat([i]);
                     var bb = _.clone(b);
-                    var cango = true;
-                    var cc = c;
-                    if (i > 0)
-                    {
-                        for (var bi = 0; bi < via[l].burn.length; bi++)
+                    bb[s] += i;
+                    // If burns will raise it too high
+                    if (bb[s] > this.start[s])
+                        continue;
+                    var cont = false;
+                    _.each(via.burn, function(vb) {
+                        bb[vb] += i;
+                        if (bb[vb] > this.start[vb])
                         {
-                            var ba = via[l].burn[bi];
-                            bb[ba] += i;
-                            if (bb[ba] > this.start[ba])
-                            {
-                                // Too many burns for one area
-                                cango = false;
-                            }
+                            // If burns will raise it too high
+                            cont = true;
                         }
-                        bb[s] += i;
-                        
-                        debug > 1 && console.log("c",via[l].sea,k)
-                        cc = c.concat([]);
-                        _.each(via[l].sea, function(s) {
-                            var snext = via[l].burn.indexOf(s)+1;
-                            var snext = via[l].burn[snext];
-                            if (!snext) snext = k;
-                            cc.push([s,snext]);
-                        },this);
-                    }
-                    if (!cango) continue;
-                    debug > 2 && console.log('+',s,k,n-i,bb,mm,cc)
-                    yield* this._umove(s,mm,bb,null,cc);
-                }
+                    },this);
+                    if (cont) continue;
+                    
+                    var aa = _.clone(a);
+                    aa[k] += i;
+                    // if there is too much moved already to target
+                    if (aa[k] > this.end[k])
+                        continue;
+                    
+                    var cc = c.concat([]);
+                    _.each(via.sea, function(s) {
+                        var snext = via.burn.indexOf(s)+1;
+                        var snext = via.burn[snext];
+                        if (!snext) snext = k;
+                        cc.push([s,snext]);
+                    },this);
+                    
+                    debug > 2 && console.log(Array(mm.length+1).join("+"),s,k,i,bb,aa,mm,cc)
+                    yield* this._umove(s,mm,bb,n-i,cc,aa);
+            }
             }
         }
     },
-    moves: function*(m,b,c) {
+    moves: function*(m,b,c,a) {
         if (!m) m = [];
         if (!c) c = [];
         
@@ -268,15 +300,17 @@ TribeMover.prototype = {
             }
         }
         else {
-            var g = this._umove(k,null,b,null,c)
+            var g = this._umove(k,null,b,null,c,a)
             
             var gg = g.next();
             while (!gg.done)
             {
+                debug > 2 && console.log(gg.value)
                 yield* this.moves(
                     m.concat([gg.value.move]),
                     gg.value.burn,
-                    gg.value.cost
+                    gg.value.cost,
+                    gg.value.already
                     );
                 gg = g.next();
             }
@@ -392,8 +426,9 @@ TribeMover.prototype = {
         // Go through every possible move
         while (!nn.done)
         {
-            debug > 3 && console.log(nn.value)
+            debug > 2 && console.log(nn.value)
             var move = nn.value.move;
+            /*
             var summed = {1:0,2:0,3:0,4:0,5:0,6:0,7:0,8:0};
             for (var i = 0; i < _.size(move); i++)
             {
@@ -411,7 +446,8 @@ TribeMover.prototype = {
                     summed = false;
                 }
             }
-            if (summed)
+            */
+            if (true)
             {
                 debug && console.log("--")
                 debug && console.log(nn.value);
@@ -451,7 +487,7 @@ TribeMover.prototype = {
                     fin[c[1]] += 1; //TODO: seaCost!
             });
             return fin;
-        }), false, require('util').inspect);
+        }), false, util.inspect);
         
         return valid;
     },
