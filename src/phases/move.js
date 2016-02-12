@@ -1,7 +1,8 @@
 var reducer = require("../core/reducer");
 var _ = require('underscore');
+var util = require('util');
 
-var debug = 0;
+var debug = 1;
         
 function isSea(n)
 {
@@ -146,10 +147,78 @@ TribeMover.prototype = {
                 if (cost.burn.length <= moveLimit)
                     neighbours2[_.first(route)].push(_.last(route))
             });
+            
+            // Select only the best ones
+            _.each(viaMap[fk], function(via, tk) {
+                via = _.sortBy(via, function(v) {
+                    return [v.burn.length, v.sea.length];
+                });
+                
+                var maxs = [];
+                var shortest = 9;
+                var shortestSea = 9;
+                
+                var straight = _.find(via, function(v) {
+                    if (v.burn.length == 0 && v.sea.length == 0)
+                    {
+                        shortest = 0;
+                        shortestSea = 0;
+                        maxs.push(v.max);
+                        return true;
+                    }
+                });
+                
+                var straightSea =_.find(via, function(v) {
+                    if (v.burn.length == 0 && _.first(v.sea) == fk)
+                    {
+                        shortestSea = v.sea.length;
+                        maxs.push(v.max);
+                        return true;
+                    }
+                });
+                
+                var shortestLand = _.filter(via, function(v) {
+                    if (_.isEqual(v,straight)) return false;
+                    if  (v.sea.length == 0 && v.burn.length < shortest)
+                    {
+                        shortest = v.burn.length;
+                        maxs.push[v.max];
+                        return true;
+                    }
+                });
+                
+                var shortestSea = _.filter(via, function(v) {
+                    if (_.isEqual(v,straightSea)) return false;
+                    if (straightSea && _.first(v.sea) == fk) return false;
+                    if (_.any(shortestLand, function(s) { return _.isEqual(s.burn, v.burn) })) return false;
+                    if  (v.sea.length > 0 && v.burn.length <= shortestSea)
+                    {
+                        shortestSea = v.burn.length;
+                        maxs.push[v.max];
+                        return true;
+                    }
+                });
+                
+                var missingMaxes = _.filter(via, function(v) {
+                    if (v.max <= _.max(maxs)) return false;
+                    maxs.push(v.max);
+                    return true;
+                });
+                
+                
+                via = [];
+                
+                if (straight) via = via.concat([straight]);
+                if (straightSea) via = via.concat([straightSea]);
+                via = via.concat(shortestLand);
+                via = via.concat(shortestSea);
+                via = via.concat(missingMaxes);
+                
+                viaMap[fk][tk] = _.uniq(via, JSON.stringify);
+            });
         }, this);
         debug && console.log("viaMap")
-        debug && console.log(JSON.stringify(viaMap, null, 4))
-        
+        debug && console.log(util.inspect(viaMap, false, 4))
         /*
         var ngh2 = [];
         _.each(this.map, function(from, fk) {
@@ -193,6 +262,13 @@ TribeMover.prototype = {
         {
             _.size(m) < _.size(this.start) && console.log('-',s,k,n,m)
             _.size(m) == _.size(this.start) && console.log('#',s,n,m,a)
+        }
+        
+        var lastOne = false;
+        if (s == _.last(this.keys))
+        {
+            // We are working on the last m
+            lastOne = true;
         }
         
         if (_.size(m) == _.size(this.start))
@@ -263,6 +339,10 @@ TribeMover.prototype = {
                     },this);
                     if (cont) continue;
                     
+                    // If the final target does not fulfill
+                    if (lastOne && a[k] + i != this.end[k])
+                        continue;
+                    
                     var aa = _.clone(a);
                     aa[k] += i;
                     // if there is too much moved already to target
@@ -275,7 +355,10 @@ TribeMover.prototype = {
                         var snext = via.burn[snext];
                         if (!snext) snext = k;
                         cc.push([s,snext]);
+                        if (cc.length >= this.minCost)
+                            cont = true;
                     },this);
+                    if (cont) continue;
                     
                     debug > 2 && console.log(Array(mm.length+1).join("+"),s,k,i,bb,aa,mm,cc)
                     yield* this._umove(s,mm,bb,n-i,cc,aa);
@@ -294,7 +377,8 @@ TribeMover.prototype = {
             yield {
                 move: m,
                 burn: b,
-                cost: _.uniq(c, false, function(v) { return v.toString() })
+                cost: _.uniq(c, false, function(v) { return v.toString() }),
+                already: a
             }
         }
         else {
@@ -398,6 +482,7 @@ TribeMover.prototype = {
                 fail();
             }
         }
+        debug && console.log("Basic checks ok");
         
         // If the preliminary check failed
         if (!valid.ok) return valid;
@@ -453,8 +538,8 @@ TribeMover.prototype = {
                 
                 //jvar cost = 0;
                 //for (var i = 0; i < _.size(nn.value.cost); i++)
-                var cost = _.size(_.uniq(nn.value.cost));
-                debug > 1 && console.log(cost);
+                var cost = _.size(_.uniq(nn.value.cost, JSON.stringify));
+                debug && console.log("cost",cost);
                 
                 // Found out the cheapest alternative
                 if (cost == 0 || seaCost == 0){
@@ -466,6 +551,7 @@ TribeMover.prototype = {
                 {
                     valid.cost = [nn.value.cost];
                     smallest_cost = cost;
+                    this.minCost = cost;
                 } else if (cost == smallest_cost)
                 {
                     valid.cost.push(nn.value.cost);
