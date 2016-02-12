@@ -107,7 +107,7 @@ TribeMover.prototype = {
                     {
                         var from = _.last(route);
                         var r = _.union(route, [parseInt(sk)]);
-                        debug > 1 && console.log("s",r)
+                        debug > 2 && console.log("s",r)
                         var ccost = {
                             max: cost.max,
                             burn: _.clone(cost.burn),
@@ -136,7 +136,7 @@ TribeMover.prototype = {
         var viaMap = {1:{},2:{},3:{},4:{},5:{},6:{},7:{},8:{}};
         _.each(this.map, function(from, fk) {
             findRoute([parseInt(fk)], moveLimit, function(route, cost) {
-                debug > 1 && console.log(route,cost)
+                debug > 2 && console.log(route,cost)
                 if (cost.max > 0) {
                     if (viaMap[_.first(route)][_.last(route)] == undefined)
                         viaMap[_.first(route)][_.last(route)] = [];
@@ -237,11 +237,13 @@ TribeMover.prototype = {
         this.max = this._nghValue(this.start, this.neighbours);
         this.ngh2 = this._nghValue(this.start, this.neighbours2);
     },
-    _umove: function*(s,m,b,n,c,a) {
+    _umove: function*(s,m,b,n,c,a,d) {
         // burn
         if (!b) b = _.object(this.keys,[0,0,0,0,0,0,0,0]);
         // already moved
         if (!a) a = _.object(this.keys,[0,0,0,0,0,0,0,0]);
+        // final cost
+        if (!d) d = _.object(this.keys,[0,0,0,0,0,0,0,0]);
         // movements
         if (!m) m = [];
         // sea cost
@@ -275,7 +277,7 @@ TribeMover.prototype = {
         {
             if (n > 0) return;
             // We have reached the last area
-            yield { move: m, burn: b, cost: c, already: a };
+            yield { move: m, burn: b, cost: d, costs: c, already: a };
         }
         else if (
             // No movement if there is no moves left
@@ -293,7 +295,7 @@ TribeMover.prototype = {
             )
         {
             var mm = m.concat([0]);
-            yield* this._umove(s,mm,b,n,c,a);
+            yield* this._umove(s,mm,b,n,c,a,d);
         } else { 
             var viaMap = this.viaMap[s][k];
             // Try every possible route with every possible amount
@@ -319,7 +321,7 @@ TribeMover.prototype = {
                 // Try with every move
                 for (var i = maxVia; i>= 0; i--)
                 {
-                    debug > 2 && console.log(Array(m.length+2).join("_"),s,k,i,b,a,c)
+                    debug > 1 && console.log(Array(m.length+2).join("_"),s,k,i,b,a,c,d)
                     debug > 2 && console.log("       ",via)
                     
                     var mm = m.concat([i]);
@@ -350,23 +352,30 @@ TribeMover.prototype = {
                         continue;
                     
                     var cc = c.concat([]);
+                    var dd = _.clone(d);
                     _.each(via.sea, function(s) {
                         var snext = via.burn.indexOf(s)+1;
                         var snext = via.burn[snext];
                         if (!snext) snext = k;
-                        cc.push([s,snext]);
+                        if (!_.any(cc, function(com) { return _.isEqual(com,[s,snext])}))
+                        {
+                            cc.push([s,snext]);
+                            dd[snext]++;
+                        }
+                        if (dd[snext] > this.end[snext])
+                            cont = true;
                         if (cc.length >= this.minCost)
                             cont = true;
                     },this);
                     if (cont) continue;
                     
-                    debug > 2 && console.log(Array(mm.length+1).join("+"),s,k,i,bb,aa,mm,cc)
-                    yield* this._umove(s,mm,bb,n-i,cc,aa);
+                    debug > 1 && console.log(Array(mm.length+1).join("+"),s,k,i,bb,aa,mm,cc,dd)
+                    yield* this._umove(s,mm,bb,n-i,cc,aa,dd);
             }
             }
         }
     },
-    moves: function*(m,b,c,a) {
+    moves: function*(m,b,c,a,d) {
         if (!m) m = [];
         if (!c) c = [];
         
@@ -377,12 +386,13 @@ TribeMover.prototype = {
             yield {
                 move: m,
                 burn: b,
-                cost: _.uniq(c, false, function(v) { return v.toString() }),
+                costs: _.uniq(c, false, function(v) { return v.toString() }),
+                cost: d, 
                 already: a
             }
         }
         else {
-            var g = this._umove(k,null,b,null,c,a)
+            var g = this._umove(k,null,b,null,c,a,d)
             
             var gg = g.next();
             while (!gg.done)
@@ -391,8 +401,9 @@ TribeMover.prototype = {
                 yield* this.moves(
                     m.concat([gg.value.move]),
                     gg.value.burn,
-                    gg.value.cost,
-                    gg.value.already
+                    gg.value.costs,
+                    gg.value.already,
+                    gg.value.cost
                     );
                 gg = g.next();
             }
@@ -407,13 +418,13 @@ TribeMover.prototype = {
             },this);
         }
     },
-    ok: function(situation, fail, costFunc) {
+    ok: function(situation, success) {
         // Clean up the situation
         situation = _.pick(situation, _.filter(_.keys(situation), function(s) { return parseInt(s) }));
         this.handleMissing(situation, this.neighbours);
         var no_perm_check = 1;
         var valid = {
-            ok: true,
+            ok: false,
             target: situation,
             initial: this.start,
             cost: [],
@@ -424,16 +435,17 @@ TribeMover.prototype = {
         if (this.moveLimit == -1) return valid;
         if (_.isEqual(this.start, situation)) return valid;
         
-        fail = fail || function() {
-            valid.ok = false;
-            if (debug)
-                console.log("FAIL HERE!")
+        success = success || function(ok) {
+            if (ok.ok && debug)
+            {
+                debug && console.log("Success !");
+                debug && console.log(util.inspect(ok,false,4));
+            }
         };
-        costFunc = costFunc || function() {  };
         
         // Different amount of tribes
         if (sum(this.start) != sum(situation))
-            fail();
+            return valid;
         
         var start = this.start;
         var ngh = this._nghValue(situation, this.neighbours);
@@ -473,19 +485,16 @@ TribeMover.prototype = {
         {
             debug && console.log("check "+key)
             if ((situation[key] || 0) > this.max[key]) {
-                fail();
+                return valid;
             }
             if (ngh[key] < this.start[key]) {
-                fail();
+                return valid;
             }
             if (ngh[key] > this.ngh2[key]) {
-                fail();
+                return valid;
             }
         }
         debug && console.log("Basic checks ok");
-        
-        // If the preliminary check failed
-        if (!valid.ok) return valid;
         
         // Do the real check
         this.end = situation;
@@ -511,67 +520,38 @@ TribeMover.prototype = {
         {
             debug > 2 && console.log(nn.value)
             var move = nn.value.move;
-            /*
-            var summed = {1:0,2:0,3:0,4:0,5:0,6:0,7:0,8:0};
-            for (var i = 0; i < _.size(move); i++)
-            {
-                var k = this.keys[i];
-                summed[k] = this.start[k];
-                for (var j = 0; j < _.size(move); j++)
-                {
-                    summed[k] -= move[i][j];
-                    summed[k] += move[j][i];
-                }
-                
-                // If the end situation is not correct
-                if (summed[k] != (this.end[k] || 0))
-                {
-                    summed = false;
-                }
-            }
-            */
             if (true)
             {
-                debug && console.log("--")
-                debug && console.log(nn.value);
+                debug > 0 && console.log("--")
+                debug > 0 && console.log(nn.value);
                 valid.ok = true;
                 
                 //jvar cost = 0;
                 //for (var i = 0; i < _.size(nn.value.cost); i++)
-                var cost = _.size(_.uniq(nn.value.cost, JSON.stringify));
+                var cost = _.reduce(nn.value.cost, function(c,m) { return c+m },0);
                 debug && console.log("cost",cost);
                 
                 // Found out the cheapest alternative
                 if (cost == 0 || seaCost == 0){
                     valid.cost = [];
+                    success(valid);
                     break;
                 }
                     
-                if (cost < smallest_cost)
+                if (cost <= smallest_cost)
                 {
-                    valid.cost = [nn.value.cost];
+                    if (cost < smallest_cost)
+                        valid.cost = [];
                     smallest_cost = cost;
                     this.minCost = cost;
-                } else if (cost == smallest_cost)
-                {
+                    
                     valid.cost.push(nn.value.cost);
+                    success(valid);
                 }
             }
             nn = it.next();
         }
-        if (!valid.ok) fail();
-        if (seaCost == 0) return valid;
         
-        valid.cost = _.uniq(_.map(valid.cost, function(cost) {
-            var fin = {};
-            _.each(cost, function(c) {
-                if (fin[c[1]] == undefined)
-                    fin[c[1]] = 1; //TODO: seaCost!
-                else
-                    fin[c[1]] += 1; //TODO: seaCost!
-            });
-            return fin;
-        }), false, JSON.stringify);
         
         return valid;
     },
