@@ -1,7 +1,5 @@
 var reducer = require("../core/reducer");
 var _ = require('underscore');
-var YP = require('../core/YieldProlog');
-var util = require('util');
 
 var debug = 0;
         
@@ -150,7 +148,7 @@ TribeMover.prototype = {
             });
         }, this);
         debug && console.log("viaMap")
-        debug && console.log(util.inspect(viaMap, false, 4))
+        debug && console.log(JSON.stringify(viaMap, null, 4))
         
         /*
         var ngh2 = [];
@@ -487,7 +485,7 @@ TribeMover.prototype = {
                     fin[c[1]] += 1; //TODO: seaCost!
             });
             return fin;
-        }), false, util.inspect);
+        }), false, JSON.stringify);
         
         return valid;
     },
