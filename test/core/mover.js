@@ -3,7 +3,7 @@ var expect = require('chai').expect;
 var pocketciv = require('../../src/core/pocketciv');
 var event = require('../../src/core/event');
 
-describe('TribeMover', function() {
+describe.only('TribeMover', function() {
     describe('simple', function() {
         beforeEach(function() {
             // 1 - 2 - 3
@@ -121,7 +121,7 @@ describe('TribeMover', function() {
         });
         it('case 1', function() {
             mover.init({ 1: 0, 2: 0, 3: 6, 4: 0, 5: 0 });
-            mover.ok({ 1: 0, 2: 3, 3: 0, 4: 2, 5: 1 }).ok.should.be.true;
+            mover.ok(  { 1: 0, 2: 3, 3: 0, 4: 2, 5: 1 }).ok.should.be.true;
         });
         it('case 2', function() {
             mover.init({ 1: 6, 2: 6, 3: 6, 4: 0, 5: 0 });
@@ -224,6 +224,27 @@ describe('TribeMover', function() {
                 ok.cost.should.deep.equal([ { 5: 2 } ]);
             });
         });
+        describe('basic4: central point', function() {
+            beforeEach(function() {
+                //      4    
+                //      |       
+                // 1 -  2  - 3 - 5 
+                map = {
+                    1: { 'neighbours': [ 2 ] },
+                    2: { 'neighbours': [ 1, 3, 4 ] },
+                    3: { 'neighbours': [ 2, 5 ] },
+                    4: { 'neighbours': [ 2 ] },
+                    5: { 'neighbours': [ 3 ] },
+                }
+                mover = new pocketciv.TribeMover(map, 1);
+            });
+            it('case 1', function() {
+                mover.init({ 1: 2, 2: 2, 3: 0, 4: 0, 5: 0 });
+                var ok =
+                mover.ok(  { 1: 1, 2: 1, 3: 1, 4: 1, 5: 0 });
+                ok.ok.should.be.true;
+            });
+        });
         describe('basic3: no islands', function() {
             beforeEach(function() {
                 // 1  sea    
@@ -323,10 +344,40 @@ describe('TribeMover', function() {
                 ok.cost.should.deep.equal([ { 4: 1 } ]);
             });
         });
-        // TODO
-        // 1
-        // |  first    3 - 4   scnd    5 - 6 - 7
-        // 2
+        describe('straightaway', function() {
+            beforeEach(function() {
+                // 1
+                // |  first    3  - 4   scnd    5 - 6 - 7
+                // 2
+                map = {
+                    1: { 'neighbours': [ 2, 'first' ] },
+                    2: { 'neighbours': [ 1, 'first' ] },
+                    3: { 'neighbours': [ 4, 'first' ] },
+                    4: { 'neighbours': [ 3 ] },
+                }
+                mover = new pocketciv.TribeMover(map, 1, 1);
+            });
+            it('case 1', function() {
+                mover.init({ 1: 2, 2: 2, 3: 2, 4: 0 });
+                var ok =
+                mover.ok(  { 1: 1, 2: 1, 3: 2, 4: 2 });
+                ok.ok.should.be.true;
+            });
+            it('case 2', function() {
+                mover.init({ 1: 0, 2: 0, 3: 2, 4: 2 });
+                var ok =
+                mover.ok(  { 1: 1, 2: 1, 3: 2, 4: 0 });
+                ok.ok.should.be.true;
+            });
+            it('case 3', function() {
+                mover.init({ 1: 2, 2: 2, 3: 0, 4: 0 });
+                var ok =
+                mover.ok(  { 1: 1, 2: 1, 3: 2, 4: 0 });
+                ok.ok.should.be.true;
+                // 
+                ok.cost.should.deep.equal([ { 3: 1 }]);
+            });
+        });
         describe('complex1', function() {
             beforeEach(function() {
                 //       1 - 2
@@ -379,7 +430,7 @@ describe('TribeMover', function() {
                 mover.ok(  { 1: 2, 2: 3, 3: 2, 4: 2, 5: 0, 6: 0, 7: 0 });
                 ok.ok.should.be.true;
                 ok.cost.should.deep.equal([
-                    { 4: 1 }, { 3: 1 }
+                    { 3: 1 }, { 4: 1 }
                 ])
             });
         });
@@ -455,7 +506,7 @@ describe('TribeMover', function() {
                 mover.ok({ 3: 0, 4: 2, 5: 0, 8: 0 }).ok.should.be.true;
                 mover.ok({ 3: 0, 4: 2, 5: 0, 8: 0 }).cost.should.deep.equal([]);
             });
-            it.only('bypassing', function() {
+            it('bypassing', function() {
                 mover = new pocketciv.TribeMover(map, 1, 1);
                 mover.init(       { 3: 0, 4: 4, 5: 3, 6: 0, 8: 0 });
                 var ok = mover.ok({ 3: 0, 4: 1, 5: 3, 6: 3, 8: 0 });
@@ -673,6 +724,11 @@ describe('TribeMover', function() {
             mover.init({ 1: 2, 2: 0, 3: 0, 4: 2, 5: 2, 8: 2 });
             mover.ok(  { 1: 2, 2: 2, 3: 1, 4: 0, 5: 1, 8: 2 }).ok.should.be.false;
         });
+        it('lots of tribes', function() {
+            mover = new pocketciv.TribeMover(map, 1);
+            mover.init({ 1: 8, 2: 0, 3: 0, 4: 2, 5: 14, 8: 16 });
+            mover.ok(  { 1: 6, 2: 2, 3: 0, 4: 2, 5: 14, 8: 16 }).ok.should.be.true;
+        });
     });
     describe('simple with two steps', function() {
         beforeEach(function() {
@@ -705,7 +761,10 @@ describe('TribeMover', function() {
         it('case 4 - neighbour limit', function() {
             mover.init({ 1: 2, 2: 0, 3: 0, 4: 0 });
             mover.ok({ 1: 2, 2: 2, 3: 0, 4: 0 }).ok.should.be.false;
-            mover.ok({ 1: 0, 2: 0, 3: 0, 4: 0 }).ok.should.be.false;
+        });
+        it('case 5', function() {
+            mover.init({ 1: 2, 2: 0, 3: 0, 4: 0 });
+            mover.ok(  { 1: 0, 2: 1, 3: 1, 4: 0 }).ok.should.be.true;
         });
     });
 });
