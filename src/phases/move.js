@@ -440,6 +440,8 @@ TribeMover.prototype = {
         var start = this.start;
         var seaCost = this.seaCost;
         
+        // The simple true cases
+        valid.ok = true;
         if (this.moveLimit == -1) return valid;
         if (_.isEqual(this.start, situation)) return valid;
         
@@ -452,6 +454,7 @@ TribeMover.prototype = {
         };
         
         // Different amount of tribes
+        valid.ok = false;
         if (sum(this.start) != sum(situation))
             return valid;
         
@@ -519,10 +522,13 @@ TribeMover.prototype = {
         return;
         */
         
+        debug && console.log("Start find of the case")
+        var smallest_cost = 999;
+        this.minCost = smallest_cost;
+        valid.ok = false;
+        
         var it = this.moves();
         var nn = it.next();
-        valid.ok = false;
-        var smallest_cost = 999;
         // Go through every possible move
         while (!nn.done)
         {
@@ -530,7 +536,7 @@ TribeMover.prototype = {
                 valid.ok = "stopped";
                 return valid;
             }
-            debug > 2 && console.log(nn.value)
+            debug > 1 && console.log(nn.value)
             var move = nn.value.move;
             if (true)
             {
@@ -557,7 +563,7 @@ TribeMover.prototype = {
                     smallest_cost = cost;
                     this.minCost = cost;
                     
-                    valid.cost.push(nn.value.cost);
+                    valid.cost.push(_.pick(nn.value.cost, _.identity));
                     success(valid);
                 }
             }

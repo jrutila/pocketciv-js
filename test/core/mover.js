@@ -3,7 +3,7 @@ var expect = require('chai').expect;
 var pocketciv = require('../../src/core/pocketciv');
 var event = require('../../src/core/event');
 
-describe('TribeMover', function() {
+describe.only('TribeMover', function() {
     describe('simple', function() {
         beforeEach(function() {
             // 1 - 2 - 3
@@ -16,7 +16,7 @@ describe('TribeMover', function() {
         });
         it('case 1', function() {
             mover.init({ 1: 1, 2: 1, 3: 1 });
-            mover.ok({ 1: 1, 2: 1, 3: 1 }).ok.should.be.true;
+            mover.ok(  { 1: 1, 2: 1, 3: 1 }).ok.should.be.true;
         });
         it('case 2', function() {
             mover.init({ 1: 1, 2: 1, 3: 0 });
@@ -397,7 +397,7 @@ describe('TribeMover', function() {
                 }
                 mover = new pocketciv.TribeMover(map, 1, 1);
             });
-            it('case 1', function() {
+            it('case 1 and double test', function() {
                 mover.init({ 1: 0, 2: 0, 3: 3, 4: 0, 5: 0, 6: 0, 7: 0 });
                 mover.ok(  { 1: 0, 2: 3, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0 }).ok.should.be.true;
                 mover.ok(  { 1: 0, 2: 2, 3: 0, 4: 0, 5: 1, 6: 0, 7: 0 }).ok.should.be.true;
@@ -430,7 +430,7 @@ describe('TribeMover', function() {
                 mover.ok(  { 1: 2, 2: 3, 3: 2, 4: 2, 5: 0, 6: 0, 7: 0 });
                 ok.ok.should.be.true;
                 ok.cost.should.deep.equal([
-                    { 3: 1 }, { 4: 1 }
+                    { 3: 1 }
                 ])
             });
         });
@@ -768,7 +768,7 @@ describe('TribeMover', function() {
         });
     });
     describe('slow ones', function() {
-        it.only('case 1', function() {
+        it('case 1', function() {
             //     1 f 2
             //
             //  7    sea
