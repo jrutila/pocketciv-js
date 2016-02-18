@@ -111,12 +111,13 @@ TribeMover.prototype = {
                     if(_.contains(area.neighbours, s) && !_.contains(route,parseInt(sk)))
                     {
                         var from = _.last(route);
+                        debug > 1 && console.log("s-",route)
                         var r = _.union(route, [parseInt(sk)]);
-                        debug > 2 && console.log("s",r)
+                        debug > 1 && console.log("s+",r)
                         var ccost = {
                             max: cost.max,
                             burn: _.clone(cost.burn),
-                            sea: cost.sea.concat([from])
+                            sea: cost.sea.concat([[from,parseInt(sk)]])
                         };
                         found(r,ccost);
                         var max = Math.max(cost.max, start[_.last(r)]);
@@ -161,7 +162,7 @@ TribeMover.prototype = {
                 
                 var maxs = [];
                 var shortest = 9;
-                var shortestSea = 9;
+                var shortestS = 9;
                 
                 var straight = _.find(via, function(v) {
                     if (v.burn.length == 0 && v.sea.length == 0)
@@ -174,9 +175,8 @@ TribeMover.prototype = {
                 });
                 
                 var straightSea =_.find(via, function(v) {
-                    if (v.burn.length == 0 && _.first(v.sea) == fk)
+                    if (v.burn.length == 0 && _.first(v.sea) && _.first(v.sea)[0] == fk)
                     {
-                        shortestSea = v.sea.length;
                         maxs.push(v.max);
                         return true;
                     }
@@ -184,7 +184,7 @@ TribeMover.prototype = {
                 
                 var shortestLand = _.filter(via, function(v) {
                     if (_.isEqual(v,straight)) return false;
-                    if  (v.sea.length == 0 && v.burn.length < shortest)
+                    if  (v.sea.length == 0 && v.burn.length <= shortest)
                     {
                         shortest = v.burn.length;
                         maxs.push[v.max];
@@ -196,9 +196,9 @@ TribeMover.prototype = {
                     if (_.isEqual(v,straightSea)) return false;
                     if (straightSea && _.first(v.sea) == fk) return false;
                     if (_.any(shortestLand, function(s) { return _.isEqual(s.burn, v.burn) })) return false;
-                    if  (v.sea.length > 0 && v.burn.length <= shortestSea)
+                    if  (v.sea.length > 0 && v.burn.length <= shortestS)
                     {
-                        shortestSea = v.burn.length;
+                        shortestS = v.burn.length;
                         maxs.push[v.max];
                         return true;
                     }
@@ -223,7 +223,7 @@ TribeMover.prototype = {
             });
         }, this);
         debug && console.log("viaMap")
-        debug && console.log(util.inspect(viaMap, false, 4))
+        debug && console.log(util.inspect(viaMap, false, 5))
         /*
         var ngh2 = [];
         _.each(this.map, function(from, fk) {
@@ -241,6 +241,53 @@ TribeMover.prototype = {
         
         this.max = this._nghValue(this.start, this.neighbours);
         this.ngh2 = this._nghValue(this.start, this.neighbours2);
+    },
+    _burns: function*(burns, move, bb, c) {
+        if (bb == undefined) bb = {};
+        if (c == undefined) c = [];
+        
+        if (burns.length == 0)
+        {
+            if (move > 0)
+                return;
+            yield { burn: bb, cost: c }
+        } else {
+            var b = _.first(burns);
+            if (move == 0)
+            {
+                yield* this._burns(_.rest(burns), move, bb, c);
+            } else {
+                if (b.burn.length == 0)
+                {
+                    if (move > 0)
+                    {
+                        var cc = c.concat(b.sea);
+                        yield { burn: {}, cost: cc }
+                    }
+                } else {
+                    var m = Math.min(move, b.max);
+                    
+                    for (var i = m; i >= 0; i--)
+                    {
+                        var bbb = _.clone(bb);
+                        if (i>0)
+                        {
+                            var cc = c.concat(b.sea);
+                            for (var bk in b.burn)
+                            {
+                                var k = b.burn[bk];
+                                if (!_.has(bbb, k)) bbb[k] = 0;
+                                bbb[k] += i;
+                            }
+                        }
+                        else
+                            cc = c;
+                        yield* this._burns(_.rest(burns), move-i, bbb, cc);
+                    }
+                    
+                }
+            }
+        }
     },
     _umove: function*(s,m,b,n,c,a,d) {
         if (this.stopped) return;
@@ -297,7 +344,8 @@ TribeMover.prototype = {
             // No movement if there is no tribes in the target
             this.end[k] == 0 ||
             // No movement if target is not increased
-            this.end[k] <= this.start[k]
+            this.end[k] <= this.start[k] ||
+            false
             )
         {
             var mm = m.concat([0]);
@@ -309,6 +357,29 @@ TribeMover.prototype = {
             for (var l = 0; l < viaMap.length; l++)
             {
                 var via = viaMap[l];
+                var viaMax = via.max;
+                var vias = [];
+                
+                // Go through every possible permutation of
+                // burns. for example:
+                // max: 2, burn: [2]
+                // max: 1, burn: [3]
+                // should yield: [2,1],[2,0],[1,1],[1,0],[0,1]
+                if (via.burn.length > 0)
+                {
+                    var bl = via.burn.length;
+                    while (via && via.burn.length == bl)
+                    {
+                        vias.push(via);
+                        viaMax = Math.max(viaMax, via.max);
+                        
+                        via = viaMap[l+1];
+                        if (via && via.burn.length == bl)
+                            l++;
+                    }
+                } else {
+                    vias.push(via);
+                }
                 
                 // What is the maximum
                 var maxEnd = this.end[k]-a[k];
@@ -316,13 +387,14 @@ TribeMover.prototype = {
                     maxEnd = this.end[k]-b[k];
                 // How many can be transferred from here at max
                 // Either what is left, or via's max or targets final
-                var maxVia = Math.min(n,via.max,this.end[k]);
+                var maxVia = Math.min(n,viaMax,this.end[k]);
                 
                 // If this is the first element of the move array
                 // and there is previous burn
                 // pb does not go into recursion, it just fixes n
                 if (pb)
                     maxVia -= pb;
+                debug > 2 && console.log(Array(m.length+2).join("|"),s,k,i,maxEnd,maxVia)
                 
                 // Try with every move
                 for (var i = maxVia; i>= 0; i--)
@@ -330,54 +402,62 @@ TribeMover.prototype = {
                     debug > 1 && console.log(Array(m.length+2).join("_"),s,k,i,b,a,c,d)
                     debug > 2 && console.log("       ",via)
                     
-                    var mm = m.concat([i]);
-                    var bb = _.clone(b);
-                    bb[s] += i;
-                    // If burns will raise it too high
-                    if (bb[s] > this.start[s])
-                        continue;
-                    var cont = false;
-                    _.each(via.burn, function(vb) {
-                        bb[vb] += i;
-                        if (bb[vb] > this.start[vb])
-                        {
-                            // If burns will raise it too high
-                            cont = true;
-                        }
-                    },this);
-                    if (cont) continue;
+                    var vbb = this._burns(vias, i);
+                    var vvbb = vbb.next();
+                    while (!vvbb.done)
+                    {
+                        var mm = m.concat([i]);
+                        var bb = _.clone(b);
+                        //bb[s] += i;
+                        // If burns will raise it too high
+                        //if (bb[s] > this.start[s])
+                            //continue;
+                        var cont = false;
+                        
+                        var curvb = vvbb.value;
+                        vvbb = vbb.next();
                     
-                    // If the final target does not fulfill
-                    if (lastOne && a[k] + i != this.end[k])
-                        continue;
-                    
-                    var aa = _.clone(a);
-                    aa[k] += i;
-                    // if there is too much moved already to target
-                    if (aa[k] > this.end[k])
-                        continue;
-                    
-                    var cc = c.concat([]);
-                    var dd = _.clone(d);
-                    _.each(via.sea, function(s) {
-                        var snext = via.burn.indexOf(s)+1;
-                        var snext = via.burn[snext];
-                        if (!snext) snext = k;
-                        if (!_.any(cc, function(com) { return _.isEqual(com,[s,snext])}))
-                        {
-                            cc.push([s,snext]);
-                            dd[snext]++;
-                        }
-                        if (dd[snext] > this.end[snext])
-                            cont = true;
-                        if (cc.length >= this.minCost)
-                            cont = true;
-                    },this);
-                    if (cont) continue;
-                    
-                    debug > 1 && console.log(Array(mm.length+1).join("+"),s,k,i,bb,aa,mm,cc,dd)
-                    yield* this._umove(s,mm,bb,n-i,cc,aa,dd);
-            }
+                        _.each(curvb.burn, function(am,vb) {
+                            bb[vb] += am;
+                            if (bb[vb] > this.start[vb] || bb[vb] > this.end[vb])
+                            {
+                                // If burns will raise it too high
+                                cont = true;
+                            }
+                        },this);
+                        
+                        if (cont) continue;
+                        
+                        // If the final target does not fulfill
+                        if (lastOne && this.start[k] + a[k] + i != this.end[k])
+                            continue;
+                            
+                        var aa = _.clone(a);
+                        aa[k] += i;
+                        // if there is too much moved already to target
+                        if (aa[k] > this.end[k])
+                            continue;
+                            
+                        var cc = c.concat([]);
+                        var dd = _.clone(d);
+                        _.each(curvb.cost, function(s) {
+                            var snext = s[1];
+                            if (!_.any(cc, function(com) { return _.isEqual(com,s)}))
+                            {
+                                cc.push(s);
+                                dd[snext]++;
+                            }
+                            if (dd[snext] > this.end[snext])
+                                cont = true;
+                            if (cc.length >= this.minCost)
+                                cont = true;
+                        },this);
+                        if (cont) continue;
+                        
+                        debug > 1 && console.log(Array(mm.length+1).join("+"),s,k,i,bb,aa,mm,cc,dd)
+                        yield* this._umove(s,mm,bb,n-i,cc,aa,dd);
+                    }
+                }
             }
         }
     },
