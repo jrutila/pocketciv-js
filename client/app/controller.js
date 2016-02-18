@@ -22,6 +22,8 @@ var AdvanceAcquirer = require("../../src/actions/acquire").AdvanceAcquirer;
 var WonderBuilderer = require("../../src/actions/build").WonderBuilderer;
 var signals = require("signals");
 
+var ClientMover = require("./mover/mover");
+
 engine = undefined;
 
 
@@ -38,6 +40,7 @@ var scenarios = {
     "scenario10": require("../../src/scenarios/scenario10"),
     "scenario11": require("../../src/scenarios/scenario11"),
     "scenario12": require("../../src/scenarios/scenario12"),
+    "scenario13": require("../../src/scenarios/scenario13"),
     "scenario15": require("../../src/scenarios/scenario15"),
 }
 
@@ -109,14 +112,8 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
     
     var moveFunc = undefined;
     $scope.moveTribes = function() {
-        var mover = new pocketciv.TribeMover(
-            $scope.engine.map.areas,
-            $scope.engine.params.moveLimit,
-            $scope.engine.params.sea_move ? $scope.engine.params.sea_cost : undefined);
-            
-        mover.init(getMovement($scope.engine.map.areas));
-        var ok = mover.ok($scope.movement);
-        if (ok.ok)
+        var ok = $scope.movementOk;
+        if (ok == undefined || ok.ok)
         {
             console.log("OK MOVE!");
             moveFunc(ok);
@@ -124,6 +121,8 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
             $scope.hideMover = true;
             $scope.mapInfo = undefined;
             $scope.movement = undefined;
+            $scope.movementOk = undefined;
+            $scope.mover.terminate();
             $scope.mover = undefined;
         } else {
             console.log("FAILED MOVE")
@@ -131,8 +130,9 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
     }
     $scope.hideMover = true;
     
-    function drawMovement() {
-        _.each($scope.movement, function(tr, ak) {
+    function drawMovement(movement) {
+        movement = movement || $scope.movement;
+        _.each(movement, function(tr, ak) {
             drawElem("tribes", ak, tr);
         });
     }
@@ -140,7 +140,7 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
     function handleOk(ok) {
         console.log("handleOk")
         console.log(ok)
-        $scope.mapTitle = "MOVE "+(ok.cost || "");
+        $scope.mapTitle = "MOVE";
         if (ok.ok)
         {
             _.each(ok.target, function(t, reg) {
@@ -153,6 +153,7 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
                 })
             }
             $scope.movement = ok.target;
+            $scope.movementOk = ok;
             drawMovement();
             moveFrom = 0;
             clearRegions();
@@ -183,26 +184,11 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
                 selectRegion(region);
             }
         } else {
-            if (window.Worker) {
-                $scope.mover.postMessage({ action: "init",
-                 start: getMovement($scope.map.areas)
-                });
-            } else {
-                $scope.mover.init(getMovement($scope.map.areas));
-            }
-            
             var movement = _.clone($scope.movement);
             movement[moveFrom]--;
             movement[region]++;
-            
-            if (window.Worker) {
-                $scope.mover.postMessage({ action: "ok",
-                    situation: movement
-                });
-            } else {
-                var ok = $scope.mover.ok(movement);
-                handleOk(ok, moveFrom, region);
-            }
+            drawMovement(movement);
+            $scope.mover.ok(movement);
         }
     });
     
@@ -211,30 +197,19 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
         console.log("Show mover")
         if ($scope.tutorial)
             $scope.forceMove = $scope.tutorial.game.move.shift();
+            
         // Plain mover
         $scope.movement = getMovement(situation);
         $scope.hideMover = false;
+        
         moveFunc = move;
-        if (window.Worker) {
-            $scope.mover = new Worker("moveworker.js");
-            $scope.mover.postMessage({ action: "create",
-                map: $scope.engine.map.areas,
-                moveLimit: $scope.engine.params.moveLimit,
-                seaCost: $scope.engine.params.sea_move ? $scope.engine.params.sea_cost : undefined
-            });
-            $scope.mover.onmessage = function(msg) {
-                if (msg.data.ok != undefined)
-                    handleOk(msg.data);
-                else
-                {
-                    // Not OK! What now?
-                }
-            };
-        } else
-            $scope.mover = new pocketciv.TribeMover(
-                $scope.engine.map.areas,
-                $scope.engine.params.moveLimit,
-                $scope.engine.params.sea_move ? $scope.engine.params.sea_cost : undefined);
+        
+        $scope.mover = new ClientMover();
+        $scope.mover.reset($scope.engine.map.areas,
+                      $scope.engine.params.moveLimit,
+                      $scope.engine.params.sea_move ? $scope.engine.params.sea_cost : undefined);
+        $scope.mover.init(getMovement(situation));
+        $scope.mover.valid = handleOk;
         
         // UI
         $scope.mapInfo = "Move tribes by clicking start region and then target region";

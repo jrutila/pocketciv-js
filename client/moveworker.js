@@ -5,7 +5,7 @@ importScripts("move.js", "bower_components/underscore/underscore.js");
 
 onmessage = function(msg) {
     var action = msg.data.action;
-    if (action == "create")
+    if (action == "reset")
     {
         self.mover = new module.exports.TribeMover(msg.data.map, msg.data.moveLimit, msg.data.seaCost);
         console.log("Inited TribeMover")
@@ -14,6 +14,7 @@ onmessage = function(msg) {
         console.log("Start set",msg.data.start);
     } else if (action == "ok") {
         self.mover.stop();
+        console.log("Checking for ok in Move Worker")
         var ok = self.mover.ok(msg.data.situation,
             function(ok) {
                 // Found valid, not necessarily cheapest
@@ -30,6 +31,8 @@ onmessage = function(msg) {
             console.log("Calculated",ok);
             console.log("TODO: Cache this fastest one")
             postMessage(ok);
+        } else {
+            console.log("Mover was stopped!")
         }
     }
 }

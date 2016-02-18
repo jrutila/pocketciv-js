@@ -507,6 +507,7 @@ TribeMover.prototype = {
         }
     },
     ok: function(situation, success) {
+        this.stopped = false;
         // Clean up the situation
         situation = _.pick(situation, _.filter(_.keys(situation), function(s) { return parseInt(s) }));
         this.handleMissing(situation, this.neighbours);
@@ -679,44 +680,19 @@ module.exports = {
         console.log("Moving tribes with mover");
         var engine = this;
         this.mover(this.map.areas, function(ok) {
-            ctx.target(_.mapObject(ok.target, function(t) { return {tribes: t }}));
+            if (ok)
+                ctx.target(_.mapObject(ok.target, function(t) { return {tribes: t }}));
             
-            if (_.size(ok.cost)) {
+            if (ok && _.size(ok.cost)) {
                 console.log("Used SEA, must pay tribes!")
                 
-                var initial = {};
-                _.each(ctx.initial, function(area, ak) {
-                    if (_.any(ok.cost, function(c) { return _.has(c, ak ); }))
-                        initial[ak] = { tribes: ok.target[ak] };
-                });
-                
-                var opts = {
-                    map: this.map.areas,
-                    initial: initial,
-                    shows: ['tribes'],
-                    edits: ['tribes'],
-                    original: ok.reduce,
-                    amount: _.reduce(ok.cost[0], function(memo, n) {
-                        return memo + n;
-                    }, 0),
-                    reduce: function(key, chg) {
-                        var rTrb = this.initial[key].tribes - chg.tribes;
-                        this.amount -= rTrb;
-                        return { 'tribes': chg.tribes };
-                    },
-                    current: function(chg, key, val) {
-                        if (!key)
-                        {
-                            this.current = this.initial;
-                        }
-                    }
-                }
-                engine.reducer(new reducer.Reducer(opts), function(rdc) {
-                    ctx.change(rdc.changes);
+                    var ccost = _.mapObject(_.first(ok.cost), function(c) {
+                        return { 'tribes': -1*c };
+                    });
+                    ctx.change(ccost);
                     ctx.done && ctx.done();
-                });
-            } else
-                ctx.done && ctx.done();
+            }
+            ctx.done && ctx.done();
         });
     },
     TribeMover: TribeMover,
