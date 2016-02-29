@@ -8,10 +8,10 @@ onmessage = function(msg) {
     if (action == "reset")
     {
         self.mover = new module.exports.TribeMover(msg.data.map, msg.data.moveLimit, msg.data.seaCost);
-        console.log("Inited TribeMover")
+        console.log("Reseted TribeMover")
     } else if (action == "init") {
         self.mover.init(msg.data.start);
-        console.log("Start set",msg.data.start);
+        console.log("Init start set",msg.data.start);
     } else if (action == "ok") {
         self.mover.stop();
         console.log("Checking for ok in Move Worker")

@@ -4,52 +4,6 @@ var util = require('util');
 
 var debug = 0;
 
-var permutate = (function() {
-    
-    var results = [];    
-    
-    function doPermute(input, output, used, size, level) {        
-            
-        if (size == level) {
-            var word = output.join('');
-            results.push(word);
-            return;
-        } 
-        
-        level++;
-        
-        for (var i = 0; i < input.length; i++) {
-            
-            if (used[i] === true) {
-                continue;
-            }            
-            
-            used[i] = true;
-
-            output.push(input[i]);
-            
-            doPermute(input, output, used, size, level);
-            
-            used[i] = false;
-            
-            output.pop();
-        }
-    }
-    
-    return {
-        getPermutations: function(input, size) {
-            
-            var chars = input.split('');
-            var output = [];
-            var used = new Array(chars.length);      
-
-            doPermute(chars, output, used, size, 0);        
-
-            return results;    
-        }
-    }
-})();
-        
 function isSea(n)
 {
     return typeof n == "string" && n != "frontier";
@@ -204,7 +158,6 @@ TribeMover.prototype = {
                             }
                             debug > 2 && console.log("+",r, ccost, de);
                             findRoute(r, de, found, ccost);
-                            
                         }
                     }
                 });
@@ -677,6 +630,7 @@ TribeMover.prototype = {
         var smallest_cost = 999;
         this.minCost = smallest_cost;
         valid.ok = false;
+        var seaCost = this.seaCost;
         
         var it = this.moves();
         var nn = it.next();
@@ -714,7 +668,11 @@ TribeMover.prototype = {
                     smallest_cost = cost;
                     this.minCost = cost;
                     
-                    valid.cost.push(_.pick(nn.value.cost, _.identity));
+                    valid.cost.push(
+                        _.mapObject(
+                        _.pick(nn.value.cost, _.identity),
+                        function(cst) { return cst*seaCost; }
+                        ));
                     success(valid);
                 }
             }

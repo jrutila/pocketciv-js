@@ -633,6 +633,14 @@ describe.only('TribeMover', function() {
                 ok.ok.should.be.true;
                 ok.cost.should.deep.equal([{2:1}]);
             });
+            it('case 3', function() {
+                mover = new pocketciv.TribeMover(map, 1, 2);
+                mover.init({ 6: 2, 8: 2 });
+                var ok =
+                mover.ok(  { 1: 1, 2: 1, 6: 1, 8: 1 });
+                ok.ok.should.be.true;
+                ok.cost.should.deep.equal([{1:2,2:2}]);
+            });
             it('slow case', function() {
                 mover = new pocketciv.TribeMover(map, 1, 1);
                 mover.init({ 1: 2, 2: 3, 5: 2, 6: 2, 3: 2, 4: 3 });
