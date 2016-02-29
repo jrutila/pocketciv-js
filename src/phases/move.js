@@ -3,6 +3,52 @@ var _ = require('underscore');
 var util = require('util');
 
 var debug = 0;
+
+var permutate = (function() {
+    
+    var results = [];    
+    
+    function doPermute(input, output, used, size, level) {        
+            
+        if (size == level) {
+            var word = output.join('');
+            results.push(word);
+            return;
+        } 
+        
+        level++;
+        
+        for (var i = 0; i < input.length; i++) {
+            
+            if (used[i] === true) {
+                continue;
+            }            
+            
+            used[i] = true;
+
+            output.push(input[i]);
+            
+            doPermute(input, output, used, size, level);
+            
+            used[i] = false;
+            
+            output.pop();
+        }
+    }
+    
+    return {
+        getPermutations: function(input, size) {
+            
+            var chars = input.split('');
+            var output = [];
+            var used = new Array(chars.length);      
+
+            doPermute(chars, output, used, size, 0);        
+
+            return results;    
+        }
+    }
+})();
         
 function isSea(n)
 {
@@ -76,7 +122,6 @@ TribeMover.prototype = {
         var seaCost = this.seaCost;
         
         function findRoute(route,dist,found,cost) {
-            dist--;
             var mySeas = [];
             if (!cost) cost = { max: start[_.first(route)], burn: [], sea: [] };
             _.each(_.difference(findMap[_.last(route)].neighbours, route), function(ngh, nk) {
@@ -85,21 +130,38 @@ TribeMover.prototype = {
                     mySeas.push(ngh);
                     return;
                 }
-                var r = _.union(route, [parseInt(ngh)])
-                found(r,cost);
-                var max = Math.max(cost.max, start[_.last(r)]);
-                var burn = cost.burn;
-                if (dist <= 0)
-                {
-                    max = Math.min(cost.max, start[_.last(r)]);
-                    burn = cost.burn.concat([_.last(r)]);
-                }
+                
                 var ccost = {
-                    max: max,
-                    burn: burn,
-                    sea: cost.sea
+                    max: cost.max,
+                    burn: _.clone(cost.burn),
+                    sea: _.clone(cost.sea)
                 }
-                findRoute(r,dist, found,ccost);
+                var last = parseInt(ngh);
+                var r = route.concat([last]);
+                
+                // Straight option
+                debug > 2 && console.log(r, ccost, dist);
+                found(r,ccost);
+                
+                ccost = {
+                    max: ccost.max,
+                    burn: _.clone(ccost.burn),
+                    sea: _.clone(ccost.sea)
+                }
+                
+                for (var dd = dist-1; dd >= 0; dd--)
+                {
+                    var de = dd;
+                    if (dd == 0)
+                    {
+                        de = moveLimit;
+                        ccost.max = Math.min(ccost.max, start[last]);
+                        ccost.burn.push(last)
+                    }
+                    debug > 2 && console.log("+",r, ccost, de);
+                    findRoute(r, de, found, ccost);
+                    
+                }
                 
             }, this);
             
@@ -110,30 +172,40 @@ TribeMover.prototype = {
                 _.each(findMap, function(area, sk) {
                     if(_.contains(area.neighbours, s) && !_.contains(route,parseInt(sk)))
                     {
+                        // HERE
+                        var last = parseInt(sk);
+                        var r = route.concat([last]);
                         var from = _.last(route);
-                        debug > 1 && console.log("s-",route)
-                        var r = _.union(route, [parseInt(sk)]);
-                        debug > 1 && console.log("s+",r)
+                        
                         var ccost = {
                             max: cost.max,
                             burn: _.clone(cost.burn),
-                            sea: cost.sea.concat([[from,parseInt(sk)]])
-                        };
-                        found(r,ccost);
-                        var max = Math.max(cost.max, start[_.last(r)]);
-                        var burn = ccost.burn;
-                        if (dist <= 0)
-                        {
-                            max = Math.min(cost.max, start[_.last(r)]);
-                            burn = cost.burn.concat([_.last(r)]);
+                            sea: cost.sea.concat([[from,last]])
                         }
                         
+                        // Straight option
+                        debug > 2 && console.log("s", r, ccost, dist);
+                        found(r,ccost);
+                        
                         ccost = {
-                            max: max,
-                            burn: burn,
-                            sea: ccost.sea
+                            max: ccost.max,
+                            burn: _.clone(ccost.burn),
+                            sea: _.clone(ccost.sea)
                         }
-                        findRoute(r,dist,found,ccost);
+                        
+                        for (var dd = dist-1; dd >= 0; dd--)
+                        {
+                            var de = dd;
+                            if (dd == 0)
+                            {
+                                de = moveLimit;
+                                ccost.max = Math.min(ccost.max, start[last]);
+                                ccost.burn.push(last)
+                            }
+                            debug > 2 && console.log("+",r, ccost, de);
+                            findRoute(r, de, found, ccost);
+                            
+                        }
                     }
                 });
             },this);
@@ -142,7 +214,6 @@ TribeMover.prototype = {
         var viaMap = {1:{},2:{},3:{},4:{},5:{},6:{},7:{},8:{}};
         _.each(this.map, function(from, fk) {
             findRoute([parseInt(fk)], moveLimit, function(route, cost) {
-                debug > 2 && console.log(route,cost)
                 if (cost.max > 0) {
                     if (viaMap[_.first(route)][_.last(route)] == undefined)
                         viaMap[_.first(route)][_.last(route)] = [];
@@ -602,7 +673,6 @@ TribeMover.prototype = {
         }
         return;
         */
-        
         debug && console.log("Start find of the case")
         var smallest_cost = 999;
         this.minCost = smallest_cost;
