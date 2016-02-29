@@ -404,12 +404,20 @@ describe.only('TribeMover', function() {
                 ok.cost.should.deep.equal([ { 4: 1 } ]);
             });
             it('case 2', function() {
-                mover = new pocketciv.TribeMover(map, 2, 1);
+                mover = new pocketciv.TribeMover(map, 1, 1);
                 mover.init({ 1: 2, 2: 2, 3: 2, 4: 0 });
                 var ok =
                 mover.ok(  { 1: 0, 2: 2, 3: 1, 4: 3 });
                 ok.ok.should.be.true;
                 ok.cost.should.deep.equal([ { 4: 1 } ]);
+            });
+            it('case 3', function() {
+                mover = new pocketciv.TribeMover(map, 2, 1);
+                mover.init({ 1: 2, 2: 2, 3: 2, 4: 0 });
+                var ok =
+                mover.ok(  { 1: 0, 2: 2, 3: 1, 4: 3 });
+                ok.ok.should.be.true;
+                ok.cost.should.deep.equal([]);
             });
         });
         describe('straightaway', function() {
