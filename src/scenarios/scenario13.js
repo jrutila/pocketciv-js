@@ -1,11 +1,27 @@
 module.exports = {
     "name": "scenario13",
     "title":  "13. Watchers of the Sea",
-    "rules": "If you have Roadbuilding or Equestrian, you can move \
-    Tribes between Regions 8 and 7 as if they share a common border",
-    "goal": "Build a Coliseum of Death and an Amphitheater before the end of the  8th Era.",
-    "description": "You start the game automatically with Coinage.",
+    "rules": "",
+    "goal": "Build 3 Huge Monoliths of Impressiveness, one each in Regions 2, 5, and 6, before the end of the 8th Era.",
+    "description": "You start the game automatically with Navigation.",
     "acquired": ["navigation"],
+    'end_of_era.post': function(ctx) {
+        var engine = this;
+        // End of era  8
+        if (engine.era ==  9)
+        {
+            if (_.contains(engine.map.areas[2].wonders, 'monolith')
+             && _.contains(engine.map.areas[5].wonders, 'monolith')
+             && _.contains(engine.map.areas[6].wonders, 'monolith')
+             )
+             {
+              engine.gameOver(true);
+            } else {
+                engine.gameOver(false, "You did not manage to build enough Monoliths.");
+            }
+        }
+        ctx.done && ctx.done();
+    },
     "map": {
         "areas": {
              "1": {
