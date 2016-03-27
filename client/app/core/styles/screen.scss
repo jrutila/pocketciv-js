@@ -277,14 +277,14 @@ body.initiating {
     float: right;
     position: absolute;
     right: 0px;
-    top: 0px;
+    top: 45px;
     //height: 100%;
     z-index: 180;
     
     > div {
         background-color: $color-primary-1;
         margin: 20px;
-        margin-top: 45px;
+        margin-top: 0px;
         z-index: 99;
         border: 3px solid $color-primary-4;
         
@@ -312,7 +312,7 @@ body.initiating {
         div.away {
             z-index: 225;
             padding: 0px;
-            margin-top: 40px;
+            margin-top: 0px;
             margin-left: auto;
             margin-right: auto;
             width: 50%;

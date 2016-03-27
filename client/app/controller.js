@@ -97,10 +97,17 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
     
     $scope.startTutorial = function() {
         $scope.tutorial = tutorials[$scope.engine.name];
-        $scope.tour = new Tour({
+        globalTour = $scope.tour = new Tour({
             steps: $scope.tutorial.steps,
-            container: "#main",
+            container: "body",
+            onEnd: function() {
+                location.reload();
+            }
             //backdrop: true
+        });
+        _.each($("#canvases .areaCode"), function(ac) {
+            var n = $(ac).text();
+            $(ac).html("<span class='tut'></span>"+n)
         });
         $scope.tour.end();
         $scope.tour.init();
@@ -983,6 +990,7 @@ pocketcivApp.directive('godPopover', function($rootScope, $compile) {
         restrict: 'A',
         link: function($scope, tElem, tAttr) {
             var areaId = parseInt(tElem.text());
+            console.log("godPopover link "+areaId)
             $(tElem).popover({
                 title: "Edit area "+$(tElem).html(),
                 container: "#mapWrapper",

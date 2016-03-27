@@ -125,7 +125,7 @@ module.exports = {
             prev: -1
         },
         {
-            element: "#area5",
+            element: "#area5 .tut",
             title: "Moving",
             placement: "top",
             content: "First click the Region where you are moving a Tribe <i>from</i>. \
@@ -143,7 +143,7 @@ module.exports = {
             onShown: disableNext,
         },
         {
-            element: "#area7",
+            element: "#area7 .tut",
             title: "Moving",
             placement: "right",
             content: "Second, click the Region where you want the Tribe to move. \
@@ -265,6 +265,7 @@ module.exports = {
             placement: "right",
             content: "This Red Circle determines that the Active Region is <span class='areaCode'>2</span>.",
             prev: -1,
+            delay: delay,
             onShow: function(tour) {
                 $("#changePrompt button:first").prop('disabled', true);
             }
@@ -387,7 +388,7 @@ module.exports = {
             element: "#changePrompt button:first",
             title: "Populate",
             placement: "bottom",
-            content: "This round you cicked in three more Tribes! Now you are going to get \
+            content: "This round you kicked in three more Tribes! Now you are going to get \
             things done.",
             reflex: true,
             onShown: disableNext,
@@ -400,7 +401,7 @@ module.exports = {
             placement: "bottom",
             content: "Your target now is try to get a City to Region <span class='areaCode'>8</span>. \
             That is your midway point to the final goal. First you need to build a Farm so that the \
-            City is supported. Farm needs two tribes. Move tribes like this: \
+            City is supported. Farm costs two tribes. Move tribes like this: \
             <ul> \
             <li><span class='areaCode'>1</span>: <span class='tribes'>1</span></li> \
             <li><span class='areaCode'>8</span>: <span class='tribes'>4</span></li> \
@@ -533,7 +534,7 @@ module.exports = {
             element: "#changePrompt button:first",
             title: "Populate",
             placement: "bottom",
-            content: "Three Tribes coming in again. Damn Famine emptied the \
+            content: "Three Tribes coming in again. That damned Famine emptied the \
             Region <span class='areaCode'>5</span>.",
             reflex: true,
             onShown: disableNext,
@@ -666,7 +667,7 @@ module.exports = {
             element: "#changePrompt button:first",
             title: "Populate",
             placement: "bottom",
-            content: "Three Tribes, again. Will it ever change?",
+            content: "Three Tribes, again. Remember, only tribes generate tribes. Cities do not get you more tribes.",
             reflex: true,
             onShown: disableNext,
             prev: -1,
@@ -677,7 +678,7 @@ module.exports = {
             title: "Moving",
             placement: "bottom",
             content: "You have to spread the Tribes so that you get more \
-            Tribes on the Population phase.<br/> \
+            Tribes in the Population phase.<br/> \
             Move tribes like this: \
             <ul> \
             <li><span class='areaCode'>1</span>: <span class='tribes'>1</span></li> \
@@ -732,7 +733,7 @@ module.exports = {
             content: "Now you are close of winning this Scenario. \
             Here's a wild idea: build the City to Region \
             <span class='areaCode'>4</span> now. Yes, it does not have \
-            support ... <i>yet</i>. You'll see...<br/> \
+            support (the farm) ... <i>yet</i>. You'll see...<br/> \
             Move tribes like this: \
             <ul> \
             <li><span class='areaCode'>4</span>: <span class='tribes'>4</span></li> \
@@ -761,7 +762,7 @@ module.exports = {
             title: "Event",
             placement: "top",
             content: "Before you draw the Region Card, pay attention \
-            to the symbol (<span class='expr'>s</span>) next to the Event name. \
+            to the symbol (<span class='expr s'>s</span>) next to the Event name. \
             It tells you that a card draw and its Green Square Value will \
             determine the <strong>Population Loss</strong> \
             for the Epidemic.",
@@ -872,7 +873,7 @@ module.exports = {
             It is not acquirable at the moment so scroll down.",
             onShown: disableNext,
             onShow: function(tour) {
-                $("#techtree tr:has(td:first:contains('Engineering'))").one("click",
+                $("#techtree tr:has(td:nth-child(2):contains('Engineering'))").one("click",
                 function() {
                     tour.next();
                 });
@@ -899,7 +900,7 @@ module.exports = {
             City can only acquire one Advance per round. So you have to plan your \
             Advances well. The Tribes for the Advance are taken from the acquiring \
             Region. Gold is reduced from the common stock. For example Engineering \
-            would reduce three tribes from the Region.",
+            would reduce three tribes from the Region acquiring it.",
         },
         {
             element: "#techtree .advanceres",
@@ -927,20 +928,36 @@ module.exports = {
             title: "Acquiring Advances",
             placement: "top",
             content: "Advance Cost and Requirements are also shown in the list. \
-            <p>Now, select Advance with the name \"Cartage\".</p>",
+            <p>Now, select Advance with the name \"Cartage\" (It is on top part of the list).</p>",
             onShown: disableNext,
             onShow: function(tour) {
-                $("#techtree tr:has(td:first:contains('Cartage'))").one("click",
+                $("#techtree tr:has(td:nth-child(2):contains('Cartage'))").one("click",
                 function() {
                     tour.next();
                 });
             }
         },
         {
+            element: "#techtree tr:has(td:nth-child(2):contains('Cartage')) td:first button",
+            title: "Acquiring Advances",
+            placement: "right",
+            content: "By ticking this box you can pin the Advance to the toggle button. Pin the \"Cartage\" now.",
+            onShown: disableNext,
+            reflex: true,
+            /*
+            onShow: function(tour) {
+                $("#techtree tr:has(td:nth-child(2):contains('Cartage')) td:first button").one("click",
+                function() {
+                    tour.next();
+                });
+            }
+            */
+        },
+        {
             element: "#showTechTree",
             title: "Acquiring Advances",
             placement: "top",
-            content: "As you can see, the current selected Advance is also \
+            content: "As you can see, the pinned Advance is now \
             shown down here. This helps you when you plan your Tribe movement. \
             Close the Tech Tree by clicking this button again.",
             onShown: disableNext,
@@ -955,7 +972,7 @@ module.exports = {
             title: "Acquire Cartage",
             placement: "left",
             content: "Now, when you actually want to acquire the Advance and not \
-            just plan acquireing it, you have to click \""+acquire.title+"\". It opens \
+            just plan acquiring it, you have to click \""+acquire.title+"\". It opens \
             the same Tech Tree but now with a possiblity to actually acquire \
             the Advances. You should now acquire <strong>Cartage</strong>.",
             onShown: disableNext,
@@ -1000,7 +1017,7 @@ module.exports = {
             content: "When you now close the Tech Tree, you will lose the two \
             Tribes and gain the Cartage Advance. Oh yeah, Cartage lets you \
             use a Farm from another Region to give support to a City in \
-            other Region. Do you see the plan, already?",
+            other Region. Do you see the plan already?",
             onShown: disableNext,
             reflex: true,
             onShow: function() {
@@ -1083,10 +1100,11 @@ module.exports = {
             placement: "bottom",
             content: "Oh right! You don't have enough support for your Cities. \
             Normally, you would have lost the City in Region \
-            <span class='areaCode'>4</span>. But because you have the \
+            <span class='areaCode'>4</span> (no Farm). But because you have the \
             <strong>Cartage</strong>, you get to choose which City AV is \
-            decreased essentially destroying the City! Remember, to win you \
-            only need a City in Region <span class='areaCode'>4</span>.",
+            decreased (this destroys the City)! Remember, to win you \
+            only need a City in Region <span class='areaCode'>4</span>. \
+            <p>Select the desired Region from the Reducer or from the Map.",
             onShown: disableNext,
             prev: -1,
             reflex: true,
@@ -1109,7 +1127,8 @@ module.exports = {
             You can now try to tackle this Scenario without the tutorial. \
             This first Scenario is quite challenging so don't give up if your \
             Empire is destroyed during the first Event. Next Scenario tutorial will get you \
-            to the Gold business. <i>Disclaimer: It is not implemented yet!</i>",
+            to the Gold business. <i>Disclaimer: It is not implemented yet!</i> \
+            <p><strong>Reload this page to end the tutorial properly!</strong></p>",
             onShown: disableNext,
             prev: -1,
         },
@@ -1121,6 +1140,7 @@ module.exports = {
             { "1": 1, "2": 0, "3": 0, "4": 0, "5": 1, "7": 1, "8": 4 },
             { "1": 1, "2": 0, "3": 0, "4": 0, "5": 1, "7": 1, "8": 4 },
             { "1": 1, "2": 0, "3": 1, "4": 0, "5": 1, "7": 1, "8": 2 },
+            { "1": 1, "2": 0, "3": 1, "4": 4, "5": 1, "7": 1, "8": 3 },
           ],
           "deck": [ 4, 2, 11, 10, 13, 6, 3, 5, 16, 7, 1 ],
           "reduce": [ [ 8 ], [ 8 ], [7, 5], [4], [8] ],
