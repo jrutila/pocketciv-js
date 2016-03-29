@@ -99,9 +99,10 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
         $scope.tutorial = tutorials[$scope.engine.name];
         globalTour = $scope.tour = new Tour({
             steps: $scope.tutorial.steps,
-            container: "body",
-            onEnd: function() {
-                location.reload();
+            container: "#main",
+            onEnd: function(tour) {
+                if (tour._current >= 0)
+                    location.reload();
             }
             //backdrop: true
         });
