@@ -3,7 +3,7 @@ var expect = require('chai').expect;
 var pocketciv = require('../../src/core/pocketciv');
 var event = require('../../src/core/event');
 
-describe.only('TribeMover', function() {
+describe('TribeMover', function() {
     describe('inner methods', function() {
         it('_burns', function() {
             var tm = new pocketciv.TribeMover({});
