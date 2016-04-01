@@ -347,11 +347,13 @@ TribeMover.prototype = {
         if (!m) m = [];
         // sea cost
         if (!c) c = [];
+        // previous burn
+        var pb = 0;
         // n marks what is left in this branch to move from s
         if (n == undefined) {
             n = Math.max(this.start[s]-this.end[s], 0);
             if (_.has(b,s))
-                var pb = b[s];
+                pb = b[s];
         }
         
         var j = _.size(m);
@@ -433,14 +435,10 @@ TribeMover.prototype = {
                     maxEnd = this.end[k]-b[k];
                 // How many can be transferred from here at max
                 // Either what is left, or via's max or targets final
-                var maxVia = Math.min(n,viaMax,this.end[k]);
+                // subtract previous burn from viaMax
+                var maxVia = Math.min(n,viaMax-pb,this.end[k]);
                 
-                // If this is the first element of the move array
-                // and there is previous burn
-                // pb does not go into recursion, it just fixes n
-                if (pb)
-                    maxVia -= pb;
-                debug > 2 && console.log(Array(m.length+2).join("|"),s,k,i,maxEnd,maxVia)
+                debug > 1 && console.log(Array(m.length+2).join("|"),s,k,maxVia,n,viaMax-pb,this.end[k])
                 
                 // Try with every move
                 for (var i = maxVia; i>= 0; i--)

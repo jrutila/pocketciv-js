@@ -3,7 +3,7 @@ var expect = require('chai').expect;
 var pocketciv = require('../../src/core/pocketciv');
 var event = require('../../src/core/event');
 
-describe('TribeMover', function() {
+describe.only('TribeMover', function() {
     describe('inner methods', function() {
         it('_burns', function() {
             var tm = new pocketciv.TribeMover({});
@@ -138,6 +138,28 @@ describe('TribeMover', function() {
         it('case 1', function() {
             mover.init({ 1: 2, 2: 2, 3: 2, 4: 0 });
             mover.ok(  { 1: 0, 2: 1, 3: 1, 4: 4 }).ok.should.be.true;
+        });
+        it('case 2', function() {
+            mover.init({ 1: 2, 2: 2, 3: 2, 4: 0 });
+            mover.ok(  { 1: 1, 2: 1, 3: 1, 4: 3 }).ok.should.be.true;
+        });
+    });
+    describe('diamond with twist', function() {
+        beforeEach(function() {
+            //   1 - 3
+            //   | / | 
+            //   3 - 2
+            map = {
+                1: { 'neighbours': [3,4,'sea'] },
+                2: { 'neighbours': [3,4, 'sea'] },
+                3: { 'neighbours': [1,2,4] },
+                4: { 'neighbours': [1,2,3,'sea'] },
+            }
+            mover = new pocketciv.TribeMover(map, 1);
+        });
+        it('case 2', function() {
+            mover.init({ 1: 0, 2: 2, 3: 2, 4: 2 });
+            mover.ok(  { 1: 3, 2: 1, 3: 1, 4: 1 }).ok.should.be.true;
         });
     });
     describe('big one', function() {
@@ -890,6 +912,13 @@ describe('TribeMover', function() {
                 mover.init({ 1: 3, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0 });
                 var ok =
                 mover.ok(  { 1: 2, 2: 0, 3: 0, 4: 1, 5: 0, 6: 0, 7: 0, 8: 0 });
+                ok.ok.should.be.true;
+            });
+            it('case 2', function() {
+                mover = new pocketciv.TribeMover(map);
+                mover.init({ 1: 0, 6: 2, 7: 2, 8: 2 });
+                var ok =
+                mover.ok(  { 1: 3, 6: 1, 7: 1, 8: 1 });
                 ok.ok.should.be.true;
             });
         });
