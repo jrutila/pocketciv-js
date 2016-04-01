@@ -357,7 +357,7 @@
     <!-- BEGIN RIGHT ACTION ELEMENTS -->
     <div id="rightAction" style="width: calc(50% - {{ (mapArea.width - 18) / 2 }}px)">
         <div class="row actionElement collapsible" ng-hide="mapInfo == undefined">
-            <h2>{{ mapTitle }}</h2>
+            <h2>{{ mapTitle }}<span ng-show="busy" style="color: blue;"> busy</span></h2>
             <span class="actionContent">{{ mapInfo }}</span>
             <ul ng-hide="reducer == undefined">
                 <li ng-repeat="(a,v) in reduceOk.current">

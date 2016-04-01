@@ -921,5 +921,34 @@ describe('TribeMover', function() {
                 ok.cost.should.deep.equal([{ 1: 2 }]);
             });
         });
+        describe.only('scenario 13', function() {
+            beforeEach(function() {
+                //     2
+                //
+                //  6  sea  4 - 5
+                //    
+                //      7 - 8
+                //       \ / \
+                //        1 - 3
+                map = {
+                    1: { 'neighbours': [7,8,3,'sea'] },
+                    2: { 'neighbours': ['sea','frontier'] },
+                    3: { "neighbours": [1,8,'sea'] },
+                    4: { "neighbours": [5, 'sea']},
+                    5: { "neighbours": [4, 'sea', 'frontier'] },
+                    6: { "neighbours": ['sea', 'frontier']},
+                    7: { "neighbours": [1,8, 'sea' ] },
+                    8: { "neighbours": [1,3,7,'sea' ] },
+                }
+            });
+            it("case 1", function(done) {
+                mover = new pocketciv.TribeMover(map, 1, 1);
+                mover.init({ 1: 6, 2: 1, 3: 6, 4: 1, 5: 1, 6: 1, 7: 6, 8: 6 });
+                var ok =
+                mover.ok(  { 1: 5, 2: 2, 3: 5, 4: 2, 5: 2, 6: 2, 7: 5, 8: 5 });
+                ok.ok.should.be.true;
+                done();
+            });
+        });
     });
 });

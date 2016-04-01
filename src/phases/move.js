@@ -57,8 +57,10 @@ function pp(cur, perms, maxMoves, max, min, count) {
 
 TribeMover.prototype = {
     stop: function() {
+        console.log("stopped was "+this.stopped)
         debug && console.log("STOP")
         this.stopped = true;
+        console.log("stopped is "+this.stopped)
     },
     init: function(strt) {
         this.stopped = false;
@@ -131,6 +133,9 @@ TribeMover.prototype = {
                         var r = route.concat([last]);
                         var from = _.last(route);
                         
+                        // Do not travel to neighbour by sea
+                        if (_.contains(findMap[from].neighbours, last)) return;
+                        
                         var ccost = {
                             max: cost.max,
                             burn: _.clone(cost.burn),
@@ -186,6 +191,7 @@ TribeMover.prototype = {
                 
                 var maxs = [];
                 var shortest = 9;
+                var shortestSB = 9;
                 var shortestS = 9;
                 
                 var straight = _.find(via, function(v) {
@@ -202,6 +208,7 @@ TribeMover.prototype = {
                     if (v.burn.length == 0 && _.first(v.sea) && _.first(v.sea)[0] == fk)
                     {
                         maxs.push(v.max);
+                        shortestS = 1;
                         return true;
                     }
                 });
@@ -216,13 +223,23 @@ TribeMover.prototype = {
                     }
                 });
                 
+                var shortSeaTravels = [];
                 var shortestSea = _.filter(via, function(v) {
                     if (_.isEqual(v,straightSea)) return false;
                     if (straightSea && _.first(v.sea) == fk) return false;
                     if (_.any(shortestLand, function(s) { return _.isEqual(s.burn, v.burn) })) return false;
-                    if  (v.sea.length > 0 && v.burn.length <= shortestS)
+                    var strPr = _.map(v.sea, function(s) { return s.toString(); });
+                    if  (v.sea.length > 0 &&
+                         v.sea.length <= shortestS &&
+                         v.burn.length <= shortestSB &&
+                         !_.any(shortSeaTravels, function(s) {
+                             return _.intersection(strPr, s).length == s.length;
+                         })
+                         )
                     {
-                        shortestS = v.burn.length;
+                        shortSeaTravels.push(strPr)
+                        shortestSB = v.burn.length;
+                        shortestS = v.sea.length;
                         maxs.push[v.max];
                         return true;
                     }
@@ -238,13 +255,18 @@ TribeMover.prototype = {
                 via = [];
                 
                 if (straight) via = via.concat([straight]);
-                if (straightSea) via = via.concat([straightSea]);
-                via = via.concat(shortestLand);
-                via = via.concat(shortestSea);
-                via = via.concat(missingMaxes);
+                
+                // Neighbours with straight connection should use only that!
+                if (!straight || !_.contains(this.map[fk].neighbours, parseInt(tk)))
+                {
+                    if (straightSea) via = via.concat([straightSea]);
+                    via = via.concat(shortestLand);
+                    via = via.concat(shortestSea);
+                    via = via.concat(missingMaxes);
+                }
                 
                 viaMap[fk][tk] = _.uniq(via, JSON.stringify);
-            });
+            }, this);
         }, this);
         debug && console.log("viaMap")
         debug && console.log(util.inspect(viaMap, false, 5))
@@ -456,6 +478,10 @@ TribeMover.prototype = {
                         if (lastOne && this.start[k] + a[k] + i != this.end[k])
                             continue;
                             
+                        // If there is too much stuff already at the target
+                        if (this.start[k] + a[k] + i > this.end[k])
+                            continue;
+                            
                         var aa = _.clone(a);
                         aa[k] += i;
                         // if there is too much moved already to target
@@ -638,6 +664,7 @@ TribeMover.prototype = {
         while (!nn.done)
         {
             if (this.stopped) {
+                console.log("Stopped: DONE")
                 valid.ok = "stopped";
                 return valid;
             }

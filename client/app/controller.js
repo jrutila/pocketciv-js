@@ -146,9 +146,6 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
     }
     
     function handleOk(ok) {
-        console.log("handleOk")
-        console.log(ok)
-        $scope.mapTitle = "MOVE";
         if (ok.ok)
         {
             _.each(ok.target, function(t, reg) {
@@ -166,6 +163,7 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
             moveFrom = 0;
             clearRegions();
         } else {
+            $scope.moveFailed = true;
             drawMovement();
         }
     }
@@ -176,6 +174,11 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
     
     $scope.moveReset = function() {
         $scope.movement = getMovement($scope.engine.map.areas);
+        /*
+        _.each($scope.engine.map.areas, function(t, reg) {
+            drawElem("seacost", reg, false);
+        });
+        */
     }
     
     $scope.$on("mapClick", function(event, region) {
@@ -191,13 +194,27 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
                 moveFrom = region;
                 selectRegion(region);
             }
+        } else if (moveFrom == region) {
+            moveFrom = 0;
+            clearRegions();
         } else {
             var movement = _.clone($scope.movement);
             movement[moveFrom]--;
             movement[region]++;
-            drawMovement(movement);
+            $scope.moveFailed = false;
             $scope.mover.ok(movement);
+            setTimeout(function() {
+                if (!$scope.moveFailed)
+                {
+                    drawMovement(movement);
+                }
+            }, 300);
         }
+    });
+    
+    $scope.busy = false;
+    $scope.$watch("mover.workers.length", function(workers) {
+        $scope.busy = workers > 0;
     });
     
     var moveFrom = 0;
