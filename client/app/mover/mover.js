@@ -12,7 +12,6 @@ function ClientMover()
             if (msg.data.mover) {
                 console.log("Got mover",msg.data.mover)
                 self.mover = msg.data.mover;
-                
             }
             else if (msg.data != "final")
                 self.valid(msg.data);
@@ -77,6 +76,11 @@ ClientMover.prototype.ok = function(target) {
     console.log(target);
     if (this.worker)
     {
+        if (!this.mover)
+        {
+            console.log("Mover not ready!")
+            return;
+        }
         var self = this;
         var prevWorker = this.worker;
         prevWorker.onmessage = function(msg) {

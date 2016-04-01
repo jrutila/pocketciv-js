@@ -174,11 +174,9 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
     
     $scope.moveReset = function() {
         $scope.movement = getMovement($scope.engine.map.areas);
-        /*
         _.each($scope.engine.map.areas, function(t, reg) {
             drawElem("seacost", reg, false);
         });
-        */
     }
     
     $scope.$on("mapClick", function(event, region) {
@@ -558,7 +556,7 @@ var changeString = function(chg) {
     }
     
     $scope.$watch(function(){ return $scope.engine.phase; }, function(name) {
-        if (loading || !name) return;
+        if ($scope.loading || !name) return;
         if (name == 'advance')
         {
             console.log("gameLog advance")
@@ -583,12 +581,12 @@ var changeString = function(chg) {
         $scope.$storage[$scope.gameName] = JSON.stringify($localStorage.gameLog);
     }
     
-    var loading = false;
+    $scope.loading = false;
     $scope.loadGamePlay = function(name, game) {
         $scope.gameName = name;
         console.log("run: "+game)
         $localStorage.gameLog = JSON.parse(game);
-        loading = true;
+        $scope.loading = true;
         $scope.engine.phase = "populate";
         runplay.run($scope.engine, JSON.parse(game), function() { loading = false; })
     }
@@ -790,6 +788,7 @@ var changeString = function(chg) {
     
     $scope.load = function(scen, name, gameLog) {
         console.log("Loading "+name);
+        $scope.loading = true;
         $scope.resetUI();
         resetGameLog(scen);
         $scope.map = new  pocketciv.MapBuild();
@@ -817,6 +816,7 @@ var changeString = function(chg) {
         
         $scope.welcome = false;
         engine = $scope.engine;
+        $scope.loading = false;
     };
     
     var paintMap = function(map) {

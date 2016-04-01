@@ -21,25 +21,28 @@ onmessage = function(msg) {
         self.mover.ngh2 = msg.data.mover.ngh2;
     }
     
-    console.log("Checking for ok in Move Worker")
-    var ok = self.mover.ok(msg.data.situation,
-        function(ok) {
-            // Found valid, not necessarily cheapest
-            console.log("Ok",ok);
+    if (msg.data.situation)
+    {
+        console.log("Checking for ok in Move Worker")
+        var ok = self.mover.ok(msg.data.situation,
+            function(ok) {
+                // Found valid, not necessarily cheapest
+                console.log("Ok",ok);
+                postMessage(ok);
+            }
+        );
+        //var millis = 2000;
+        //var date = new Date();
+        //var curDate = null;
+        //do { curDate = new Date(); }
+        ////while(curDate-date < millis);
+        if (ok.ok != "stopped") {
+            console.log("Calculated",ok);
+            console.log("TODO: Cache this fastest one")
             postMessage(ok);
+            postMessage("final");
+        } else {
+            console.log("Mover was stopped!")
         }
-    );
-    //var millis = 2000;
-    //var date = new Date();
-    //var curDate = null;
-    //do { curDate = new Date(); }
-    ////while(curDate-date < millis);
-    if (ok.ok != "stopped") {
-        console.log("Calculated",ok);
-        console.log("TODO: Cache this fastest one")
-        postMessage(ok);
-        postMessage("final");
-    } else {
-        console.log("Mover was stopped!")
     }
 }

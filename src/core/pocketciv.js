@@ -307,9 +307,6 @@ Engine.prototype = {
         this.acquired = [];
         for (var a in state.acquired)
             this.acquire(state.acquired[a]);
-            
-        if (this.phase)
-            this.runPhase(this.phase);
     },
     get state() {
         var ret = {};

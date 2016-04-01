@@ -870,6 +870,30 @@ describe('TribeMover', function() {
             mover.ok(  { 1: 0, 2: 1, 3: 1, 4: 0 }).ok.should.be.true;
         });
     });
+    describe('two steps', function() {
+        describe('scenario 9', function() {
+            beforeEach(function() {
+                //
+                map = {
+                    "1": { "id": 1, "tribes": 1, "forest": true, "mountain": true, "neighbours": [ 7, 8, 'sea', 'frontier'], },
+                    "2": { "id": 2, "desert": true, "neighbours": [ 3, 4, 5, 'frontier'], },
+                    "3": { "id": 3, "forest": true, "volcano": true, "neighbours": [ 2, 5, 'sea', 'frontier'] , },
+                    "4": { "id": 4, "forest": true, "mountain": true, "neighbours": [ 2, 5, 'sea', 'frontier'] },
+                    "5": { "id": 5, "forest": true, "neighbours": [ 2, 3, 4, 'sea'], },
+                    "6": { "id": 6, "tribes": 1, "city": 2, "forest": true, "neighbours": [ 7, 8, 'sea', 'frontier'], },
+                    "7": { "id": 7, "tribes": 1, "forest": true, "fault": true, "neighbours": [ 1, 6, 8, 'frontier' ] },
+                    "8": { "id": 8, "tribes": 1, "forest": true, "neighbours": [ 1, 6, 7, 'sea', 'frontier'], },
+                }
+                mover = new pocketciv.TribeMover(map, 2, 1);
+            });
+            it('case 1', function() {
+                mover.init({ 1: 3, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0 });
+                var ok =
+                mover.ok(  { 1: 2, 2: 0, 3: 0, 4: 1, 5: 0, 6: 0, 7: 0, 8: 0 });
+                ok.ok.should.be.true;
+            });
+        });
+    });
     describe('slow ones', function() {
         describe('scenario 7', function() {
             beforeEach(function() {
@@ -921,7 +945,7 @@ describe('TribeMover', function() {
                 ok.cost.should.deep.equal([{ 1: 2 }]);
             });
         });
-        describe.only('scenario 13', function() {
+        describe('scenario 13', function() {
             beforeEach(function() {
                 //     2
                 //
