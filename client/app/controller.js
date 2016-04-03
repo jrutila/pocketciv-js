@@ -185,6 +185,9 @@ pocketcivApp.controller('MainGame', function ($scope, $http, $localStorage, $ana
         // Something does this sometimes, this fixes
         delete $scope.movement["NaN"];
         
+        if (!$scope.mover.mover)
+            return;
+        
         if (moveFrom == 0)
         {
             if ($scope.movement[region] > 0)
