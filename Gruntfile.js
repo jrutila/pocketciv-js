@@ -159,7 +159,7 @@ module.exports = function (grunt) {
       onlymin: {
         files: [
           {src: [
-            '.build/js/*.js', '!.build/js/*.min.js'
+            '!.build/js/*.js', '!.build/js/*.min.js'
           ]},
           {src: [
             '.build/css/*.css', '!.build/css/*.min.css', '!.build/css/sprites.css'
