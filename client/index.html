@@ -153,12 +153,13 @@
     <div id="deck" ng-class="{ pushed: hideDrawer }">
         <span id="cardsLeft">{{ deck.cardsLeft }}</span>
         <div ng-if="!hideDrawer">
+            <span class="draw">DRAW!</span>
             <button class="draw" ng-click="drawCard()" hotkey="{ space: drawCard }">draw</button>
             <button class="stop" ng-click="drawCard(true)" ng-show="showStopper">stop</button>
         </div>
         <input type="text" ng-model="specificCard" ng-show="godMode && !hideDrawer" />
     </div>
-    <div id="card" ng-mouseover="showCard = true" ng-mouseout="showCard = false" ng-class="{ pushed: hideDrawer, shown: showCard }">
+    <div id="card" ng-show="card" ng-mouseover="showCard = true" ng-mouseout="showCard = false" ng-class="{ pushed: hideDrawer, shown: showCard }">
         <span class="circle border">
             <span class="inner">{{ card.circle }}</span>
         </span>
@@ -166,7 +167,7 @@
         <span class="hexagon border">
             <span class="inner" data-val="{{ card.hexagon }}">{{ card.hexagon }}</span>
         </span>
-        <span class="friendly">{{ card.friendly }}</span>
+        <span ng-show="card.friendly" class="friendly">{{ card.friendly }}</span>
         <span class="gold">{{ card.gold }}</span>
         <span class="id">{{ card.id }}</span>
         <ul class="list-unstyled">

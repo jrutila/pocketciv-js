@@ -39,7 +39,7 @@ body.initiating {
     height: $cardHeight;
     z-index: 100;
     bottom: 3px;
-    right: $cardWidth + $deckRightMargin * 2;
+    right: $cardWidth + $cardBorderSize + $deckRightMargin * 2;
 }
 
 #deck {

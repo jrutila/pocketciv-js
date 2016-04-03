@@ -1,7 +1,10 @@
 @import "Hexagon.scss";
+@import "sprite/sprites.scss";
 
 $cardSymbolSize: 30px;
 $borderSize: 3px;
+$cardBorderSize: 5px;
+$cardBorderRadius: 18px;
 $hexColor-border: lightBlue;
 $hexColor-inner: black;
 $hexColor-text: lightBlue;
@@ -17,11 +20,16 @@ $eventTop: 70px;
 $eventTextColor: black;
 $deckPeek: 50px;
 $deckRightMargin: 2px;
-$deckColor: $color-primary-4;
+$deckColor: $color-primary-3;
+$deckBorderColor: $color-primary-4;
+$cardColor: $color-primary-3;
+$cardBorderColor: $color-primary-2;
 $cardsLeftColor: $color-primary-2;
 
 #card {
-    background-color: $deckColor;
+    background-color: $cardColor;
+    border: $cardBorderSize solid $cardBorderColor;
+    border-radius: $cardBorderRadius;
     
     .hexagon.border {
         @include hex($cardSymbolSize, $hexColor-border, horizontal);
@@ -94,9 +102,21 @@ $cardsLeftColor: $color-primary-2;
         display: inline-block;
     }
     
+    $handshakeZoom: 0.5;
+    
+    .friendly {
+        display: inline-block;
+        text-indent: -10000px;
+        background-image: url($handshake-image);
+        background-position: $handshake-offset-x * $handshakeZoom $handshake-offset-y * $handshakeZoom;
+        background-size: $handshake-total-width * $handshakeZoom;
+        width: $handshake-width * $handshakeZoom;
+        height: $handshake-height * $handshakeZoom;
+    }
+    
     ul {
         top: $eventTop;
-        left: 10px;
+        left: 5px;
         width: $cardWidth - 20;
         position: absolute;
         .event {
@@ -128,7 +148,15 @@ $cardsLeftColor: $color-primary-2;
 
 #deck {
     background-color: $deckColor;
-    
+    border: $cardBorderSize solid $deckBorderColor;
+    border-radius: $cardBorderRadius;
+background: 
+linear-gradient(63deg, $deckBorderColor 23%, transparent 23%) 7px 0, 
+linear-gradient(63deg, transparent 74%, $deckBorderColor 78%), 
+linear-gradient(63deg, transparent 34%, $deckBorderColor 38%, $deckBorderColor 58%, transparent 62%), 
+$deckColor;
+background-size: 16px 48px;    
+
     #cardsLeft {
         color: $cardsLeftColor;
     }
@@ -140,7 +168,16 @@ $cardsLeftColor: $color-primary-2;
     button.draw {
         width: 100%;
         height: 100%;
-        opacity: 0.2;
+        opacity: 0.0;
+    }
+    
+    span.draw {
+        text-align: center;
+        display: block;
+        pointer-events: none;
+        font-size: 20px;
+        font-weight: bold;
+        color: $cardsLeftColor;
     }
     
     button.stop {

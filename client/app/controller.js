@@ -807,6 +807,8 @@ var changeString = function(chg) {
         }
         $scope.engine.init(scen);
         
+        if (_.last($scope.engine.deck.usedCards))
+            $scope.card = $scope.deck.specific(_.last($scope.engine.deck.usedCards));
         $scope.mapHex = new Map($scope.engine.map);
         $scope.mapArea = _.clone($scope.mapHex);
         $scope.mapArea.width = Math.ceil($scope.mapArea.width - 80);
