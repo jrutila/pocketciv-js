@@ -33,6 +33,8 @@
     "express": "^4.8.4",
     "generator-express": "^2.0.5",
     "mongoskin": "~2.0.3",
+    "mongodb": "~2.0",
+    "kerberos": "~0.0",
     "debug": "*",
     "body-parser": "^1.6.4",
     "signals": "^1.0.0",
