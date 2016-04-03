@@ -190,7 +190,7 @@ module.exports = {
             }
         },
         {
-            element: "#deck .draw",
+            element: "#deck button.draw",
             title: "Event Deck",
             placement: "top",
             content: "Events are determined by drawing an Event Card from the Deck. \
@@ -203,6 +203,7 @@ module.exports = {
             onShown: disableNext,
             onHide: function(tour) {
                 $("#eventRunner").addClass("hidden");
+                debugger;
                 $("#deck .draw").addClass("hidden");
             },
             reflex: true
@@ -246,7 +247,7 @@ module.exports = {
             },
         },
         {
-            element: "#deck .draw",
+            element: "#deck button.draw",
             title: "Region Card",
             placement: "top",
             content: "In Earthquake (and actually many others) you first determine the <strong>Active \
@@ -366,7 +367,7 @@ module.exports = {
             reflex: true,
         },
         {
-            element: "#deck .draw",
+            element: "#deck button.draw",
             title: "Event Card",
             placement: "top",
             content: "Draw the next Event",
@@ -413,7 +414,7 @@ module.exports = {
             reflex: true,
         },
         {
-            element: "#deck .draw",
+            element: "#deck button.draw",
             title: "Event Card",
             placement: "top",
             content: "Draw the next Event and hope that it does not \
@@ -423,7 +424,7 @@ module.exports = {
             prev: -1
         },
         {
-            element: "#deck .draw",
+            element: "#deck button.draw",
             title: "Region Card",
             placement: "top",
             content: "Okay, <strong>Famine</strong>. Get \
@@ -558,7 +559,7 @@ module.exports = {
             reflex: true,
         },
         {
-            element: "#deck .draw",
+            element: "#deck button.draw",
             title: "Event Card",
             placement: "top",
             content: "Again, the exciting part of the game...",
@@ -568,7 +569,7 @@ module.exports = {
             delay: delay
         },
         {
-            element: "#deck .draw",
+            element: "#deck button.draw",
             title: "Region Card",
             placement: "top",
             content: "<strong>Flood</strong> is a bad one. It can turn into a \
@@ -692,7 +693,7 @@ module.exports = {
             reflex: true,
         },
         {
-            element: "#deck .draw",
+            element: "#deck button.draw",
             title: "Event Card",
             placement: "top",
             content: "What will it be? <i>drum roll</i>",
@@ -748,7 +749,7 @@ module.exports = {
             reflex: true,
         },
         {
-            element: "#deck .draw",
+            element: "#deck button.draw",
             title: "Event Card",
             placement: "top",
             content: "Let's see if the plan sticks.",
@@ -772,7 +773,7 @@ module.exports = {
             }
         },
         {
-            element: "#deck .draw",
+            element: "#deck button.draw",
             title: "Region Card",
             placement: "top",
             content: "<strong>Epidemic</strong> starts from some Region and \
@@ -787,7 +788,7 @@ module.exports = {
             }
         },
         {
-            element: "#deck .draw",
+            element: "#deck button.draw",
             title: "Population Loss",
             placement: "top",
             content: "The Epidemic spreads from Region <span class='areaCode'>7</span>. \
