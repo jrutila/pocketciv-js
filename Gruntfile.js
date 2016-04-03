@@ -717,7 +717,7 @@ module.exports = function (grunt) {
       'sprite',
       'injector:sass',
       'sass',
-      'uglify',
+      //'uglify',
       'autoprefixer',
       'cssmin',
       'clean:onlymin',

@@ -21,7 +21,7 @@
     "jquery": "~2.1.1",
     "underscore": "~1.8.2",
     "angular": "~1.2.20",
-    "bootstrap": "~3.2.0",
+    "bootstrap": "~3.3.6",
     "ngstorage": "~0.3.0",
     "angular-snap": "~1.5.4",
     "angular-bootstrap": "~0.11.0",
