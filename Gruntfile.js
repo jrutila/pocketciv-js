@@ -634,7 +634,7 @@ module.exports = function (grunt) {
           transform: function(filePath) {
             filePath = filePath.replace('/.build/', '');
             filePath = filePath.replace('/.tmp/', '');
-            return '<link rel="stylesheet" href="' + filePath + '">';
+            return '<link rel="stylesheet" href="' + filePath + '"/>';
           },
           starttag: '<!-- injector:css -->',
           endtag: '<!-- endinjector -->'
@@ -723,7 +723,7 @@ module.exports = function (grunt) {
       'clean:onlymin',
       'rev',
       'injector', 
-      'htmlmin',
+      //'htmlmin',
       
       
       /*
