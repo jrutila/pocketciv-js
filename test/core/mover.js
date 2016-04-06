@@ -855,6 +855,40 @@ describe.only('TribeMover', function() {
             
         });
     });
+    describe('scenario 6', function() {
+        beforeEach(function() {
+            /*   1 - 7
+               / | / |
+              2--3 - 4
+              | / \ /
+               5 - 8 - 6
+            */
+            map = {
+             "1": { "id":  1, "neighbours": [2,3,7], },
+             "2": { "id":  2, "neighbours": [1,3,5,'sea'], },
+             "3": { "id":  3, "neighbours": [1,2,4,5,7,8,'sea'] , },
+             "4": { "id":  4, "neighbours": [3,7,8] },
+             "5": { "id":  5, "neighbours": [2,3,8,'sea'], },
+             "6": { "id":  6, "neighbours": [8,'sea'], },
+             "7": { "id":  7, "neighbours": [1,3,4], },
+             "8": { "id":  8, "neighbours": [3,4,5,6,'sea'], },
+            }
+        });
+        it('works', function() {
+            mover = new pocketciv.TribeMover(map);
+            mover.init({ 1: 3, 2: 2, 3: 2, 4: 2, 5: 2, 6: 0, 7: 2, 8: 0 });
+            var ok =
+            mover.ok(  { 1: 2, 2: 1, 3: 1, 4: 1, 5: 6, 6: 0, 7: 2, 8: 0 });
+            ok.ok.should.be.true;
+        });
+        it('weird stuff', function() {
+            mover = new pocketciv.TribeMover(map);
+            mover.init({ 1: 3, 2: 2, 3: 2, 4: 2, 5: 2, 6: 0, 7: 2, 8: 0 });
+            var ok =
+            mover.ok(  { 1: 3, 2: 1, 3: 1, 4: 1, 5: 6, 6: 0, 7: 1, 8: 0 });
+            ok.ok.should.be.true;
+        });
+    });
     describe('simple with two steps', function() {
         beforeEach(function() {
             // 1 - 2 - 3 - 4

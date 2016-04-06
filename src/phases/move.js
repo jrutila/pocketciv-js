@@ -213,11 +213,16 @@ TribeMover.prototype = {
                     }
                 });
                 
+                var shortestBurns = [];
                 var shortestLand = _.filter(via, function(v) {
                     if (_.isEqual(v,straight)) return false;
-                    if  (v.sea.length == 0 && v.burn.length <= shortest)
+                    if  (v.sea.length == 0 && (v.burn.length <= shortest ||
+                        _.intersection(shortestBurns, v.burn).length == 0
+                    ))
                     {
-                        shortest = v.burn.length;
+                        if (v.burn.length <= shortest)
+                            shortest = v.burn.length;
+                        shortestBurns = _.union(shortestBurns, v.burn);
                         maxs.push[v.max];
                         return true;
                     }
